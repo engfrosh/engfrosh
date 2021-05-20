@@ -8,11 +8,14 @@ import json
 
 import threading
 
-import uuid
 import psycopg2
 import asyncio
 
-from . import rabbit_listener
+USE_RABBIT = False
+USE_POSTGRES = False
+
+if USE_RABBIT:
+    from . import rabbit_listener
 
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
@@ -46,23 +49,15 @@ logger.debug("Set current directory as: %s", CURRENT_DIRECTORY)
 # endregion
 
 
-# import queue_protocol
-
-# from django.conf import settings
-
-
 # region Load Settings
 with open(CURRENT_DIRECTORY + "/credentials.json") as f:
     bot_token = json.load(f)["bot_token"]
-# Fix these
 # endregion
 
 client = discord.Client()
 # TODO Change this to a discord bot instead of client
 
 # region Discord Events
-
-# sql_connection = None
 
 
 @client.event
@@ -72,14 +67,16 @@ async def on_ready():
     # region Launch Queue Listener
     # You shouldn't have to change anything in here.
     # To add more functions add them to handle_queued_command
-    discord_loop = asyncio.get_running_loop()
-    rabbit_thread = threading.Thread(target=rabbit_listener.rabbit_main,
-                                     args=(discord_loop, discord_queue_callback, RABBIT_HOST, QUEUE))
-    rabbit_thread.start()
-    global sql_connection
-    sql_connection = psycopg2.connect(database="engfrosh", user="discord_engfrosh",
-                                      password="there-exercise-fenegel", host="localhost", port="5432")
-    sql_connection.set_session(autocommit=True)
+    if USE_RABBIT:
+        discord_loop = asyncio.get_running_loop()
+        rabbit_thread = threading.Thread(target=rabbit_listener.rabbit_main,
+                                         args=(discord_loop, discord_queue_callback, RABBIT_HOST, QUEUE))
+        rabbit_thread.start()
+    if USE_POSTGRES:
+        global sql_connection
+        sql_connection = psycopg2.connect(database="engfrosh", user="discord_engfrosh",
+                                          password="there-exercise-fenegel", host="localhost", port="5432")
+        sql_connection.set_session(autocommit=True)
     # endregion
 
     return
@@ -94,8 +91,6 @@ async def on_message(message):
 # endregion
 
 # region Discord application commands
-
-# This should be cleaned up
 
 
 def set_command_status(command_id, status, error_msg=""):
@@ -130,18 +125,6 @@ async def discord_queue_callback(command: dict):
     else:
         logger.warning("Object type %s not supported. Ignoring command" % command["object"])
         return
-
-
-# async def send_discord_message(channel_id, message):
-#     channel = client.get_channel(channel_id)
-#     await channel.send(message)
-#     return
-# endregion
-
-# region Rabbit Queue Handler
-
-
-# endregion
 
 
 # region program start
