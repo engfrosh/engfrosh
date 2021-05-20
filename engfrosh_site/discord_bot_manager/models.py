@@ -4,7 +4,7 @@ import uuid
 
 
 class DiscordCommandStatus(models.Model):
-    command_id = models.UUIDField("Command ID", primary_key=True, unique=True, editable=False, default=uuid.uuid4())
+    command_id = models.UUIDField("Command ID", primary_key=True, unique=True, editable=False, default=uuid.uuid4)
     status = models.CharField("Command Status", max_length=4,
                               choices=[("PEND", "Pending"),
                                        ("SUCC", "Succeeded"),
