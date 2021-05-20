@@ -24,7 +24,7 @@ To activate the environment on windows, run:
 $ venv\Scripts\activate.bat
 ```
 
-To activate in powershell run:
+To activate in PowerShell run:
 ```powershell
 venv\Scripts\activate.ps1
 ```

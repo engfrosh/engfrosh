@@ -82,7 +82,7 @@ DATABASES = {
         "PASSWORD": "there-exercise-fenegle",
         "HOST": "localhost",
         "PORT": "5432",
-}}
+    }}
 
 
 # Password validation

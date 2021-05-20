@@ -12,9 +12,9 @@ PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 # Hack for development to get around import issues
 sys.path.append(PARENT_DIRECTORY)
 
-from engfrosh_common import rabbitmq_sender
+from engfrosh_common import rabbitmq_sender # noqa E402
 
-from discord_bot_manager.models import DiscordCommandStatus
+from discord_bot_manager.models import DiscordCommandStatus # noqa E402
 
 logger = logging.getLogger("DiscordPublisher")
 
@@ -60,5 +60,6 @@ class TextChannel(DiscordPublisher):
         }
         return self._send_message(d)
 
-def check_command_status(command_id:str):
+
+def check_command_status(command_id: str):
     return DiscordCommandStatus.objects.get(command_id=command_id).get_status()
