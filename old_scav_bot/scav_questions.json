@@ -1,0 +1,34 @@
+[
+    {
+        "clue": "What is my favorite colour?",
+        "answer": "BLUEXXXXXX",
+        "hint": "What Colour is the sky, padded by XXXXXXs"
+    },
+    {
+        "clue": "What type of plant do I have?",
+        "answer": "SNAKEPLANT",
+        "hint": "SSSSSSSSSSSSS"
+    },
+    {
+        "clue": "https://www.youtube.com/watch?v=DLzxrzFCyOs",
+        "answer": "RICKASTLEY"
+    },
+    {
+        "clue": "What are the numbers from 0 to 9?",
+        "answer": "0123456789"
+    },
+    {
+        "clue": "Who's Boat?",
+        "answer": "NAVIGATION",
+        "file": "files/GrantMeme.jpg",
+        "file_display_name": "BoatMeme.jpg"
+    },
+    {
+        "clue": "How am I feeling?",
+        "answer": "annoyed",
+        "file": "files/GrantFrosh.jpg",
+        "hint": "Am I annoying you?",
+        "hint_file": "files/GrantFrosh.jpg",
+        "hint_file_display": "Hint.jpg"
+    }
+]

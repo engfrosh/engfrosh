@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'discord_bot_manager.apps.DiscordBotManagerConfig'
 ]
 
 MIDDLEWARE = [
@@ -75,10 +76,13 @@ WSGI_APPLICATION = 'engfrosh_site.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "engfrosh",
+        "USER": "django_engfrosh",
+        "PASSWORD": "there-exercise-fenegle",
+        "HOST": "localhost",
+        "PORT": "5432",
+    }}
 
 
 # Password validation
