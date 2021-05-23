@@ -102,7 +102,11 @@ def set_command_status(command_id, status, error_msg=""):
     # command_obj.error_message = error_msg
     return
 
-
+@client.command(pass_context=True) #this command is temporary, to keep the functionality of how to react to a message easy and here.
+async def react(ctx):
+    await ctx.message.add_reaction("🍋")
+    await ctx.channel.send("did it work?")
+    
 async def discord_queue_callback(command: dict):
     if command["object"] == "discord.TextChannel":
         # command.pop("object")
