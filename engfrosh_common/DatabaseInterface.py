@@ -75,7 +75,7 @@ class DatabaseInterface():
 
     async def get_group_id(self, *, group_name=None, scav_channel_id=None):
         if group_name:
-            sql = "SELECT id FROM auth_group WHERE name = ?;"
+            sql = f"SELECT id FROM auth_group WHERE name = {self._qp()};"
             row = await self._fetchrow(sql, (group_name,))
             if row:
                 return row["id"]
@@ -83,7 +83,7 @@ class DatabaseInterface():
                 return None
 
         elif scav_channel_id:
-            sql = "SELECT group_id FROM discord_bot_manager_scavchannel WHERE channel_id = ?;"
+            sql = f"SELECT group_id FROM discord_bot_manager_scavchannel WHERE channel_id = {self._qp()};"
             row = await self._fetchrow(sql, (scav_channel_id,))
             if row:
                 return row["group_id"]
@@ -96,7 +96,7 @@ class DatabaseInterface():
     async def get_user_id(self, *, discord_id=None):
 
         if discord_id:
-            sql = "SELECT * FROM authentication_discorduser WHERE id = ?;"
+            sql = f"SELECT * FROM authentication_discorduser WHERE id = {self._qp()};"
             row = await self._fetchrow(sql, (discord_id,))
             if row:
                 return row["user_id"]
@@ -111,7 +111,7 @@ class DatabaseInterface():
     # region CHECK methods
 
     async def check_user_in_group(self, user_id=None, group_name=None, discord_user_id=None, group_id=None):
-        sql = "SELECT * FROM auth_user_groups WHERE user_id = ? AND group_id = ?;"
+        sql = f"SELECT * FROM auth_user_groups WHERE user_id = {self._qp(1)} AND group_id = {self._qp(2)};"
 
         if not group_id:
             group_id = await self.get_group_id(group_name=group_name)
@@ -127,7 +127,7 @@ class DatabaseInterface():
 
     # endregion
 
-        # region ADD methods
+    # region ADD methods
 
     async def add_group(self, group_name):
         """Then returns the new group id"""
@@ -200,7 +200,7 @@ class DatabaseInterface():
         if self._is_postgres():
             await self._ensure_pool()
             async with self.pool.acquire() as conn:
-                row = await conn.fetchrow(sql, parameters)
+                row = await conn.fetchrow(sql, *parameters)
 
         elif self._is_sqlite():
             cur = self.connection.cursor()
@@ -227,6 +227,18 @@ class DatabaseInterface():
 
     def _is_sqlite(self):
         return self.db == "SQLITE"
+
+    def _qp(self, num=1):
+        """Alias for _get_query_parameter"""
+        return self._get_query_parameter(num)
+
+    def _get_query_parameter(self, num=1):
+        if self._is_sqlite():
+            return "?"
+        elif self._is_postgres():
+            return f"${num}"
+        else:
+            raise NotImplementedError("Databases other than Postgres or SQLite not supported.")
     # endregion
 
     def __del__(self):
