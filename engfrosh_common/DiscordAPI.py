@@ -2,14 +2,22 @@ import requests
 import datetime
 from oauthlib.oauth2 import WebApplicationClient
 
+
+
 import logging
-import os
 
 logger = logging.getLogger("DiscordAPI")
 
 DISCORD_API_URL = "https://discord.com/api"
 TOKEN_URL_PATH = "/oauth2/token"
 AUTHERIZATION_API_URL_PATH = "/oauth2/authorize"
+
+# Temp db credentials
+DATABASE = "engfrosh"
+USER = "discord_engfrosh"
+PASSWORD = "there-exercise-fenegel"
+HOST = "localhost"
+PORT = "5432"
 
 
 class DiscordAPI():
@@ -116,3 +124,6 @@ def get_authorization_url(version=None):
 def get_token_url(version=None):
     return get_api_url(version) + TOKEN_URL_PATH
 # endregion
+
+
+
