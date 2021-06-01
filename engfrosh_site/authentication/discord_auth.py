@@ -15,7 +15,7 @@ PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 # Hack for development to get around import issues
 sys.path.append(PARENT_DIRECTORY)
 
-from engfrosh_common.discord_api import DiscordAPI  # noqa E402
+from engfrosh_common.DiscordAPI import DiscordAPI  # noqa E402
 
 
 logger = logging.getLogger(__name__)

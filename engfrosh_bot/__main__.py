@@ -8,8 +8,8 @@ import json
 
 import threading
 
-import psycopg2
 import asyncio
+import asyncpg
 
 USE_RABBIT = False
 USE_POSTGRES = False

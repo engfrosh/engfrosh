@@ -1,10 +1,22 @@
+from sqlite3.dbapi2 import IntegrityError
 import asyncpg
 import sqlite3
+
+import logging
+import os
+
+CURRENT_DIRECTORY = os.path.dirname(__file__)
+SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
+
+LOG_LEVEL = logging.DEBUG
+
+logger = logging.getLogger(SCRIPT_NAME)
+
 
 SQLITE_INIT = [
     """ CREATE TABLE IF NOT EXISTS auth_group (
             id integer PRIMARY KEY,
-            name text NOT NULL
+            name text NOT NULL UNIQUE
             );""",
     """ CREATE TABLE IF NOT EXISTS auth_user_groups (
             id integer PRIMARY KEY,
@@ -14,14 +26,18 @@ SQLITE_INIT = [
     """ CREATE TABLE IF NOT EXISTS authentication_discorduser (
             id integer PRIMARY KEY,
             discord_username text,
-            discriminator integer, 
+            discriminator integer,
             user_id NOT NULL
+            );""",
+    """ CREATE TABLE IF NOT EXISTS discord_bot_manager_scavchannel (
+            channel_id integer PRIMARY KEY,
+            group_id integer NOT NULL
             );"""
 ]
 
 # TODO Sync these tables up better with what Django does and proper database technique, etc
 
-DEFAULT_SQLITE_DB = "default.db"
+DEFAULT_SQLITE_DB = "default_name.db"
 
 
 class DatabaseInterface():
@@ -55,35 +71,27 @@ class DatabaseInterface():
             for command in SQLITE_INIT:
                 self.connection.cursor().execute(command)
 
-    async def get_group_id(self, group_name):
-        sql = "SELECT id FROM auth_group WHERE name = ?;"
-        row = await self._fetchrow(sql, (group_name,))
-        return row["id"]
+    # region GET methods
 
-    async def add_group(self, group_name):
-        """Then returns the new group id"""
-        if self._is_sqlite():
-            cur = self.connection.cursor()
-            cur.execute(""" INSERT INTO auth_group(name) VALUES(?)""", (group_name,))
-            self.connection.commit()
-            return cur.lastrowid
+    async def get_group_id(self, *, group_name=None, scav_channel_id=None):
+        if group_name:
+            sql = "SELECT id FROM auth_group WHERE name = ?;"
+            row = await self._fetchrow(sql, (group_name,))
+            if row:
+                return row["id"]
+            else:
+                return None
+
+        elif scav_channel_id:
+            sql = "SELECT group_id FROM discord_bot_manager_scavchannel WHERE channel_id = ?;"
+            row = await self._fetchrow(sql, (scav_channel_id,))
+            if row:
+                return row["group_id"]
+            else:
+                return None
+
         else:
-            raise NotImplementedError("Adding groups not currently supported outside SQLite")
-
-    async def check_user_in_group(self, user_id=None, group_name=None, discord_user_id=None, group_id=None):
-        sql = "SELECT * FROM auth_user_groups WHERE user_id = ? AND group_id = ?;"
-
-        if not group_id:
-            group_id = self.get_group_id(group_name)
-
-        if not user_id:
-            user_id = await self.get_user_id(discord_id=discord_user_id)
-
-        row = await self._fetchone(sql, (user_id, group_id,))
-        if row:
-            return True
-        else:
-            return False
+            raise NotImplementedError("Must pass one parameter to get group id.")
 
     async def get_user_id(self, *, discord_id=None):
 
@@ -94,26 +102,66 @@ class DatabaseInterface():
                 return row["user_id"]
             else:
                 return None
-                
+
         else:
             raise NotImplementedError
+
+    # endregion
+
+    # region CHECK methods
+
+    async def check_user_in_group(self, user_id=None, group_name=None, discord_user_id=None, group_id=None):
+        sql = "SELECT * FROM auth_user_groups WHERE user_id = ? AND group_id = ?;"
+
+        if not group_id:
+            group_id = await self.get_group_id(group_name=group_name)
+
+        if not user_id:
+            user_id = await self.get_user_id(discord_id=discord_user_id)
+
+        row = await self._fetchone(sql, (user_id, group_id,))
+        if row:
+            return True
+        else:
+            return False
+
+    # endregion
+
+        # region ADD methods
+
+    async def add_group(self, group_name):
+        """Then returns the new group id"""
+        if self._is_sqlite():
+            cur = self.connection.cursor()
+            try:
+                cur.execute(""" INSERT INTO auth_group(name) VALUES(?)""", (group_name,))
+                self.connection.commit()
+            except IntegrityError:
+                logger.error("IntegrityError, could not add group. A group with that name probably already exists.")
+                return None
+            return cur.lastrowid
+        else:
+            raise NotImplementedError("Adding groups not currently supported outside SQLite")
 
     async def add_discord_user(self, discord_id, user_id, discord_username=None, discriminator=None):
         sql = """INSERT INTO authentication_discorduser(id,discord_username,discriminator,user_id) VALUES(?,?,?,?);"""
 
         if self._is_sqlite():
             cur = self.connection.cursor()
-            cur.execute(sql, (discord_id, discord_username, discriminator, user_id))
+            try:
+                cur.execute(sql, (discord_id, discord_username, discriminator, user_id))
+            except IntegrityError:
+                logger.error("IntegrityError, could not add Discord user. The user probably already exists.")
             self.connection.commit()
             return True
         else:
             raise NotImplementedError("Adding groups not currently supported outside SQLite")
 
-    async def add_user_to_group(self, user_id, group_name=None, group_id=None):
+    async def add_user_to_group(self, user_id, *, group_name=None, group_id=None):
         sql = """INSERT INTO auth_user_groups(user_id,group_id) VALUES(?,?)"""
 
         if not group_id:
-            group_id = await self.get_group_id(group_name)
+            group_id = await self.get_group_id(group_name=group_name)
 
         if self._is_sqlite():
             cur = self.connection.cursor()
@@ -122,6 +170,21 @@ class DatabaseInterface():
             return True
         else:
             raise NotImplementedError("Adding groups not currently supported outside SQLite")
+
+    async def add_scav_channel(self, channel_id, group_id):
+        if self._is_sqlite():
+            sql = """INSERT INTO discord_bot_manager_scavchannel(channel_id,group_id) VALUES(?,?)"""
+            cur = self.connection.cursor()
+            try:
+                cur.execute(sql, (channel_id, group_id))
+            except IntegrityError:
+                logger.error("IntegrityError, could not add scav channel. The channel probably already exists.")
+            self.connection.commit()
+            return True
+        else:
+            raise NotImplementedError("Adding Scav channels is not currently supported outside SQLite")
+
+    # endregion
 
     # region Helper Functions
 
@@ -158,9 +221,6 @@ class DatabaseInterface():
             rows = cur.fetchall()
 
         return rows
-
-    # async def _execute(self, sql, parameters):
-    #     if self._is_sqlite():
 
     def _is_postgres(self):
         return self.db == "POSTGRES"

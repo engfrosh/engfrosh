@@ -12,7 +12,7 @@ PARENT_DIRECTORY = os.path.dirname(os.path.dirname(CURRENT_DIRECTORY))
 # Hack for development to get around import issues
 sys.path.append(PARENT_DIRECTORY)
 
-from engfrosh_common.rabbitmq_sender import RabbitMQSender # noqa E402
+from engfrosh_common.RabbitMQSender import RabbitMQSender # noqa E402
 # from discord_bot_manager import .discord_publisher # noqa E402
 from . import discord_publisher # noqa E402
 

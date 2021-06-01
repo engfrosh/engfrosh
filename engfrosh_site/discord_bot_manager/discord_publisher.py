@@ -12,7 +12,7 @@ PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 # Hack for development to get around import issues
 sys.path.append(PARENT_DIRECTORY)
 
-from engfrosh_common import rabbitmq_sender # noqa E402
+from engfrosh_common import RabbitMQSender # noqa E402
 
 from discord_bot_manager.models import DiscordCommandStatus # noqa E402
 
@@ -20,7 +20,7 @@ logger = logging.getLogger("DiscordPublisher")
 
 
 class DiscordPublisher():
-    def __init__(self, sender: rabbitmq_sender.RabbitMQSender):
+    def __init__(self, sender: RabbitMQSender.RabbitMQSender):
         self.sender = sender
 
     def _send_message(self, message_dict):
@@ -36,7 +36,7 @@ class DiscordPublisher():
 
 
 class TextChannel(DiscordPublisher):
-    def __init__(self, sender: rabbitmq_sender.RabbitMQSender, id):
+    def __init__(self, sender: RabbitMQSender.RabbitMQSender, id):
         super().__init__(sender)
         self.id = id
 

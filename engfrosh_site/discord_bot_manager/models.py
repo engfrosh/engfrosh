@@ -1,6 +1,10 @@
 from django.db import models
 
+from django.contrib.auth.models import Group
+
 import uuid
+
+from django.db.models.deletion import CASCADE
 
 
 class DiscordCommandStatus(models.Model):
@@ -23,3 +27,11 @@ class DiscordCommandStatus(models.Model):
 
     def __string__(self):
         return str(self.command_id)
+
+
+class ScavChannel(models.Model):
+    channel_id = models.BigIntegerField(primary_key=True)
+    group = models.OneToOneField(Group, on_delete=CASCADE, db_index=True)
+
+    # TODO add __string__ method
+    

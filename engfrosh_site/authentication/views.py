@@ -17,7 +17,7 @@ PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 # Hack for development to get around import issues
 sys.path.append(PARENT_DIRECTORY)
 
-from engfrosh_common.discord_api import build_oauth_authorize_url
+from engfrosh_common.DiscordAPI import build_oauth_authorize_url
 
 
 def index(request: HttpRequest):
