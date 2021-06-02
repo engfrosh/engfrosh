@@ -1,9 +1,11 @@
 from sqlite3.dbapi2 import IntegrityError
 import asyncpg
 import sqlite3
+import uuid
 
 import logging
 import os
+
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
@@ -54,11 +56,13 @@ class DatabaseInterface():
             self.db = "POSTGRES"
             self.pool = sql_pool
             self.db_credentials = None
+            logger.info("DatabaseInterface created for Postgres with sql_pool object")
 
         elif db_credentials:
             self.db = "POSTGRES"
             self.pool = None
             self.db_credentials = db_credentials
+            logger.info("DatabaseInterface created for Postgres with database credentials")
 
         else:
             self.db = "SQLITE"
@@ -68,8 +72,11 @@ class DatabaseInterface():
             self.connection = sqlite3.connect(sqlite_filename)
             self.connection.row_factory = sqlite3.Row
 
+            logger.info(f"DatabaseInterface created for SQLite at {sqlite_filename}")
+
             for command in SQLITE_INIT:
                 self.connection.cursor().execute(command)
+            logger.debug("Initialized SQLite Database")
 
     # region GET methods
 
@@ -105,6 +112,16 @@ class DatabaseInterface():
 
         else:
             raise NotImplementedError
+
+    # endregion
+
+    # region SET methods
+    async def set_discord_command_status(self, command_id, status, error_msg=""):
+        sql = f"""UPDATE discord_bot_manager_discordcommandstatus
+                    SET status = {self._qp(1)}
+                    WHERE command_id = {self._qp(2)};"""
+        await self._execute(sql, (status, uuid.UUID(command_id)))
+        logger.info(f"Set Discord Command {command_id} to {status}")
 
     # endregion
 
@@ -192,6 +209,9 @@ class DatabaseInterface():
         if not self.pool:
             self.pool = await asyncpg.create_pool(**self.db_credentials)
             self.db_credentials = None
+            logger.info("Connection pool created")
+        else:
+            logger.debug("ensure_pool: pool already exists")
 
     async def _fetchone(self, sql, parameters):
         return await self._fetchrow(sql, parameters)
@@ -221,6 +241,19 @@ class DatabaseInterface():
             rows = cur.fetchall()
 
         return rows
+
+    async def _execute(self, sql, parameters):
+        if self._is_postgres():
+            await self._ensure_pool()
+            logger.debug(f"Executing command '{sql}' with parameters {parameters}")
+            async with self.pool.acquire() as conn:
+                await conn.execute(sql, *parameters)
+            return True
+
+        # TODO add support for sqlite
+
+        else:
+            raise NotImplementedError("Execute currently only written for postgres.")
 
     def _is_postgres(self):
         return self.db == "POSTGRES"
