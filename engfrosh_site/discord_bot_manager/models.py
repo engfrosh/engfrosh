@@ -37,4 +37,3 @@ class ScavChannel(models.Model):
     group = models.OneToOneField(Group, on_delete=CASCADE, db_index=True)
 
     # TODO add __string__ method
-    

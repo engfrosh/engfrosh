@@ -14,15 +14,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name='discordcommandstatus',
-            name='command_id',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True, verbose_name='Command ID'),
-        ),
+            model_name='discordcommandstatus', name='command_id', field=models.UUIDField(
+                default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True,
+                verbose_name='Command ID'),),
         migrations.CreateModel(
             name='ScavChannel',
-            fields=[
-                ('channel_id', models.BigIntegerField(primary_key=True, serialize=False)),
-                ('group', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='auth.group')),
-            ],
-        ),
-    ]
+            fields=[('channel_id', models.BigIntegerField(primary_key=True, serialize=False)),
+                    ('group', models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, to='auth.group')), ],), ]

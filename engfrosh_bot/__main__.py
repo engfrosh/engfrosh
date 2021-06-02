@@ -1,14 +1,10 @@
 import discord
 import sys
-
 import logging
 import os
-
 import json
-
 import threading
 import asyncio
-
 import yaml
 
 
@@ -18,7 +14,7 @@ SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
 
 # Hack for development to get around import issues
 sys.path.append(PARENT_DIRECTORY)
-from engfrosh_common.DatabaseInterface import DatabaseInterface 
+from engfrosh_common.DatabaseInterface import DatabaseInterface # noqa E402
 
 logger = logging.getLogger(SCRIPT_NAME)
 
@@ -41,11 +37,8 @@ if __name__ == "__main__":
     logger.info("Log file set as: %s", LOG_FILE)
 # endregion
 
-
 if config["modules"]["rabbitmq"]:
     from . import rabbit_listener
-
-# logger.setLevel(config["log_level"])
 
 # Load Credentials
 if config["credentials"]["relative_path"]:
@@ -55,8 +48,6 @@ else:
 
 with open(path) as f:
     credentials = json.load(f)
-
-
 
 # endregion
 
@@ -87,7 +78,6 @@ async def on_ready():
         db_int = DatabaseInterface(db_credentials=credentials["database_credentials"])
 
     # endregion
-
     return
 
 
@@ -132,6 +122,8 @@ async def discord_queue_callback(command: dict):
     else:
         logger.warning("Object type %s not supported. Ignoring command" % command["object"])
         return
+
+# endregion
 
 
 # region program start
