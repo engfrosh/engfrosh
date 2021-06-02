@@ -2,8 +2,6 @@ import requests
 import datetime
 from oauthlib.oauth2 import WebApplicationClient
 
-
-
 import logging
 
 logger = logging.getLogger("DiscordAPI")
@@ -124,6 +122,3 @@ def get_authorization_url(version=None):
 def get_token_url(version=None):
     return get_api_url(version) + TOKEN_URL_PATH
 # endregion
-
-
-

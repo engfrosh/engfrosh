@@ -17,5 +17,3 @@ class DiscordUser(models.Model):
         self.refresh_token = refresh_token
         self.expiry = datetime.datetime.now() + datetime.timedelta(seconds=expires_in - 10)
         self.save()
-
-
