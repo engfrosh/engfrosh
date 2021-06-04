@@ -1,39 +1,31 @@
 import discord
 import sys
-
 import logging
 import os
-
 import json
-
 import threading
-
-import psycopg2
 import asyncio
-
-USE_RABBIT = False
-USE_POSTGRES = False
-
-if USE_RABBIT:
-    from . import rabbit_listener
+import yaml
 
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
+SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
 
 # Hack for development to get around import issues
 sys.path.append(PARENT_DIRECTORY)
-
-LOG_LEVEL = logging.DEBUG
-
-RABBIT_HOST = "localhost"
-QUEUE = "django_discord"
-
-# region Logging Setup
-SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
+from engfrosh_common.DatabaseInterface import DatabaseInterface # noqa E402
 
 logger = logging.getLogger(SCRIPT_NAME)
 
+CONFIG_FILE = CURRENT_DIRECTORY + "/bot_config.yaml"
+
+# region Load Configuration Settings
+
+with open(CONFIG_FILE) as f:
+    config = yaml.load(f, Loader=yaml.SafeLoader)
+
+# region Logging Setup
 if __name__ == "__main__":
     LOG_FILE = CURRENT_DIRECTORY + "/{}.log".format(SCRIPT_NAME)
     if os.path.exists(LOG_FILE):
@@ -41,18 +33,24 @@ if __name__ == "__main__":
             os.remove(LOG_FILE)
         except PermissionError:
             pass
-    logging.basicConfig(level=LOG_LEVEL, filename=LOG_FILE)
-    logger.debug("Module started.")
-    logger.debug("Log file set as: %s", LOG_FILE)
-
-logger.debug("Set current directory as: %s", CURRENT_DIRECTORY)
+    logging.basicConfig(filename=LOG_FILE, level=config["log_level"].upper())
+    logger.info("Log file set as: %s", LOG_FILE)
 # endregion
 
+if config["modules"]["rabbitmq"]:
+    from . import rabbit_listener
 
-# region Load Settings
-with open(CURRENT_DIRECTORY + "/credentials.json") as f:
-    bot_token = json.load(f)["bot_token"]
+# Load Credentials
+if config["credentials"]["relative_path"]:
+    path = CURRENT_DIRECTORY + "/" + config["credentials"]["relative_path"]
+else:
+    path = config["credentials"]["absolute_path"]
+
+with open(path) as f:
+    credentials = json.load(f)
+
 # endregion
+
 
 client = discord.Client()
 # TODO Change this to a discord bot instead of client
@@ -67,18 +65,19 @@ async def on_ready():
     # region Launch Queue Listener
     # You shouldn't have to change anything in here.
     # To add more functions add them to handle_queued_command
-    if USE_RABBIT:
+    if config["modules"]["rabbitmq"]:
         discord_loop = asyncio.get_running_loop()
+        host = config["module_settings"]["rabbitmq"]["host"]
+        queue = config["module_settings"]["rabbitmq"]["queue"]
         rabbit_thread = threading.Thread(target=rabbit_listener.rabbit_main,
-                                         args=(discord_loop, discord_queue_callback, RABBIT_HOST, QUEUE))
+                                         args=(discord_loop, discord_queue_callback, host, queue))
         rabbit_thread.start()
-    if USE_POSTGRES:
-        global sql_connection
-        sql_connection = psycopg2.connect(database="engfrosh", user="discord_engfrosh",
-                                          password="there-exercise-fenegel", host="localhost", port="5432")
-        sql_connection.set_session(autocommit=True)
-    # endregion
 
+    if config["modules"]["postgres"]:
+        global db_int
+        db_int = DatabaseInterface(db_credentials=credentials["database_credentials"])
+
+    # endregion
     return
 
 
@@ -93,23 +92,20 @@ async def on_message(message):
 # region Discord application commands
 
 
-def set_command_status(command_id, status, error_msg=""):
-    cursor = sql_connection.cursor()
-    cursor.execute(
-        f"UPDATE discord_client_discordcommandstatus SET status = '{status}' WHERE command_id = '{command_id}'")
-    # command_obj = DiscordCommandStatus.objects.filter(command_id = uuid.UUID(command_id))
-    # command_obj.status = status
-    # command_obj.error_message = error_msg
+async def set_command_status(command_id, status, error_msg=""):
+    await db_int.set_discord_command_status(command_id, status, error_msg)
+    logger.info(f"Set command [{command_id}] to {status}")
     return
 
 
 async def discord_queue_callback(command: dict):
+    logger.debug(f"Received discord_queue_callback with command:{command}")
+
     if command["object"] == "discord.TextChannel":
-        # command.pop("object")
         # region Object Creation
         if "id" in command["attributes"]:
             channel = client.get_channel(command["attributes"]["id"])
-            # command.pop("attributes")
+            logger.debug("Got channel object for command")
         else:
             logger.error("No id provided to send message")
             return
@@ -118,7 +114,8 @@ async def discord_queue_callback(command: dict):
         # region Method Handling
         if command["method"] == "send":
             await channel.send(**command["args"])
-            set_command_status(command["command_id"], "SUCC")
+            logger.info("Message sent to channel")
+            await set_command_status(command["command_id"], "SUCC")
             return
         # endregion
 
@@ -126,9 +123,11 @@ async def discord_queue_callback(command: dict):
         logger.warning("Object type %s not supported. Ignoring command" % command["object"])
         return
 
+# endregion
+
 
 # region program start
-discord_thread = threading.Thread(target=client.run, args=(bot_token,))
+discord_thread = threading.Thread(target=client.run, args=(credentials["bot_token"],))
 
 discord_thread.start()
 discord_thread.join()

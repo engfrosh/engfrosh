@@ -18,5 +18,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('discord/', include('discord_bot_manager.urls'))
+    path('discord/', include('discord_bot_manager.urls')),
+    path('accounts/', include('authentication.urls'))
 ]

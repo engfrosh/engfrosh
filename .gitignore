@@ -2,6 +2,7 @@
 .vscode 
 credentials.*
 temp_*
+default_name.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
