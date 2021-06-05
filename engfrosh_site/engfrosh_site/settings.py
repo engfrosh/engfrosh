@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'discord_bot_manager.apps.DiscordBotManagerConfig',
-    'authentication.apps.AuthenticationConfig'
+    'authentication.apps.AuthenticationConfig',
+    'frosh.apps.FroshConfig'
 ]
 
 MIDDLEWARE = [

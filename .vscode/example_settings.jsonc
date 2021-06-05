@@ -1,0 +1,11 @@
+// This is an example of a VSCode Settings file
+// Most importantly are the extraPaths so that the imports can be properly resolved
+{
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true,
+    "python.analysis.extraPaths": [
+        "engfrosh_common",
+        "engfrosh_site",
+        "engfrosh_bot"
+    ]
+}
