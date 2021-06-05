@@ -3,6 +3,8 @@ import asyncpg
 import sqlite3
 import uuid
 
+from SQLITE_INIT import SQLITE_INIT
+
 import logging
 import os
 
@@ -14,30 +16,6 @@ LOG_LEVEL = logging.DEBUG
 
 logger = logging.getLogger(SCRIPT_NAME)
 
-
-SQLITE_INIT = [
-    """ CREATE TABLE IF NOT EXISTS auth_group (
-            id integer PRIMARY KEY,
-            name text NOT NULL UNIQUE
-            );""",
-    """ CREATE TABLE IF NOT EXISTS auth_user_groups (
-            id integer PRIMARY KEY,
-            user_id integer NOT NULL,
-            group_id integer NOT NULL
-            );""",
-    """ CREATE TABLE IF NOT EXISTS authentication_discorduser (
-            id integer PRIMARY KEY,
-            discord_username text,
-            discriminator integer,
-            user_id NOT NULL
-            );""",
-    """ CREATE TABLE IF NOT EXISTS discord_bot_manager_scavchannel (
-            channel_id integer PRIMARY KEY,
-            group_id integer NOT NULL
-            );"""
-]
-
-# TODO Sync these tables up better with what Django does and proper database technique, etc
 
 DEFAULT_SQLITE_DB = "default_name.db"
 
@@ -113,6 +91,42 @@ class DatabaseInterface():
         else:
             raise NotImplementedError
 
+    async def get_coin_amount(self, *, group_name=None, group_id=None):
+        if not group_id and group_name:
+            group_id = await self.get_group_id(group_name=group_name)
+        if group_id:
+            sql = f"SELECT * FROM frosh_team WHERE group_id = {self._qp()};"
+            row = await self._fetchrow(sql, (group_id,))
+            if row:
+                return row["coin_amount"]
+            else:
+                return None
+        else:
+            logger.warning("No arguments passed to get_coin_amount.")
+            return None
+
+    async def get_team_display_name(self, group_id):
+        sql = f"SELECT * FROM frosh_team WHERE group_id = {self._qp()};"
+        row = await self._fetchrow(sql, (group_id,))
+        if row:
+            return row["display_name"]
+        else:
+            return None
+
+    # endregion
+
+    # region UPDATE methods
+    async def update_coin_amount(self, change: int, *, group_name=None, group_id=None):
+        if not group_id and group_name:
+            group_id = await self.get_group_id(group_name=group_name)
+        if group_id:
+            sql = f"UPDATE frosh_team SET coin_amount = coin_amount + {self._qp(1)} WHERE group_id = {self._qp(2)};"
+            await self._execute(sql, (change, group_id))
+            logger.info(f"Adjusted coin for team with id: {group_id} by {change}.")
+
+        else:
+            logger.error("No group passed to update_coin_amount.")
+            return False
     # endregion
 
     # region SET methods
@@ -196,11 +210,25 @@ class DatabaseInterface():
                 cur.execute(sql, (channel_id, group_id))
             except IntegrityError:
                 logger.error("IntegrityError, could not add scav channel. The channel probably already exists.")
+                return False
             self.connection.commit()
             return True
         else:
             raise NotImplementedError("Adding Scav channels is not currently supported outside SQLite")
 
+    async def add_team(self, group_id, display_name=None):
+        if self._is_sqlite():
+            sql = """INSERT INTO frosh_team(group_id,display_name) VALUES(?,?);"""
+            cur = self.connection.cursor()
+            try:
+                cur.execute(sql, (group_id, display_name))
+            except IntegrityError:
+                logger.error("IntegrityError, could not add team. The team probably already exists.")
+                return False
+            self.connection.commit()
+            return True
+        else:
+            raise NotImplementedError("Adding Scav channels is not currently supported outside SQLite")
     # endregion
 
     # region Helper Functions
@@ -250,7 +278,10 @@ class DatabaseInterface():
                 await conn.execute(sql, *parameters)
             return True
 
-        # TODO add support for sqlite
+        elif self._is_sqlite():
+            cur = self.connection.cursor()
+            cur.execute(sql, parameters)
+            self.connection.commit()
 
         else:
             raise NotImplementedError("Execute currently only written for postgres.")
