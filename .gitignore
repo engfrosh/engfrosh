@@ -4,6 +4,7 @@
 credentials.*
 temp_*
 default_name.db
+files/media/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
