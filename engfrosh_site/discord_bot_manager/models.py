@@ -37,3 +37,8 @@ class ScavChannel(models.Model):
     group = models.OneToOneField(Group, on_delete=CASCADE, db_index=True)
 
     # TODO add __string__ method
+
+
+class Role(models.Model):
+    role_id = models.IntegerField("Discord Role ID", primary_key=True)
+    group_id = models.OneToOneField(Group, CASCADE)
