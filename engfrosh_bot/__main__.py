@@ -86,15 +86,25 @@ async def on_ready():
 
 
 def moderation_checks(message_text):
+    """
+    This function returns true or false based on the results of a profanity/word check of a string.
+    """
+
     # better_profanity checks
-    profanity.add_censor_words(["uottawa", "bannedWord1"])
-    # profanity.add_censor_words("bannedWord1")
-    contains_bad = profanity.contains_profanity(message_text)
+
+    profanity.add_censor_words(["uottawa"])                     # adding custom bad words
+    contains_bad = profanity.contains_profanity(message_text)   # checks if the string contains the bad word
 
     return contains_bad
 
 
 async def moderate(message):
+    """
+    This function takes a message, checks for profanity using the moderation_checks() function.
+    If the message has profanity, the message is deleted, and the user is mentions with a message indicating that their
+    message is not allowed
+
+    """
     if moderation_checks(str(message.content)):
         author_id = "<@" + str(message.author.id) + ">"
         await message.delete()
@@ -109,7 +119,7 @@ async def on_message(message):
     if message.author == client.user:
         return
     await message.channel.send("Hello There")
-    await moderate(message)
+    await moderate(message)        # call this function to moderate messages, done here so it happens for every message
     return
 
 
