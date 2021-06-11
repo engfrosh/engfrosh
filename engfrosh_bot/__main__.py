@@ -8,6 +8,7 @@ import asyncio
 import yaml
 from .EngFroshBot import EngFroshBot
 
+from better_profanity import profanity
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
@@ -105,12 +106,34 @@ async def react(ctx):
     await ctx.channel.send("did it work?")
 
 
+def moderation_checks(message_text):
+
+    # better_profanity checks
+    profanity.add_censor_words(["uottawa", "bannedWord1"])
+    # profanity.add_censor_words("bannedWord1")
+    contains_bad = profanity.contains_profanity(message_text)
+
+    return contains_bad
+
+
+async def moderate(message):
+    if moderation_checks(str(message.content)):
+        author_id = "<@" + str(message.author.id) + ">"
+        await message.delete()
+        await message.channel.send("Hey " + author_id + " Your Message \" " + profanity.censor(str(message.content), censor_char="\\*") + " \" is not permitted")
+    return
+
+
 @client.event
 async def on_reaction_add(reaction, user):
     if reaction.message.author == client.user:
         if reaction.emoji == '👍':
             await reaction.message.channel.send('Hi there!')
         return
+    await message.channel.send("Hello There")
+    await moderate(message)
+    return
+
 
 # endregion
 
