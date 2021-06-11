@@ -86,7 +86,6 @@ async def on_ready():
 
 
 def moderation_checks(message_text):
-
     # better_profanity checks
     profanity.add_censor_words(["uottawa", "bannedWord1"])
     # profanity.add_censor_words("bannedWord1")
@@ -99,7 +98,9 @@ async def moderate(message):
     if moderation_checks(str(message.content)):
         author_id = "<@" + str(message.author.id) + ">"
         await message.delete()
-        await message.channel.send("Hey " + author_id + " Your Message \" " + profanity.censor(str(message.content), censor_char="\\*") + " \" is not permitted")
+        await message.channel.send(
+            "Hey " + author_id + " Your Message \" " + profanity.censor(str(message.content), censor_char="\\*") +
+            " \" is not permitted")
     return
 
 
