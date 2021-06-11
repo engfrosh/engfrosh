@@ -11,12 +11,13 @@ import threading
 import psycopg2
 import asyncio
 
+from better_profanity import profanity
+
 USE_RABBIT = False
 USE_POSTGRES = False
 
 if USE_RABBIT:
     from . import rabbit_listener
-
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
@@ -55,6 +56,8 @@ with open(CURRENT_DIRECTORY + "/credentials.json") as f:
 # endregion
 
 client = discord.Client()
+
+
 # TODO Change this to a discord bot instead of client
 
 # region Discord Events
@@ -82,12 +85,33 @@ async def on_ready():
     return
 
 
+def moderation_checks(message_text):
+
+    # better_profanity checks
+    profanity.add_censor_words(["uottawa", "bannedWord1"])
+    # profanity.add_censor_words("bannedWord1")
+    contains_bad = profanity.contains_profanity(message_text)
+
+    return contains_bad
+
+
+async def moderate(message):
+    if moderation_checks(str(message.content)):
+        author_id = "<@" + str(message.author.id) + ">"
+        await message.delete()
+        await message.channel.send("Hey " + author_id + " Your Message \" " + profanity.censor(str(message.content), censor_char="\\*") + " \" is not permitted")
+    return
+
+
 @client.event
 async def on_message(message):
     if message.author == client.user:
         return
     await message.channel.send("Hello There")
+    await moderate(message)
     return
+
+
 # endregion
 
 # region Discord application commands
