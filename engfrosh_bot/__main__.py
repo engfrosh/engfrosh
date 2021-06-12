@@ -87,6 +87,14 @@ async def on_message(message):
         return
     await message.channel.send("Hello There")
     return
+
+
+@client.event
+async def on_reaction_add(reaction, user):
+    if reaction.message.author == client.user:
+        if reaction.emoji == '👍':
+            await reaction.message.channel.send('Hi there!')
+        return
 # endregion
 
 # region Discord application commands
