@@ -123,6 +123,29 @@ async def discord_queue_callback(command: dict):
         logger.warning("Object type %s not supported. Ignoring command" % command["object"])
         return
 
+# Add Bot Listner for when someone gets a role
+intents = discord.Intents.default()
+intents.members = True
+intents.presences = True
+client = discord.Client(intents=intents)
+
+@client.event
+async def on_ready():
+    general_channel = client.get_channel(852503379430473801)
+    await general_channel.send('Bot Activated')
+
+@client.event
+async def on_member_join(member):
+    role = discord.utils.get(member.guild.roles, name="Default Role")
+    await member.add_roles(role)
+    general_channel = client.get_channel(852503379430473801)
+    await general_channel.send('Display name: ' + member.display_name)
+    await general_channel.send('ID: ' + str(member.id))
+    await general_channel.send('Roles: ')
+    for x in member.roles:
+        await general_channel.send(x.name)
+
+client.run('ODUyNTAxOTI3MjE1NDk3MjQ2.YMHwSg.Xmq86dx-ny-m0ouurZlW6LZm-aA')
 # endregion
 
 
