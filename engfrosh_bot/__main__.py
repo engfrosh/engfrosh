@@ -41,8 +41,6 @@ logger.debug("Set current directory as: %s", CURRENT_DIRECTORY)
 @client.event
 async def on_ready():
     logger.debug("Logged on as {}".format(client.user))
-    #game = discord.Game(name="\'!help\' for info!")
-    #await client.change_presence(activity=game)
     await client.change_presence(activity = discord.Game(name="\'!help\' for info!", type=1, url='engfrosh.com'))
 
 @client.command(pass_context=True)
