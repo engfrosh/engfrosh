@@ -2,9 +2,63 @@
 <html>
     <head>
         <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+        
+        <!-- css in style tags -->
+        <style>
+
+            /*button*/
+            button.discord{
+                background-color:#7289da; 
+                color:#ffffff; 
+                padding:24px 60px; 
+                text-align:center; 
+                font-size:16px;
+                border:none;
+                border-radius:5px;
+                box-shadow:0 4px #999;
+            }
+
+            button.discord:hover{
+                background-color:#7289da;
+            }
+
+            button.discord:active{
+                background-color:#7289da;
+                box-shadow:0 2px #666;
+                transform:translateY(4px);
+            }
+
+            /*image*/
+            img.discord{
+                width:35%;
+            }
+
+            /*body and div*/
+            body.discord{
+                background-color:#353940;
+            }
+
+            div.discord{
+                position: absolute;
+                left:50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                padding: 10px;
+                margin: auto;
+            }
+
+        </style>
+
+
         <title>Login</title>
     </head>
-    <body>
-        <a href="discord/">Login with Discord</a>
+    <body class="discord">
+        <div class="discord">
+            <center>
+                <img src="https://www.freepnglogos.com/uploads/discord-logo-png/discord-logo-logodownload-download-logotipos-1.png" alt="discord logo" class="discord">
+                <br><br>
+                <a href="https://discord.com/"><button type="button" class="discord">Login with Discord</button></a>
+            </center>
+        </div>
     </body>
 </html>

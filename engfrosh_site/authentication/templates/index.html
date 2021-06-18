@@ -2,11 +2,62 @@
 <html>
     <head>
         <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+
+        <!-- css in style tags -->
+        <style>
+
+            /*body and div*/
+            body.discord{
+                background-color:#353940;
+                text-align:center;
+            }
+
+            div.discord{
+                position: absolute;
+                left:50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                padding: 10px;
+                margin: auto;
+            }
+
+            /*links*/
+            a.discord:link{
+                text-align:center;
+                text-decoration:none;
+                color:#7289da;
+            }
+
+            a.discord:hover{
+                text-decoration:underline;
+                color:#3053d3;
+            }
+
+            a.discord:visited{
+                text-decoration:none;
+                color:#7289da;
+            }
+
+            a.discord:active{
+                text-decoration:underline;
+                color:#3053d3;
+            }  
+
+            /*image*/
+            img.discord{
+                width:35%;
+            }
+
+        </style>
         <title>Accounts</title>
     </head>
-    <body>
-        <a href="login/">Login</a>
-        <br/>
-        <a href="register/">Register</a>
+    <body class="discord">
+        <div class=discord>
+            <img src="https://www.freepnglogos.com/uploads/discord-logo-png/discord-logo-logodownload-download-logotipos-1.png" alt="discord logo" class="discord">
+            <br><br>
+            <a href="https://discord.com/" class="discord">Login</a>
+            <br><br>
+            <a href="https://discord.com/" class="discord">Register</a>
+        </div>
     </body>
 </html>

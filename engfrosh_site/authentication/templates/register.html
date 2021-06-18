@@ -1,10 +1,63 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+    <!-- css in style tags -->
+        <style>
+            
+            /*link*/
+            a.discord:link{
+                color:#7289da; 
+                font-size:16px;
+                text-decoration:none;
+            }
+
+            a.discord:visited{
+                color:#7289da; 
+                font-size:16px;
+                text-decoration:none;
+            }
+
+            a.discord:hover{
+                color:#7289da;
+                font-size:16px;
+                text-decoration:underline;
+            }
+
+            /*body and div*/
+            body.discord{
+                background-color:#353940;
+            }
+
+            div.discord{
+                text-align:center;
+                margin:0;
+                position:absolute;
+                top:50%;
+                left:50%;
+                -ms-transform:translate(-50%,-50%);
+                transform:translate(-50%,-50%);
+            }
+
+            /*image*/
+            img.discord{
+                height:76px;
+            }
+
+            /*paragraph*/
+            p.discord{
+                color:#aaaaaa;
+            }
+
+        </style>
+
+
         <title>Register</title>
     </head>
-    <body>
-        <a href="discord/">Register with Discord</a>
+    <body class="discord">
+        <div class="discord">
+            <img src="https://www.freepnglogos.com/uploads/discord-logo-png/discord-logo-logodownload-download-logotipos-1.png" alt="discord logo" class="discord">
+            <p class="discord">Don't have an account?</p> <a href="https://discord.com/" class="discord">Register with Discord</button></a>
+        </div>
     </body>
 </html>
