@@ -2,6 +2,7 @@ modules:
   # Which modules to import and use
   rabbitmq: False
   postgres: False # Otherwise will use sqlite
+  cogs: ["engfrosh_bot.cogs.cogModeration.moderation"] # "cogs.cogScav.scav"
 
 log_level: DEBUG
 
@@ -15,4 +16,6 @@ module_settings:
     host: localhost
     queue: django_discord
 
-  postgres:
+  # postgres:
+
+  bot_prefix: "!"

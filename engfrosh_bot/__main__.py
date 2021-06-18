@@ -1,4 +1,5 @@
 import discord
+from discord.ext import commands
 import sys
 import logging
 import os
@@ -14,7 +15,7 @@ SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
 
 # Hack for development to get around import issues
 sys.path.append(PARENT_DIRECTORY)
-from engfrosh_common.DatabaseInterface import DatabaseInterface # noqa E402
+from engfrosh_common.DatabaseInterface import DatabaseInterface  # noqa E402
 
 logger = logging.getLogger(SCRIPT_NAME)
 
@@ -52,15 +53,22 @@ with open(path) as f:
 # endregion
 
 
-client = discord.Client()
-# TODO Change this to a discord bot instead of client
+client = commands.Bot(config["module_settings"]["bot_prefix"])
+
+# Load Cogs
+for cog in config["modules"]["cogs"]:
+    print(cog)
+    client.load_extension(cog)
+    logger.debug('Cog %s loaded', cog)
+
 
 # region Discord Events
 
 
 @client.event
 async def on_ready():
-    logger.info("Successfully Logged In")
+    logger.debug("Logged on as {}".format(client.user))
+    await client.change_presence(activity=discord.Game(name="\'!help\' for info!", type=1, url='engfrosh.com'))
 
     # region Launch Queue Listener
     # You shouldn't have to change anything in here.
@@ -81,12 +89,20 @@ async def on_ready():
     return
 
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-    await message.channel.send("Hello There")
-    return
+@client.command(pass_context=True)
+async def superhelp(ctx):
+    logger.debug("Help message used in {}".format(ctx.message.channel.guild.name))
+    string = "hey, type !react emoji" \
+
+    embed = discord.Embed()
+    embed.add_field(name="Bot Usage!", value=string)
+    await ctx.channel.send(embed=embed)
+
+
+@client.command(pass_context=True)
+async def react(ctx):
+    await ctx.message.add_reaction("🍋")
+    await ctx.channel.send("did it work?")
 
 
 @client.event
@@ -95,6 +111,7 @@ async def on_reaction_add(reaction, user):
         if reaction.emoji == '👍':
             await reaction.message.channel.send('Hi there!')
         return
+
 # endregion
 
 # region Discord application commands
