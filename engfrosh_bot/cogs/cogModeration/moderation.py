@@ -1,5 +1,5 @@
 from discord.ext import commands
-from discord.ext.commands import cog
+# from discord.ext.commands import cog
 
 
 class Moderation(commands.Cog):
