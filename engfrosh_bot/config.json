@@ -1,7 +1,0 @@
-{
-    "bot_token": "ODQ1ODAzMTQ0ODAwNzYzOTI1.YKmRjw.FVSqQqLaTHrdHGykh9ODjPW7cXc",
-    "modules": ["cogs.cogModeration.moderation"],
-    "prefix": "!",
-
-    "ignoreThis,its for testing": "cogs.cogScav.scav"
-}
