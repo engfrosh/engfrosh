@@ -1,0 +1,18 @@
+modules:
+  # Which modules to import and use
+  rabbitmq: True
+  postgres: True # Otherwise will use sqlite
+
+log_level: debug
+
+credentials:
+  relative_path: credentials.json
+  absolute_path: Null
+  # If both are provided, will default to the relative path
+
+module_settings:
+  rabbitmq:
+    host: localhost
+    queue: django_discord
+
+  postgres:

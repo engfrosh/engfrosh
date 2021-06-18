@@ -1,7 +1,9 @@
 # User Defined
-.vscode 
+.vscode/settings.json
+.vscode/spellright.dict
 credentials.*
 temp_*
+default_name.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
