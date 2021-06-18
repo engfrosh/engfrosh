@@ -111,6 +111,7 @@ async def on_reaction_add(reaction, user):
         if reaction.emoji == '👍':
             await reaction.message.channel.send('Hi there!')
         return
+
 # endregion
 
 # region Discord application commands
