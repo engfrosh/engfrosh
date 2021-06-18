@@ -1,3 +1,7 @@
+# flake8: noqa
+
+# TODO Rewrite and fix this whole file, etc. It is still based on the old bot.
+
 import logging
 import os
 import discord
@@ -58,6 +62,7 @@ user_registrations = {}
 
 # region Function Definitions
 
+
 def load_all_settings():
     global settings
     with open(SETTINGS_FILE, "r") as f:
@@ -71,18 +76,22 @@ def load_all_settings():
         settings["bot_status_channel_id"] = settings["channels"]["bot_status_channel"]
     return settings
 
+
 def load_scav_questions():
     with open(SCAV_QUESTIONS_FILE, "r") as f:
         return json.load(f)
+
 
 def load_user_registrations():
     with open(USER_REGISTRATION_FILE, "r") as f:
         global user_registrations
         user_registrations = json.load(f)
 
+
 def save_user_registrations(indent=4):
     with open(USER_REGISTRATION_FILE, "w") as f:
         json.dump(user_registrations, f, indent=indent)
+
 
 async def reload_files():
     # global settings
@@ -97,6 +106,7 @@ async def reload_files():
 #     client.logout()
 #     exit()
 
+
 def save_settings(fp=None, indent=4):
     if fp == None:
         fp = SETTINGS_FILE
@@ -104,11 +114,14 @@ def save_settings(fp=None, indent=4):
         json.dump(settings, f, indent=4)
     logger.debug("Settings saved to %s", fp)
 
+
 def is_admin(user_id):
     return user_id in quick_settings["admin_ids"]
 
+
 def is_scav_manager(user_id):
     return user_id in quick_settings["scav_manager_ids"]
+
 
 async def load_scav_teams():
     global scav_game
@@ -119,6 +132,8 @@ async def load_scav_teams():
 # endregion
 
 # region commands
+
+
 class Scav(commands.Cog):
     def __init__(self, bot):
         global client
@@ -150,11 +165,11 @@ class Scav(commands.Cog):
                 await self.bot.user.edit(avatar=f.read())
             settings["profile_picture_set"] = True
             save_settings()
-    
+
     @commands.command()
     async def guess(self, ctx):
         message_array = ctx.message.content.lower().strip().split()
-        
+
         if settings["scav"]["allowed"]:
             active_scav_team = scav_game.is_scav_channel(ctx.message.channel.id)
             if active_scav_team is not False:
@@ -194,9 +209,9 @@ class Scav(commands.Cog):
         if settings["scav"]["allowed"] and settings["scav"]["self_registration_allowed"]:
             if len(message_array) > 1:
                 team_name = " ".join(message_array[1:])
-            else: 
+            else:
                 team_name = "Team {}".format(len(scav_game.teams))
-            logger.debug("Creating team %s",team_name)
+            logger.debug("Creating team %s", team_name)
             reg_codes = await scav_game.new_scav_team(team_name=team_name)
             code_msg = "Here are your scav team registration codes for team {team_name}\n".format(team_name=team_name)
             code_msg += "```\n"
@@ -206,7 +221,7 @@ class Scav(commands.Cog):
             code_msg += "Send one of these codes in a channel in the discord server. Send these to your teammates and have them do the same."
             await ctx.message.author.send(code_msg)
             await ctx.message.delete()
-            return 
+            return
 
     @commands.command()
     async def enableScav(self, ctx):
@@ -217,7 +232,7 @@ class Scav(commands.Cog):
             return
         else:
             logger.debug("Illegal Command by %s: %s".format(ctx.author, ctx.message.content))
-    
+
     @commands.command()
     async def disableScav(self, ctx):
         if is_admin(ctx.message.author.id):
@@ -281,7 +296,7 @@ class Scav(commands.Cog):
 
     @commands.command()
     async def hint(self, ctx):
-         if settings["scav"]["allowed"]:
+        if settings["scav"]["allowed"]:
             active_scav_team = scav_game.is_scav_channel(ctx.channel.id)
             if active_scav_team is not False:
                 if active_scav_team.is_team_member(ctx.author.id):
@@ -295,26 +310,26 @@ class Scav(commands.Cog):
             else:
                 await ctx.send("This is not a SCAV channel!")
             return
-    
+
     @commands.command()
     async def reload(self, ctx):
         if is_admin(ctx.author.id):
-                await reload_files()
-                await channels["bot_status_channel"].send("Files Reloaded")
-                await ctx.delete()
+            await reload_files()
+            await channels["bot_status_channel"].send("Files Reloaded")
+            await ctx.delete()
         else:
             logger.debug("Illegal Command by %s: %s".format(ctx.author, ctx.message.content))
-    
+
     @commands.command()
     async def resetTeam(self, ctx):
         message_array = ctx.message.content.lower().strip().split()
         if is_admin(ctx.author.id):
-                team_id = int(message_array[1])
-                if team_id in scav_game.teams:
-                    await scav_game.teams[team_id].reset_team()
+            team_id = int(message_array[1])
+            if team_id in scav_game.teams:
+                await scav_game.teams[team_id].reset_team()
         else:
             logger.debug("Illegal Command by %s: %s".format(ctx.author, ctx.message.content))
-    
+
     @commands.command()
     async def createTeam(self, ctx):
         if is_admin(ctx.author.id):
@@ -323,10 +338,10 @@ class Scav(commands.Cog):
                 team_name = message_array[1]
             else:
                 team_name = None
-            await scav_game.new_scav_team(team_name)    
+            await scav_game.new_scav_team(team_name)
         else:
             logger.debug("Illegal Command by %s: %s".format(ctx.author, ctx.message.content))
-    
+
     @commands.command()
     async def removeScavManager(self, ctx):
         if is_admin(ctx.author.id):
@@ -340,14 +355,14 @@ class Scav(commands.Cog):
             await ctx.delete()
         else:
             logger.debug("Illegal Command by %s: %s".format(ctx.author, ctx.message.content))
-    
+
     @commands.command()
     async def welcome(self, ctx):
         if is_admin(ctx.author.id):
             await scav_game.send_introductions()
         else:
             logger.debug("Illegal Command by %s: %s".format(ctx.author, ctx.message.content))
-    
+
     @commands.command()
     async def leaderboard(self, ctx):
         if is_admin(ctx.author.id):
@@ -358,8 +373,8 @@ class Scav(commands.Cog):
     @commands.command()
     async def scavHelp(self, ctx):
         if scav_game.is_scav_channel(ctx.channel.id):
-                await ctx.send(settings["help_text"])
-                return
+            await ctx.send(settings["help_text"])
+            return
         else:
             await ctx.send("Please `@Grant` for help")
 
@@ -370,7 +385,7 @@ class Scav(commands.Cog):
         if ctx.guild.id != settings["guild_id"]:
             return
         message_array = ctx.message.content.lower().strip().split()
-        #NEED GRANT TO TALK ME THROUGH THIS PART
+        # NEED GRANT TO TALK ME THROUGH THIS PART
         if message_array[0][0] == "$":
             await ctx.message.delete()
             if message_array[0] in user_registrations:
@@ -378,7 +393,7 @@ class Scav(commands.Cog):
                     if user_registrations[message_array[0]]["account_type"] == "admin":
                         if ctx.author.id not in settings["admin_users"]:
                             user_registrations[message_array[0]
-                                            ]["user_id"] = ctx.author.id
+                                               ]["user_id"] = ctx.author.id
                             save_user_registrations()
                             settings["admin_users"].append(ctx.author.id)
                             save_settings()
@@ -391,7 +406,7 @@ class Scav(commands.Cog):
                     elif user_registrations[message_array[0]]["account_type"] == "scav_manager":
                         if ctx.author.id not in settings["scav_manager_users"] and ctx.author.id not in settings["admin_users"]:
                             user_registrations[message_array[0]
-                                            ]["user_id"] = ctx.author.id
+                                               ]["user_id"] = ctx.author.id
                             save_user_registrations()
                             settings["scav_manager_users"].append(
                                 ctx.author.id)
@@ -406,7 +421,7 @@ class Scav(commands.Cog):
                     elif user_registrations[message_array[0]]["account_type"] == "scav_player":
                         if ctx.author.id not in settings["scav_manager_users"] and ctx.author.id not in settings["admin_users"]:
                             user_registrations[message_array[0]
-                                            ]["user_id"] = ctx.author.id
+                                               ]["user_id"] = ctx.author.id
                             save_user_registrations()
                             await scav_game.teams[user_registrations[message_array[0]]["scav_team"]].add_player(
                                 ctx.author)
@@ -422,11 +437,14 @@ class Scav(commands.Cog):
                 await ctx.channel.send("Invalid activation code")
             return
 
+
 def setup(bot):
     bot.add_cog(Scav(bot))
 # endregion
 
 # region SCAV Classes
+
+
 class ScavTeam():
     def __init__(self, team_info: dict, channel_id: int):
         self.team_info = dict(team_info)
@@ -526,7 +544,7 @@ class ScavTeam():
             if "hint_file" in scav_questions[self.team_info["current_question"]]:
                 if "hint_file_display" in scav_questions[self.team_info["current_question"]]:
                     filename = scav_questions[self.team_info["current_question"]
-                                            ]["file_display_name"]
+                                              ]["file_display_name"]
                 else:
                     filename = None
                 f = discord.File(
@@ -585,7 +603,7 @@ class ScavTeam():
 
     def create_registration_code(self, name="", nickname=""):
         code = "$" + "".join(random.choice(string.ascii_lowercase +
-                                     string.digits) for i in range(8))
+                                           string.digits) for i in range(8))
         global user_registrations
         user_registrations[code] = {
             "name": "",
@@ -597,6 +615,7 @@ class ScavTeam():
         }
         save_user_registrations()
         return code
+
 
 class ScavGame():
     def __init__(self, all_team_info_fp: str):
@@ -660,7 +679,7 @@ class ScavGame():
         for i in range(settings["scav"]["default_team_size"]):
             reg_codes.append(self.teams[channel.id].create_registration_code())
         await self.leaderboard()
-         
+
         guild = await client.fetch_guild(settings["guild_id"])
         return reg_codes
 
@@ -676,7 +695,7 @@ class ScavGame():
         finished_teams = sorted(
             finished_teams, key=lambda team: team.team_info["finish_time"])
         inprogress_teams = sorted(
-            inprogress_teams, key=lambda team: team.team_info["current_question"],reverse=True)
+            inprogress_teams, key=lambda team: team.team_info["current_question"], reverse=True)
         leaderboard_str = "Standings\n============\n"
         position = 1
         for team in finished_teams:
