@@ -2,6 +2,7 @@ from sqlite3.dbapi2 import IntegrityError
 import asyncpg
 import sqlite3
 import uuid
+import datetime
 
 from .SQLITE_INIT import SQLITE_INIT
 
@@ -113,6 +114,24 @@ class DatabaseInterface():
         else:
             return None
 
+    async def get_team_locked_out_time(self, group_id):
+        sql = f"SELECT * FROM scavenger_team WHERE group_id = {self._qp()};"
+
+        row = await self._fetchone(sql, (group_id,))
+        if not row:
+            # None if the team does not exist
+            return None
+
+        if not row["locked_out_until"]:
+            # False if team is not locked out
+            return False
+
+        locked_out_time = row["locked_out_until"]
+        if type(locked_out_time) is str:
+            locked_out_time = datetime.datetime.fromisoformat(locked_out_time)
+
+        return locked_out_time
+
     # endregion
 
     # region UPDATE methods
@@ -136,6 +155,35 @@ class DatabaseInterface():
                     WHERE command_id = {self._qp(2)};"""
         await self._execute(sql, (status, uuid.UUID(command_id)))
         logger.info(f"Set Discord Command {command_id} to {status}")
+
+    async def set_team_locked_out_time(self, group_id, minutes=None, *, end_time=None):
+        sql = f"""UPDATE scavenger_team
+                    SET locked_out_until = {self._qp(1)}
+                    WHERE group_id = {self._qp(2)};"""
+
+        if minutes and not end_time:
+            end_time = datetime.datetime.now() + datetime.timedelta(minutes=minutes)
+
+        if not end_time:
+            raise ValueError("Endtime or minutes must be provided")
+
+        if self._is_postgres():
+            if type(end_time) is str:
+                end_time = datetime.datetime.fromisoformat(end_time)
+
+            if type(end_time) is not datetime.datetime:
+                raise TypeError(f"end_time can only be type datetime.datetime or str, not {type(end_time)}")
+
+        elif self._is_sqlite():
+            if type(end_time) is datetime.datetime:
+                end_time = end_time.isoformat()
+
+            if type(end_time) is not str:
+                raise TypeError(f"end_time can only be type datetime.datetime or str, not {type(end_time)}")
+
+        await self._execute(sql, (end_time, group_id))
+
+        logger.info(f"Set lockout until time for group {group_id} to {end_time}")
 
     # endregion
 
@@ -216,7 +264,7 @@ class DatabaseInterface():
         else:
             raise NotImplementedError("Adding Scav channels is not currently supported outside SQLite")
 
-    async def add_team(self, group_id, display_name=None):
+    async def add_frosh_team(self, group_id, display_name=None):
         if self._is_sqlite():
             sql = """INSERT INTO frosh_team(group_id,display_name) VALUES(?,?);"""
             cur = self.connection.cursor()
@@ -229,6 +277,21 @@ class DatabaseInterface():
             return True
         else:
             raise NotImplementedError("Adding Scav channels is not currently supported outside SQLite")
+
+    async def add_scavenger_team(self, group_id):
+        if self._is_sqlite():
+            sql = """INSERT INTO scavenger_team(group_id) VALUES(?);"""
+            cur = self.connection.cursor()
+            try:
+                cur.execute(sql, (group_id,))
+            except IntegrityError:
+                logger.error("IntegrityError, could not add team. The team probably already exists.")
+                return False
+            self.connection.commit()
+            logger.info(f"Added scavenger team with id {group_id}")
+            return True
+        else:
+            raise NotImplementedError("Adding scavenger teams only supported with SQLite")
     # endregion
 
     # region Helper Functions
