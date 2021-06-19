@@ -5,6 +5,3 @@ class Message:
         self.text = text
         self.file_path = file_path
         self.display_filename = display_filename
-
-    
-

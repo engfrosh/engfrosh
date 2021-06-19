@@ -60,7 +60,8 @@ class Hint(models.Model):
 
 class Team(models.Model):
     group = models.OneToOneField(Group, CASCADE, primary_key=True)
-    current_question = models.OneToOneField(Question, on_delete=PROTECT, blank=True, related_name="scavenger_team", null=True)
+    current_question = models.OneToOneField(Question, on_delete=PROTECT, blank=True,
+                                            related_name="scavenger_team", null=True)
     locked_out_until = models.DateTimeField("Locked Out Until", blank=True, null=True)
     last_hint = models.ForeignKey(Hint, blank=True, on_delete=PROTECT, null=True)
     last_hint_time = models.DateTimeField(blank=True, null=True)
