@@ -8,7 +8,15 @@
             "module": "engfrosh_bot"
         },
         {
-            "name": "Python: Current File",
+            "name": "Py Dir: Current File in Directory",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${fileDirname}"
+        },
+        {
+            "name": "Py Wrk: Current File in Workspace",
             "type": "python",
             "request": "launch",
             "program": "${file}",
