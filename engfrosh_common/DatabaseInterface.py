@@ -3,7 +3,7 @@ import asyncpg
 import sqlite3
 import uuid
 
-from SQLITE_INIT import SQLITE_INIT
+from .SQLITE_INIT import SQLITE_INIT
 
 import logging
 import os

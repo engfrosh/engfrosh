@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'discord_bot_manager.apps.DiscordBotManagerConfig',
     'authentication.apps.AuthenticationConfig',
-    'frosh.apps.FroshConfig'
+    'frosh.apps.FroshConfig',
     'scavenger.apps.ScavengerConfig'
 ]
 

@@ -36,20 +36,13 @@ class Question(models.Model):
     file = models.FileField(upload_to=question_path, blank=True)
     image = models.ImageField(upload_to=question_path, blank=True)
     display_filename = models.CharField(max_length=256, blank=True)
+    weight = models.IntegerField("Order Number", unique=True, default=0, db_index=True)
 
     def __str__(self):
         if self.identifier:
             return self.identifier
         else:
             return f"Question-{hex(self.id)}"
-
-
-class QuestionOrder(models.Model):
-    weight = models.IntegerField("Order Number", primary_key=True)
-    question = models.OneToOneField(Question, CASCADE)
-
-    def __str__(self):
-        return f"{self.weight}: {self.question}"
 
 
 class Hint(models.Model):
@@ -66,11 +59,14 @@ class Hint(models.Model):
 
 
 class Team(models.Model):
-    group_id = models.OneToOneField(Group, CASCADE, primary_key=True)
-    current_question = models.ForeignKey(Question, on_delete=PROTECT)
-    locked_out_until = models.DateTimeField("Locked Out Until", blank=True)
-    last_hint = models.ForeignKey(Hint, blank=True, on_delete=PROTECT)
-    last_hint_time = models.DateTimeField(blank=True)
+    group = models.OneToOneField(Group, CASCADE, primary_key=True)
+    current_question = models.OneToOneField(Question, on_delete=PROTECT, blank=True, related_name="scavenger_team", null=True)
+    locked_out_until = models.DateTimeField("Locked Out Until", blank=True, null=True)
+    last_hint = models.ForeignKey(Hint, blank=True, on_delete=PROTECT, null=True)
+    last_hint_time = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self) -> str:
+        return self.group.name
 
 
 class QuestionTime(models.Model):
