@@ -5,6 +5,7 @@ credentials.*
 temp_*
 default_name.db
 .idea/
+files/media/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

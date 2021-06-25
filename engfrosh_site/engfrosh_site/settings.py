@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# TODO Change Where these settings live, put them in the database
 # Discord API Settings
 DEFAULT_DISCORD_API_VERSION = 8
 DEFAULT_DISCORD_SCOPE = ["identify", "guilds.join"]
@@ -46,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'discord_bot_manager.apps.DiscordBotManagerConfig',
     'authentication.apps.AuthenticationConfig',
-    'frosh.apps.FroshConfig'
+    'frosh.apps.FroshConfig',
+    'scavenger.apps.ScavengerConfig'
 ]
 
 MIDDLEWARE = [
@@ -136,6 +138,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'files/static'
+MEDIA_ROOT = 'files/media'
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
