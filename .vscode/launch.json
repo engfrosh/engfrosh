@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Module",
+            "name": "Discord Bot",
             "type": "python",
             "request": "launch",
             "module": "engfrosh_bot"

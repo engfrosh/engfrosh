@@ -2,7 +2,10 @@ modules:
   # Which modules to import and use
   rabbitmq: False
   postgres: False # Otherwise will use sqlite
-  cogs: ["engfrosh_bot.cogs.cogModeration.moderation"] # "cogs.cogScav.scav"
+  cogs: [
+    "engfrosh_bot.cogs.cogModeration.moderation", 
+    "engfrosh_bot.cogs.cogCoin.coin"
+    ] # "cogs.cogScav.scav"
 
 log_level: DEBUG
 
@@ -18,4 +21,17 @@ module_settings:
 
   # postgres:
 
+  # sqlite:
+  #   filename: 
+
   bot_prefix: "!"
+
+  moderation:
+    checkmark: True
+
+  coin:
+    public_commands: True
+    public_confirmations: True
+    scoreboard_channels: [
+      813043254358442034
+    ]
