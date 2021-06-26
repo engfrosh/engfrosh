@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+        <title>Scoin Standings</title>
+    </head>
+    <body>
+        <table>
+            <tr>
+                <th>Place</th>
+                <th>Team</th>
+                <th>Amount</th>
+            </tr>
+            {% for team in teams %}
+                <tr>
+                    <th>{{team.place}}</th>
+                    <th>{{team.name}}</th>
+                    <th>{{team.coin}}</th>
+                </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>
