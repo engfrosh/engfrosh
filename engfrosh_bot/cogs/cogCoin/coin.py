@@ -49,10 +49,30 @@ class Coin(commands.Cog):
         msg = "```\nScoin Standings\n==================\n"
         name_padding = 25
         coin_padding = 10
-        for i in range(len(teams)):
-            msg += "{place}. {team_name} {coin_amount}\n".format(
-                place=i + 1, team_name=f"{teams[i].name}{' ' * (name_padding - len(str(teams[i].name)))}",
-                coin_amount=f"{teams[i].coin}{' ' * (coin_padding - len(str(teams[i].coin)))}")
+
+        cur_place = 0
+        cur_coin = None
+        next_place = 1
+
+        for team in teams:
+            s = "{place}. {team_name} {coin_amount}\n"
+
+            team_name = team.name
+            coin_amount = team.coin
+
+            if coin_amount == cur_coin:
+                # If there is a tie
+                place = cur_place
+                next_place += 1
+            else:
+                place = next_place
+                cur_place = next_place
+                next_place += 1
+                cur_coin = coin_amount
+
+            msg += s.format(
+                place=place, team_name=f"{team_name}{' ' * (name_padding - len(str(team_name)))}",
+                coin_amount=f"{coin_amount}{' ' * (coin_padding - len(str(coin_amount)))}")
         msg += "```"
 
         for chid in self.config["scoreboard_channels"]:

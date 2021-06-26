@@ -11,14 +11,28 @@ def coin_standings(request: HttpRequest):
         "teams": []
     }
 
-    teams = Team.objects.all()
+    teams = Team.objects.all().order_by("coin_amount").reverse()
+
+    cur_place = 0
+    cur_coin = None
+    next_place = 1
 
     for team in teams:
         d = {}
 
         d["name"] = team.display_name
         d["coin"] = team.coin_amount
-        d["place"] = 0
+
+        if d["coin"] == cur_coin:
+            # If there is a tie
+            d["place"] = cur_place
+            next_place += 1
+        else:
+            d["place"] = next_place
+            cur_place = next_place
+            next_place += 1
+            cur_coin = d["coin"]
+
         context["teams"].append(d)
 
     return render(request, "scoin_standings.html", context)
