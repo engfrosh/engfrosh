@@ -35,3 +35,4 @@ module_settings:
     scoreboard_channels: [
       813043254358442034
     ]
+    permission: change_team_coin # Names must be unique as currently written

@@ -12,6 +12,7 @@ logger = logging.getLogger("Cogs.Coin")
 class Coin(commands.Cog):
     def __init__(self, bot: EngFroshBot) -> None:
         self.bot = bot
+        self.db = bot.db_int
         self.config = bot.config["module_settings"]["coin"]
 
     @commands.command()
@@ -20,6 +21,11 @@ class Coin(commands.Cog):
 
     @commands.command()
     async def coin(self, ctx: commands.Context, team, amount):
+        allowed = await self.db.check_user_has_permission(discord_id=ctx.author.id, permission_name=self.config["permission"])
+        if not allowed:
+            await ctx.message.reply("Sorry, you don't have the permission to do that.")
+            return
+
         if not self.bot.config["module_settings"]["coin"]["public_commands"]:
             await ctx.message.delete()
 

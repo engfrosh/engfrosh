@@ -45,7 +45,8 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
     # If no given User account to asociate with, create a new one
     if not user:
         if not username:
-            username = "".join(random.choice(string.ascii_letters + string.digits) for i in range(32))
+            s = f"{discord_username}#{discord_discriminator} - "
+            username = s + "".join(random.choice(string.ascii_letters + string.digits) for i in range(8))
         user = User.objects.create_user(username, email, password)
         user.save()
 

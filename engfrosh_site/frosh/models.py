@@ -10,3 +10,8 @@ class Team(models.Model):
 
     def __str__(self):
         return str(self.display_name)
+
+    class Meta:
+        permissions = [
+            ("change_team_coin", "Can change the coin amount of a team.")
+        ]

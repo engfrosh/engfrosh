@@ -161,6 +161,14 @@ class DatabaseInterface():
             lst.append(Objects.FroshTeam(row["group_id"], row["display_name"], row["coin_amount"]))
         return lst
 
+    async def get_permission_id(self, name) -> int:
+        sql = f"""SELECT * FROM auth_permission WHERE codename = {self._qp()};"""
+        row = await self._fetchrow(sql, (name,))
+        if row:
+            return row["id"]
+        else:
+            return None
+
     # endregion
 
     # region UPDATE methods
@@ -233,6 +241,26 @@ class DatabaseInterface():
             return True
         else:
             return False
+
+    async def check_user_has_permission(self, user_id=None, discord_id=None, permission_name=None, permission_id=None):
+        if not user_id:
+            user_id = await self.get_user_id(discord_id=discord_id)
+
+        if not permission_id:
+            permission_id = await self.get_permission_id(permission_name)
+
+        if not (user_id and permission_id):
+            return False
+        
+        # Check single permissions
+        sql = f"SELECT * FROM auth_user_user_permissions WHERE user_id = {self._qp(1)} AND permission_id = {self._qp(2)};"
+        row = self._fetchrow(sql, (user_id, permission_id))
+        if row:
+            return True
+
+        # Check group permissions
+
+        return False
 
     # endregion
 
@@ -322,6 +350,7 @@ class DatabaseInterface():
             return True
         else:
             raise NotImplementedError("Adding scavenger teams only supported with SQLite")
+
     # endregion
 
     # region Helper Functions
