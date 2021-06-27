@@ -1,10 +1,16 @@
 from sqlite3.dbapi2 import IntegrityError
+from typing import List, Tuple
 import asyncpg
 import sqlite3
 import uuid
 import datetime
+from . import Objects
 
-from .SQLITE_INIT import SQLITE_INIT
+try:
+    from .SQLITE_INIT import SQLITE_INIT
+except ModuleNotFoundError:
+    from SQLITE_INIT import SQLITE_INIT
+
 
 import logging
 import os
@@ -79,6 +85,20 @@ class DatabaseInterface():
         else:
             raise NotImplementedError("Must pass one parameter to get group id.")
 
+    async def get_frosh_team_id(self, *, team_name=None):
+        """Name can either be a team display name or the group name. Group name takes priority."""
+        if team_name:
+            id = await self.get_group_id(group_name=team_name)
+            if not id:
+                sql = f"SELECT * FROM frosh_team WHERE display_name = {self._qp()};"
+                row = await self._fetchrow(sql, (team_name,))
+                if row:
+                    id = row["group_id"]
+        else:
+            raise ValueError
+
+        return id
+
     async def get_user_id(self, *, discord_id=None):
 
         if discord_id:
@@ -132,9 +152,39 @@ class DatabaseInterface():
 
         return locked_out_time
 
+    async def get_all_frosh_teams(self) -> List[Objects.FroshTeam]:
+        """Returns a dictionary where the key is the team_id, and the value is the display name."""
+        sql = "SELECT * FROM frosh_team;"
+        rows = await self._fetchall(sql)
+        lst = []
+        for row in rows:
+            lst.append(Objects.FroshTeam(row["group_id"], row["display_name"], row["coin_amount"]))
+        return lst
+
+    async def get_permission_id(self, name) -> int:
+        sql = f"""SELECT * FROM auth_permission WHERE codename = {self._qp()};"""
+        row = await self._fetchrow(sql, (name,))
+        if row:
+            return row["id"]
+        else:
+            return None
+
+    async def get_groups(self, *, user_id=None) -> Tuple[int]:
+        if not user_id:
+            raise ValueError
+
+        sql = f"SELECT * FROM auth_user_groups WHERE user_id = {self._qp()};"
+        rows = await self._fetchall(sql, (user_id,))
+        lst = []
+        for row in rows:
+            lst.append(row["group_id"])
+
+        return tuple(lst)
+
     # endregion
 
     # region UPDATE methods
+
     async def update_coin_amount(self, change: int, *, group_name=None, group_id=None):
         if not group_id and group_name:
             group_id = await self.get_group_id(group_name=group_name)
@@ -142,6 +192,7 @@ class DatabaseInterface():
             sql = f"UPDATE frosh_team SET coin_amount = coin_amount + {self._qp(1)} WHERE group_id = {self._qp(2)};"
             await self._execute(sql, (change, group_id))
             logger.info(f"Adjusted coin for team with id: {group_id} by {change}.")
+            return True
 
         else:
             logger.error("No group passed to update_coin_amount.")
@@ -203,6 +254,41 @@ class DatabaseInterface():
             return True
         else:
             return False
+
+    async def check_user_has_permission(self, user_id=None, discord_id=None, permission_name=None, permission_id=None):
+        if not user_id:
+            user_id = await self.get_user_id(discord_id=discord_id)
+
+        if not permission_id:
+            permission_id = await self.get_permission_id(permission_name)
+
+        if not (user_id and permission_id):
+            return False
+
+        # Check single permissions
+        sql = f"""SELECT * FROM auth_user_user_permissions
+                  WHERE user_id = {self._qp(1)} AND permission_id = {self._qp(2)};"""
+        row = await self._fetchrow(sql, (user_id, permission_id))
+        if row:
+            return True
+
+        # Check group permissions
+        groups = await self.get_groups(user_id=user_id)
+        for group_id in groups:
+            res = await self.check_group_has_permission(group_id=group_id, permission_id=permission_id)
+            if res:
+                return True
+
+        return False
+
+    async def check_group_has_permission(self, *, group_id=None, permission_id=None):
+        sql = f"SELECT * FROM auth_group_permissions WHERE group_id = {self._qp(1)} AND permission_id = {self._qp(2)};"
+
+        res = await self._fetchone(sql, (group_id, permission_id))
+        if res:
+            return True
+
+        return False
 
     # endregion
 
@@ -292,6 +378,7 @@ class DatabaseInterface():
             return True
         else:
             raise NotImplementedError("Adding scavenger teams only supported with SQLite")
+
     # endregion
 
     # region Helper Functions
@@ -320,11 +407,11 @@ class DatabaseInterface():
 
         return row
 
-    async def _fetchall(self, sql, parameters):
+    async def _fetchall(self, sql, parameters=tuple()):
         if self._is_postgres():
             await self._ensure_pool()
             async with self.pool.acquire() as conn:
-                rows = await conn.fetch(sql, parameters)
+                rows = await conn.fetch(sql, *parameters)
 
         elif self._is_sqlite():
             cur = self.connection.cursor()

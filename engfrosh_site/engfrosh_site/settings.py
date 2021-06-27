@@ -32,9 +32,6 @@ ALLOWED_HOSTS = []
 DEFAULT_DISCORD_API_VERSION = 8
 DEFAULT_DISCORD_SCOPE = ["identify", "guilds.join"]
 
-# Discord Authentication Details for OAuth Application
-DISCORD_CLIENT_ID = r""
-DISCORD_CLIENT_SECRET = r""
 
 # Application definition
 

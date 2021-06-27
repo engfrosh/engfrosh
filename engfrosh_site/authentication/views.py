@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from .discord_auth import register
 
 from django.conf import settings
+from . import credentials
 
 import os
 import sys
@@ -16,7 +17,7 @@ PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 # Hack for development to get around import issues
 sys.path.append(PARENT_DIRECTORY)
-from engfrosh_common.DiscordAPI import build_oauth_authorize_url # noqa E402
+from engfrosh_common.DiscordAPI import build_oauth_authorize_url  # noqa E402
 
 
 def index(request: HttpRequest):
@@ -34,7 +35,7 @@ def discord_login(request: HttpRequest):
 
     return redirect(
         build_oauth_authorize_url(
-            settings.DISCORD_CLIENT_ID, callback_url, settings.DEFAULT_DISCORD_SCOPE, prompt="none"))
+            credentials.DISCORD_CLIENT_ID, callback_url, settings.DEFAULT_DISCORD_SCOPE, prompt="none"))
 
 
 def discord_login_callback(request: HttpRequest):
@@ -54,8 +55,12 @@ def discord_login_callback(request: HttpRequest):
 
 
 def login_failed(request):
-    return HttpResponse("Your login attempt failed for some reason")
+    return render(request, "login_failed.html")
 # endregion
+
+
+def permission_denied(request: HttpRequest):
+    return render(request, "permission_denied.html")
 
 
 # region Registration

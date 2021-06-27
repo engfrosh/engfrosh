@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 import random
 import string
 import logging
-from django.conf import settings
+from . import credentials
 
 import os
 import sys
@@ -25,9 +25,9 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
              password=None, discord_oauth_code=None, callback_url=None):
 
     # Get User Info
-    discord_api = DiscordAPI(
-        settings.DISCORD_CLIENT_ID, settings.DISCORD_CLIENT_SECRET, access_token=access_token, expires_in=expires_in,
-        refresh_token=refresh_token, oauth_code=discord_oauth_code, callback_url=callback_url)
+    discord_api = DiscordAPI(credentials.DISCORD_CLIENT_ID, credentials.DISCORD_CLIENT_SECRET,
+                             access_token=access_token, expires_in=expires_in, refresh_token=refresh_token,
+                             oauth_code=discord_oauth_code, callback_url=callback_url)
     discord_user_info = discord_api.get_user_info()
 
     discord_user_id = discord_user_info["id"]
@@ -45,7 +45,8 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
     # If no given User account to asociate with, create a new one
     if not user:
         if not username:
-            username = "".join(random.choice(string.ascii_letters + string.digits) for i in range(32))
+            s = f"{discord_username}+{discord_discriminator}-"
+            username = s + "".join(random.choice(string.ascii_letters + string.digits) for i in range(8))
         user = User.objects.create_user(username, email, password)
         user.save()
 
@@ -76,7 +77,7 @@ class DiscordAuthBackend(BaseBackend):
 
         try:
             client = DiscordAPI(
-                settings.DISCORD_CLIENT_ID, settings.DISCORD_CLIENT_SECRET, version=8,
+                credentials.DISCORD_CLIENT_ID, credentials.DISCORD_CLIENT_SECRET, version=8,
                 access_token=discord_access_token, expires_in=discord_expires_in, refresh_token=discord_refresh_token,
                 oauth_code=discord_oauth_code, callback_url=callback_url)
         except Exception:

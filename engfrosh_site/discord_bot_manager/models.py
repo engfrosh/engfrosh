@@ -40,5 +40,5 @@ class ScavChannel(models.Model):
 
 
 class Role(models.Model):
-    role_id = models.IntegerField("Discord Role ID", primary_key=True)
+    role_id = models.PositiveBigIntegerField("Discord Role ID", primary_key=True)
     group_id = models.OneToOneField(Group, CASCADE)
