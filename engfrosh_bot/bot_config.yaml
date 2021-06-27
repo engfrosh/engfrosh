@@ -1,7 +1,9 @@
 modules:
   # Which modules to import and use
   rabbitmq: False
-  postgres: False # Otherwise will use sqlite
+  postgres: False 
+  # Warning, lots of functionality will fail if not using a postgres database.
+
   cogs: [
     "engfrosh_bot.cogs.cogModeration.moderation", 
     "engfrosh_bot.cogs.cogCoin.coin"
@@ -20,9 +22,6 @@ module_settings:
     queue: django_discord
 
   # postgres:
-
-  # sqlite:
-  #   filename: 
 
   bot_prefix: "!"
 
