@@ -27,6 +27,22 @@ module_settings:
 
   moderation:
     checkmark: True
+    reply:
+      channel: True
+      dm: True
+    
+    ignored_channels: [
+      858741004831555634
+    ]
+    report_channels: [
+      858741004831555634
+    ]
+    additional_words: [
+      "uottawa"
+    ]
+
+    report_message: "{author} sent a message to channel {channel} that broke the moderation rules:\n\n||{content}||"
+    profanity_message: "Your message is not appropriate. It has been deleted from the channel and sent to the moderation team."
 
   coin:
     public_commands: True

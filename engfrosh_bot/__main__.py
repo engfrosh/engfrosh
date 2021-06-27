@@ -8,7 +8,6 @@ import asyncio
 import yaml
 from .EngFroshBot import EngFroshBot
 
-
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
@@ -102,7 +101,6 @@ async def superhelp(ctx):
 @client.command(pass_context=True)
 async def react(ctx):
     await ctx.message.add_reaction("🍋")
-    await ctx.channel.send("did it work?")
 
 
 @client.event
@@ -110,7 +108,8 @@ async def on_reaction_add(reaction, user):
     if reaction.message.author == client.user:
         if reaction.emoji == '👍':
             await reaction.message.channel.send('Hi there!')
-        return
+    return
+
 
 # endregion
 
