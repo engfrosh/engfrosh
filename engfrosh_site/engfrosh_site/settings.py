@@ -34,7 +34,7 @@ DEFAULT_DISCORD_SCOPE = ["identify", "guilds.join"]
 
 # Discord Authentication Details for OAuth Application
 DISCORD_CLIENT_ID = r"846882636185206804"
-DISCORD_CLIENT_SECRET = r"MrsvVuuFJ0zvJvBRpatGswcMdrEPM5oC"
+DISCORD_CLIENT_SECRET = r""
 # Application definition
 
 INSTALLED_APPS = [
