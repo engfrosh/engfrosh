@@ -20,7 +20,8 @@ class Coin(commands.Cog):
 
     @commands.command()
     async def coin(self, ctx: commands.Context, team, amount):
-        allowed = await self.db.check_user_has_permission(discord_id=ctx.author.id, permission_name=self.config["permission"])
+        allowed = await self.db.check_user_has_permission(discord_id=ctx.author.id,
+                                                          permission_name=self.config["permission"])
         if not allowed:
             await ctx.message.reply("Sorry, you don't have the permission to do that.")
             return

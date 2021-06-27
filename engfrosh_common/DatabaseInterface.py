@@ -266,7 +266,8 @@ class DatabaseInterface():
             return False
 
         # Check single permissions
-        sql = f"SELECT * FROM auth_user_user_permissions WHERE user_id = {self._qp(1)} AND permission_id = {self._qp(2)};"
+        sql = f"""SELECT * FROM auth_user_user_permissions
+                  WHERE user_id = {self._qp(1)} AND permission_id = {self._qp(2)};"""
         row = await self._fetchrow(sql, (user_id, permission_id))
         if row:
             return True
