@@ -74,12 +74,7 @@ class Coin(commands.Cog):
                 coin_amount=f"{coin_amount}{' ' * (coin_padding - len(str(coin_amount)))}")
         msg += "```"
 
-        for chid in self.config["scoreboard_channels"]:
-            if channel := self.bot.get_channel(chid):
-                await channel.purge()
-                await channel.send(msg)
-            else:
-                logger.error(f"Could not get channel with id: {chid}")
+        self.bot.send_to_all(msg, self.config["scoreboard_channels"], purge_first=True)
 
 
 def setup(bot):

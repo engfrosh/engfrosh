@@ -8,7 +8,6 @@ import asyncio
 import yaml
 from .EngFroshBot import EngFroshBot
 
-from better_profanity import profanity
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
@@ -103,36 +102,6 @@ async def superhelp(ctx):
 @client.command(pass_context=True)
 async def react(ctx):
     await ctx.message.add_reaction("🍋")
-    await ctx.channel.send("did it work?")
-
-
-def moderation_checks(message_text):
-    """
-    This function returns true or false based on the results of a profanity/word check of a string.
-    """
-
-    # better_profanity checks
-
-    profanity.add_censor_words(["uottawa"])                     # adding custom bad words
-    contains_bad = profanity.contains_profanity(message_text)   # checks if the string contains the bad word
-
-    return contains_bad
-
-
-async def moderate(message):
-    """
-    This function takes a message, checks for profanity using the moderation_checks() function.
-    If the message has profanity, the message is deleted, and the user is mentions with a message indicating that their
-    message is not allowed
-
-    """
-    if moderation_checks(str(message.content)):
-        author_id = "<@" + str(message.author.id) + ">"
-        await message.delete()
-        await message.channel.send(
-            "Hey " + author_id + " Your Message \" " + profanity.censor(str(message.content), censor_char="\\*") +
-            " \" is not permitted")
-    return
 
 
 @client.event
@@ -140,9 +109,6 @@ async def on_reaction_add(reaction, user):
     if reaction.message.author == client.user:
         if reaction.emoji == '👍':
             await reaction.message.channel.send('Hi there!')
-        return
-    await message.channel.send("Hello There")
-    await moderate(message)        # call this function to moderate messages, done here so it happens for every message
     return
 
 
