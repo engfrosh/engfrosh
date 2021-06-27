@@ -1,11 +1,13 @@
 from django.shortcuts import render  # noqa F401
 from django.http import HttpRequest
+from django.contrib.auth.decorators import permission_required
 
 from .models import Team
 
 # Create your views here.
 
 
+@permission_required('frosh.view_team_coin_standings', "/accounts/permission-denied/")
 def coin_standings(request: HttpRequest):
     context = {
         "teams": []

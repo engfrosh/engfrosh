@@ -13,5 +13,6 @@ class Team(models.Model):
 
     class Meta:
         permissions = [
-            ("change_team_coin", "Can change the coin amount of a team.")
+            ("change_team_coin", "Can change the coin amount of a team."),
+            ("view_team_coin_standings", "Can view the coin standings of all teams.")
         ]

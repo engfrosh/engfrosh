@@ -14,5 +14,6 @@ urlpatterns = [
     path("register/discord/callback/", views.discord_register_callback, name="discord_register_callback"),
     path("register/discord/", views.discord_register, name="discord_register"),
     # Other
-    path("welcome/discord/", views.discord_initial_setup, name="discord_welcome")
+    path("welcome/discord/", views.discord_initial_setup, name="discord_welcome"),
+    path("permission-denied/", views.permission_denied, name="permission_denied")
 ]
