@@ -24,7 +24,7 @@
             "cwd": "${workspaceFolder}"
         },
         {
-            "name": "Python: Django",
+            "name": "Website (Django)",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}\\engfrosh_site\\manage.py",

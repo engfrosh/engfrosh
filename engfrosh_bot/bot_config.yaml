@@ -34,4 +34,10 @@ module_settings:
     scoreboard_channels: [
       813043254358442034
     ]
+    scoreboard:
+      header: "Scoin Standings\n=================="
+      row: "{place}. {team_name} {coin_amount}"
+      # row must contain format placeholders: place, team_name, coin_amount
+      name_length: 25
+      coin_length: 10
     permission: change_team_coin # Names must be unique as currently written

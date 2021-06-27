@@ -61,7 +61,6 @@ else:
 client = EngFroshBot(config["module_settings"]["bot_prefix"], db_int=db_int, config=config)
 
 for cog in config["modules"]["cogs"]:
-    print(cog)
     client.load_extension(cog)
     logger.debug('Cog %s loaded', cog)
 

@@ -1,8 +1,6 @@
+import logging
 from discord.ext import commands
 from ...EngFroshBot import EngFroshBot
-# from engfrosh_common.DatabaseInterface import DatabaseInterface
-
-import logging
 
 
 logger = logging.getLogger("Cogs.Coin")
@@ -15,10 +13,6 @@ class Coin(commands.Cog):
         self.config = bot.config["module_settings"]["coin"]
 
     @commands.command()
-    async def hello(self, ctx):
-        await ctx.channel.send("Hello!")
-
-    @commands.command()
     async def coin(self, ctx: commands.Context, team, amount):
         allowed = await self.db.check_user_has_permission(discord_id=ctx.author.id,
                                                           permission_name=self.config["permission"])
@@ -26,10 +20,8 @@ class Coin(commands.Cog):
             await ctx.message.reply("Sorry, you don't have the permission to do that.")
             return
 
-        if not self.bot.config["module_settings"]["coin"]["public_commands"]:
+        if not self.config["public_commands"]:
             await ctx.message.delete()
-
-        await ctx.channel.send(f"Team: {team} Amount {amount}")
 
         team_id = await self.bot.db_int.get_frosh_team_id(team_name=team)
 
@@ -41,6 +33,7 @@ class Coin(commands.Cog):
 
         if res:
             display_name = await self.bot.db_int.get_team_display_name(team_id)
+            # TODO change so it sends to that team's update channel
             await ctx.channel.send(f"{display_name} You got {amount} scoin!")
             await self.update_coin_board()
         else:
@@ -52,16 +45,16 @@ class Coin(commands.Cog):
 
         teams.sort(key=lambda team: team.coin, reverse=True)
 
-        msg = "```\nScoin Standings\n==================\n"
-        name_padding = 25
-        coin_padding = 10
+        msg = f"```\n{self.config['scoreboard']['header']}\n"
+        name_padding = self.config['scoreboard']['name_length']
+        coin_padding = self.config['scoreboard']['coin_length']
 
         cur_place = 0
         cur_coin = None
         next_place = 1
 
         for team in teams:
-            s = "{place}. {team_name} {coin_amount}\n"
+            s = f"{self.config['scoreboard']['row']}\n"
 
             team_name = team.name
             coin_amount = team.coin
