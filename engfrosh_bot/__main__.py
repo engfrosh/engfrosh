@@ -8,7 +8,6 @@ import asyncio
 import yaml
 from .EngFroshBot import EngFroshBot
 
-
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
