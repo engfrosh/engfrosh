@@ -1,5 +1,5 @@
 from sqlite3.dbapi2 import IntegrityError
-from typing import List
+from typing import List, Tuple
 import asyncpg
 import sqlite3
 import uuid
@@ -169,9 +169,22 @@ class DatabaseInterface():
         else:
             return None
 
+    async def get_groups(self, *, user_id=None) -> Tuple[int]:
+        if not user_id:
+            raise ValueError
+
+        sql = f"SELECT * FROM auth_user_groups WHERE user_id = {self._qp()};"
+        rows = await self._fetchall(sql, (user_id,))
+        lst = []
+        for row in rows:
+            lst.append(row["group_id"])
+
+        return tuple(lst)
+
     # endregion
 
     # region UPDATE methods
+
     async def update_coin_amount(self, change: int, *, group_name=None, group_id=None):
         if not group_id and group_name:
             group_id = await self.get_group_id(group_name=group_name)
@@ -251,14 +264,28 @@ class DatabaseInterface():
 
         if not (user_id and permission_id):
             return False
-        
+
         # Check single permissions
         sql = f"SELECT * FROM auth_user_user_permissions WHERE user_id = {self._qp(1)} AND permission_id = {self._qp(2)};"
-        row = self._fetchrow(sql, (user_id, permission_id))
+        row = await self._fetchrow(sql, (user_id, permission_id))
         if row:
             return True
 
         # Check group permissions
+        groups = await self.get_groups(user_id=user_id)
+        for group_id in groups:
+            res = await self.check_group_has_permission(group_id=group_id, permission_id=permission_id)
+            if res:
+                return True
+
+        return False
+
+    async def check_group_has_permission(self, *, group_id=None, permission_id=None):
+        sql = f"SELECT * FROM auth_group_permissions WHERE group_id = {self._qp(1)} AND permission_id = {self._qp(2)};"
+
+        res = await self._fetchone(sql, (group_id, permission_id))
+        if res:
+            return True
 
         return False
 

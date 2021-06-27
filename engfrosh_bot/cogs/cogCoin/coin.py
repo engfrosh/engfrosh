@@ -3,7 +3,6 @@ from ...EngFroshBot import EngFroshBot
 # from engfrosh_common.DatabaseInterface import DatabaseInterface
 
 import logging
-import os
 
 
 logger = logging.getLogger("Cogs.Coin")
