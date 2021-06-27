@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 import random
 import string
 import logging
-from django.conf import settings
+from . import credentials
 
 import os
 import sys
@@ -26,7 +26,7 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
 
     # Get User Info
     discord_api = DiscordAPI(
-        settings.DISCORD_CLIENT_ID, settings.DISCORD_CLIENT_SECRET, access_token=access_token, expires_in=expires_in,
+        credentials.DISCORD_CLIENT_ID, credentials.DISCORD_CLIENT_SECRET, access_token=access_token, expires_in=expires_in,
         refresh_token=refresh_token, oauth_code=discord_oauth_code, callback_url=callback_url)
     discord_user_info = discord_api.get_user_info()
 
@@ -77,7 +77,7 @@ class DiscordAuthBackend(BaseBackend):
 
         try:
             client = DiscordAPI(
-                settings.DISCORD_CLIENT_ID, settings.DISCORD_CLIENT_SECRET, version=8,
+                credentials.DISCORD_CLIENT_ID, credentials.DISCORD_CLIENT_SECRET, version=8,
                 access_token=discord_access_token, expires_in=discord_expires_in, refresh_token=discord_refresh_token,
                 oauth_code=discord_oauth_code, callback_url=callback_url)
         except Exception:

@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from .discord_auth import register
 
 from django.conf import settings
+from . import credentials
 
 import os
 import sys
@@ -34,7 +35,7 @@ def discord_login(request: HttpRequest):
 
     return redirect(
         build_oauth_authorize_url(
-            settings.DISCORD_CLIENT_ID, callback_url, settings.DEFAULT_DISCORD_SCOPE, prompt="none"))
+            credentials.DISCORD_CLIENT_ID, callback_url, settings.DEFAULT_DISCORD_SCOPE, prompt="none"))
 
 
 def discord_login_callback(request: HttpRequest):
