@@ -1,0 +1,37 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Discord Bot",
+            "type": "python",
+            "request": "launch",
+            "module": "engfrosh_bot"
+        },
+        {
+            "name": "Py Dir: Current File in Directory",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${fileDirname}"
+        },
+        {
+            "name": "Py Wrk: Current File in Workspace",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Website (Django)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}\\engfrosh_site\\manage.py",
+            "args": [
+                "runserver"
+            ],
+            "django": true
+        }
+    ]
+}

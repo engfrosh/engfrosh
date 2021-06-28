@@ -27,6 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# TODO Change Where these settings live, put them in the database
+# Discord API Settings
+DEFAULT_DISCORD_API_VERSION = 8
+DEFAULT_DISCORD_SCOPE = ["identify", "guilds.join"]
+
 
 # Application definition
 
@@ -37,6 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'discord_bot_manager.apps.DiscordBotManagerConfig',
+    'authentication.apps.AuthenticationConfig',
+    'frosh.apps.FroshConfig',
+    'scavenger.apps.ScavengerConfig'
 ]
 
 MIDDLEWARE = [
@@ -75,13 +84,16 @@ WSGI_APPLICATION = 'engfrosh_site.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "engfrosh",
+        "USER": "django_engfrosh",
+        "PASSWORD": "there-exercise-fenegle",
+        "HOST": "localhost",
+        "PORT": "5432",
+    }}
 
 
-# Password validation
+# Password validation & Authentication
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -99,13 +111,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'authentication.discord_auth.DiscordAuthBackend'
+]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Toronto'
 
 USE_I18N = True
 
@@ -118,8 +135,26 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'files/static'
+MEDIA_ROOT = 'files/media'
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
