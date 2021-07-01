@@ -75,3 +75,16 @@ class QuestionTime(models.Model):
     team = models.ForeignKey(Team, CASCADE)
     question = models.ForeignKey(Question, PROTECT)
     end_time = models.DateTimeField("Completed At")
+
+
+class Settings(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=32, unique=True)
+    display_name = models.CharField(max_length=64, blank=True)
+    enabled = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        if self.display_name:
+            return self.display_name
+        else:
+            return self.name

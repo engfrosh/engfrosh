@@ -1,3 +1,5 @@
+# These settings are only for settings that will not need to be changed while running 
+
 modules:
   # Which modules to import and use
   rabbitmq: False
@@ -6,8 +8,9 @@ modules:
 
   cogs: [
     "engfrosh_bot.cogs.cogModeration.moderation", 
-    "engfrosh_bot.cogs.cogCoin.coin"
-    ] # "cogs.cogScav.scav"
+    "engfrosh_bot.cogs.cogCoin.coin",
+    "engfrosh_bot.cogs.cogScav.scav"
+    ] 
 
 log_level: DEBUG
 
@@ -57,3 +60,8 @@ module_settings:
       name_length: 25
       coin_length: 10
     permission: change_team_coin # Names must be unique as currently written
+
+
+  scav:
+    settings_names:
+      active: "scav_active"

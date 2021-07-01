@@ -1,30 +1,18 @@
-from sqlite3.dbapi2 import IntegrityError
-from typing import List, Tuple
+
+# region Imports
+import logging
 import asyncpg
-import sqlite3
 import uuid
 import datetime
+
+from sqlite3.dbapi2 import IntegrityError
+from typing import Iterable, List, Tuple
+
 from . import Objects
-
-try:
-    from .SQLITE_INIT import SQLITE_INIT
-except ModuleNotFoundError:
-    from SQLITE_INIT import SQLITE_INIT
+# endregion
 
 
-import logging
-import os
-
-
-CURRENT_DIRECTORY = os.path.dirname(__file__)
-SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
-
-LOG_LEVEL = logging.DEBUG
-
-logger = logging.getLogger(SCRIPT_NAME)
-
-
-DEFAULT_SQLITE_DB = "default_name.db"
+logger = logging.getLogger("DatabaseInterface")
 
 
 class DatabaseInterface():
@@ -50,18 +38,7 @@ class DatabaseInterface():
             logger.info("DatabaseInterface created for Postgres with database credentials")
 
         else:
-            self.db = "SQLITE"
-            if not sqlite_filename:
-                sqlite_filename = DEFAULT_SQLITE_DB
-
-            self.connection = sqlite3.connect(sqlite_filename)
-            self.connection.row_factory = sqlite3.Row
-
-            logger.info(f"DatabaseInterface created for SQLite at {sqlite_filename}")
-
-            for command in SQLITE_INIT:
-                self.connection.cursor().execute(command)
-            logger.debug("Initialized SQLite Database")
+            raise NotImplementedError("Does not support non-postgres")
 
     # region GET methods
 
@@ -290,6 +267,25 @@ class DatabaseInterface():
 
         return False
 
+    async def check_scavenger_setting_enabled(self, *, id: int = None, name: str = None):
+        if id and name:
+            raise ValueError
+        elif id:
+            field = "id"
+            parameters = (id,)
+        elif name:
+            field = "name"
+            parameters = (name,)
+        else:
+            raise ValueError
+
+        sql = f"SELECT * FROM scavenger_settings WHERE {field} = {self._qp()};"
+        row = await self._fetchrow(sql, parameters)
+        if row:
+            return row["enabled"]
+
+        return None
+
     # endregion
 
     # region ADD methods
@@ -391,10 +387,10 @@ class DatabaseInterface():
         else:
             logger.debug("ensure_pool: pool already exists")
 
-    async def _fetchone(self, sql, parameters):
+    async def _fetchone(self, sql: str, parameters: Iterable):
         return await self._fetchrow(sql, parameters)
 
-    async def _fetchrow(self, sql, parameters):
+    async def _fetchrow(self, sql: str, parameters: Iterable):
         if self._is_postgres():
             await self._ensure_pool()
             async with self.pool.acquire() as conn:

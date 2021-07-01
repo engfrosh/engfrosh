@@ -8,6 +8,16 @@
             "module": "engfrosh_bot"
         },
         {
+            "name": "Website (Django)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}\\engfrosh_site\\manage.py",
+            "args": [
+                "runserver"
+            ],
+            "django": true
+        },
+        {
             "name": "Py Dir: Current File in Directory",
             "type": "python",
             "request": "launch",
@@ -22,16 +32,6 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}"
-        },
-        {
-            "name": "Website (Django)",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}\\engfrosh_site\\manage.py",
-            "args": [
-                "runserver"
-            ],
-            "django": true
         }
     ]
 }
