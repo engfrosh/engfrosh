@@ -134,7 +134,32 @@ class Scav(commands.Cog):
             await ctx.message.reply("Scav is not enabled.")
             return
 
-        await ctx.message.reply(f"You guessed {guess}")
+        if self.bot.config["debug"]:
+            await ctx.message.add_reaction("🔄")
+
+        # Get the team id from the channel
+        team_id = await self.db.get_group_id(scav_channel_id=ctx.message.channel.id)
+        if not team_id:
+            await self.bot.log("Could not get scav channel.")
+            return
+
+        # TODO Check if user is allowed to guess in this channel / group
+
+        # TODO check if team is locked out and allowed to guess
+
+        # TODO add support for image and file clues
+
+        question = await self.db.get_scav_question(team_id=team_id)
+        if not question:
+            await self.bot.log(f"Could not get a current question for team id: {team_id}", "ERROR")
+            return
+
+        if guess != question.answer:
+            if self.config["incorrect_message"]:
+                await ctx.message.reply(self.config["incorrect_message"])
+            else:
+                await ctx.message.add_reaction("👀")
+            return
 
         # if settings["scav"]["allowed"]:
         #     active_scav_team = scav_game.is_scav_channel(ctx.message.channel.id)

@@ -57,7 +57,7 @@ if config["modules"]["postgres"]:
 else:
     db_int = DatabaseInterface()
 
-client = EngFroshBot(config["module_settings"]["bot_prefix"], db_int=db_int, config=config)
+client = EngFroshBot(config["bot_prefix"], db_int=db_int, config=config, log_channels=config["bot_log_channel"])
 
 for cog in config["modules"]["cogs"]:
     client.load_extension(cog)

@@ -37,12 +37,13 @@ class Question(models.Model):
     image = models.ImageField(upload_to=question_path, blank=True)
     display_filename = models.CharField(max_length=256, blank=True)
     weight = models.IntegerField("Order Number", unique=True, default=0, db_index=True)
+    answer = models.CharField(max_length=32)
 
     def __str__(self):
         if self.identifier:
-            return self.identifier
+            return f"{self.weight}. {self.identifier}"
         else:
-            return f"Question-{hex(self.id)}"
+            return f"Question {self.weight}"
 
 
 class Hint(models.Model):

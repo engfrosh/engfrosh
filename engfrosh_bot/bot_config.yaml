@@ -3,7 +3,7 @@
 modules:
   # Which modules to import and use
   rabbitmq: False
-  postgres: False 
+  postgres: True 
   # Warning, lots of functionality will fail if not using a postgres database.
 
   cogs: [
@@ -19,6 +19,14 @@ credentials:
   absolute_path: Null
   # If both are provided, will default to the relative path
 
+bot_log_channel: [
+  807100215651074109
+]
+
+bot_prefix: "!"
+
+debug: True
+
 module_settings:
   rabbitmq:
     host: localhost
@@ -26,7 +34,6 @@ module_settings:
 
   # postgres:
 
-  bot_prefix: "!"
 
   moderation:
     checkmark: True
@@ -63,5 +70,9 @@ module_settings:
 
 
   scav:
+    incorrect_message: Null
+
     settings_names:
       active: "scav_active"
+
+    

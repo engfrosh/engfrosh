@@ -158,6 +158,28 @@ class DatabaseInterface():
 
         return tuple(lst)
 
+    async def get_scav_question(self, *, team_id: int) -> Objects.ScavQuestion:
+        sql = f"SELECT * FROM scavenger_team WHERE group_id = {self._qp()};"
+        row = await self._fetchrow(sql, (team_id,))
+        if not row:
+            return None
+
+        qid = row["current_question_id"]
+
+        sql = f"SELECT * FROM scavenger_question WHERE id = {self._qp()};"
+        row = await self._fetchrow(sql, (qid,))
+
+        if row:
+            return Objects.ScavQuestion(id=row["id"],
+                                        enabled=row["enabled"],
+                                        identifier=row["identifier"],
+                                        text=row["text"],
+                                        weight=row["weight"],
+                                        answer=row["answer"])
+
+        logger.error(f"No Question with id {qid}")
+        return None
+
     # endregion
 
     # region UPDATE methods
