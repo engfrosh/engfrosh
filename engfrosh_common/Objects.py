@@ -1,3 +1,6 @@
+from asyncpg import Record
+
+
 class FroshTeam:
     def __init__(self, id: int, display_name: str, coin_amount: int = None) -> None:
         self.id = id
@@ -6,12 +9,43 @@ class FroshTeam:
 
 
 class ScavQuestion:
-    def __init__(self, id: int, enabled: bool, identifier: str, text: str, weight: int,
-                 answer: str) -> None:
+    def __init__(
+            self, *, id: int = None, enabled: bool = None, identifier: str = None, text: str = None, weight: int = None,
+            answer: str = None, row: Record = None) -> None:
 
-        self.id = id
-        self.enabled = enabled
-        self.identifier = identifier
-        self.text = text
-        self.weight = weight
-        self.answer = answer
+        if not row and not (id, answer):
+            raise ValueError("Insufficient arguments")
+
+        if row:
+            self.id = row["id"]
+            self.enabled = row["enabled"]
+            self.identifier = row["identifier"]
+            self.text = row["text"]
+            self.weight = row["weight"]
+            self.answer = row["answer"]
+
+        else:
+            self.id = id
+            self.enabled = enabled
+            self.identifier = identifier
+            self.text = text
+            self.weight = weight
+            self.answer = answer
+
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, ScavQuestion):
+            return NotImplemented
+
+        if self.id == o.id and self.identifier == o.identifier and self.answer == o.answer:
+            return True
+
+        return False
+
+    def __str__(self) -> str:
+        if self.identifier:
+            return self.identifier
+        else:
+            return f"Question {self.weight}"
+
+    def __repr__(self) -> str:
+        return f"<Question: {str(self)} id: {self.id}>"

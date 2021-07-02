@@ -6,7 +6,8 @@ import discord
 import datetime as dt
 
 from discord.ext import commands
-from discord.ext.commands import cog
+from discord.errors import NotFound
+
 from ...EngFroshBot import EngFroshBot
 # endregion
 
@@ -134,7 +135,7 @@ class Scav(commands.Cog):
             await ctx.message.reply("Scav is not enabled.")
             return
 
-        if self.bot.config["debug"]:
+        if self.bot.debug:
             await ctx.message.add_reaction("🔄")
 
         # Get the team id from the channel
@@ -149,17 +150,43 @@ class Scav(commands.Cog):
 
         # TODO add support for image and file clues
 
+        # TODO add handling question response times
+
+        # TODO add check if the question is actually enabled
+
         question = await self.db.get_scav_question(team_id=team_id)
         if not question:
             await self.bot.log(f"Could not get a current question for team id: {team_id}", "ERROR")
             return
 
-        if guess != question.answer:
-            if self.config["incorrect_message"]:
-                await ctx.message.reply(self.config["incorrect_message"])
-            else:
-                await ctx.message.add_reaction("👀")
+        if guess.lower() != question.answer.lower():
+            try:
+                if self.config["incorrect_message"]:
+                    await ctx.message.reply(self.config["incorrect_message"])
+                else:
+                    await ctx.message.add_reaction("👀")
+            except NotFound:
+                pass
             return
+
+        if self.bot.debug:
+            try:
+                await ctx.message.add_reaction("✅")
+            except NotFound:
+                self.bot.warning(f"Correct guess given, but message deleted first:\n{ctx.message}")
+
+        await ctx.message.reply("That is correct!")
+
+        try:
+            res = await self.db.increment_question(team_id, question)
+            if not res:
+                await self.bot.log("Failed")
+                raise Exception(f"Could not increment Team {team_id}'s scav question.")
+
+        except self.db.FinishedScavException:
+            await ctx.message.channel.send("Congratulations! You have completed Scav!")
+
+        # TODO Update Standings
 
         # if settings["scav"]["allowed"]:
         #     active_scav_team = scav_game.is_scav_channel(ctx.message.channel.id)

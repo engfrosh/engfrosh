@@ -40,6 +40,80 @@ class DatabaseInterface():
         else:
             raise NotImplementedError("Does not support non-postgres")
 
+    # region Helper Functions
+
+    async def _ensure_pool(self):
+        if not self.pool:
+            self.pool = await asyncpg.create_pool(**self.db_credentials)
+            self.db_credentials = None
+            logger.info("Connection pool created")
+        else:
+            logger.debug("ensure_pool: pool already exists")
+
+    async def _fetchone(self, sql: str, parameters: Iterable):
+        return await self._fetchrow(sql, parameters)
+
+    async def _fetchrow(self, sql: str, parameters: Iterable):
+        if self._is_postgres():
+            await self._ensure_pool()
+            async with self.pool.acquire() as conn:
+                row = await conn.fetchrow(sql, *parameters)
+
+        elif self._is_sqlite():
+            cur = self.connection.cursor()
+            cur.execute(sql, parameters)
+            row = cur.fetchone()
+
+        return row
+
+    async def _fetchall(self, sql, parameters=tuple()):
+        if self._is_postgres():
+            await self._ensure_pool()
+            async with self.pool.acquire() as conn:
+                rows = await conn.fetch(sql, *parameters)
+
+        elif self._is_sqlite():
+            cur = self.connection.cursor()
+            cur.execute(sql, parameters)
+            rows = cur.fetchall()
+
+        return rows
+
+    async def _execute(self, sql, parameters):
+        if self._is_postgres():
+            await self._ensure_pool()
+            logger.debug(f"Executing command '{sql}' with parameters {parameters}")
+            async with self.pool.acquire() as conn:
+                await conn.execute(sql, *parameters)
+            return True
+
+        elif self._is_sqlite():
+            cur = self.connection.cursor()
+            cur.execute(sql, parameters)
+            self.connection.commit()
+
+        else:
+            raise NotImplementedError("Execute currently only written for postgres.")
+
+    def _is_postgres(self):
+        return self.db == "POSTGRES"
+
+    def _is_sqlite(self):
+        return self.db == "SQLITE"
+
+    def _qp(self, num=1):
+        """Alias for _get_query_parameter"""
+        return self._get_query_parameter(num)
+
+    def _get_query_parameter(self, num=1):
+        if self._is_sqlite():
+            return "?"
+        elif self._is_postgres():
+            return f"${num}"
+        else:
+            raise NotImplementedError("Databases other than Postgres or SQLite not supported.")
+    # endregion
+
     # region GET methods
 
     async def get_group_id(self, *, group_name=None, scav_channel_id=None):
@@ -157,6 +231,24 @@ class DatabaseInterface():
             lst.append(row["group_id"])
 
         return tuple(lst)
+
+    async def get_all_scav_questions(self) -> List[Objects.ScavQuestion]:
+        """Returns a sorted list of scavenger questions from lowest to highest weight."""
+        logger.debug("Getting all scav questions from database.")
+        
+        sql = "SELECT * FROM scavenger_question;"
+        rows = await self._fetchall(sql)
+        logger.debug(f"Got rows: {rows}")
+        if not rows:
+            raise Exception("Could not get scav questions.")
+
+        questions = []
+        for row in rows:
+            questions.append(Objects.ScavQuestion(row=row))
+
+        questions.sort(key=lambda q: q.weight)
+        logger.debug(f"Got all questions: {questions}")
+        return questions
 
     async def get_scav_question(self, *, team_id: int) -> Objects.ScavQuestion:
         sql = f"SELECT * FROM scavenger_team WHERE group_id = {self._qp()};"
@@ -399,79 +491,29 @@ class DatabaseInterface():
 
     # endregion
 
-    # region Helper Functions
+    class FinishedScavException(Exception):
+        pass
 
-    async def _ensure_pool(self):
-        if not self.pool:
-            self.pool = await asyncpg.create_pool(**self.db_credentials)
-            self.db_credentials = None
-            logger.info("Connection pool created")
-        else:
-            logger.debug("ensure_pool: pool already exists")
+    async def increment_question(self, team_id: int, current_question: Objects.ScavQuestion):
+        logger.debug(f"Incrementing question for team {team_id} for question: {current_question.identifier}")
+        questions = await self.get_all_scav_questions()
 
-    async def _fetchone(self, sql: str, parameters: Iterable):
-        return await self._fetchrow(sql, parameters)
+        i = questions.index(current_question)
+        logger.debug(f"Got index of current question: {i}")
 
-    async def _fetchrow(self, sql: str, parameters: Iterable):
-        if self._is_postgres():
-            await self._ensure_pool()
-            async with self.pool.acquire() as conn:
-                row = await conn.fetchrow(sql, *parameters)
+        for q in questions[i + 1:]:
+            if q.enabled:
+                logger.debug(f"Found valid next question {q}")
+                sql = f"UPDATE scavenger_team SET current_question_id = {self._qp(1)} WHERE group_id = {self._qp(2)};"
+                res = await self._execute(sql, (q.id, team_id))
+                if not res:
+                    raise Exception("Failed to update current question.")
+                logger.info(
+                    f"Incremented question for team {team_id} from question {current_question.weight} to {q.weight}")
+                return True
 
-        elif self._is_sqlite():
-            cur = self.connection.cursor()
-            cur.execute(sql, parameters)
-            row = cur.fetchone()
-
-        return row
-
-    async def _fetchall(self, sql, parameters=tuple()):
-        if self._is_postgres():
-            await self._ensure_pool()
-            async with self.pool.acquire() as conn:
-                rows = await conn.fetch(sql, *parameters)
-
-        elif self._is_sqlite():
-            cur = self.connection.cursor()
-            cur.execute(sql, parameters)
-            rows = cur.fetchall()
-
-        return rows
-
-    async def _execute(self, sql, parameters):
-        if self._is_postgres():
-            await self._ensure_pool()
-            logger.debug(f"Executing command '{sql}' with parameters {parameters}")
-            async with self.pool.acquire() as conn:
-                await conn.execute(sql, *parameters)
-            return True
-
-        elif self._is_sqlite():
-            cur = self.connection.cursor()
-            cur.execute(sql, parameters)
-            self.connection.commit()
-
-        else:
-            raise NotImplementedError("Execute currently only written for postgres.")
-
-    def _is_postgres(self):
-        return self.db == "POSTGRES"
-
-    def _is_sqlite(self):
-        return self.db == "SQLITE"
-
-    def _qp(self, num=1):
-        """Alias for _get_query_parameter"""
-        return self._get_query_parameter(num)
-
-    def _get_query_parameter(self, num=1):
-        if self._is_sqlite():
-            return "?"
-        elif self._is_postgres():
-            return f"${num}"
-        else:
-            raise NotImplementedError("Databases other than Postgres or SQLite not supported.")
-    # endregion
+        logger.info(f"No more questions found, therefore assuming Team {team_id} has finished scav.")
+        raise self.FinishedScavException
 
     def __del__(self):
         if self._is_sqlite():
