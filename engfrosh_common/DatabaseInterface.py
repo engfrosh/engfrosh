@@ -513,6 +513,10 @@ class DatabaseInterface():
                 return True
 
         logger.info(f"No more questions found, therefore assuming Team {team_id} has finished scav.")
+        sql = f"UPDATE scavenger_team SET current_question_id = NULL WHERE group_id = {self._qp()};"
+        res = await self._execute(sql, (team_id,))
+        if not res:
+            raise Exception("Failed to update current question to null.")
         raise self.FinishedScavException
 
     def __del__(self):
