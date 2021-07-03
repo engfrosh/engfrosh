@@ -1,5 +1,4 @@
 import discord
-from discord.ext import commands
 import sys
 import logging
 import os
@@ -7,7 +6,7 @@ import json
 import threading
 import asyncio
 import yaml
-
+from .EngFroshBot import EngFroshBot
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
@@ -53,14 +52,16 @@ with open(path) as f:
 # endregion
 
 
-client = commands.Bot(config["module_settings"]["bot_prefix"])
+if config["modules"]["postgres"]:
+    db_int = DatabaseInterface(db_credentials=credentials["database_credentials"])
+else:
+    db_int = DatabaseInterface()
 
-# Load Cogs
+client = EngFroshBot(config["module_settings"]["bot_prefix"], db_int=db_int, config=config)
+
 for cog in config["modules"]["cogs"]:
-    print(cog)
     client.load_extension(cog)
     logger.debug('Cog %s loaded', cog)
-
 
 # region Discord Events
 
@@ -80,12 +81,10 @@ async def on_ready():
         rabbit_thread = threading.Thread(target=rabbit_listener.rabbit_main,
                                          args=(discord_loop, discord_queue_callback, host, queue))
         rabbit_thread.start()
-
-    if config["modules"]["postgres"]:
-        global db_int
-        db_int = DatabaseInterface(db_credentials=credentials["database_credentials"])
-
     # endregion
+
+    logger.info("Logged on and ready...")
+
     return
 
 
@@ -102,7 +101,6 @@ async def superhelp(ctx):
 @client.command(pass_context=True)
 async def react(ctx):
     await ctx.message.add_reaction("🍋")
-    await ctx.channel.send("did it work?")
 
 
 @client.event
@@ -110,7 +108,8 @@ async def on_reaction_add(reaction, user):
     if reaction.message.author == client.user:
         if reaction.emoji == '👍':
             await reaction.message.channel.send('Hi there!')
-        return
+    return
+
 
 # endregion
 
