@@ -29,8 +29,9 @@ class EngFroshBot(commands.Bot):
         self.log_channels = log_channels
         super().__init__(command_prefix, description=description, **options)
 
-    async def send_to_all(self, message: str, channels: Iterable[int], *, purge_first=False) -> None:
+    async def send_to_all(self, message: str, channels: Iterable[int], *, purge_first=False) -> bool:
         """Sends message to all channels with given ids."""
+        res = True
         for chid in channels:
             if channel := self.get_channel(chid):
                 if purge_first:
@@ -38,6 +39,9 @@ class EngFroshBot(commands.Bot):
                 await channel.send(message)
             else:
                 logger.error(f"Could not get channel with id: {chid}")
+                res = False
+
+        return res
 
     async def log(self, message: str, level: str = "INFO"):
         """Log a message to the bot channels and the logger."""

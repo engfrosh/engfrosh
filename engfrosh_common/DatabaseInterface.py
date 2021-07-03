@@ -235,7 +235,7 @@ class DatabaseInterface():
     async def get_all_scav_questions(self) -> List[Objects.ScavQuestion]:
         """Returns a sorted list of scavenger questions from lowest to highest weight."""
         logger.debug("Getting all scav questions from database.")
-        
+
         sql = "SELECT * FROM scavenger_question;"
         rows = await self._fetchall(sql)
         logger.debug(f"Got rows: {rows}")
@@ -272,6 +272,14 @@ class DatabaseInterface():
         logger.error(f"No Question with id {qid}")
         return None
 
+    async def get_scav_channels(self, *, group_id: int) -> List[int]:
+        sql = f"SELECT * FROM discord_bot_manager_scavchannel WHERE group_id = {self._qp()};"
+
+        rows = await self._fetchall(sql, (group_id,))
+        if not rows:
+            return False
+
+        return [r["channel_id"] for r in rows]
     # endregion
 
     # region UPDATE methods

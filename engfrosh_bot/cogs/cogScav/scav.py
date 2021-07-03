@@ -182,11 +182,62 @@ class Scav(commands.Cog):
             if not res:
                 await self.bot.log("Failed")
                 raise Exception(f"Could not increment Team {team_id}'s scav question.")
+            
+            await self.send_question(group_id=team_id)
 
         except self.db.FinishedScavException:
-            await ctx.message.channel.send("Congratulations! You have completed Scav!")
+            channels = await self.db.get_scav_channels(group_id=team_id)
+            await self.bot.send_to_all("Congratulations! You have completed Scav!", channels)
 
         # TODO Update Standings
+
+    @commands.command()
+    async def question(self, ctx: commands.Context):
+        # TODO check if it is a scav channel
+        if self.bot.debug:
+            await ctx.message.add_reaction("🔄")
+        
+        res = await self.send_question(channel_id=ctx.message.channel.id)
+        if not res:
+            await self.bot.log(f"Failed to send question to <#{ctx.message.channel.id}>")
+
+    class ScavNotEnabledError(Exception):
+        pass
+
+    class TeamNotFoundError(Exception):
+        pass
+
+    async def send_question(self, *, group_id: int = None, channel_id: int = None) -> bool:
+        if not group_id and not channel_id:
+            raise ValueError("Must provide an argument")
+
+        if group_id and channel_id:
+            raise ValueError("May only provide channel or team id.")
+
+        enabled = await self.scav_enabled()
+        if not enabled:
+            raise self.ScavNotEnabledError
+
+        if channel_id:
+            team_id = await self.db.get_group_id(scav_channel_id=channel_id)
+            if not team_id:
+                raise self.TeamNotFoundError
+            channels = [channel_id]
+
+        elif group_id:
+            team_id = group_id
+            channels = await self.db.get_scav_channels(group_id=group_id)
+
+        else:
+            raise Exception
+
+        question = await self.db.get_scav_question(team_id=team_id)
+        if not question:
+            await self.bot.log(f"Could not get a current question for team id: {team_id}", "ERROR")
+            return False
+
+        res = await self.bot.send_to_all(question.text, channels)
+        return res
 
         # if settings["scav"]["allowed"]:
         #     active_scav_team = scav_game.is_scav_channel(ctx.message.channel.id)
