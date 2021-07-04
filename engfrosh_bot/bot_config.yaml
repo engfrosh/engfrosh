@@ -1,16 +1,16 @@
-# These settings are only for settings that will not need to be changed while running 
+# These settings are only for settings that will not need to be changed while running
 
 modules:
   # Which modules to import and use
   rabbitmq: False
-  postgres: True 
+  postgres: False
   # Warning, lots of functionality will fail if not using a postgres database.
 
   cogs: [
-    "engfrosh_bot.cogs.cogModeration.moderation", 
+    "engfrosh_bot.cogs.cogModeration.moderation",
     "engfrosh_bot.cogs.cogCoin.coin",
     "engfrosh_bot.cogs.cogScav.scav"
-    ] 
+    ]
 
 log_level: DEBUG
 
@@ -40,7 +40,7 @@ module_settings:
     reply:
       channel: True
       dm: True
-    
+
     ignored_channels: [
       858741004831555634
     ]
@@ -74,5 +74,3 @@ module_settings:
 
     settings_names:
       active: "scav_active"
-
-    

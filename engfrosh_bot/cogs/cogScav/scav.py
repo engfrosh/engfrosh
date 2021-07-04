@@ -1,5 +1,3 @@
-# TODO Rewrite and fix this whole file, etc. It is still based on the old bot.
-
 # region Imports
 import logging
 # import discord
