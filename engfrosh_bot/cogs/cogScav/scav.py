@@ -2,8 +2,8 @@
 
 # region Imports
 import logging
-import discord
-import datetime as dt
+# import discord
+# import datetime as dt
 
 from discord.ext import commands
 from discord.errors import NotFound
@@ -114,7 +114,8 @@ class Scav(commands.Cog):
         # print(guild.text_channels)
         # channels["bot_status_channel"] = await self.bot.fetch_channel(settings["channels"]["bot_status_channel"])
         # channels["leaderboard_channel"] = await self.bot.fetch_channel(settings["channels"]["leaderboard_channel"])
-        # await channels["bot_status_channel"].send("Hello, I am now working! It is currently {datetime}".format(datetime=dt.datetime.now().isoformat()))
+        # await channels["bot_status_channel"].send("Hello, I am now working! It is currently {datetime}".format(
+        #   datetime=dt.datetime.now().isoformat()))
         # await load_scav_teams()
         # await reload_files()
         # scav_game.save_team_info(CURRENT_DIRECTORY + "/test_teams_out.json.tmp")
@@ -182,7 +183,7 @@ class Scav(commands.Cog):
             if not res:
                 await self.bot.log("Failed")
                 raise Exception(f"Could not increment Team {team_id}'s scav question.")
-            
+
             await self.send_question(group_id=team_id)
 
         except self.db.FinishedScavException:
@@ -196,7 +197,7 @@ class Scav(commands.Cog):
         # TODO check if it is a scav channel
         if self.bot.debug:
             await ctx.message.add_reaction("🔄")
-        
+
         res = await self.send_question(channel_id=ctx.message.channel.id)
         if not res:
             await self.bot.log(f"Failed to send question to <#{ctx.message.channel.id}>")
@@ -248,12 +249,14 @@ class Scav(commands.Cog):
         #                 if lockout_time == 0:
         #                     # await message.channel.send("Checking Your Guess!")
         #                     if len(message_array) < 2:
-        #                         await ctx.message.channel.send("You need to guess something!\nUse the format: ```! YOURGUESS```")
+        #                         await ctx.message.channel.send(
+        #                               "You need to guess something!\nUse the format: ```! YOURGUESS```")
         #                         return
         #                     else:
         #                         await active_scav_team.check_answer(message_array[1])
         #                 else:
-        #                     await ctx.message.channel.send("You are locked out for {}:{}".format((lockout_time / 60), lockout_time % 60))
+        #                     await ctx.message.channel.send("You are locked out for {}:{}".format(
+        #                               (lockout_time / 60), lockout_time % 60))
         #                 return
         #             else:
         #                 await ctx.message.channel.send("SCAV is currently disabled")
@@ -287,7 +290,8 @@ class Scav(commands.Cog):
     #         for code in reg_codes:
     #             code_msg += code + "\n"
     #         code_msg += "```"
-    #         code_msg += "Send one of these codes in a channel in the discord server. Send these to your teammates and have them do the same."
+    #         code_msg += "Send one of these codes in a channel in the discord server.
+    #                   Send these to your teammates and have them do the same."
     #         await ctx.message.author.send(code_msg)
     #         await ctx.message.delete()
     #         return
@@ -473,7 +477,8 @@ class Scav(commands.Cog):
     #                     else:
     #                         await ctx.channel.send("Already an Admin")
     #                 elif user_registrations[message_array[0]]["account_type"] == "scav_manager":
-    #                     if ctx.author.id not in settings["scav_manager_users"] and ctx.author.id not in settings["admin_users"]:
+    #                     if ctx.author.id not in settings["scav_manager_users"] and
+    #                                   ctx.author.id not in settings["admin_users"]:
     #                         user_registrations[message_array[0]
     #                                            ]["user_id"] = ctx.author.id
     #                         save_user_registrations()
@@ -488,7 +493,8 @@ class Scav(commands.Cog):
     #                     else:
     #                         await ctx.channel.send("Already a Scav Manager or Higher")
     #                 elif user_registrations[message_array[0]]["account_type"] == "scav_player":
-    #                     if ctx.author.id not in settings["scav_manager_users"] and ctx.author.id not in settings["admin_users"]:
+    #                     if ctx.author.id not in settings["scav_manager_users"] and ctx.author.id
+    #                                    not in settings["admin_users"]:
     #                         user_registrations[message_array[0]
     #                                            ]["user_id"] = ctx.author.id
     #                         save_user_registrations()
@@ -735,7 +741,8 @@ def setup(bot):
 #             new_role: discord.PermissionOverwrite(read_messages=True),
 #             scav_manager_role: discord.PermissionOverwrite(read_messages=True)
 #         }
-#         # channel = await guild.create_text_channel(team_name, category=settings["scav"]["category"], overwrites=overwrites)
+#         # channel = await guild.create_text_channel(team_name, category=settings["scav"]["category"],
+#                   overwrites=overwrites)
 #         channel = await guild.create_text_channel(team_name, overwrites=overwrites)
 #         team_details = BLANK_TEAM_CSV
 #         team_details["role"] = new_role.id

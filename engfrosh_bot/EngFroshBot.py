@@ -79,7 +79,8 @@ class EngFroshBot(commands.Bot):
         # if cog and commands.Cog._get_overridden_method(cog.cog_command_error) is not None:
         #     return
 
-        msg = f'Ignoring exception in command {context.command}:\n{"".join(traceback.format_exception(type(exception), exception, exception.__traceback__))}'
+        trace = "".join(traceback.format_exception(type(exception), exception, exception.__traceback__))
+        msg = f'Ignoring exception in command {context.command}:\n{trace}'
         await self.log(msg, "EXCEPTION")
 
     async def error(self, message):
