@@ -1,5 +1,6 @@
 # AWS SES
 
+##Notes
 ### AWS Account Limitations
 - By default, an AWS may be in the "Amazon SES sandbox." This limits to whom you can send an email (verified emails only).
 - More info about this, as well as how to move out of the sandbox can be found here: 
@@ -14,3 +15,5 @@
     https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
 - As always with these types of files, make sure you do not add it to your GIT/VCS, or you may have a bad time when 
   someone starts using your account without permission.
+  
+## Usage
