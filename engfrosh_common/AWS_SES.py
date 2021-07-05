@@ -119,4 +119,4 @@ SES_BODY_HTML = """<html>
 
 if __name__ == '__main__':
     send_SES(SES_Sender, SES_Recipient, SES_Subject, SES_BODY_TEXT, SES_BODY_TEXT)
-    #SES.send_SES(SES_Sender, SES_Recipient, SES_Subject, SES_BODY_TEXT, SES_BODY_HTML)
+    # SES.send_SES(SES_Sender, SES_Recipient, SES_Subject, SES_BODY_TEXT, SES_BODY_HTML)
