@@ -37,6 +37,7 @@ class ScavChannel(models.Model):
     group = models.OneToOneField(Group, on_delete=CASCADE, db_index=True)
 
     # TODO add __string__ method
+    # Todo make the one to one field reference a scav team instead of group
 
 
 class Role(models.Model):

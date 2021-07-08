@@ -1,13 +1,16 @@
+# These settings are only for settings that will not need to be changed while running
+
 modules:
   # Which modules to import and use
   rabbitmq: False
-  postgres: False 
+  postgres: False
   # Warning, lots of functionality will fail if not using a postgres database.
 
   cogs: [
-    "engfrosh_bot.cogs.cogModeration.moderation", 
-    "engfrosh_bot.cogs.cogCoin.coin"
-    ] # "cogs.cogScav.scav"
+    "engfrosh_bot.cogs.cogModeration.moderation",
+    "engfrosh_bot.cogs.cogCoin.coin",
+    "engfrosh_bot.cogs.cogScav.scav"
+    ]
 
 log_level: DEBUG
 
@@ -16,6 +19,14 @@ credentials:
   absolute_path: Null
   # If both are provided, will default to the relative path
 
+bot_log_channel: [
+  807100215651074109
+]
+
+bot_prefix: "!"
+
+debug: True
+
 module_settings:
   rabbitmq:
     host: localhost
@@ -23,14 +34,13 @@ module_settings:
 
   # postgres:
 
-  bot_prefix: "!"
 
   moderation:
     checkmark: True
     reply:
       channel: True
       dm: True
-    
+
     ignored_channels: [
       858741004831555634
     ]
@@ -57,3 +67,10 @@ module_settings:
       name_length: 25
       coin_length: 10
     permission: change_team_coin # Names must be unique as currently written
+
+
+  scav:
+    incorrect_message: Null
+
+    settings_names:
+      active: "scav_active"

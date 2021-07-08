@@ -55,9 +55,9 @@ with open(path) as f:
 if config["modules"]["postgres"]:
     db_int = DatabaseInterface(db_credentials=credentials["database_credentials"])
 else:
-    db_int = DatabaseInterface()
+    db_int = DatabaseInterface(allow_development_db=config["debug"])
 
-client = EngFroshBot(config["module_settings"]["bot_prefix"], db_int=db_int, config=config)
+client = EngFroshBot(config["bot_prefix"], db_int=db_int, config=config, log_channels=config["bot_log_channel"])
 
 for cog in config["modules"]["cogs"]:
     client.load_extension(cog)

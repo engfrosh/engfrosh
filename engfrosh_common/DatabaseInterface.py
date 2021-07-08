@@ -1,40 +1,27 @@
-from sqlite3.dbapi2 import IntegrityError
-from typing import List, Tuple
+
+# region Imports
+import logging
 import asyncpg
-import sqlite3
 import uuid
 import datetime
+
+from typing import Iterable, List, Tuple
+
 from . import Objects
-
-try:
-    from .SQLITE_INIT import SQLITE_INIT
-except ModuleNotFoundError:
-    from SQLITE_INIT import SQLITE_INIT
+# endregion
 
 
-import logging
-import os
-
-
-CURRENT_DIRECTORY = os.path.dirname(__file__)
-SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
-
-LOG_LEVEL = logging.DEBUG
-
-logger = logging.getLogger(SCRIPT_NAME)
-
-
-DEFAULT_SQLITE_DB = "default_name.db"
+logger = logging.getLogger("DatabaseInterface")
 
 
 class DatabaseInterface():
 
-    def __init__(self, *, sql_pool: asyncpg.Pool = None, db_credentials: dict = None, sqlite_filename=None) -> None:
+    def __init__(self, *, sql_pool: asyncpg.Pool = None, db_credentials: dict = None,
+                 allow_development_db=False) -> None:
         """
         Arguments:
             sql_pool: asyncpg pool object to the database
             db_credentials: postgresql credentials in a dictionary
-            sqlite_filename: filename/path to the sqlite file to open / create
         """
 
         if sql_pool:
@@ -49,23 +36,99 @@ class DatabaseInterface():
             self.db_credentials = db_credentials
             logger.info("DatabaseInterface created for Postgres with database credentials")
 
+        elif allow_development_db:
+            self.db = "FAKE"
+            logger.warning("Using fake development database")
+
         else:
-            self.db = "SQLITE"
-            if not sqlite_filename:
-                sqlite_filename = DEFAULT_SQLITE_DB
+            raise NotImplementedError("Does not support non-postgres")
 
-            self.connection = sqlite3.connect(sqlite_filename)
-            self.connection.row_factory = sqlite3.Row
+    # region Exceptions
 
-            logger.info(f"DatabaseInterface created for SQLite at {sqlite_filename}")
+    class NotPostgresError(Exception):
+        """Not Postgres Error for postgres only command."""
 
-            for command in SQLITE_INIT:
-                self.connection.cursor().execute(command)
-            logger.debug("Initialized SQLite Database")
+    class FakeDatabaseError(Exception):
+        """Tried running command on fake database."""
+
+    class FinishedScavException(Exception):
+        pass
+
+    # region Helper Functions
+
+    def _is_postgres(self):
+        return self.db == "POSTGRES"
+
+    def _is_fake(self):
+        return self.db == "FAKE"
+
+    async def _ensure_pool(self):
+        if not self._is_postgres():
+            raise self.NotPostgresError
+
+        if not self.pool:
+            self.pool = await asyncpg.create_pool(**self.db_credentials)
+            self.db_credentials = None
+            logger.info("Connection pool created")
+        else:
+            logger.debug("ensure_pool: pool already exists")
+
+    async def _fetchone(self, sql: str, parameters: Iterable):
+        return await self._fetchrow(sql, parameters)
+
+    async def _fetchrow(self, sql: str, parameters: Iterable):
+        if self._is_postgres():
+            await self._ensure_pool()
+            async with self.pool.acquire() as conn:
+                row = await conn.fetchrow(sql, *parameters)
+
+        elif self._is_fake():
+            raise self.FakeDatabaseError
+
+        return row
+
+    async def _fetchall(self, sql, parameters=tuple()):
+        if self._is_postgres():
+            await self._ensure_pool()
+            async with self.pool.acquire() as conn:
+                rows = await conn.fetch(sql, *parameters)
+
+        elif self._is_fake():
+            raise self.FakeDatabaseError
+
+        return rows
+
+    async def _execute(self, sql, parameters):
+        if self._is_postgres():
+            await self._ensure_pool()
+            logger.debug(f"Executing command '{sql}' with parameters {parameters}")
+            async with self.pool.acquire() as conn:
+                await conn.execute(sql, *parameters)
+            return True
+
+        elif self._is_fake():
+            raise self.FakeDatabaseError
+
+        else:
+            raise NotImplementedError("Execute currently only written for postgres.")
+
+    def _qp(self, num=1):
+        """Alias for _get_query_parameter"""
+        return self._get_query_parameter(num)
+
+    def _get_query_parameter(self, num=1):
+        if self._is_postgres():
+            return f"${num}"
+        else:
+            raise NotImplementedError("Databases other than Postgres not supported.")
+    # endregion
 
     # region GET methods
 
     async def get_group_id(self, *, group_name=None, scav_channel_id=None):
+        if self._is_fake():
+            return 1
+
         if group_name:
             sql = f"SELECT id FROM auth_group WHERE name = {self._qp()};"
             row = await self._fetchrow(sql, (group_name,))
@@ -87,6 +150,9 @@ class DatabaseInterface():
 
     async def get_frosh_team_id(self, *, team_name=None):
         """Name can either be a team display name or the group name. Group name takes priority."""
+        if self._is_fake():
+            return 1
+
         if team_name:
             id = await self.get_group_id(group_name=team_name)
             if not id:
@@ -100,6 +166,8 @@ class DatabaseInterface():
         return id
 
     async def get_user_id(self, *, discord_id=None):
+        if self._is_fake():
+            return 1
 
         if discord_id:
             sql = f"SELECT * FROM authentication_discorduser WHERE id = {self._qp()};"
@@ -113,6 +181,9 @@ class DatabaseInterface():
             raise NotImplementedError
 
     async def get_coin_amount(self, *, group_name=None, group_id=None):
+        if self._is_fake():
+            return 50
+
         if not group_id and group_name:
             group_id = await self.get_group_id(group_name=group_name)
         if group_id:
@@ -127,6 +198,9 @@ class DatabaseInterface():
             return None
 
     async def get_team_display_name(self, group_id):
+        if self._is_fake():
+            return "Test Team"
+
         sql = f"SELECT * FROM frosh_team WHERE group_id = {self._qp()};"
         row = await self._fetchrow(sql, (group_id,))
         if row:
@@ -135,6 +209,9 @@ class DatabaseInterface():
             return None
 
     async def get_team_locked_out_time(self, group_id):
+        if self._is_fake():
+            return False
+
         sql = f"SELECT * FROM scavenger_team WHERE group_id = {self._qp()};"
 
         row = await self._fetchone(sql, (group_id,))
@@ -153,6 +230,9 @@ class DatabaseInterface():
         return locked_out_time
 
     async def get_all_frosh_teams(self) -> List[Objects.FroshTeam]:
+        if self._is_fake():
+            return [Objects.FroshTeam(i + 1, f"Test Team {i+1}", (i % 2) * 15) for i in range(3)]
+
         """Returns a dictionary where the key is the team_id, and the value is the display name."""
         sql = "SELECT * FROM frosh_team;"
         rows = await self._fetchall(sql)
@@ -162,6 +242,9 @@ class DatabaseInterface():
         return lst
 
     async def get_permission_id(self, name) -> int:
+        if self._is_fake():
+            return 1
+
         sql = f"""SELECT * FROM auth_permission WHERE codename = {self._qp()};"""
         row = await self._fetchrow(sql, (name,))
         if row:
@@ -170,6 +253,9 @@ class DatabaseInterface():
             return None
 
     async def get_groups(self, *, user_id=None) -> Tuple[int]:
+        if self._is_fake():
+            return (1, 2, 3)
+
         if not user_id:
             raise ValueError
 
@@ -181,11 +267,72 @@ class DatabaseInterface():
 
         return tuple(lst)
 
+    async def get_all_scav_questions(self) -> List[Objects.ScavQuestion]:
+        """Returns a sorted list of scavenger questions from lowest to highest weight."""
+        if self._is_fake():
+            return [Objects.ScavQuestion(id=i, enabled=True, text=f"Question {i}",
+                                         answer=f"answer{i}", weight=i) for i in range(1, 5)]
+
+        logger.debug("Getting all scav questions from database.")
+
+        sql = "SELECT * FROM scavenger_question;"
+        rows = await self._fetchall(sql)
+        logger.debug(f"Got rows: {rows}")
+        if not rows:
+            raise Exception("Could not get scav questions.")
+
+        questions = []
+        for row in rows:
+            questions.append(Objects.ScavQuestion(row=row))
+
+        questions.sort(key=lambda q: q.weight)
+        logger.debug(f"Got all questions: {questions}")
+        return questions
+
+    async def get_scav_question(self, *, team_id: int) -> Objects.ScavQuestion:
+        if self._is_fake():
+            return Objects.ScavQuestion(id=1, enabled=True, weight=6, answer="answer", text="Question?")
+
+        sql = f"SELECT * FROM scavenger_team WHERE group_id = {self._qp()};"
+        row = await self._fetchrow(sql, (team_id,))
+        if not row:
+            return None
+
+        qid = row["current_question_id"]
+
+        sql = f"SELECT * FROM scavenger_question WHERE id = {self._qp()};"
+        row = await self._fetchrow(sql, (qid,))
+
+        if row:
+            return Objects.ScavQuestion(id=row["id"],
+                                        enabled=row["enabled"],
+                                        identifier=row["identifier"],
+                                        text=row["text"],
+                                        weight=row["weight"],
+                                        answer=row["answer"])
+
+        logger.error(f"No Question with id {qid}")
+        return None
+
+    async def get_scav_channels(self, *, group_id: int) -> List[int]:
+        if self._is_fake():
+            return [1, 2, 3]
+
+        sql = f"SELECT * FROM discord_bot_manager_scavchannel WHERE group_id = {self._qp()};"
+
+        rows = await self._fetchall(sql, (group_id,))
+        if not rows:
+            return False
+
+        return [r["channel_id"] for r in rows]
     # endregion
 
     # region UPDATE methods
 
     async def update_coin_amount(self, change: int, *, group_name=None, group_id=None):
+        if self._is_fake():
+            return True
+
         if not group_id and group_name:
             group_id = await self.get_group_id(group_name=group_name)
         if group_id:
@@ -208,6 +355,9 @@ class DatabaseInterface():
         logger.info(f"Set Discord Command {command_id} to {status}")
 
     async def set_team_locked_out_time(self, group_id, minutes=None, *, end_time=None):
+        if self._is_fake():
+            return True
+
         sql = f"""UPDATE scavenger_team
                     SET locked_out_until = {self._qp(1)}
                     WHERE group_id = {self._qp(2)};"""
@@ -225,13 +375,6 @@ class DatabaseInterface():
             if type(end_time) is not datetime.datetime:
                 raise TypeError(f"end_time can only be type datetime.datetime or str, not {type(end_time)}")
 
-        elif self._is_sqlite():
-            if type(end_time) is datetime.datetime:
-                end_time = end_time.isoformat()
-
-            if type(end_time) is not str:
-                raise TypeError(f"end_time can only be type datetime.datetime or str, not {type(end_time)}")
-
         await self._execute(sql, (end_time, group_id))
 
         logger.info(f"Set lockout until time for group {group_id} to {end_time}")
@@ -241,6 +384,9 @@ class DatabaseInterface():
     # region CHECK methods
 
     async def check_user_in_group(self, user_id=None, group_name=None, discord_user_id=None, group_id=None):
+        if self._is_fake():
+            return True
+
         sql = f"SELECT * FROM auth_user_groups WHERE user_id = {self._qp(1)} AND group_id = {self._qp(2)};"
 
         if not group_id:
@@ -256,6 +402,9 @@ class DatabaseInterface():
             return False
 
     async def check_user_has_permission(self, user_id=None, discord_id=None, permission_name=None, permission_id=None):
+        if self._is_fake():
+            return True
+
         if not user_id:
             user_id = await self.get_user_id(discord_id=discord_id)
 
@@ -282,6 +431,9 @@ class DatabaseInterface():
         return False
 
     async def check_group_has_permission(self, *, group_id=None, permission_id=None):
+        if self._is_fake():
+            return True
+
         sql = f"SELECT * FROM auth_group_permissions WHERE group_id = {self._qp(1)} AND permission_id = {self._qp(2)};"
 
         res = await self._fetchone(sql, (group_id, permission_id))
@@ -290,171 +442,58 @@ class DatabaseInterface():
 
         return False
 
-    # endregion
-
-    # region ADD methods
-
-    async def add_group(self, group_name):
-        """Then returns the new group id"""
-        if self._is_sqlite():
-            cur = self.connection.cursor()
-            try:
-                cur.execute(""" INSERT INTO auth_group(name) VALUES(?)""", (group_name,))
-                self.connection.commit()
-            except IntegrityError:
-                logger.error("IntegrityError, could not add group. A group with that name probably already exists.")
-                return None
-            return cur.lastrowid
-        else:
-            raise NotImplementedError("Adding groups not currently supported outside SQLite")
-
-    async def add_discord_user(self, discord_id, user_id, discord_username=None, discriminator=None):
-        sql = """INSERT INTO authentication_discorduser(id,discord_username,discriminator,user_id) VALUES(?,?,?,?);"""
-
-        if self._is_sqlite():
-            cur = self.connection.cursor()
-            try:
-                cur.execute(sql, (discord_id, discord_username, discriminator, user_id))
-            except IntegrityError:
-                logger.error("IntegrityError, could not add Discord user. The user probably already exists.")
-            self.connection.commit()
+    async def check_scavenger_setting_enabled(self, *, id: int = None, name: str = None):
+        if self._is_fake():
             return True
+
+        if id and name:
+            raise ValueError
+        elif id:
+            field = "id"
+            parameters = (id,)
+        elif name:
+            field = "name"
+            parameters = (name,)
         else:
-            raise NotImplementedError("Adding groups not currently supported outside SQLite")
+            raise ValueError
 
-    async def add_user_to_group(self, user_id, *, group_name=None, group_id=None):
-        sql = """INSERT INTO auth_user_groups(user_id,group_id) VALUES(?,?)"""
+        sql = f"SELECT * FROM scavenger_settings WHERE {field} = {self._qp()};"
+        row = await self._fetchrow(sql, parameters)
+        if row:
+            return row["enabled"]
 
-        if not group_id:
-            group_id = await self.get_group_id(group_name=group_name)
-
-        if self._is_sqlite():
-            cur = self.connection.cursor()
-            cur.execute(sql, (user_id, group_id,))
-            self.connection.commit()
-            return True
-        else:
-            raise NotImplementedError("Adding groups not currently supported outside SQLite")
-
-    async def add_scav_channel(self, channel_id, group_id):
-        if self._is_sqlite():
-            sql = """INSERT INTO discord_bot_manager_scavchannel(channel_id,group_id) VALUES(?,?)"""
-            cur = self.connection.cursor()
-            try:
-                cur.execute(sql, (channel_id, group_id))
-            except IntegrityError:
-                logger.error("IntegrityError, could not add scav channel. The channel probably already exists.")
-                return False
-            self.connection.commit()
-            return True
-        else:
-            raise NotImplementedError("Adding Scav channels is not currently supported outside SQLite")
-
-    async def add_frosh_team(self, group_id, display_name=None):
-        if self._is_sqlite():
-            sql = """INSERT INTO frosh_team(group_id,display_name) VALUES(?,?);"""
-            cur = self.connection.cursor()
-            try:
-                cur.execute(sql, (group_id, display_name))
-            except IntegrityError:
-                logger.error("IntegrityError, could not add team. The team probably already exists.")
-                return False
-            self.connection.commit()
-            return True
-        else:
-            raise NotImplementedError("Adding Scav channels is not currently supported outside SQLite")
-
-    async def add_scavenger_team(self, group_id):
-        if self._is_sqlite():
-            sql = """INSERT INTO scavenger_team(group_id) VALUES(?);"""
-            cur = self.connection.cursor()
-            try:
-                cur.execute(sql, (group_id,))
-            except IntegrityError:
-                logger.error("IntegrityError, could not add team. The team probably already exists.")
-                return False
-            self.connection.commit()
-            logger.info(f"Added scavenger team with id {group_id}")
-            return True
-        else:
-            raise NotImplementedError("Adding scavenger teams only supported with SQLite")
+        return None
 
     # endregion
 
-    # region Helper Functions
+    # region Other Actions
 
-    async def _ensure_pool(self):
-        if not self.pool:
-            self.pool = await asyncpg.create_pool(**self.db_credentials)
-            self.db_credentials = None
-            logger.info("Connection pool created")
-        else:
-            logger.debug("ensure_pool: pool already exists")
-
-    async def _fetchone(self, sql, parameters):
-        return await self._fetchrow(sql, parameters)
-
-    async def _fetchrow(self, sql, parameters):
-        if self._is_postgres():
-            await self._ensure_pool()
-            async with self.pool.acquire() as conn:
-                row = await conn.fetchrow(sql, *parameters)
-
-        elif self._is_sqlite():
-            cur = self.connection.cursor()
-            cur.execute(sql, parameters)
-            row = cur.fetchone()
-
-        return row
-
-    async def _fetchall(self, sql, parameters=tuple()):
-        if self._is_postgres():
-            await self._ensure_pool()
-            async with self.pool.acquire() as conn:
-                rows = await conn.fetch(sql, *parameters)
-
-        elif self._is_sqlite():
-            cur = self.connection.cursor()
-            cur.execute(sql, parameters)
-            rows = cur.fetchall()
-
-        return rows
-
-    async def _execute(self, sql, parameters):
-        if self._is_postgres():
-            await self._ensure_pool()
-            logger.debug(f"Executing command '{sql}' with parameters {parameters}")
-            async with self.pool.acquire() as conn:
-                await conn.execute(sql, *parameters)
+    async def increment_question(self, team_id: int, current_question: Objects.ScavQuestion):
+        if self._is_fake():
             return True
 
-        elif self._is_sqlite():
-            cur = self.connection.cursor()
-            cur.execute(sql, parameters)
-            self.connection.commit()
+        logger.debug(f"Incrementing question for team {team_id} for question: {current_question.identifier}")
+        questions = await self.get_all_scav_questions()
 
-        else:
-            raise NotImplementedError("Execute currently only written for postgres.")
+        i = questions.index(current_question)
+        logger.debug(f"Got index of current question: {i}")
 
-    def _is_postgres(self):
-        return self.db == "POSTGRES"
+        for q in questions[i + 1:]:
+            if q.enabled:
+                logger.debug(f"Found valid next question {q}")
+                sql = f"UPDATE scavenger_team SET current_question_id = {self._qp(1)} WHERE group_id = {self._qp(2)};"
+                res = await self._execute(sql, (q.id, team_id))
+                if not res:
+                    raise Exception("Failed to update current question.")
+                logger.info(
+                    f"Incremented question for team {team_id} from question {current_question.weight} to {q.weight}")
+                return True
 
-    def _is_sqlite(self):
-        return self.db == "SQLITE"
+        logger.info(f"No more questions found, therefore assuming Team {team_id} has finished scav.")
+        sql = f"UPDATE scavenger_team SET current_question_id = NULL WHERE group_id = {self._qp()};"
+        res = await self._execute(sql, (team_id,))
+        if not res:
+            raise Exception("Failed to update current question to null.")
+        raise self.FinishedScavException
 
-    def _qp(self, num=1):
-        """Alias for _get_query_parameter"""
-        return self._get_query_parameter(num)
-
-    def _get_query_parameter(self, num=1):
-        if self._is_sqlite():
-            return "?"
-        elif self._is_postgres():
-            return f"${num}"
-        else:
-            raise NotImplementedError("Databases other than Postgres or SQLite not supported.")
     # endregion
-
-    def __del__(self):
-        if self._is_sqlite():
-            self.connection.close()

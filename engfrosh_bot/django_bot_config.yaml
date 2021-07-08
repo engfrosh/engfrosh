@@ -1,18 +1,73 @@
+# These settings are only for settings that will not need to be changed while running
+
 modules:
   # Which modules to import and use
   rabbitmq: True
-  postgres: True # Otherwise will use sqlite
+  postgres: True
+  # Warning, lots of functionality will fail if not using a postgres database.
 
-log_level: debug
+  cogs: [
+    "engfrosh_bot.cogs.cogModeration.moderation",
+    "engfrosh_bot.cogs.cogCoin.coin",
+    "engfrosh_bot.cogs.cogScav.scav"
+    ]
+
+debug: True
+log_level: DEBUG
 
 credentials:
   relative_path: credentials.json
   absolute_path: Null
   # If both are provided, will default to the relative path
 
+bot_prefix: "!"
+
+bot_log_channel: [
+  807100215651074109
+]
+
 module_settings:
   rabbitmq:
     host: localhost
     queue: django_discord
 
-  postgres:
+  moderation:
+    checkmark: True
+    reply:
+      channel: True
+      dm: True
+
+    ignored_channels: [
+      858741004831555634
+    ]
+    report_channels: [
+      858741004831555634
+    ]
+    additional_words: [
+      "uottawa"
+    ]
+
+    report_message: "{author} sent a message to channel {channel} that broke the moderation rules:\n\n||{content}||"
+    profanity_message: "Your message is not appropriate. It has been deleted from the channel and sent to the moderation team."
+
+  coin:
+    public_commands: True
+    public_confirmations: True
+    permission: change_team_coin # Names must be unique as currently written
+
+    scoreboard_channels: [
+      813043254358442034
+    ]
+
+    scoreboard:
+      header: "Scoin Standings\n=================="
+      row: "{place}. {team_name} {coin_amount}"
+      # row must contain format placeholders: place, team_name, coin_amount
+      name_length: 25
+      coin_length: 10
+
+  scav:
+    incorrect_message: Null
+
+    settings_names:
+      active: "scav_active"

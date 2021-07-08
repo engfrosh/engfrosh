@@ -24,7 +24,7 @@ class Moderation(commands.Cog):
 
         if ctx.channel.id in self.config["ignored_channels"]:
             try:
-                if self.config["checkmark"]:
+                if self.bot.debug:
                     await ctx.add_reaction("🟨")
             except NotFound:
                 pass
@@ -55,7 +55,7 @@ class Moderation(commands.Cog):
 
         else:
             try:
-                if self.config["checkmark"]:
+                if self.bot.debug:
                     await ctx.add_reaction("☑")
             except NotFound:
                 pass

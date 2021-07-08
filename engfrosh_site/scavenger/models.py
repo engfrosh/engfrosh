@@ -37,12 +37,13 @@ class Question(models.Model):
     image = models.ImageField(upload_to=question_path, blank=True)
     display_filename = models.CharField(max_length=256, blank=True)
     weight = models.IntegerField("Order Number", unique=True, default=0, db_index=True)
+    answer = models.CharField(max_length=32)
 
     def __str__(self):
         if self.identifier:
-            return self.identifier
+            return f"{self.weight}. {self.identifier}"
         else:
-            return f"Question-{hex(self.id)}"
+            return f"Question {self.weight}"
 
 
 class Hint(models.Model):
@@ -75,3 +76,16 @@ class QuestionTime(models.Model):
     team = models.ForeignKey(Team, CASCADE)
     question = models.ForeignKey(Question, PROTECT)
     end_time = models.DateTimeField("Completed At")
+
+
+class Settings(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=32, unique=True)
+    display_name = models.CharField(max_length=64, blank=True)
+    enabled = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        if self.display_name:
+            return self.display_name
+        else:
+            return self.name
