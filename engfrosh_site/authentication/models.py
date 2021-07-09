@@ -37,3 +37,19 @@ class MagicLink(models.Model):
     token = models.CharField(max_length=64, default=random_token)
     user = models.OneToOneField(User, models.CASCADE)
     expiry = models.DateTimeField(default=days5)
+    delete_immediately = models.BooleanField(default=True)
+
+    def link_used(self) -> bool:
+        """Returns True if link can still be used, or False if not."""
+        if self.delete_immediately:
+            self.delete()
+            return False
+
+        if self.expiry < timezone.now() + datetime.timedelta(days=1):
+            # Only 1 day left, do nothing
+            return True
+
+        else:
+            self.expiry = timezone.now() + datetime.timedelta(days=1)
+            self.save()
+            return True

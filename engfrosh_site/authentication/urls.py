@@ -17,5 +17,6 @@ urlpatterns = [
     path("welcome/discord/", views.discord_initial_setup, name="discord_welcome"),
     path("permission-denied/", views.permission_denied, name="permission_denied"),
     path("welcome/", views.home_page),
-    path("home/", views.home_page, name="home")
+    path("home/", views.home_page, name="home"),
+    path("link/discord", views.link_discord, name="link_discord")
 ]

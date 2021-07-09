@@ -1,18 +1,15 @@
 import os
 import sys
 
-from authentication.models import MagicLink
 from .discord_auth import register
 from . import credentials
 
-from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.utils.encoding import iri_to_uri, uri_to_iri
 from django.conf import settings
-from django.utils import timezone
 
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
@@ -90,6 +87,15 @@ def permission_denied(request: HttpRequest):
     return render(request, "permission_denied.html")
 
 
+@login_required()
+def link_discord(request: HttpRequest):
+    skip_confirmation = request.GET.get("skip-confirm")
+    if skip_confirmation and skip_confirmation == "true":
+        return redirect("discord_register")
+
+    return render(request, "link_discord.html")
+
+
 # region Registration
 
 def register_page(request: HttpRequest):
@@ -101,7 +107,7 @@ def discord_register(request):
 
     return redirect(
         build_oauth_authorize_url(
-            settings.DISCORD_CLIENT_ID, callback_url, scope=settings.DEFAULT_DISCORD_SCOPE,
+            credentials.DISCORD_CLIENT_ID, callback_url, scope=settings.DEFAULT_DISCORD_SCOPE,
             prompt="consent"))
 
 
@@ -109,9 +115,13 @@ def discord_register_callback(request: HttpRequest):
     oauth_code = request.GET.get("code")
     # oauth_state = request.GET.get("state")
 
+    user = request.user
+    if user.is_anonymous:
+        user = None
+
     callback_url = request.build_absolute_uri(request.path)
 
-    user = register(discord_oauth_code=oauth_code, callback_url=callback_url)
+    user = register(discord_oauth_code=oauth_code, callback_url=callback_url, user=user)
     login(request, user, backend="authentication.discord_auth.DiscordAuthBackend")
 
     return redirect("discord_welcome")
