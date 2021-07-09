@@ -1,16 +1,19 @@
-from django.shortcuts import render  # noqa F401
-from django.shortcuts import redirect
+import os
+import sys
+
+from authentication.models import MagicLink
+from .discord_auth import register
+from . import credentials
+
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-
-from .discord_auth import register
-
+from django.utils.encoding import iri_to_uri, uri_to_iri
 from django.conf import settings
-from . import credentials
+from django.utils import timezone
 
-import os
-import sys
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
@@ -23,11 +26,35 @@ from engfrosh_common.DiscordAPI import build_oauth_authorize_url  # noqa E402
 def index(request: HttpRequest):
     return render(request, "index.html")
 
+
+@login_required()
+def home_page(request: HttpRequest):
+    return HttpResponse(request.user.get_username())
+
 # region Logins
 
 
 def login_page(request: HttpRequest):
-    return render(request, "login.html")
+    if not request.user.is_anonymous:
+        # Todo add way to log out
+        return HttpResponse("You are already loged in.")
+
+    redir = request.GET.get("redirect")
+
+    if token := request.GET.get("auth"):
+        user = authenticate(request, magic_link_token=token)
+        if user:
+            login(request, user, "authentication.discord_auth.DiscordAuthBackend")
+            if redir:
+                return redirect(uri_to_iri(redir))
+            return redirect("home")
+
+    context = {}
+    if redir:
+        context["encoded_redirect"] = redir
+
+    # Todo handle the redirect url on the other end
+    return render(request, "login.html", context)
 
 
 def discord_login(request: HttpRequest):

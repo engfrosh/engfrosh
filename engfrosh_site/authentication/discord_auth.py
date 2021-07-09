@@ -1,13 +1,15 @@
-from django.contrib.auth.backends import BaseBackend
-from .models import DiscordUser
-from django.contrib.auth.models import User
 import random
 import string
 import logging
-from . import credentials
-
 import os
 import sys
+
+from . import credentials
+from .models import DiscordUser, MagicLink
+
+from django.contrib.auth.backends import BaseBackend
+from django.contrib.auth.models import User
+from django.utils import timezone
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
@@ -62,9 +64,27 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
 class DiscordAuthBackend(BaseBackend):
     def authenticate(
             self, request, discord_user_id=None, discord_access_token=None, discord_expires_in=None,
-            discord_refresh_token=None, discord_oauth_code=None, callback_url=None) -> User:
+            discord_refresh_token=None, discord_oauth_code=None, callback_url=None, magic_link_token=None) -> User:
         logger.debug("Trying to authenticate with DiscordAuthBackend.authenticate")
         # print("Trying to authenticate with DiscordAuthBackend.authenticate")
+
+        if magic_link_token:
+            logger.debug("Trying to authenticate with magic link token")
+            try:
+                if magic_link := MagicLink.objects.get(token=magic_link_token):
+                    if magic_link.expiry > timezone.now():
+                        user = magic_link.user
+                        magic_link.delete()
+                        return user
+                    else:
+                        # Link is expired
+                        magic_link.delete()
+                        return None
+
+            except Exception:
+                pass
+
+            return None
 
         # If discord id is passed
         if discord_user_id:
