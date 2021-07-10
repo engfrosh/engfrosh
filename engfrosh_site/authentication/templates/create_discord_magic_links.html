@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+    <title>Manage Discord Magic Links</title>
+    <style>
+        button {
+            background-color: cornflowerblue;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        function buttonCopyGenerator(text, button) {
+            return function () {
+                navigator.clipboard.writeText(text)
+                    .then(data => {
+                        button.textContent = "Copied";
+                        button.style.backgroundColor = "White";
+                    });
+            };
+        };
+
+        function get_magic_link(user_id) {
+            fetch("", {
+                method: "POST",
+                mode: "cors",
+                credentials: "same-origin",
+                headers: {
+                    'X-CSRFToken': csrf_token,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ "user_id": user_id })
+            })
+                .then(res => {
+                    console.log(res);
+                    if (res.ok) {
+                        res.json().then(data => {
+                            const cls = "user_" + user_id;
+                            const button = document.querySelector("td." + cls + " button");
+                            button.style.backgroundColor = "green";
+                            button.textContent = "Copy Link";
+                            button.onclick = buttonCopyGenerator(data["link"], button);
+                        })
+                    }
+                    else {
+                        alert("Bad response " + res.status)
+
+                    }
+                });
+        };
+
+
+    </script>
+    <h3>Users</h3>
+    <table>
+        <tr>
+            <th>Username</th>
+            <th>Create Link</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{user.username}}</td>
+            <td class="user_{{user.id}}">
+                <button onclick="get_magic_link({{user.id}})">Add</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% csrf_token %}
+    <script>
+        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    </script>
+</body>
+
+</html>
