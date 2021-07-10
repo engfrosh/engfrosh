@@ -1,4 +1,4 @@
-"""engfrosh_site URL Configuration
+"""engfrosh_site URL Configuration.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.2/topics/http/urls/
@@ -13,16 +13,20 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 
+import authentication.views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('discord/', include('discord_bot_manager.urls')),
     path('accounts/', include('authentication.urls')),
-    path('teams/', include('frosh.urls'))
+    path('teams/', include('frosh.urls')),
+    path('manage/discord/magic-link', authentication.views.get_discord_link)
 ]
 
 if settings.DEBUG:

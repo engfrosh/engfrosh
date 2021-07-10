@@ -1,6 +1,17 @@
+import datetime
+import secrets
+
 from django.db import models
 from django.contrib.auth.models import User
-import datetime
+from django.utils import timezone
+
+
+def days5():
+    return timezone.now() + datetime.timedelta(days=5)
+
+
+def random_token():
+    return secrets.token_urlsafe(42)
 
 
 class DiscordUser(models.Model):
@@ -20,3 +31,25 @@ class DiscordUser(models.Model):
 
     def __str__(self) -> str:
         return f"{self.discord_username}#{self.discriminator}"
+
+
+class MagicLink(models.Model):
+    token = models.CharField(max_length=64, default=random_token)
+    user = models.OneToOneField(User, models.CASCADE)
+    expiry = models.DateTimeField(default=days5)
+    delete_immediately = models.BooleanField(default=True)
+
+    def link_used(self) -> bool:
+        """Returns True if link can still be used, or False if not."""
+        if self.delete_immediately:
+            self.delete()
+            return False
+
+        if self.expiry < timezone.now() + datetime.timedelta(days=1):
+            # Only 1 day left, do nothing
+            return True
+
+        else:
+            self.expiry = timezone.now() + datetime.timedelta(days=1)
+            self.save()
+            return True
