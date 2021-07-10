@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-ngg-3z5*no_b9zhnmj83hgv1qh5u_mx-vri57p=r&sym3p@$ru
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "alpha.engfrosh.com", 
+    "beta.engfrosh.com",
+    "week.engfrosh.com"
+]
 
 # TODO Change Where these settings live, put them in the database
 # Discord API Settings
