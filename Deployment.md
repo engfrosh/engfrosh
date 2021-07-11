@@ -163,7 +163,7 @@ write to `/etc/nginx/sites-available/alpha.engfrosh.com` the following
 ```
 server {
     listen 80;
-    server_name alpha.engfrosh.com, www.alpha.engfrosh.com;
+    server_name alpha.engfrosh.com;
     client_max_body_size 4G;
 
 
@@ -205,3 +205,13 @@ setup static files. run `manage.py collectstatic` to put the static files into t
 root, you will have to rerun this whenever files change. 
 
 You also need to watch that the environment puts it in the rigth spot, you maay want to change the static files root for in deployment.
+
+
+### Add Https
+[source](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-20-04)
+Make sure that your server name is correct.
+
+```
+sudo certbot --nginx -d alpha.engfrosh.com
+```
+
