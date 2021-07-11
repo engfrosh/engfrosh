@@ -1,3 +1,6 @@
+"""Starting point for EngFrosh main Discord bot."""
+
+import typing
 import discord
 import sys
 import logging
@@ -68,6 +71,8 @@ for cog in config["modules"]["cogs"]:
 
 @client.event
 async def on_ready():
+    """Strats Discord bot and RabbitMQ thread if configured."""
+
     logger.debug("Logged on as {}".format(client.user))
     await client.change_presence(activity=discord.Game(name="\'!help\' for info!", type=1, url='engfrosh.com'))
 
@@ -90,6 +95,8 @@ async def on_ready():
 
 @client.command(pass_context=True)
 async def superhelp(ctx):
+    """The overarching help function for the bot, lists available commands."""
+
     logger.debug("Help message used in {}".format(ctx.message.channel.guild.name))
     string = "hey, type !react emoji" \
 
@@ -100,11 +107,13 @@ async def superhelp(ctx):
 
 @client.command(pass_context=True)
 async def react(ctx):
+    """TEST FUNCTION. Add a reaction to the message."""
     await ctx.message.add_reaction("🍋")
 
 
 @client.event
 async def on_reaction_add(reaction, user):
+    """Reacts to the message when the user reacts to one of the bot's messagges."""
     if reaction.message.author == client.user:
         if reaction.emoji == '👍':
             await reaction.message.channel.send('Hi there!')
@@ -117,18 +126,22 @@ async def on_reaction_add(reaction, user):
 
 
 async def set_command_status(command_id, status, error_msg=""):
+    """Set the command status for the specified command id."""
     await db_int.set_discord_command_status(command_id, status, error_msg)
     logger.info(f"Set command [{command_id}] to {status}")
     return
 
 
 async def discord_queue_callback(command: dict):
+    """Handler for queued external discord commands."""
+
     logger.debug(f"Received discord_queue_callback with command:{command}")
 
     if command["object"] == "discord.TextChannel":
         # region Object Creation
         if "id" in command["attributes"]:
             channel = client.get_channel(command["attributes"]["id"])
+            channel = typing.cast(discord.TextChannel, channel)
             logger.debug("Got channel object for command")
         else:
             logger.error("No id provided to send message")
@@ -150,9 +163,4 @@ async def discord_queue_callback(command: dict):
 # endregion
 
 
-# region program start
-discord_thread = threading.Thread(target=client.run, args=(credentials["bot_token"],))
-
-discord_thread.start()
-discord_thread.join()
-# endregion
+client.run(credentials["bot_token"])
