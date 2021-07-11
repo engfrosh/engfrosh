@@ -5,6 +5,8 @@ credentials.*
 temp_*
 default_name.db
 files/media/*
+files/static/admin/*
+bot_config.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

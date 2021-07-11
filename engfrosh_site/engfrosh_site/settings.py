@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-ngg-3z5*no_b9zhnmj83hgv1qh5u_mx-vri57p=r&sym3p@$ru
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "alpha.engfrosh.com", 
+    "alpha.engfrosh.com",
     "beta.engfrosh.com",
     "week.engfrosh.com"
 ]

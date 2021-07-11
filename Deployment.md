@@ -14,8 +14,8 @@
 
 
 ### Once Launched
-- Create an elastic ip and assign it
-- add ip to dns as a subdomain
+- Create an elastic IP and assign it
+- add IP to DNS as a subdomain
 
 #### Update your server
 ```sh
@@ -108,19 +108,19 @@ git clone https://github.com/engfrosh/engfrosh.git
 sudo pip install -r requirements.txt
 ```
 
-Fix any dependancy errors
+Fix any dependency errors
 - psycopg2-binary if there is a compiling error
-- install the proper version of requests for django
+- install the proper version of requests for Django
 
 - create a credentials.py file in authentication.
-- change the database password for django
+- change the database password for Django
 
-- migrate django database
-- create django super user
-- run the django server and ideally using vscode or something check that at least some 
+- migrate Django database
+- create Django super user
+- run the Django server and ideally using VS Code or something check that at least some 
 pages come up 
 
-Now test gunicorn with django, run `gunicorn engfrosh_site.wsgi` do this from
+Now test Gunicorn with Django, run `gunicorn engfrosh_site.wsgi` do this from
 the folder with manage.py
 
 you can also run it as `gunicorn --bind 0.0.0.0:5000 engfrosh_site.wsgi` which will bind 
@@ -204,7 +204,8 @@ sudo rm /etc/nginx/sites-enabled/default
 setup static files. run `manage.py collectstatic` to put the static files into the static 
 root, you will have to rerun this whenever files change. 
 
-You also need to watch that the environment puts it in the rigth spot, you maay want to change the static files root for in deployment.
+You also need to watch that the environment puts it in the right spot, you may
+want to change the static files root for in deployment.
 
 
 ### Add Https
@@ -214,4 +215,70 @@ Make sure that your server name is correct.
 ```
 sudo certbot --nginx -d alpha.engfrosh.com
 ```
+
+## RabbitMQ
+[source](https://www.rabbitmq.com/install-debian.html#apt-quick-start-cloudsmith)
+
+Run the `install-rabbitmq.sh` file. 
+
+## Discord Bot
+Add a `credentials.json` to the engfrosh_bot folder based on the template. 
+
+Make sure to change the bot config to the production one.
+
+### Creating Discord Credentials
+
+Create a new discord application [here](https://discord.com/developers/applications)
+
+Under OAuth2 add the redirects:
+```
+https://alpha.engfrosh.com/accounts/login/discord/callback/
+https://alpha.engfrosh.com/accounts/register/discord/callback/
+```
+
+Copy your client id and client secret to the credentials.py in the engfrosh_site folder.
+
+Got to bot and add it as a bot.
+- Copy the token to the `credentials.json` file in the engfrosh_bot folder.
+- update the database credentials as well in that file
+- Uncheck public bot
+
+- Go back to OAuth and check bot, then administrator (for now) and then use the link to add the bot to your server. 
+
+- For your discord server, make it a community server is desired.
+
+
+- Give the needed permissions to the discord bot on the database.
+- Add the needed database entries such as the enable scavenger setting.
+
+- make sure it is up and running properly
+
+Add it as a service.
+Add to `/etc/systemd/system/engfrosh_bot.service`
+```
+[Unit]
+Description=EngFrosh Discord Bot
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/engfrosh
+ExecStart=python3 -m engfrosh_bot
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then run
+```
+systemctl start engfrosh_bot
+```
+and check that the bot is indeed running
+```
+systemctl enable engfrosh_bot
+```
+so that it runs at start up. 
+
+You may also want to change the service file permissions so non root can control them.
+
 
