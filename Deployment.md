@@ -26,7 +26,7 @@ $ sudo apt upgrade
 
 ### Install Postgres
 ```sh
-$ sudo apt install postgresql postgresql-contrib nginx python3-pip gunicorn
+$ sudo apt install postgresql postgresql-contrib nginx python3-pip gunicorn certbot python3-certbot-nginx
 ```
 
 #### Setup Postgres
@@ -59,10 +59,11 @@ $ exit
 [source](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04)
 
 
-You can check the status
+You can check the status and also check by going to the web address.
 ```sh
 $ systemctl status nginx
 ```
+
 
 #### Management Commands:
 
@@ -162,10 +163,21 @@ write to `/etc/nginx/sites-available/alpha.engfrosh.com` the following
 ```
 server {
     listen 80;
-    server_name alpha.engfrosh.com;
+    server_name alpha.engfrosh.com, www.alpha.engfrosh.com;
+    client_max_body_size 4G;
+
+
+    location /static/ {
+        root /home/ubuntu/engfrosh/files;
+    }
 
     location / {
-        include proxy_params;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        # we don't want nginx trying to do something clever with
+        # redirects, we set the Host: header above already.
+        proxy_redirect off;
         proxy_pass http://unix:/home/ubuntu/engfrosh/engfrosh_site/engfrosh_site.sock;
     }
 }
@@ -179,3 +191,17 @@ sudo ln -s /etc/nginx/sites-available/alpha.engfrosh.com /etc/nginx/sites-enable
 test `sudo nginx -t`
 
 restart `sudo systemctl restart nginx`
+
+Your site should now be at least somewhat up.
+
+## Next steps
+
+<!-- Disable example site
+```
+sudo rm /etc/nginx/sites-enabled/default
+``` -->
+
+setup static files. run `manage.py collectstatic` to put the static files into the static 
+root, you will have to rerun this whenever files change. 
+
+You also need to watch that the environment puts it in the rigth spot, you maay want to change the static files root for in deployment.
