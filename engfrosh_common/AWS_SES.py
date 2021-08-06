@@ -1,3 +1,5 @@
+"""Has support for sending emails with AWS SES."""
+
 import boto3
 import logging
 import os
@@ -32,7 +34,23 @@ logger.debug("Set current directory as: %s", CURRENT_DIRECTORY)
 # endregion
 
 
-def send_SES(sender_email, recipient_email, subject, body_text, body_html):
+def send_SES(sender_email: str, recipient_email: str, subject: str,
+             body_text: str, body_html: str):
+    """
+    Send an email using AWS SES.
+
+    Parameters
+    ----------
+    sender_email : str
+    recipient_email : str
+    subject : str
+    body_text : str
+        The message in plain text
+    body_html : str
+        The message formatted with html tags
+
+    """
+
     # If necessary, replace us-west-2 with the AWS Region you're using for Amazon SES.
     AWS_REGION = "us-east-2"
 
@@ -78,7 +96,8 @@ def send_SES(sender_email, recipient_email, subject, body_text, body_html):
         logger.error(e.response['Error']['Message'])
         return False
     else:
-        logger.info(f"Email sent! Message ID: {response['MessageId']}"),
+        logger.info(f"Email sent! Message ID: {response['MessageId']}")
+        return True
 
 
 # The following section can be added to another python file (once this file is imported) to added sending
