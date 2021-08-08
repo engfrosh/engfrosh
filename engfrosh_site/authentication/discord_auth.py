@@ -38,8 +38,10 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
 
     # Get User Info
     discord_api = DiscordUserAPI(client_id=credentials.DISCORD_CLIENT_ID,
-                                 client_secret=credentials.DISCORD_CLIENT_SECRET, access_token=access_token,
-                                 expires_in=expires_in, refresh_token=refresh_token, oauth_code=discord_oauth_code,
+                                 client_secret=credentials.DISCORD_CLIENT_SECRET,
+                                 access_token=access_token,
+                                 expires_in=expires_in, refresh_token=refresh_token,
+                                 oauth_code=discord_oauth_code,
                                  callback_url=callback_url)
     discord_user_info = discord_api.get_user_info()
 

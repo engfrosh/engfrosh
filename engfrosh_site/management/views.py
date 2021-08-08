@@ -113,8 +113,7 @@ def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
                                       expiry=discord_user.expiry)
 
             # TODO Make guild id dynamic
-            GUILD_ID = 731598642426675301
-            res = user_api.add_user_to_guild(GUILD_ID, user_id=discord_user.id)
+            res = user_api.add_user_to_guild(credentials.GUILD_ID, user_id=discord_user.id)
 
             if res:
                 # Add succeeded

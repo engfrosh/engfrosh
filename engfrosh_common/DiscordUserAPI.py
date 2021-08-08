@@ -1,6 +1,5 @@
 """API abstraction for performing actions on Discord Users."""
 
-import json
 from typing import List, Optional, Union
 import requests
 import datetime
@@ -36,7 +35,15 @@ class DiscordUserAPI():
         if not (access_token and refresh_token) and oauth_code and callback_url:
             # If no tokens, get the tokens
             logger.info("No tokens provided, getting tokens with oauth code and callback url")
-            credentials = get_tokens(oauth_code, callback_url, client_id, client_secret)
+            try:
+                credentials = get_tokens(oauth_code, callback_url, client_id, client_secret)
+            except requests.exceptions.HTTPError as e:
+                logger.error(
+                    f"Failed to get tokens from discord."
+                    f"\nResponse: {e.response.status_code} {e.response.reason} {e.response.content}"
+                    f"\nRequest: {e.request.method} {e.request.headers} {e.request.body}",
+                    exc_info=e)
+                raise e
 
             access_token = credentials["access_token"]
             expires_in = credentials["expires_in"]
@@ -155,6 +162,8 @@ class DiscordUserAPI():
 
 
 def get_tokens(oauth_code, callback_url, client_id, client_secret):
+    """Get the tokens OAuth tokens for the user via the discord api."""
+    
     data = {
         'client_id': client_id,
         'client_secret': client_secret,
@@ -167,7 +176,7 @@ def get_tokens(oauth_code, callback_url, client_id, client_secret):
         "Content-Type": 'application/x-www-form-urlencoded'
     }
 
-    response = requests.post(get_token_url(), headers=headers, data=json.dumps(data))
+    response = requests.post(get_token_url(), headers=headers, data=data)
     response.raise_for_status()
     return response.json()
 
