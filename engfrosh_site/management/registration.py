@@ -75,7 +75,7 @@ def email_magic_link(user: User, hostname: str, login_path: str, sender_email: s
     if not body_text:
         body_text = DEFAULT_MAGIC_LINK_EMAIL_TEXT
     if not body_html:
-        body_html = DEFAULT_MAGIC_LINK_EMAIL_TEXT
+        body_html = DEFAULT_MAGIC_LINK_EMAIL_HTML
     if not subject:
         subject = DEFAULT_MAGIC_LINK_EMAIL_SUBJECT
 

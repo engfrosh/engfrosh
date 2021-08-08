@@ -79,7 +79,7 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
 
 @permission_required("auth_user.change_user")
 def get_discord_link(request: HttpRequest) -> HttpResponse:
-    """View to get discord linking links for users."""
+    """View to get discord linking links for users or send link emails to users."""
     if request.method == "GET":
         # Handle Webpage requests
         # TODO add check that user doesn't yet have a discord account linked.
@@ -99,7 +99,7 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
 
         req_dict = json.loads(request.body)
         if "user_id" not in req_dict and "command" not in req_dict and req_dict["command"] not in {
-                "return_link", "email_user"}:
+                "return_link", "send_link_email"}:
             return HttpResponseBadRequest()
 
         user = User.objects.get(id=req_dict["user_id"])
@@ -110,10 +110,22 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
                 "/accounts/login", redirect="/accounts/link/discord")
             if not link:
                 logger.error("Could not get magic link for user %s", user)
-                return HttpResponseServerError()
+                return HttpResponseServerError("Could not get link for user.")
             return JsonResponse({"user_id": user.id, "link": link})
 
-        # elif req_dict["command"] == "email_user":
+        elif req_dict["command"] == "send_link_email":
+            # TODO Update the email to be dynamic
+            SENDER_EMAIL = "noreply@engfrosh.com"
+            if registration.email_magic_link(
+                    user, request.get_host(),
+                    "/accounts/login", SENDER_EMAIL,
+                    redirect="/accounts/link/discord"):
+                # Email successfully sent
+                return JsonResponse({"user_id": user.id})
+
+            else:
+                # Email failed for some reason
+                return HttpResponseServerError()
 
     else:
         return HttpResponseNotAllowed(['GET', 'POST'])
