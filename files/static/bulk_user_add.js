@@ -20,7 +20,7 @@ function validateEmail(email) {
 function validateTeam(team, role) {
   // Check against list
   // No team is valid as planning are not on a team 
-  if (team === "---") {
+  if (team === "---" | !team) {
     if (role !== "Planning") {
       return "No team selected";
     }
@@ -36,7 +36,7 @@ function validateRole(role) {
   return true;
 }
 
-function addUserRowButtonPress(row_id) {
+function addUserRowButtonPress(row_id, disable_invalid_alert) {
   let nameInput = document.querySelector("." + row_id + ".name_input");
   let emailInput = document.querySelector("." + row_id + ".email_input");
   let selectTeam = document.querySelector("." + row_id + ".team_selection");
@@ -45,7 +45,7 @@ function addUserRowButtonPress(row_id) {
 
   const name = nameInput.value;
   const email = emailInput.value;
-  const team = selectTeam.value;
+  let team = selectTeam.value;
   const role = selectRole.value;
 
   vName = validateName(name);
@@ -81,7 +81,9 @@ function addUserRowButtonPress(row_id) {
   }
 
   if (failedValidation) {
-    alert(error_message)
+    if (!disable_invalid_alert) {
+      alert(error_message)
+    }
   }
   else {
 
@@ -136,11 +138,9 @@ function addUserRowButtonPress(row_id) {
 }
 
 
-function addUserRow() {
+function addUserRow(name, email, team, role) {
 
   const table = document.getElementById("new-user-table");
-
-  const optionInfo = document.getElementById("option-info");
 
   current_row++;
   const row_id = "rowID" + current_row;
@@ -152,12 +152,18 @@ function addUserRow() {
   let nameInput = document.createElement("input");
   nameInput.setAttribute("type", "text");
   nameInput.setAttribute("class", row_id + " name_input")
+  if (name) {
+    nameInput.value = name;
+  }
   nameCell.appendChild(nameInput);
 
   let emailCell = row.insertCell(1);
   let emailInput = document.createElement("input");
   emailInput.setAttribute("type", "email");
   emailInput.setAttribute("class", row_id + " email_input")
+  if (email) {
+    emailInput.value = email;
+  }
   emailCell.appendChild(emailInput);
 
 
@@ -172,6 +178,10 @@ function addUserRow() {
     selectTeam.appendChild(opt);
   }
   selectTeam.setAttribute("class", row_id + " team_selection")
+  // TODO set team if provided
+  if (team) {
+    selectTeam.value = team;
+  }
   teamCell.appendChild(selectTeam);
 
   let roleCell = row.insertCell(3);
@@ -185,6 +195,10 @@ function addUserRow() {
     selectRole.appendChild(opt);
   }
   selectRole.setAttribute("class", row_id + " role_selection")
+  // TODO set role if provided
+  if (role) {
+    selectRole.value = role;
+  }
   roleCell.appendChild(selectRole);
 
 
@@ -194,4 +208,80 @@ function addUserRow() {
   submitButton.setAttribute("class", row_id + " submit_button")
   let submitCell = row.insertCell(4);
   submitCell.appendChild(submitButton);
+};
+
+function handleCSVFile (file) {
+  function checkFirstLine (line) {
+    let headings = line.split(",");
+    for (let i = 0; i < headings.length; i++) {
+      headings[i] = headings[i].trim().toLowerCase();
+    }
+    if (headings[0] != "name" | headings[1] != "email" | headings[2] != "team" | headings[3] != "role") {
+      return false;
+    }
+    return true;
+  }
+
+  function handleCSVLine (line) {
+    if (!line) {
+      // If line is blank, ignore and treat as properly handled
+      return true;
+    }
+
+    let values = line.split(",");
+
+    if (values.length != 4) {
+      alert("Line improper length: " + line );
+      return false;
+    }
+
+    for (let i = 0; i < values.length; i++) {
+      values[i] = values[i].trim();
+    }
+
+    const name = values[0];
+    const email = values[1];
+    const team = values[2];
+    const role = values[3];
+
+    // console.log("Got User. Name: " + name + " Email: " + email + " Team: " + team + " Role: " + role);
+    
+    // const vName = validateName(name);
+    // const vEmail = validateEmail(email);
+    // const vTeam = validateTeam(team, role);
+    // const vRole = validateRole(role);
+    // // TODO use the validation
+
+    addUserRow(name, email, team, role);
+
+
+  }
+
+  let reader = new FileReader();
+  reader.onload = function(event){
+    let lines = event.target.result.split("\n");
+
+    // Check if the file is valid
+    if (!checkFirstLine(lines[0])) {
+      alert("Bad CSV Headings. Should be name,email,team,role");
+    }
+    else {
+      // File headers are good
+      for (line of lines.slice(1)) {
+        handleCSVLine(line);
+      }
+    }
+  }
+  reader.readAsText(file);
+};
+
+
+function addAllUserButtonPress () {
+  for (let row = 1; row <= current_row; row++)  {
+    let row_id = "rowID" + row;
+    let button = document.querySelector("button." + row_id);
+    if (!button.disabled) {
+      addUserRowButtonPress(row_id, true);
+    }
+  }
 }
