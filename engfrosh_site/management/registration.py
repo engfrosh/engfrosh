@@ -55,7 +55,17 @@ def get_magic_link(user: User, hostname: str, login_path: str,
 
 
 DEFAULT_MAGIC_LINK_EMAIL_TEXT = """Here is your magic link to log into the EngFrosh site: {link}"""
-DEFAULT_MAGIC_LINK_EMAIL_HTML = """<p><a href='{link}' >Here</a> is your magic link to log into the EngFrosh site."""
+DEFAULT_MAGIC_LINK_EMAIL_HTML = \
+    """<html lang='en'>
+        <body>
+            <p><a href='{link}' >Here</a> is your magic link to log into the EngFrosh site.</p>
+            <br/>
+            <br/>
+            {link}
+        </body>
+    </html>
+    """
+# Note, google tends to get rid of some link elements.
 DEFAULT_MAGIC_LINK_EMAIL_SUBJECT = "Your EngFrosh Login"
 
 
