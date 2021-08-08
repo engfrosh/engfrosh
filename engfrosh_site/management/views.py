@@ -2,6 +2,7 @@
 
 import logging
 from django.contrib.auth.decorators import permission_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, JsonResponse, HttpResponseBadRequest, \
     HttpResponseNotAllowed, HttpResponseServerError
@@ -9,6 +10,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 
 from authentication.models import DiscordUser
+from frosh.models import FroshRole, Team
 from . import registration
 import json
 
@@ -18,16 +20,59 @@ import credentials
 
 logger = logging.getLogger("management.views")
 
-# region Bulk User Registration
-
 
 @permission_required("auth_user.add_user")
-def bulk_register_users(request: HttpRequest):
+def bulk_register_users(request: HttpRequest) -> HttpResponse:
     """View for bulk user adding."""
-    context = {}
-    return render(request, "bulk_user_add.html", context)
 
-# endregion
+    if request.method == "GET":
+        role_options = []
+        for role in FroshRole.objects.all():
+            role_options.append(role.name)
+
+        team_options = []
+        for team in Team.objects.all():
+            team_options.append(team.display_name)
+
+        context = {
+            "team_options": team_options,
+            "role_options": role_options
+        }
+        return render(request, "bulk_user_add.html", context)
+
+    elif request.method == "POST":
+
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Not application/json content type")
+
+        req_dict = json.loads(request.body)
+        try:
+            if req_dict["command"] != "add_user":
+                return HttpResponseBadRequest()
+
+            name = req_dict["name"]
+            email = req_dict["email"]
+            team = req_dict["team"]
+            role = req_dict["role"]
+        except KeyError:
+            return HttpResponseBadRequest("Key Error in Body")
+
+        try:
+            role = FroshRole.objects.get(name=role)
+            if team:
+                team = Team.objects.get(display_name=team)
+        except ObjectDoesNotExist:
+            return HttpResponseBadRequest("Bad role or team")
+
+        try:
+            user = registration.create_user_initialize(name, email, role, team)
+        except registration.UserAlreadyExistsError:
+            return HttpResponseBadRequest("User already exists.")
+
+        return JsonResponse({"user_id": user.id, "username": user.username})  # type: ignore
+
+    return HttpResponseBadRequest()
+
 
 # region Link Discord
 

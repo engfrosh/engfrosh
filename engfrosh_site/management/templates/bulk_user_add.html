@@ -3,10 +3,12 @@
 
 <head>
     <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+    {% csrf_token %}
     <script>
+        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
         // Load the constants that are modifiable at runtime
-        var teams = ["---", "Team 1", "Team 2"];
-        var roles = ["---", "Frosh", "Facil", "Head", "Planning"];
+        var teams = [{% for t in team_options %}"{{t}}", {% endfor %}];
+        var roles = [{% for r in role_options %}"{{r}}", {% endfor %}];
     </script>
     {% load static %}
     <script src="{% static 'bulk_user_add.js' %}"></script>
