@@ -163,7 +163,7 @@ class DiscordUserAPI():
 
 def get_tokens(oauth_code, callback_url, client_id, client_secret):
     """Get the tokens OAuth tokens for the user via the discord api."""
-    
+
     data = {
         'client_id': client_id,
         'client_secret': client_secret,

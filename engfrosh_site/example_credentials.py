@@ -2,3 +2,5 @@
 # This needs to be the same application as the bot in the server
 DISCORD_CLIENT_ID = r""
 DISCORD_CLIENT_SECRET = r""
+BOT_TOKEN = r""
+GUILD_ID = 0

@@ -146,7 +146,7 @@ STATICFILES_DIRS = [
     'files/static'
 ]
 
-# STATIC_ROOT should not be present, at least for development as far as I know. 
+# STATIC_ROOT should not be present, at least for development as far as I know.
 # STATIC_ROOT = 'files/static'
 
 MEDIA_ROOT = 'files/media'

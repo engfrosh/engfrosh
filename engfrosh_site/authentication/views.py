@@ -62,14 +62,12 @@ def login_page(request: HttpRequest):
     if not redirect_location:
         redirect_location = request.GET.get("next")
 
-    
     if not request.user.is_anonymous:
         # Todo add way to log out
         if redirect_location:
             return redirect(redirect_location)
         else:
             return HttpResponse("You are already logged in.")
-
 
     if token := request.GET.get("auth"):
         user = authenticate(request, magic_link_token=token)
