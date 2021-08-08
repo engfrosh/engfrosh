@@ -1,0 +1,14 @@
+bot_token: "My bot token"
+channel: 11111111111111
+
+commands: 
+  up: ["^", "up"]
+  down: ["down", "dwn"]
+  left: ["<", "left"]
+  right: [">", "right"]
+  A: ["a"]
+  B: ["b"]
+  L: ["left-button"]
+  R: ["right-button"]
+  select: ["select"]
+  start: ["start"]
