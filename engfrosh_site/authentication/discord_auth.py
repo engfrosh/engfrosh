@@ -57,7 +57,7 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
     except DiscordUser.DoesNotExist:
         pass
 
-    # If no given User account to asociate with, create a new one
+    # If no given User account to associate with, create a new one
     if not user:
         if not username:
             s = f"{discord_username}+{discord_discriminator}-"

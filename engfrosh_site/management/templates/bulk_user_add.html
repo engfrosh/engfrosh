@@ -3,68 +3,18 @@
 
 <head>
     <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+    <script>
+        // Load the constants that are modifiable at runtime
+        var teams = ["---", "Team 1", "Team 2"];
+        var roles = ["---", "Frosh", "Facil", "Head", "Planning"];
+    </script>
+    {% load static %}
+    <script src="{% static 'bulk_user_add.js' %}"></script>
     <title></title>
 </head>
 
 <body>
-    <script>
-        var teams = ["---", "Team 1", "Team 2"];
-        var roles = ["---", "Frosh", "Facil", "Head", "Planning"];
-        var current_row = 0;
-
-        function addUserRowButtonPress(row_id) {
-            alert("Button " + row_id);
-        }
-
-        function addUserRow() {
-
-            const table = document.getElementById("new-user-table");
-
-            const optionInfo = document.getElementById("option-info");
-
-            current_row++;
-            const row_id = "rowID" + current_row;
-
-            let row = table.insertRow(1);
-            row.setAttribute("class", row_id);
-
-            let nameCell = row.insertCell(0);
-            let nameInput = document.createElement("input");
-            nameInput.setAttribute("type", "text");
-            nameCell.appendChild(nameInput);
-
-            let emailCell = row.insertCell(1);
-            let emailInput = document.createElement("input");
-            emailInput.setAttribute("type", "email");
-            emailCell.appendChild(emailInput);
-
-            let teamCell = row.insertCell(2);
-            let selectTeam = document.createElement("select");
-            for (const team of teams) {
-                let opt = document.createElement("option");
-                opt.innerHTML = team;
-                selectTeam.appendChild(opt);
-            }
-            teamCell.appendChild(selectTeam);
-
-            let roleCell = row.insertCell(3);
-            let selectRole = document.createElement("select");
-            for (const role of roles) {
-                let opt = document.createElement("option");
-                opt.innerHTML = role;
-                selectRole.appendChild(opt);
-            }
-            roleCell.appendChild(selectRole);
-
-
-            let submitButton = document.createElement("button");
-            submitButton.innerText = "ADD";
-            submitButton.setAttribute("onclick", "addUserRowButtonPress('" + row_id + "')")
-            let submitCell = row.insertCell(4);
-            submitCell.appendChild(submitButton);
-
-        }
-    </script>
+    <a href="/manage">Back to Manage</a><br />
     <button>Upload CSV</button>
     <button onclick="addUserRow()">Add User</button>
     <table id="new-user-table">

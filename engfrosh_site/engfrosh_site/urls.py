@@ -18,9 +18,10 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
-
+import frosh.views
 
 urlpatterns = [
+    path('', frosh.views.overall_index),
     path('admin/', admin.site.urls),
     path('discord/', include('discord_bot_manager.urls')),
     path('accounts/', include('authentication.urls')),

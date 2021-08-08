@@ -38,3 +38,8 @@ def coin_standings(request: HttpRequest):
         context["teams"].append(d)
 
     return render(request, "scoin_standings.html", context)
+
+
+def overall_index(request: HttpRequest):
+    """The home page at the root of the site."""
+    return render(request, "overall_index.html")
