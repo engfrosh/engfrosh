@@ -32,7 +32,7 @@
                     'X-CSRFToken': csrf_token,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ "user_id": user_id })
+                body: JSON.stringify({ "command": "return_link", "user_id": user_id })
             })
                 .then(res => {
                     console.log(res);
@@ -54,6 +54,7 @@
 
 
     </script>
+    <a href="/manage">Back to Manage</a>
     <h3>Users</h3>
     <table>
         <tr>

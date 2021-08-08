@@ -1,10 +1,52 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
-        <title>Login</title>
-    </head>
-    <body>
-        <a href="discord/">Login with Discord</a>
-    </body>
+
+<head>
+    <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+    <title>Login</title>
+    <style>
+        .login_button {
+            font-family: "Ginto Nord", "Whitney", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            padding: 10pt;
+            border-radius: 6pt;
+            margin: 5px;
+            display: block;
+        }
+
+        .discord.login_button {
+            background-color: #5865F2;
+            font-size: large;
+        }
+
+        .admin.login_button {
+            background-color: slategray;
+            font-size: small;
+            
+        }
+
+        .login_box {
+            margin: auto;
+            margin-top: 20%;
+            width: 50%;
+            padding: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login_box">
+        <a href="discord/" type="button" class="login_button discord">Login with Discord</a>
+        <br/>
+        {% if encoded_redirect %}
+            <a href="/admin/login/?next={{encoded_redirect}}" type="button" class="login_button admin">Login as Staff</a> 
+        {% else %}
+            <a href="/admin/login/" type="button" class="login_button admin">Login as Staff</a> 
+        {% endif %}
+    </div>
+</body>
+
 </html>

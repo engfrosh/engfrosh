@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+        <title>Add User to Guild</title>
+    </head>
+    <body>
+        <script>
+            function user_already_added(){
+                alert("User already added.")
+            }
+    
+            function add_user_to_server(user_id) {
+                fetch("", {
+                    method: "POST",
+                    mode: "cors",
+                    credentials: "same-origin",
+                    headers: {
+                        'X-CSRFToken': csrf_token,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ "command": "add_user", "user_id": user_id })
+                })
+                    .then(res => {
+                        console.log(res);
+                        if (res.ok) {
+                            const cls = "user_" + user_id;
+                            const button = document.querySelector("td." + cls + " button");
+                            button.style.backgroundColor = "green";
+                            button.textContent = "Added";
+                            button.onclick = user_already_added;
+                        }
+                        else {
+                            alert("Bad response " + res.status)
+    
+                        }
+                    });
+            };
+    
+    
+        </script>
+        <table>
+            <tr>
+                <th>Username</th>
+                <th>Add to Server</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{user.username}}</td>
+                <td class="user_{{user.id}}">
+                    <button onclick="add_user_to_server({{user.id}})">Add</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% csrf_token %}
+        <script>
+            const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        </script>
+    </body>
+</html>

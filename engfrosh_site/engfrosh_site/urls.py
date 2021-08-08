@@ -19,14 +19,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 
-import authentication.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('discord/', include('discord_bot_manager.urls')),
     path('accounts/', include('authentication.urls')),
     path('teams/', include('frosh.urls')),
-    path('manage/discord/magic-link', authentication.views.get_discord_link)
+    path('manage/', include('management.urls'))
 ]
 
 if settings.DEBUG:

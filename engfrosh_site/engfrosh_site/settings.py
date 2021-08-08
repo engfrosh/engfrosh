@@ -28,7 +28,9 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "alpha.engfrosh.com",
     "beta.engfrosh.com",
-    "week.engfrosh.com"
+    "week.engfrosh.com",
+    # TODO Update settings for different files
+    "127.0.0.1"
 ]
 
 # TODO Change Where these settings live, put them in the database
@@ -49,7 +51,8 @@ INSTALLED_APPS = [
     'discord_bot_manager.apps.DiscordBotManagerConfig',
     'authentication.apps.AuthenticationConfig',
     'frosh.apps.FroshConfig',
-    'scavenger.apps.ScavengerConfig'
+    'scavenger.apps.ScavengerConfig',
+    'management.apps.ManagementConfig'
 ]
 
 MIDDLEWARE = [
