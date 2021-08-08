@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+    <title>Manage Discord Magic Links</title>
+    {% csrf_token %}
+    <script>
+        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    </script>
+    <style>
+        button {
+            background-color: cornflowerblue;
+        }
+
+        td.button_cell {
+            text-align: center;
+        }
+
+        th {
+            padding: 5px;
+        }
+    </style>
+    {% load static %}
+    <script src="{% static 'create_discord_magic_links.js' %}"></script>
+</head>
+
+<body>
+    <a href="/manage">Back to Manage</a>
+    <h3>Add Users to Discord</h3>
+    <table>
+        <tr>
+            <th>Username</th>
+            <th>Create Link</th>
+            <th>Email Link</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{user.username}}</td>
+            <td class="user_{{user.id}} create_link button_cell">
+                <button onclick="get_magic_link({{user.id}})" type="button">Add</button>
+            </td>
+            <td class="user_{{user.id}} email_link button_cell">
+                <button type="button" onclick="email_magic_link({{user.id}})">Email</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+</body>
+
+</html>

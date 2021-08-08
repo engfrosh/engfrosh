@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+    {% csrf_token %}
+    <script>
+        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        // Load the constants that are modifiable at runtime
+        var teams = [{% for t in team_options %}"{{t}}", {% endfor %}];
+        var roles = [{% for r in role_options %}"{{r}}", {% endfor %}];
+    </script>
+    <style>
+        th {
+            width: 100px;
+        }
+
+        th.email, th.name {
+            width: 300px;
+        }
+
+        input.name_input, input.email_input {
+            width: 300px;
+        }
+
+        td {
+            text-align: center;
+        }
+    </style>
+    {% load static %}
+    <script src="{% static 'bulk_user_add.js' %}"></script>
+    <title></title>
+</head>
+
+<body>
+    <a href="/manage">Back to Manage</a><br />
+    <hr/>
+    <p>Upload CSV: <input type="file" id="file_selector" accept=".csv"></input></p>
+    <a href="{% static 'example_user_csv.csv' %}">Example CSV</a><br/>
+    <script>
+        const fileSelector = document.getElementById("file_selector")
+        fileSelector.addEventListener('change', (event) => {
+            const file = event.target.files[event.target.files.length - 1];
+            console.log(file);
+            handleCSVFile(file);
+        })
+    </script>
+    <hr/>
+    <button onclick="addUserRow()">Add User</button>
+    <table id="new-user-table">
+        <tr>
+            <th class="name">Name</th>
+            <th class="email">Email</th>
+            <th class="team">Team</th>
+            <th class="role">Role</th>
+            <th class="add_all"><button type="button" onclick="addAllUserButtonPress()">ADD ALL</button></th>
+        </tr>
+    </table>
+</body>
+
+</html>

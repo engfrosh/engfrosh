@@ -235,6 +235,12 @@ Under OAuth2 add the redirects:
 https://alpha.engfrosh.com/accounts/login/discord/callback/
 https://alpha.engfrosh.com/accounts/register/discord/callback/
 ```
+<!-- For development user the callbacks:
+```
+http://localhost:8000/accounts/register/discord/callback/
+http://localhost:8000/accounts/login/discord/callback/
+```
+ -->
 
 Copy your client id and client secret to the credentials.py in the engfrosh_site folder.
 

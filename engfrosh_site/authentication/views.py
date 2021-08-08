@@ -6,32 +6,30 @@ Includes views for:
  - custom user management.
 """
 
+import logging
 import os
 import sys
-import json
 
-from django.contrib.auth.models import User
-from django.http.response import HttpResponseBadRequest, HttpResponseNotAllowed, \
-    HttpResponseServerError, JsonResponse
+from authentication.models import DiscordUser
 
 from .discord_auth import register
-from . import credentials
-from . import registration
+import credentials
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.utils.encoding import uri_to_iri
 from django.conf import settings
 
+logger = logging.getLogger("Authentication.Views")
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 # Hack for development to get around import issues
 sys.path.append(PARENT_DIRECTORY)
-from engfrosh_common.DiscordAPI import build_oauth_authorize_url  # noqa E402
+from engfrosh_common.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  # noqa E402
 
 
 def index(request: HttpRequest):
@@ -45,65 +43,43 @@ def home_page(request: HttpRequest):
     return HttpResponse(request.user.get_username())
 
 
-@permission_required("auth_user.change_user")
-def get_discord_link(request: HttpRequest) -> HttpResponse:
-    """View to get discord linking links for users."""
-    if request.method == "GET":
-        # Handle Webpage requests
-        context = {"users": []}
+@login_required()
+def link_discord(request: HttpRequest):
+    """Page to prompt user to link their discord account to their user account."""
+    skip_confirmation = request.GET.get("skip-confirm")
+    if skip_confirmation and skip_confirmation == "true":
+        return redirect("discord_register")
 
-        users = User.objects.all()
-        for usr in users:
-            if not usr.is_staff:
-                context["users"].append(usr)
-
-        return render(request, "create_discord_magic_links.html", context)
-
-    elif request.method == "POST":
-        # Handle commands
-        if request.content_type != "application/json":
-            return HttpResponseBadRequest()
-
-        req_dict = json.loads(request.body)
-        if "user_id" not in req_dict:
-            return HttpResponseBadRequest()
-
-        user = User.objects.get(id=req_dict["user_id"])
-
-        link = registration.get_magic_link(
-            user, request.get_host(),
-            "/accounts/login", redirect="/accounts/link/discord")
-        if not link:
-            return HttpResponseServerError()
-
-        return JsonResponse({"user_id": user.id, "link": link})
-
-    else:
-        return HttpResponseNotAllowed(['GET', 'POST'])
-
+    return render(request, "link_discord.html")
+# endregion
 
 # region Logins
 
 
 def login_page(request: HttpRequest):
-    """Login page. Currently just links to login with discord."""
+    """Login page."""
+    redirect_location = request.GET.get("redirect")
+    if not redirect_location:
+        redirect_location = request.GET.get("next")
+
     if not request.user.is_anonymous:
         # Todo add way to log out
-        return HttpResponse("You are already loged in.")
-
-    redir = request.GET.get("redirect")
+        if redirect_location:
+            return redirect(redirect_location)
+        else:
+            return HttpResponse("You are already logged in.")
 
     if token := request.GET.get("auth"):
         user = authenticate(request, magic_link_token=token)
         if user:
             login(request, user, "authentication.discord_auth.DiscordAuthBackend")
-            if redir:
-                return redirect(uri_to_iri(redir))
+            if redirect_location:
+                return redirect(uri_to_iri(redirect_location))
             return redirect("home")
 
     context = {}
-    if redir:
-        context["encoded_redirect"] = redir
+    if redirect_location:
+        context["encoded_redirect"] = redirect_location
 
     # Todo handle the redirect url on the other end
     return render(request, "login.html", context)
@@ -133,6 +109,7 @@ def discord_login_callback(request: HttpRequest):
     user = authenticate(request, discord_oauth_code=oauth_code, callback_url=callback_url)
     if user is not None:
         login(request, user, backend="authentication.discord_auth.DiscordAuthBackend")
+
         return redirect("discord_welcome")
 
     else:
@@ -150,17 +127,7 @@ def permission_denied(request: HttpRequest):
     return render(request, "permission_denied.html")
 
 
-@login_required()
-def link_discord(request: HttpRequest):
-    """Page to prompt user to link their discord account to their user account."""
-    skip_confirmation = request.GET.get("skip-confirm")
-    if skip_confirmation and skip_confirmation == "true":
-        return redirect("discord_register")
-
-    return render(request, "link_discord.html")
-
-
-# region Registration
+# region Single User Registration
 
 def register_page(request: HttpRequest):
     """Generic registration page, links to register with discord page."""
@@ -196,11 +163,29 @@ def discord_register_callback(request: HttpRequest):
     user = register(discord_oauth_code=oauth_code, callback_url=callback_url, user=user)
     login(request, user, backend="authentication.discord_auth.DiscordAuthBackend")
 
+    if credentials.GUILD_ID:
+        discord_user = DiscordUser.objects.get(user=user)
+        if not discord_user:
+            logger.error(f"Could not get discord user for user {user} after they registered.")
+
+        else:
+            user_api = DiscordUserAPI(bot_token=credentials.BOT_TOKEN, access_token=discord_user.access_token,
+                                      refresh_token=discord_user.refresh_token, expiry=discord_user.expiry)
+
+            if user_api.add_user_to_guild(credentials.GUILD_ID, user_id=discord_user.id):
+                logger.info(f"Successfully added user {discord_user} to discord server.")
+
+            else:
+                logger.warning(f"Failed to add user {discord_user} to discord server.")
+
     return redirect("discord_welcome")
 
 
 @login_required()
 def discord_initial_setup(request: HttpRequest):
     """Redirect for after user has registered with discord account."""
-    return HttpResponse("You are logged in")
+    context = {"guild_id": credentials.GUILD_ID}
+    # TODO add the welcome channel id here.
+    # context = {"guild_id": credentials.GUILD_ID, "channel_id": channel_id}
+    return render(request, "discord_welcome.html", context)
 # endregion

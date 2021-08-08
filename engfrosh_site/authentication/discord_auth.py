@@ -7,7 +7,7 @@ import os
 import sys
 from typing import Union
 
-from . import credentials
+import credentials
 from .models import DiscordUser, MagicLink
 
 from django.contrib.auth.backends import BaseBackend
@@ -22,7 +22,7 @@ PARENT_PARENT_DIRECTORY = os.path.dirname(PARENT_DIRECTORY)
 # Hack for development to get around import issues
 sys.path.append(PARENT_PARENT_DIRECTORY)
 
-from engfrosh_common.DiscordAPI import DiscordAPI  # noqa E402
+from engfrosh_common.DiscordUserAPI import DiscordUserAPI  # noqa E402
 
 
 logger = logging.getLogger(__name__)
@@ -37,9 +37,12 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
     """
 
     # Get User Info
-    discord_api = DiscordAPI(credentials.DISCORD_CLIENT_ID, credentials.DISCORD_CLIENT_SECRET,
-                             access_token=access_token, expires_in=expires_in, refresh_token=refresh_token,
-                             oauth_code=discord_oauth_code, callback_url=callback_url)
+    discord_api = DiscordUserAPI(client_id=credentials.DISCORD_CLIENT_ID,
+                                 client_secret=credentials.DISCORD_CLIENT_SECRET,
+                                 access_token=access_token,
+                                 expires_in=expires_in, refresh_token=refresh_token,
+                                 oauth_code=discord_oauth_code,
+                                 callback_url=callback_url)
     discord_user_info = discord_api.get_user_info()
 
     discord_user_id = discord_user_info["id"]
@@ -54,7 +57,7 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
     except DiscordUser.DoesNotExist:
         pass
 
-    # If no given User account to asociate with, create a new one
+    # If no given User account to associate with, create a new one
     if not user:
         if not username:
             s = f"{discord_username}+{discord_discriminator}-"
@@ -110,8 +113,8 @@ class DiscordAuthBackend(BaseBackend):
                 return None
 
         try:
-            client = DiscordAPI(
-                credentials.DISCORD_CLIENT_ID, credentials.DISCORD_CLIENT_SECRET, version=8,
+            client = DiscordUserAPI(
+                client_id=credentials.DISCORD_CLIENT_ID, client_secret=credentials.DISCORD_CLIENT_SECRET, version=8,
                 access_token=discord_access_token, expires_in=discord_expires_in, refresh_token=discord_refresh_token,
                 oauth_code=discord_oauth_code, callback_url=callback_url)
         except Exception:
