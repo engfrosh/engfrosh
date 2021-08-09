@@ -11,6 +11,7 @@ class Team(models.Model):
     display_name = models.CharField("Team Name", max_length=64, unique=True)
     group = models.OneToOneField(Group, on_delete=CASCADE, primary_key=True, related_name="frosh_team")
     coin_amount = models.BigIntegerField("Coin Amount", default=0)
+    color = models.PositiveIntegerField("Hex Color Code", null=True, blank=True, default=None)
 
     class Meta:
         """Team Meta information."""
@@ -47,7 +48,7 @@ class UserDetails(models.Model):
 
     user = models.OneToOneField(User, on_delete=CASCADE, primary_key=True)
     name = models.CharField("Name", max_length=64)
-    pronouns = models.CharField("Pronouns", max_length=20, blank=True, null=True)
+    pronouns = models.CharField("Pronouns", max_length=20, blank=True)
 
     class Meta:
         """User Details Meta information."""

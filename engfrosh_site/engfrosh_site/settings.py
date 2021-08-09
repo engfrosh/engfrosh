@@ -35,7 +35,7 @@ ALLOWED_HOSTS = [
 
 # TODO Change Where these settings live, put them in the database
 # Discord API Settings
-DEFAULT_DISCORD_API_VERSION = 8
+DEFAULT_DISCORD_API_VERSION = 9
 DEFAULT_DISCORD_SCOPE = ["identify", "guilds.join"]
 
 

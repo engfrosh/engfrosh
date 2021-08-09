@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+        <!-- <script src="script.js"></script> -->
+        <title>Manage Frosh Teams</title>
+        {% csrf_token %}
+        <script>
+            const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        </script>
+        <style>
+            td.discord_role {
+                text-align: center;
+            }
+
+            td.color_box {
+                width: 10px;
+            }
+        </style>
+        <script>
+            function addDiscordRoleButton(team_id) {
+                fetch("", {
+                    method: "POST",
+                    mode: "cors",
+                    credentials: "same-origin",
+                    headers: {
+                        'X-CSRFToken': csrf_token,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ "command": "add_discord_role", "team_id": team_id })
+                })
+                    .then(res => {
+                        console.log(res);
+                        if (res.ok) {
+                            let cell = document.querySelector("td.discord_role.team" + team_id);
+                            cell.innerHTML = "✔";
+                        }
+                        else {
+                            alert("Bad response " + res.status)
+    
+                        }
+                    });
+            };
+        </script>
+    </head>
+    <body>
+        <a href="{% url 'manage_index' %}">Back to Manage</a>
+        <table>
+            <tr>
+                <th></th>
+                <th>Team</th>
+                <th>Discord Role?</th>
+            </tr>
+            {% for team in teams %}
+            <tr>
+                {% if team.color %}
+                    <td class="color_box" style="background-color:{{team.color}};"></td>
+                {% else %}
+                    <td class="color_box"></td>
+                {% endif %}
+                <td class="team{{team.id}}">{{team.name}}</td>
+                {% if team.discord_role %}
+                    <td class="discord_role">✔</td>
+                {% else %}
+                    <td class="discord_role team{{team.id}}">
+                        <button type="button" onclick="addDiscordRoleButton('{{team.id}}')">Add Role</button>
+                    </td>
+                {% endif %}
+                <td></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>
