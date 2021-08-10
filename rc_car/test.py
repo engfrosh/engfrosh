@@ -15,9 +15,11 @@ arrow_forward = PiMotor.Arrow(3)
 arrow_right = PiMotor.Arrow(4)
 
 
+arrow_forward.on()
 front_left.forward(50)
 front_right.forward(50)
 back_left.forward(50)
 back_right.forward(50)
 time.sleep(2)
 all_motors.stop()
+arrow_forward.off()
