@@ -11,6 +11,7 @@ class Team(models.Model):
     display_name = models.CharField("Team Name", max_length=64, unique=True)
     group = models.OneToOneField(Group, on_delete=CASCADE, primary_key=True, related_name="frosh_team")
     coin_amount = models.BigIntegerField("Coin Amount", default=0)
+    color = models.PositiveIntegerField("Hex Color Code", null=True, blank=True, default=None)
 
     class Meta:
         """Team Meta information."""
@@ -24,6 +25,24 @@ class Team(models.Model):
 
     def __str__(self):
         return str(self.display_name)
+
+    def to_dict(self):
+        """Get the dict representation of the team."""
+        return {
+            "team_id": self.group.id,
+            "team_name": self.display_name,
+            "coin_amount": self.coin_amount,
+            "color_number": self.color,
+            "color_code": self.color_code
+        }
+
+    @property
+    def color_code(self):
+        """The hex color code string of the team's color."""
+        if self.color is not None:
+            return "#{:06x}".format(self.color)
+        else:
+            return None
 
 
 class FroshRole(models.Model):
@@ -47,7 +66,7 @@ class UserDetails(models.Model):
 
     user = models.OneToOneField(User, on_delete=CASCADE, primary_key=True)
     name = models.CharField("Name", max_length=64)
-    pronouns = models.CharField("Pronouns", max_length=20, blank=True, null=True)
+    pronouns = models.CharField("Pronouns", max_length=20, blank=True)
 
     class Meta:
         """User Details Meta information."""

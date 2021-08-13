@@ -1,24 +1,33 @@
 """Views for management pages."""
 
 import logging
+import requests
+import json
+import os
+
+import credentials
+
+from engfrosh_common.DiscordAPI.DiscordAPI import DiscordAPI
+from engfrosh_common.DiscordAPI.DiscordUserAPI import DiscordUserAPI
+from authentication.models import DiscordUser
+from frosh.models import FroshRole, Team
+from discord_bot_manager.models import Role
+from . import registration
+
+from django.conf import settings
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, JsonResponse, HttpResponseBadRequest, \
     HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import render
-from django.contrib.auth.models import User
 
-from authentication.models import DiscordUser
-from frosh.models import FroshRole, Team
-from . import registration
-import json
-
-from engfrosh_common.DiscordUserAPI import DiscordUserAPI
-
-import credentials
 
 logger = logging.getLogger("management.views")
+
+CURRENT_DIRECTORY = os.path.dirname(__file__)
+PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 
 @permission_required("auth_user.add_user")
@@ -182,7 +191,7 @@ def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
                 return HttpResponseServerError()
 
         else:
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest("Invalid command")
 
     return HttpResponseServerError()
 
@@ -192,3 +201,98 @@ def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
 def manage_index(request: HttpRequest) -> HttpResponse:
     """Home page for management."""
     return render(request, "manage.html")
+
+
+@permission_required("frosh_team.change_team")
+def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
+    """Page to manage and add frosh teams."""
+    if request.method == "GET":
+        context = {"teams": []}
+        for team in Team.objects.all():
+            if Role.objects.filter(group_id=team.group).exists():
+                role_exists = True
+            else:
+                role_exists = False
+
+            team_color = team.color_code
+
+            t = {
+                "id": team.group.id,
+                "name": team.display_name,
+                "discord_role": role_exists,
+                "color": team_color if team_color else None
+            }
+            context["teams"].append(t)
+        return render(request, "frosh_teams.html", context)
+
+    if request.method == "POST":
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Invalid / missing content type.")
+
+        req_dict = json.loads(request.body)
+        if "command" not in req_dict:
+            return HttpResponseBadRequest("Bad request body.")
+
+        if req_dict["command"] == "add_discord_role":
+            if "team_id" not in req_dict:
+                return HttpResponseBadRequest("No team id.")
+            try:
+                group = Group.objects.get(id=req_dict["team_id"])
+                team = Team.objects.get(group=group)
+            except ObjectDoesNotExist:
+                return HttpResponseBadRequest("Invalid team id")
+
+            discord_api = DiscordAPI(credentials.BOT_TOKEN, api_version=settings.DEFAULT_DISCORD_API_VERSION)
+
+            try:
+                role_id = discord_api.create_guild_role(credentials.GUILD_ID, name=team.display_name, color=team.color)
+            except requests.HTTPError as e:
+                logger.error(f"HTTP Error. \nRequest: {e.request} \nResponse: {e.response}")
+                return HttpResponseServerError("Could not add guild role.")
+
+            role = Role(role_id=role_id, group_id=group)
+            role.save()
+
+            return JsonResponse({"team_id": group.id, "role_id": role.role_id})  # type: ignore
+
+        elif req_dict["command"] == "add_team":
+            if "team_name" not in req_dict or not req_dict["team_name"]:
+                return HttpResponseBadRequest("No team name provided.")
+            team_name = req_dict["team_name"]
+
+            group = Group(name=team_name)
+            group.save()
+
+            if "team_color" in req_dict and req_dict["team_color"]:
+                team_color = req_dict["team_color"]
+            else:
+                team_color = None
+
+            team = Team(display_name=team_name, group=group, color=team_color)
+            team.save()
+
+            return JsonResponse(team.to_dict())
+
+        elif req_dict["command"] == "update_team":
+            if "team_id" not in req_dict:
+                return HttpResponseBadRequest("No team id.")
+
+            try:
+                group = Group.objects.get(id=req_dict["team_id"])
+                team = Team.objects.get(group=group)
+            except ObjectDoesNotExist:
+                return HttpResponseBadRequest("Invalid team id")
+
+            logger.debug(f"Request: {req_dict}")
+
+            if "team_color" in req_dict and isinstance(req_dict["team_color"], int):
+                logger.debug(f"Setting team color to : {req_dict['team_color']}")
+                team.color = req_dict["team_color"]
+                team.save()
+
+            return JsonResponse(team.to_dict())
+
+        else:
+            return HttpResponseBadRequest("Invalid command.")
+
+    return HttpResponseBadRequest()

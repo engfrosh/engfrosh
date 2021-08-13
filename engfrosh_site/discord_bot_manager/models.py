@@ -41,5 +41,16 @@ class ScavChannel(models.Model):
 
 
 class Role(models.Model):
+    """Relates a Django group to a discord role."""
+
     role_id = models.PositiveBigIntegerField("Discord Role ID", primary_key=True)
     group_id = models.OneToOneField(Group, CASCADE)
+
+    class Meta:
+        """Meta information for Discord roles."""
+
+        verbose_name = "Discord Role"
+        verbose_name_plural = "Discord Roles"
+
+    def __str__(self) -> str:
+        return self.group_id.name

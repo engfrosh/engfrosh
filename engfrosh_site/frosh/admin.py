@@ -2,6 +2,6 @@
 
 from django.contrib import admin
 
-from .models import Team, FroshRole
+from .models import Team, FroshRole, UserDetails
 
-admin.site.register([Team, FroshRole])
+admin.site.register([Team, FroshRole, UserDetails])

@@ -8,13 +8,16 @@ Includes views for:
 
 import logging
 import os
-import sys
+from typing import List, Union
 
-from authentication.models import DiscordUser
-
-from .discord_auth import register
 import credentials
 
+from authentication.models import DiscordUser
+from discord_bot_manager.models import Role
+from .discord_auth import register
+from engfrosh_common.DiscordAPI.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  # noqa E402
+
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
 from django.contrib.auth import authenticate, login
@@ -26,10 +29,6 @@ logger = logging.getLogger("Authentication.Views")
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
-
-# Hack for development to get around import issues
-sys.path.append(PARENT_DIRECTORY)
-from engfrosh_common.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  # noqa E402
 
 
 def index(request: HttpRequest):
@@ -161,6 +160,9 @@ def discord_register_callback(request: HttpRequest):
     callback_url = request.build_absolute_uri(request.path)
 
     user = register(discord_oauth_code=oauth_code, callback_url=callback_url, user=user)
+    if not user:
+        logger.error("Could not register user.")
+        raise Exception("Could not register user.")
     login(request, user, backend="authentication.discord_auth.DiscordAuthBackend")
 
     if credentials.GUILD_ID:
@@ -172,7 +174,19 @@ def discord_register_callback(request: HttpRequest):
             user_api = DiscordUserAPI(bot_token=credentials.BOT_TOKEN, access_token=discord_user.access_token,
                                       refresh_token=discord_user.refresh_token, expiry=discord_user.expiry)
 
-            if user_api.add_user_to_guild(credentials.GUILD_ID, user_id=discord_user.id):
+            # Get all the roles that the user has and their corresponding Discord Roles
+            groups = user.groups.all()
+            discord_role_ids: Union[List[int], None] = []
+            for g in groups:
+                try:
+                    discord_role_ids.append(Role.objects.get(group_id=g).role_id)
+                except ObjectDoesNotExist:
+                    continue
+
+            if not discord_role_ids:
+                discord_role_ids = None
+
+            if user_api.add_user_to_guild(credentials.GUILD_ID, user_id=discord_user.id, roles=discord_role_ids):
                 logger.info(f"Successfully added user {discord_user} to discord server.")
 
             else:

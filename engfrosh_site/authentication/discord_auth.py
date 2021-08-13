@@ -4,7 +4,6 @@ import random
 import string
 import logging
 import os
-import sys
 from typing import Union
 
 import credentials
@@ -14,15 +13,11 @@ from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+from engfrosh_common.DiscordAPI.DiscordUserAPI import DiscordUserAPI
+
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 PARENT_PARENT_DIRECTORY = os.path.dirname(PARENT_DIRECTORY)
-
-
-# Hack for development to get around import issues
-sys.path.append(PARENT_PARENT_DIRECTORY)
-
-from engfrosh_common.DiscordUserAPI import DiscordUserAPI  # noqa E402
 
 
 logger = logging.getLogger(__name__)

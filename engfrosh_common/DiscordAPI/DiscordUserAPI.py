@@ -1,25 +1,16 @@
 """API abstraction for performing actions on Discord Users."""
 
-from typing import List, Optional, Union
 import requests
 import datetime
+import logging
+
+from typing import List, Optional, Union
 from oauthlib.oauth2 import WebApplicationClient
 
-import logging
+from .url_functions import get_api_url, get_authorization_url, get_token_url
 
 
 logger = logging.getLogger("DiscordAPI")
-
-DISCORD_API_URL = "https://discord.com/api"
-TOKEN_URL_PATH = "/oauth2/token"
-AUTHORIZATION_API_URL_PATH = "/oauth2/authorize"
-
-# Temp db credentials
-DATABASE = "engfrosh"
-USER = "discord_engfrosh"
-PASSWORD = "there-exercise-fenegel"
-HOST = "localhost"
-PORT = "5432"
 
 
 class DiscordUserAPI():
@@ -54,8 +45,6 @@ class DiscordUserAPI():
         self.version = version
         self.refresh_token = refresh_token
         self.bot_token = bot_token
-        # self.client_id = client_id
-        # self.client_secret = client_secret
 
         self.user_id: Union[int, None] = None
 
@@ -195,17 +184,4 @@ def build_oauth_authorize_url(client_id, callback_url, scope, prompt="consent", 
     return authorization_request[0]
 
 
-def get_api_url(version=None):
-    if not version:
-        return DISCORD_API_URL
-    else:
-        return DISCORD_API_URL + f"/v{version}"
-
-
-def get_authorization_url(version=None):
-    return get_api_url(version) + AUTHORIZATION_API_URL_PATH
-
-
-def get_token_url(version=None):
-    return get_api_url(version) + TOKEN_URL_PATH
 # endregion
