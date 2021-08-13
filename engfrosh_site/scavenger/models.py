@@ -29,15 +29,22 @@ def hint_path(instance, filename):
 
 
 class Question(models.Model):
+    """Questions in Scavenger."""
+
     identifier = models.CharField(max_length=32, blank=True, unique=True)
     enabled = models.BooleanField(default=True)
     id = models.AutoField("Question ID", primary_key=True, editable=False)
     text = models.CharField("Text", blank=True, max_length=2000)
     file = models.FileField(upload_to=question_path, blank=True)
-    image = models.ImageField(upload_to=question_path, blank=True)
     display_filename = models.CharField(max_length=256, blank=True)
     weight = models.IntegerField("Order Number", unique=True, default=0, db_index=True)
     answer = models.CharField(max_length=32)
+
+    class Meta:
+        """Meta properties for Scavenger Questions."""
+
+        verbose_name = "Scavenger Question"
+        verbose_name_plural = "Scavenger Questions"
 
     def __str__(self):
         if self.identifier:
@@ -60,6 +67,7 @@ class Hint(models.Model):
 
 
 class Team(models.Model):
+    """Representation of a scavenger team."""
     group = models.OneToOneField(Group, CASCADE, primary_key=True)
     current_question = models.OneToOneField(Question, on_delete=PROTECT, blank=True,
                                             related_name="scavenger_team", null=True)
@@ -69,6 +77,12 @@ class Team(models.Model):
 
     def __str__(self) -> str:
         return self.group.name
+
+    def reset_progress(self) -> None:
+        """Reset the team's current scavenger question to the first enabled question."""
+        first_question = Question.objects.filter(enabled=True).order_by("weight")[0]
+        self.current_question = first_question
+        self.save()
 
 
 class QuestionTime(models.Model):

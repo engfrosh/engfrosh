@@ -1,4 +1,7 @@
-from typing import Iterable
+"""Discord Bot Client with EngFrosh specific features."""
+
+from typing import Iterable, Optional
+import discord
 from discord.ext import commands
 from engfrosh_common.DatabaseInterface import DatabaseInterface
 import logging
@@ -18,6 +21,8 @@ LOG_LEVELS = {
 
 
 class EngFroshBot(commands.Bot):
+    """Discord Bot Client with additional properties including config and database support."""
+
     def __init__(self, command_prefix, db_int: DatabaseInterface,
                  config: dict, help_command=None, description=None, log_channels=[], **options):
         self.db_int = db_int
@@ -29,14 +34,15 @@ class EngFroshBot(commands.Bot):
         self.log_channels = log_channels
         super().__init__(command_prefix, description=description, **options)
 
-    async def send_to_all(self, message: str, channels: Iterable[int], *, purge_first=False) -> bool:
+    async def send_to_all(self, message: str, channels: Iterable[int], *,
+                          purge_first=False, file: Optional[discord.File] = None) -> bool:
         """Sends message to all channels with given ids."""
         res = True
         for chid in channels:
             if channel := self.get_channel(chid):
                 if purge_first:
                     await channel.purge()
-                await channel.send(message)
+                await channel.send(message, file=file)
             else:
                 logger.error(f"Could not get channel with id: {chid}")
                 res = False

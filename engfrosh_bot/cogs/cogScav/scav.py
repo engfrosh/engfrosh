@@ -1,5 +1,6 @@
 # region Imports
 import logging
+import discord
 # import discord
 # import datetime as dt
 
@@ -206,7 +207,17 @@ class Scav(commands.Cog):
     class TeamNotFoundError(Exception):
         pass
 
+    @commands.command()
+    async def hint(self, ctx: commands.Context):
+        """Request hint for the question."""
+        if self.bot.debug:
+            await ctx.message.add_reaction("🔄")
+
+        await ctx.message.reply("Hints are not yet implemented.")
+
     async def send_question(self, *, group_id: int = None, channel_id: int = None) -> bool:
+        """Send the current question for a team to all its channels."""
+
         if not group_id and not channel_id:
             raise ValueError("Must provide an argument")
 
@@ -235,7 +246,14 @@ class Scav(commands.Cog):
             await self.bot.log(f"Could not get a current question for team id: {team_id}", "ERROR")
             return False
 
-        res = await self.bot.send_to_all(question.text, channels)
+        logger.debug(f"File for questions is: {question.file}")
+        if question.file:
+            file = discord.File(self.bot.config["media_root"] + "/" + question.file, question.display_filename)
+        else:
+            file = None
+
+        res = await self.bot.send_to_all(question.text, channels, file=file)
+        logger.debug("Successfully sent scav question.")
         return res
 
         # if settings["scav"]["allowed"]:

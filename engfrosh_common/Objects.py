@@ -1,4 +1,5 @@
 from asyncpg import Record
+from typing import Optional
 
 
 class FroshTeam:
@@ -23,6 +24,8 @@ class ScavQuestion:
             self.text = row["text"]
             self.weight = row["weight"]
             self.answer = row["answer"]
+            self.file = row["file"]
+            self.display_filename = row["display_filename"]
 
         else:
             self.id = id
@@ -31,6 +34,8 @@ class ScavQuestion:
             self.text = text
             self.weight = weight
             self.answer = answer
+            self.file = None
+            self.display_filename = None
 
     def __eq__(self, o: object) -> bool:
         if not isinstance(o, ScavQuestion):

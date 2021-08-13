@@ -5,7 +5,7 @@ import asyncpg
 import uuid
 import datetime
 
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Tuple, Union
 
 from . import Objects
 # endregion
@@ -289,7 +289,7 @@ class DatabaseInterface():
         logger.debug(f"Got all questions: {questions}")
         return questions
 
-    async def get_scav_question(self, *, team_id: int) -> Objects.ScavQuestion:
+    async def get_scav_question(self, *, team_id: int) -> Union[None, Objects.ScavQuestion]:
         if self._is_fake():
             return Objects.ScavQuestion(id=1, enabled=True, weight=6, answer="answer", text="Question?")
 
@@ -304,12 +304,7 @@ class DatabaseInterface():
         row = await self._fetchrow(sql, (qid,))
 
         if row:
-            return Objects.ScavQuestion(id=row["id"],
-                                        enabled=row["enabled"],
-                                        identifier=row["identifier"],
-                                        text=row["text"],
-                                        weight=row["weight"],
-                                        answer=row["answer"])
+            return Objects.ScavQuestion(row=row)
 
         logger.error(f"No Question with id {qid}")
         return None
