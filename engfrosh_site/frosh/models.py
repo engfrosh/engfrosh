@@ -26,6 +26,24 @@ class Team(models.Model):
     def __str__(self):
         return str(self.display_name)
 
+    def to_dict(self):
+        """Get the dict representation of the team."""
+        return {
+            "team_id": self.group.id,
+            "team_name": self.display_name,
+            "coin_amount": self.coin_amount,
+            "color_number": self.color,
+            "color_code": self.color_code
+        }
+
+    @property
+    def color_code(self):
+        """The hex color code string of the team's color."""
+        if self.color is not None:
+            return "#{:06x}".format(self.color)
+        else:
+            return None
+
 
 class FroshRole(models.Model):
     """Frosh role, such as Frosh, Facil, Head, Planning."""

@@ -214,11 +214,13 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
             else:
                 role_exists = False
 
+            team_color = team.color_code
+
             t = {
                 "id": team.group.id,
                 "name": team.display_name,
                 "discord_role": role_exists,
-                "color": "#{:06x}".format(team.color) if team.color is not None else None
+                "color": team_color if team_color else None
             }
             context["teams"].append(t)
         return render(request, "frosh_teams.html", context)
@@ -228,16 +230,17 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
             return HttpResponseBadRequest("Invalid / missing content type.")
 
         req_dict = json.loads(request.body)
-        if "team_id" not in req_dict and "command" not in req_dict:
+        if "command" not in req_dict:
             return HttpResponseBadRequest("Bad request body.")
 
         if req_dict["command"] == "add_discord_role":
+            if "team_id" not in req_dict:
+                return HttpResponseBadRequest("No team id.")
             try:
                 group = Group.objects.get(id=req_dict["team_id"])
+                team = Team.objects.get(group=group)
             except ObjectDoesNotExist:
                 return HttpResponseBadRequest("Invalid team id")
-
-            team = Team.objects.get(group=group)
 
             discord_api = DiscordAPI(credentials.BOT_TOKEN, api_version=settings.DEFAULT_DISCORD_API_VERSION)
 
@@ -251,6 +254,43 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
             role.save()
 
             return JsonResponse({"team_id": group.id, "role_id": role.role_id})  # type: ignore
+
+        elif req_dict["command"] == "add_team":
+            if "team_name" not in req_dict or not req_dict["team_name"]:
+                return HttpResponseBadRequest("No team name provided.")
+            team_name = req_dict["team_name"]
+
+            group = Group(name=team_name)
+            group.save()
+
+            if "team_color" in req_dict and req_dict["team_color"]:
+                team_color = req_dict["team_color"]
+            else:
+                team_color = None
+
+            team = Team(display_name=team_name, group=group, color=team_color)
+            team.save()
+
+            return JsonResponse(team.to_dict())
+
+        elif req_dict["command"] == "update_team":
+            if "team_id" not in req_dict:
+                return HttpResponseBadRequest("No team id.")
+
+            try:
+                group = Group.objects.get(id=req_dict["team_id"])
+                team = Team.objects.get(group=group)
+            except ObjectDoesNotExist:
+                return HttpResponseBadRequest("Invalid team id")
+
+            logger.debug(f"Request: {req_dict}")
+
+            if "team_color" in req_dict and isinstance(req_dict["team_color"], int):
+                logger.debug(f"Setting team color to : {req_dict['team_color']}")
+                team.color = req_dict["team_color"]
+                team.save()
+
+            return JsonResponse(team.to_dict())
 
         else:
             return HttpResponseBadRequest("Invalid command.")
