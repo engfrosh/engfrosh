@@ -26,6 +26,11 @@ bot_log_channel: [
   807100215651074109
 ]
 
+timezone: America/Toronto
+
+media_root: "files/media"
+temp_root: "files/temp"
+
 module_settings:
   rabbitmq:
     host: localhost
@@ -65,6 +70,7 @@ module_settings:
       # row must contain format placeholders: place, team_name, coin_amount
       name_length: 25
       coin_length: 10
+    permission: change_team_coin # Names must be unique as currently written
 
   scav:
     incorrect_message: Null

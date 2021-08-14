@@ -30,7 +30,8 @@ ALLOWED_HOSTS = [
     "beta.engfrosh.com",
     "week.engfrosh.com",
     # TODO Update settings for different files
-    "127.0.0.1"
+    "127.0.0.1",
+    "localhost"
 ]
 
 # TODO Change Where these settings live, put them in the database
