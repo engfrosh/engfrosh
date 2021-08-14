@@ -1,5 +1,6 @@
 """Discord Bot Client with EngFrosh specific features."""
 
+import io
 from typing import Iterable, Optional
 import discord
 from discord.ext import commands
@@ -35,7 +36,7 @@ class EngFroshBot(commands.Bot):
         super().__init__(command_prefix, description=description, **options)
 
     async def send_to_all(self, message: str, channels: Iterable[int], *,
-                          purge_first=False, file: Optional[discord.File] = None) -> bool:
+                          purge_first: bool = False, file: Optional[discord.File] = None) -> bool:
         """Sends message to all channels with given ids."""
         res = True
         for chid in channels:
@@ -56,7 +57,14 @@ class EngFroshBot(commands.Bot):
         print(f"\n{level}: {message}")
 
         # Send to log channels
-        await self.send_to_all(f"```\n{level} {dt.datetime.now().isoformat()}: {message}\n```", self.log_channels)
+        content = f"\n{level} {dt.datetime.now().isoformat()}: {message}\n"
+        if len(content) >= 1900:
+            fp = io.StringIO(content)
+            file = discord.File(fp, f"{dt.datetime.now().isoformat()}.log")
+            await self.send_to_all("", self.log_channels, file=file)
+
+        else:
+            await self.send_to_all(f"```{content}```", self.log_channels)
 
         # Python Logger
         level = level.upper()

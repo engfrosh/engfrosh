@@ -1,5 +1,6 @@
 # region Imports
 import logging
+from typing import Optional
 import discord
 # import discord
 # import datetime as dt
@@ -173,7 +174,7 @@ class Scav(commands.Cog):
             try:
                 await ctx.message.add_reaction("✅")
             except NotFound:
-                self.bot.warning(f"Correct guess given, but message deleted first:\n{ctx.message}")
+                await self.bot.warning(f"Correct guess given, but message deleted first:\n{ctx.message}")
 
         await ctx.message.reply("That is correct!")
 
@@ -183,7 +184,7 @@ class Scav(commands.Cog):
                 await self.bot.log("Failed")
                 raise Exception(f"Could not increment Team {team_id}'s scav question.")
 
-            await self.send_question(group_id=team_id)
+            await self.handle_scav_question(group_id=team_id)
 
         except self.db.FinishedScavException:
             channels = await self.db.get_scav_channels(group_id=team_id)
@@ -193,11 +194,12 @@ class Scav(commands.Cog):
 
     @commands.command()
     async def question(self, ctx: commands.Context):
+        """Get questions for current scavenger channel."""
         # TODO check if it is a scav channel
         if self.bot.debug:
             await ctx.message.add_reaction("🔄")
 
-        res = await self.send_question(channel_id=ctx.message.channel.id)
+        res = await self.handle_scav_question(channel_id=ctx.message.channel.id)
         if not res:
             await self.bot.log(f"Failed to send question to <#{ctx.message.channel.id}>")
 
@@ -215,8 +217,16 @@ class Scav(commands.Cog):
 
         await ctx.message.reply("Hints are not yet implemented.")
 
-    async def send_question(self, *, group_id: int = None, channel_id: int = None) -> bool:
-        """Send the current question for a team to all its channels."""
+    async def handle_scav_question(self, send_question: bool = True, current_hints: bool = True, new_hint: bool = False, *,
+                                   group_id: Optional[int] = None, channel_id: Optional[int] = None, new_hint_lockout: Optional[int] = None) -> bool:
+        """
+        Handle a scav question request.
+
+        new_hint_lockout: lockout time in seconds overides default.
+
+        """
+
+        # region Get Team and Check Enabled
 
         if not group_id and not channel_id:
             raise ValueError("Must provide an argument")
@@ -241,20 +251,48 @@ class Scav(commands.Cog):
         else:
             raise Exception
 
+        # endregion
+
+        # region Get Question
+
         question = await self.db.get_scav_question(team_id=team_id)
         if not question:
             await self.bot.log(f"Could not get a current question for team id: {team_id}", "ERROR")
             return False
 
+        q_res = True
+        if send_question:
         logger.debug(f"File for questions is: {question.file}")
         if question.file:
             file = discord.File(self.bot.config["media_root"] + "/" + question.file, question.display_filename)
         else:
             file = None
 
-        res = await self.bot.send_to_all(question.text, channels, file=file)
-        logger.debug("Successfully sent scav question.")
-        return res
+            q_res = await self.bot.send_to_all(question.text, channels, file=file)
+
+        hints = []
+        if current_hints:
+            hints = await self.db.get_team_scav_hints(team_id=team_id)
+            if not hints:
+                logger.info(f"No active hints for team {team_id}")
+                return q_res
+
+        if new_hint:
+            # TODO Implement New Hints
+            raise NotImplementedError
+
+        h_res = True
+        if hints:
+            for hint in hints:
+                if hint.file:
+                    file = discord.File(self.bot.config["media_root"] + "/" + hint.file, hint.display_filename)
+                else:
+                    file = None
+
+                res = await self.bot.send_to_all(hint.text, channels, file=file)
+                h_res = h_res and res
+
+        return h_res and q_res
 
         # if settings["scav"]["allowed"]:
         #     active_scav_team = scav_game.is_scav_channel(ctx.message.channel.id)

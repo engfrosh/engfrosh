@@ -1,3 +1,4 @@
+"""Interface for interacting with Postgres Database."""
 
 # region Imports
 import logging
@@ -5,7 +6,7 @@ import asyncpg
 import uuid
 import datetime
 
-from typing import Iterable, List, Tuple, Union
+from typing import Dict, Iterable, List, Tuple, Union
 
 from . import Objects
 # endregion
@@ -15,10 +16,13 @@ logger = logging.getLogger("DatabaseInterface")
 
 
 class DatabaseInterface():
+    """Interface for interacting with Postgres Database."""
 
-    def __init__(self, *, sql_pool: asyncpg.Pool = None, db_credentials: dict = None,
+    def __init__(self, *, sql_pool: asyncpg.Pool = None, db_credentials: Dict[str, str] = None,
                  allow_development_db=False) -> None:
         """
+        Initialize Database Interface.
+
         Arguments:
             sql_pool: asyncpg pool object to the database
             db_credentials: postgresql credentials in a dictionary
@@ -52,18 +56,20 @@ class DatabaseInterface():
         """Tried running command on fake database."""
 
     class FinishedScavException(Exception):
-        pass
+        """Exception raised when Team is finished Scavenger."""
 
     # region Helper Functions
 
-    def _is_postgres(self):
+    @property
+    def _is_postgres(self) -> bool:
         return self.db == "POSTGRES"
 
-    def _is_fake(self):
+    @property
+    def _is_fake(self) -> bool:
         return self.db == "FAKE"
 
     async def _ensure_pool(self):
-        if not self._is_postgres():
+        if not self._is_postgres:
             raise self.NotPostgresError
 
         if not self.pool:
@@ -77,36 +83,36 @@ class DatabaseInterface():
         return await self._fetchrow(sql, parameters)
 
     async def _fetchrow(self, sql: str, parameters: Iterable):
-        if self._is_postgres():
+        if self._is_postgres:
             await self._ensure_pool()
             async with self.pool.acquire() as conn:
                 row = await conn.fetchrow(sql, *parameters)
 
-        elif self._is_fake():
+        elif self._is_fake:
             raise self.FakeDatabaseError
 
         return row
 
     async def _fetchall(self, sql, parameters=tuple()):
-        if self._is_postgres():
+        if self._is_postgres:
             await self._ensure_pool()
             async with self.pool.acquire() as conn:
                 rows = await conn.fetch(sql, *parameters)
 
-        elif self._is_fake():
+        elif self._is_fake:
             raise self.FakeDatabaseError
 
         return rows
 
     async def _execute(self, sql, parameters):
-        if self._is_postgres():
+        if self._is_postgres:
             await self._ensure_pool()
             logger.debug(f"Executing command '{sql}' with parameters {parameters}")
             async with self.pool.acquire() as conn:
                 await conn.execute(sql, *parameters)
             return True
 
-        elif self._is_fake():
+        elif self._is_fake:
             raise self.FakeDatabaseError
 
         else:
@@ -117,7 +123,7 @@ class DatabaseInterface():
         return self._get_query_parameter(num)
 
     def _get_query_parameter(self, num=1):
-        if self._is_postgres():
+        if self._is_postgres:
             return f"${num}"
         else:
             raise NotImplementedError("Databases other than Postgres not supported.")
@@ -126,7 +132,7 @@ class DatabaseInterface():
     # region GET methods
 
     async def get_group_id(self, *, group_name=None, scav_channel_id=None):
-        if self._is_fake():
+        if self._is_fake:
             return 1
 
         if group_name:
@@ -150,7 +156,7 @@ class DatabaseInterface():
 
     async def get_frosh_team_id(self, *, team_name=None):
         """Name can either be a team display name or the group name. Group name takes priority."""
-        if self._is_fake():
+        if self._is_fake:
             return 1
 
         if team_name:
@@ -166,7 +172,7 @@ class DatabaseInterface():
         return id
 
     async def get_user_id(self, *, discord_id=None):
-        if self._is_fake():
+        if self._is_fake:
             return 1
 
         if discord_id:
@@ -181,7 +187,7 @@ class DatabaseInterface():
             raise NotImplementedError
 
     async def get_coin_amount(self, *, group_name=None, group_id=None):
-        if self._is_fake():
+        if self._is_fake:
             return 50
 
         if not group_id and group_name:
@@ -198,7 +204,7 @@ class DatabaseInterface():
             return None
 
     async def get_team_display_name(self, group_id):
-        if self._is_fake():
+        if self._is_fake:
             return "Test Team"
 
         sql = f"SELECT * FROM frosh_team WHERE group_id = {self._qp()};"
@@ -209,7 +215,7 @@ class DatabaseInterface():
             return None
 
     async def get_team_locked_out_time(self, group_id):
-        if self._is_fake():
+        if self._is_fake:
             return False
 
         sql = f"SELECT * FROM scavenger_team WHERE group_id = {self._qp()};"
@@ -230,7 +236,7 @@ class DatabaseInterface():
         return locked_out_time
 
     async def get_all_frosh_teams(self) -> List[Objects.FroshTeam]:
-        if self._is_fake():
+        if self._is_fake:
             return [Objects.FroshTeam(i + 1, f"Test Team {i+1}", (i % 2) * 15) for i in range(3)]
 
         """Returns a dictionary where the key is the team_id, and the value is the display name."""
@@ -242,7 +248,7 @@ class DatabaseInterface():
         return lst
 
     async def get_permission_id(self, name) -> int:
-        if self._is_fake():
+        if self._is_fake:
             return 1
 
         sql = f"""SELECT * FROM auth_permission WHERE codename = {self._qp()};"""
@@ -253,7 +259,7 @@ class DatabaseInterface():
             return None
 
     async def get_groups(self, *, user_id=None) -> Tuple[int]:
-        if self._is_fake():
+        if self._is_fake:
             return (1, 2, 3)
 
         if not user_id:
@@ -269,7 +275,7 @@ class DatabaseInterface():
 
     async def get_all_scav_questions(self) -> List[Objects.ScavQuestion]:
         """Returns a sorted list of scavenger questions from lowest to highest weight."""
-        if self._is_fake():
+        if self._is_fake:
             return [Objects.ScavQuestion(id=i, enabled=True, text=f"Question {i}",
                                          answer=f"answer{i}", weight=i) for i in range(1, 5)]
 
@@ -290,7 +296,7 @@ class DatabaseInterface():
         return questions
 
     async def get_scav_question(self, *, team_id: int) -> Union[None, Objects.ScavQuestion]:
-        if self._is_fake():
+        if self._is_fake:
             return Objects.ScavQuestion(id=1, enabled=True, weight=6, answer="answer", text="Question?")
 
         sql = f"SELECT * FROM scavenger_team WHERE group_id = {self._qp()};"
@@ -309,8 +315,74 @@ class DatabaseInterface():
         logger.error(f"No Question with id {qid}")
         return None
 
+    async def get_team_scav_hints(self, active_only: bool = True, *,
+                                  team_id: int) -> Union[None, List[Objects.ScavHint]]:
+        """
+        Return the scav hints for a team.
+
+        If active only is True, only provides the active hints for the team.
+        """
+
+        if self._is_fake:
+            raise NotImplementedError()
+
+        cur_question = await self.get_scav_question(team_id=team_id)
+        if not cur_question:
+            logger.error(f"Could not get current team question for team: {team_id}")
+            return None
+
+        if active_only:
+            team = await self.get_scav_team(team_id=team_id)
+            if not team:
+                logger.error(f"Could not get team with specified id {team_id}")
+                return None
+
+            last_hint = await self.get_scav_hint(team.last_hint)
+            if not last_hint:
+                logger.info(f"Team {team_id} has no active hints.")
+                return None
+
+            if last_hint.question == cur_question.id:
+                sql = "SELECT * FROM scavenger_hint WHERE (question_id = $1 AND weight <= $2);"
+
+                rows = await self._fetchall(sql, (team.current_question, last_hint.weight))
+                if not rows:
+                    logger.error(
+                        f"Could not get any hints for the current question {team.current_question} for team {team_id}")
+                    return None
+
+            else:
+                return None
+
+        else:
+            sql = "SELECT * FROM scavenger_hint WHERE question_id = $1;"
+
+            rows = await self._fetchall(sql, (cur_question,))
+            if not rows:
+                logger.warning(f"Could not get any hints for question {cur_question}")
+                return None
+
+        hints = []
+        for row in rows:
+            hints.append(Objects.ScavHint(row=row))
+
+        return hints
+
+    async def get_scav_hint(self, hint_id: int) -> Union[None, Objects.ScavHint]:
+        """Get the scav hint specified with hint_id."""
+
+        if self._is_fake:
+            raise NotImplementedError()
+
+        sql = "SELECT * FROM scavenger_hint WHERE id = $1;"
+        row = await self._fetchrow(sql, (hint_id,))
+        if not row:
+            return None
+
+        return Objects.ScavHint(row=row)
+
     async def get_scav_channels(self, *, group_id: int) -> List[int]:
-        if self._is_fake():
+        if self._is_fake:
             return [1, 2, 3]
 
         sql = f"SELECT * FROM discord_bot_manager_scavchannel WHERE group_id = {self._qp()};"
@@ -320,12 +392,24 @@ class DatabaseInterface():
             return False
 
         return [r["channel_id"] for r in rows]
+
+    async def get_scav_team(self, *, team_id: int) -> Union[None, Objects.ScavTeam]:
+        """Get the scav team with the specified team id."""
+
+        sql = "SELECT * FROM scavenger_team WHERE group_id = $1;"
+
+        row = await self._fetchone(sql, (team_id,))
+        if not row:
+            return None
+
+        return Objects.ScavTeam(row=row)
+
     # endregion
 
     # region UPDATE methods
 
     async def update_coin_amount(self, change: int, *, group_name=None, group_id=None):
-        if self._is_fake():
+        if self._is_fake:
             return True
 
         if not group_id and group_name:
@@ -350,7 +434,7 @@ class DatabaseInterface():
         logger.info(f"Set Discord Command {command_id} to {status}")
 
     async def set_team_locked_out_time(self, group_id, minutes=None, *, end_time=None):
-        if self._is_fake():
+        if self._is_fake:
             return True
 
         sql = f"""UPDATE scavenger_team
@@ -363,7 +447,7 @@ class DatabaseInterface():
         if not end_time:
             raise ValueError("Endtime or minutes must be provided")
 
-        if self._is_postgres():
+        if self._is_postgres:
             if type(end_time) is str:
                 end_time = datetime.datetime.fromisoformat(end_time)
 
@@ -379,7 +463,7 @@ class DatabaseInterface():
     # region CHECK methods
 
     async def check_user_in_group(self, user_id=None, group_name=None, discord_user_id=None, group_id=None):
-        if self._is_fake():
+        if self._is_fake:
             return True
 
         sql = f"SELECT * FROM auth_user_groups WHERE user_id = {self._qp(1)} AND group_id = {self._qp(2)};"
@@ -397,7 +481,7 @@ class DatabaseInterface():
             return False
 
     async def check_user_has_permission(self, user_id=None, discord_id=None, permission_name=None, permission_id=None):
-        if self._is_fake():
+        if self._is_fake:
             return True
 
         if not user_id:
@@ -426,7 +510,7 @@ class DatabaseInterface():
         return False
 
     async def check_group_has_permission(self, *, group_id=None, permission_id=None):
-        if self._is_fake():
+        if self._is_fake:
             return True
 
         sql = f"SELECT * FROM auth_group_permissions WHERE group_id = {self._qp(1)} AND permission_id = {self._qp(2)};"
@@ -438,7 +522,7 @@ class DatabaseInterface():
         return False
 
     async def check_scavenger_setting_enabled(self, *, id: int = None, name: str = None):
-        if self._is_fake():
+        if self._is_fake:
             return True
 
         if id and name:
@@ -464,7 +548,7 @@ class DatabaseInterface():
     # region Other Actions
 
     async def increment_question(self, team_id: int, current_question: Objects.ScavQuestion):
-        if self._is_fake():
+        if self._is_fake:
             return True
 
         logger.debug(f"Incrementing question for team {team_id} for question: {current_question.identifier}")

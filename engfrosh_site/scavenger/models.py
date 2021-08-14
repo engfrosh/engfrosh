@@ -54,13 +54,22 @@ class Question(models.Model):
 
 
 class Hint(models.Model):
+    """Scavenger Hint Model."""
+
     id = models.AutoField("Hint ID", primary_key=True)
     question = models.ForeignKey(Question, CASCADE, db_index=True)
     text = models.CharField("Hint Text", blank=True, max_length=2000)
     file = models.FileField(upload_to=hint_path, blank=True)
-    image = models.ImageField(upload_to=hint_path, blank=True)
+    display_filename = models.CharField(max_length=256, blank=True)
     weight = models.IntegerField(default=0)
     enabled = models.BooleanField(default=True)
+    lockout_time = models.IntegerField("Lockout Duration in Seconds", default=900)
+
+    class Meta:
+        """Scavenger Hints Meta info."""
+
+        verbose_name = "Scavenger Hint"
+        verbose_name_plural = "Scavenger Hints"
 
     def __str__(self):
         return f"{self.question} - Hint {self.weight}"
