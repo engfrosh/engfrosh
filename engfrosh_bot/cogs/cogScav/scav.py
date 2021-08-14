@@ -98,6 +98,12 @@ class Scav(commands.Cog):
         res = await self.db.check_scavenger_setting_enabled(name=self.config["settings_names"]["active"])
         return bool(res)
 
+    class ScavNotEnabledError(Exception):
+        """Exception raised when scav is not enabled."""
+
+    class TeamNotFoundError(Exception):
+        """Exception raised when a team for the given information is not found."""
+
     # @commands.Cog.listener()
     # async def on_ready(self):
         # logger.info("Successfully Logged In")
@@ -125,31 +131,54 @@ class Scav(commands.Cog):
         #     settings["profile_picture_set"] = True
         #     save_settings()
 
-    @commands.command()
-    async def guess(self, ctx: commands.Context, guess: str):
-        # TODO check if the channel is a scav channel
-        # if not
+    async def scav_user_allowed(self, ctx: commands.Context) -> bool:
+        """Check if the user and channel are correct and allowed to guess / request a hint, and send messages stating errors if not."""
 
-        # checks if scav is enabled
+        # Check that the channel is a scav channel
+        group_id = await self.db.get_group_id(scav_channel_id=ctx.channel.id)
+        if not group_id:
+            await ctx.message.reply("There is no scav team associated with this channel.")
+            return False
+
+        # Check that scav is enabled
         enabled = await self.scav_enabled()
         if not enabled:
-            await ctx.message.reply("Scav is not enabled.")
-            return
+            await ctx.message.reply("Scav is not currently enabled.")
+            return False
+
+        # Check that the user is on the team and they can guess
+        on_team_task = self.db.check_user_in_group(discord_user_id=ctx.message.author.id, group_id=group_id)
+        can_guess = await self.db.check_user_has_permission(discord_id=ctx.message.author.id, permission_name="guess_scav_question")
+        on_team = await on_team_task
+        if not on_team or not can_guess:
+            await ctx.message.reply("You are not authorized to guess here.")
+            return False
+
+        # Get team and check if they are locked out
+        team = await self.db.get_scav_team(team_id=group_id)
+        assert team is not None
+        if team.locked_out:
+            await ctx.message.reply("Your team is currently locked out for: ")
+            return False
+
+        return True
+
+    @commands.command()
+    async def guess(self, ctx: commands.Context, guess: str):
+        """Make a guess of the answer to the current scav question."""
 
         if self.bot.debug:
             await ctx.message.add_reaction("🔄")
 
+        allowed = await self.scav_user_allowed(ctx)
+        if not allowed:
+            return
+
         # Get the team id from the channel
-        team_id = await self.db.get_group_id(scav_channel_id=ctx.message.channel.id)
+        team_id = await self.db.get_group_id(scav_channel_id=ctx.channel.id)
         if not team_id:
             await self.bot.log("Could not get scav channel.")
             return
-
-        # TODO Check if user is allowed to guess in this channel / group
-
-        # TODO check if team is locked out and allowed to guess
-
-        # TODO add support for image and file clues
 
         # TODO add handling question response times
 
@@ -202,12 +231,6 @@ class Scav(commands.Cog):
         res = await self.handle_scav_question(channel_id=ctx.message.channel.id)
         if not res:
             await self.bot.log(f"Failed to send question to <#{ctx.message.channel.id}>")
-
-    class ScavNotEnabledError(Exception):
-        pass
-
-    class TeamNotFoundError(Exception):
-        pass
 
     @commands.command()
     async def hint(self, ctx: commands.Context):

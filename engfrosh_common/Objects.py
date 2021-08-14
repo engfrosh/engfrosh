@@ -2,6 +2,7 @@
 
 from asyncpg import Record
 from typing import Optional
+import datetime
 
 
 class FroshTeam:
@@ -98,4 +99,15 @@ class ScavTeam:
     @property
     def locked_out(self) -> bool:
         """Return a boolean of whether the team is currently locked out of scav."""
+
+        if self.locked_out_until is None:
+            return False
+
+        cur_time = datetime.datetime.now()
+        if cur_time > self.locked_out_until:
+            return True
+
+        else:
+            return False
+
         raise NotImplementedError()

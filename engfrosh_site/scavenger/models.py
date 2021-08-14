@@ -43,6 +43,10 @@ class Question(models.Model):
     class Meta:
         """Meta properties for Scavenger Questions."""
 
+        permissions = [
+            ("guess_scav_question", "Can guess for scav questions")
+        ]
+
         verbose_name = "Scavenger Question"
         verbose_name_plural = "Scavenger Questions"
 
@@ -77,12 +81,19 @@ class Hint(models.Model):
 
 class Team(models.Model):
     """Representation of a scavenger team."""
+
     group = models.OneToOneField(Group, CASCADE, primary_key=True)
     current_question = models.OneToOneField(Question, on_delete=PROTECT, blank=True,
                                             related_name="scavenger_team", null=True)
     locked_out_until = models.DateTimeField("Locked Out Until", blank=True, null=True)
     last_hint = models.ForeignKey(Hint, blank=True, on_delete=PROTECT, null=True)
     last_hint_time = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        """Meta information for scavenger teams."""
+
+        verbose_name = "Scavenger Team"
+        verbose_name_plural = "Scavenger Teams"
 
     def __str__(self) -> str:
         return self.group.name
@@ -91,6 +102,8 @@ class Team(models.Model):
         """Reset the team's current scavenger question to the first enabled question."""
         first_question = Question.objects.filter(enabled=True).order_by("weight")[0]
         self.current_question = first_question
+        self.last_hint = None
+        self.locked_out_until = None
         self.save()
 
 

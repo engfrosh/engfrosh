@@ -6,7 +6,7 @@ import asyncpg
 import uuid
 import datetime
 
-from typing import Dict, Iterable, List, Tuple, Union
+from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 from . import Objects
 # endregion
@@ -131,7 +131,9 @@ class DatabaseInterface():
 
     # region GET methods
 
-    async def get_group_id(self, *, group_name=None, scav_channel_id=None):
+    async def get_group_id(self, *, group_name: Optional[int] = None, scav_channel_id=None) -> Union[None, int]:
+        """Return the group id if it exists, otherwise None."""
+
         if self._is_fake:
             return 1
 
@@ -462,7 +464,9 @@ class DatabaseInterface():
 
     # region CHECK methods
 
-    async def check_user_in_group(self, user_id=None, group_name=None, discord_user_id=None, group_id=None):
+    async def check_user_in_group(self, user_id: Optional[int] = None, group_name=None,
+                                  discord_user_id: int = None, group_id: Optional[int] = None) -> bool:
+        """Checks whether the provided user is in the provided group."""
         if self._is_fake:
             return True
 
