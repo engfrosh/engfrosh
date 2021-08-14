@@ -466,9 +466,10 @@ class DatabaseInterface():
         await self._execute(sql, (status, uuid.UUID(command_id)))
         logger.info(f"Set Discord Command {command_id} to {status}")
 
-    async def set_team_locked_out_time(self, group_id: int, minutes: float = 0, seconds: float = 0, *, end_time=None) -> bool:
+    async def set_team_locked_out_time(self, group_id: int, minutes: float = 0,
+                                       seconds: float = 0, *, end_time=None) -> bool:
         """Set the lockout time for the given team."""
-        
+
         if self._is_fake:
             return True
 

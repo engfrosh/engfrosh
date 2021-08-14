@@ -104,6 +104,9 @@ class Scav(commands.Cog):
     class TeamNotFoundError(Exception):
         """Exception raised when a team for the given information is not found."""
 
+    class TeamAlreadyFinishedError(Exception):
+        """Exception raised when a team is already finished scav."""
+
     # @commands.Cog.listener()
     # async def on_ready(self):
         # logger.info("Successfully Logged In")
@@ -132,7 +135,11 @@ class Scav(commands.Cog):
         #     save_settings()
 
     async def scav_user_allowed(self, ctx: commands.Context) -> bool:
-        """Check if the user and channel are correct and allowed to guess / request a hint, and send messages stating errors if not."""
+        """
+        Check if the user and channel are correct and allowed to guess / request a hint,
+        and send messages stating errors if not.
+
+        """
 
         # Check that the channel is a scav channel
         group_id = await self.db.get_group_id(scav_channel_id=ctx.channel.id)
@@ -148,7 +155,8 @@ class Scav(commands.Cog):
 
         # Check that the user is on the team and they can guess
         on_team_task = self.db.check_user_in_group(discord_user_id=ctx.message.author.id, group_id=group_id)
-        can_guess = await self.db.check_user_has_permission(discord_id=ctx.message.author.id, permission_name="guess_scav_question")
+        can_guess = await self.db.check_user_has_permission(discord_id=ctx.message.author.id,
+                                                            permission_name="guess_scav_question")
         on_team = await on_team_task
         if not on_team or not can_guess:
             await ctx.message.reply("You are not authorized to guess here.")
@@ -233,9 +241,9 @@ class Scav(commands.Cog):
             await ctx.message.add_reaction("🔄")
 
         try:
-        res = await self.handle_scav_question(channel_id=ctx.message.channel.id)
-        if not res:
-            await self.bot.log(f"Failed to send question to <#{ctx.message.channel.id}>")
+            res = await self.handle_scav_question(channel_id=ctx.message.channel.id)
+            if not res:
+                await self.bot.log(f"Failed to send question to <#{ctx.message.channel.id}>")
         except self.TeamNotFoundError:
             await self.bot.log(f"Could not find a scav team for channel: {ctx.channel.id}", "ERROR")
             return
@@ -328,8 +336,13 @@ class Scav(commands.Cog):
 
         await self.bot.send_to_all(f"Hint: {hint.text}", [ctx.channel.id], file=file)
 
-    async def handle_scav_question(self, send_question: bool = True, current_hints: bool = True, new_hint: bool = False, *,
-                                   group_id: Optional[int] = None, channel_id: Optional[int] = None, 
+    async def handle_scav_question(self,
+                                   send_question: bool = True,
+                                   current_hints: bool = True,
+                                   new_hint: bool = False,
+                                   *,
+                                   group_id: Optional[int] = None,
+                                   channel_id: Optional[int] = None,
                                    new_hint_lockout: Optional[int] = None) -> bool:
         """
         Handle a scav question request.
@@ -379,11 +392,12 @@ class Scav(commands.Cog):
 
         q_res = True
         if send_question:
-        logger.debug(f"File for questions is: {question.file}")
-        if question.file:
-            file = discord.File(self.bot.config["media_root"] + "/" + question.file, question.display_filename)
-        else:
-            file = None
+            logger.debug(f"File for questions is: {question.file}")
+
+            if question.file:
+                file = discord.File(self.bot.config["media_root"] + "/" + question.file, question.display_filename)
+            else:
+                file = None
 
             q_res = await self.bot.send_to_all(question.text, channels, file=file)
 
