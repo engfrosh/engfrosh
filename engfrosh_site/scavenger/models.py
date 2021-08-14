@@ -1,7 +1,12 @@
+"""Models for scavenger app."""
+
+import datetime
+from typing import Optional
 from django.db import models
 
 from django.contrib.auth.models import Group
 from django.db.models.deletion import CASCADE, PROTECT
+from django.utils import timezone
 
 import random
 import os
@@ -39,12 +44,14 @@ class Question(models.Model):
     display_filename = models.CharField(max_length=256, blank=True)
     weight = models.IntegerField("Order Number", unique=True, default=0, db_index=True)
     answer = models.CharField(max_length=32)
+    cooldown_time = models.IntegerField("Hint Cooldown duration in Seconds", default=0)
 
     class Meta:
         """Meta properties for Scavenger Questions."""
 
         permissions = [
-            ("guess_scav_question", "Can guess for scav questions")
+            ("guess_scav_question", "Can guess for scav questions"),
+            ("manage_scav", "Can manage scav")
         ]
 
         verbose_name = "Scavenger Question"
@@ -68,6 +75,7 @@ class Hint(models.Model):
     weight = models.IntegerField(default=0)
     enabled = models.BooleanField(default=True)
     lockout_time = models.IntegerField("Lockout Duration in Seconds", default=900)
+    cooldown_time = models.IntegerField("Hint Cooldown duration in Seconds", null=True, default=None)
 
     class Meta:
         """Scavenger Hints Meta info."""
@@ -86,8 +94,10 @@ class Team(models.Model):
     current_question = models.OneToOneField(Question, on_delete=PROTECT, blank=True,
                                             related_name="scavenger_team", null=True)
     locked_out_until = models.DateTimeField("Locked Out Until", blank=True, null=True)
+    hint_cooldown_until = models.DateTimeField("Hint Cooldown Until", blank=True, null=True)
     last_hint = models.ForeignKey(Hint, blank=True, on_delete=PROTECT, null=True)
     last_hint_time = models.DateTimeField(blank=True, null=True)
+    finished = models.BooleanField("Finished Scavenger", default=False)
 
     class Meta:
         """Meta information for scavenger teams."""
@@ -104,6 +114,27 @@ class Team(models.Model):
         self.current_question = first_question
         self.last_hint = None
         self.locked_out_until = None
+        self.hint_cooldown_until = None
+        self.finished = False
+        self.save()
+
+    def remove_blocks(self) -> None:
+        """Remove lockouts and cooldowns."""
+
+        self.locked_out_until = None
+        self.hint_cooldown_until = None
+
+        self.save()
+
+    def lockout(self, duration: Optional[datetime.timedelta] = None) -> None:
+        """Lockout team for seconds."""
+
+        if duration is None:
+            duration = datetime.timedelta(minutes=15)
+
+        now = timezone.now()
+        until = now + duration
+        self.locked_out_until = until
         self.save()
 
 

@@ -1,0 +1,14 @@
+# Scav
+
+[x] Add ability to get new hints
+[x] Add ability for scav managers to lockout and free teams
+[x] Add check of whether user is allowed to guess in the channel
+[x] Add check to make sure a team is not locked out from guessing / hints
+[ ] Add a cooldown for getting hints
+[ ] Add handling question response times
+[ ] Add check if questions are actually enabled before sending them
+[ ] Add check if hints are actually enabled
+
+# Scoin
+
+[ ] Add more robust permissions

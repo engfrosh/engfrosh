@@ -359,7 +359,7 @@ class DatabaseInterface():
         else:
             sql = "SELECT * FROM scavenger_hint WHERE question_id = $1;"
 
-            rows = await self._fetchall(sql, (cur_question,))
+            rows = await self._fetchall(sql, (cur_question.id,))
             if not rows:
                 logger.warning(f"Could not get any hints for question {cur_question}")
                 return None
@@ -406,6 +406,37 @@ class DatabaseInterface():
 
         return Objects.ScavTeam(row=row)
 
+    async def get_next_hint(self, *, team_id: int) -> Union[None, Objects.ScavHint]:
+        """Get the next hint for the team and increment the hint number."""
+
+        team = await self.get_scav_team(team_id=team_id)
+        if not team:
+            return None
+
+        hints = await self.get_team_scav_hints(False, team_id=team_id)
+        if not hints:
+            return None
+
+        hints.sort(key=lambda h: h.weight)
+
+        cur_hint = await self.get_scav_hint(team.last_hint)
+        if cur_hint in hints:
+            i = hints.index(cur_hint)
+            next_hint = hints[i + 1]
+        else:
+            next_hint = hints[0]
+
+        sql = "UPDATE scavenger_team SET last_hint_id = $1;"
+        res = await self._execute(sql, (next_hint.id,))
+        if not res:
+            raise Exception("Error setting team's next hint.")
+
+        res = await self.set_team_locked_out_time(seconds=next_hint.lockout_time, group_id=team_id)
+        if not res:
+            raise Exception("Could not lock team out.")
+
+        return next_hint
+
     # endregion
 
     # region UPDATE methods
@@ -435,7 +466,9 @@ class DatabaseInterface():
         await self._execute(sql, (status, uuid.UUID(command_id)))
         logger.info(f"Set Discord Command {command_id} to {status}")
 
-    async def set_team_locked_out_time(self, group_id, minutes=None, *, end_time=None):
+    async def set_team_locked_out_time(self, group_id: int, minutes: float = 0, seconds: float = 0, *, end_time=None) -> bool:
+        """Set the lockout time for the given team."""
+        
         if self._is_fake:
             return True
 
@@ -443,8 +476,8 @@ class DatabaseInterface():
                     SET locked_out_until = {self._qp(1)}
                     WHERE group_id = {self._qp(2)};"""
 
-        if minutes and not end_time:
-            end_time = datetime.datetime.now() + datetime.timedelta(minutes=minutes)
+        if (minutes or seconds) and not end_time:
+            end_time = datetime.datetime.now() + datetime.timedelta(minutes=minutes, seconds=seconds)
 
         if not end_time:
             raise ValueError("Endtime or minutes must be provided")
@@ -459,6 +492,15 @@ class DatabaseInterface():
         await self._execute(sql, (end_time, group_id))
 
         logger.info(f"Set lockout until time for group {group_id} to {end_time}")
+
+        return True
+
+    async def set_scav_team_unlocked(self, group_id: int):
+        """Unlock the specified team."""
+
+        sql = "UPDATE scavenger_team SET locked_out_until = NULL WHERE group_id = $1;"
+
+        await self._execute(sql, (group_id,))
 
     # endregion
 
@@ -573,7 +615,7 @@ class DatabaseInterface():
                 return True
 
         logger.info(f"No more questions found, therefore assuming Team {team_id} has finished scav.")
-        sql = f"UPDATE scavenger_team SET current_question_id = NULL WHERE group_id = {self._qp()};"
+        sql = f"UPDATE scavenger_team SET current_question_id = NULL, finished = TRUE WHERE group_id = {self._qp()};"
         res = await self._execute(sql, (team_id,))
         if not res:
             raise Exception("Failed to update current question to null.")

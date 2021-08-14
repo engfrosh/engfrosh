@@ -3,6 +3,10 @@
 from asyncpg import Record
 from typing import Optional
 import datetime
+import dateutil.tz
+import logging
+
+logger = logging.getLogger("EngFrosh_Common.Objects")
 
 
 class FroshTeam:
@@ -76,7 +80,16 @@ class ScavHint:
             self.display_filename: str = row["display_filename"]
             self.weight = row["weight"]
             self.enabled = row["enabled"]
-            self.lockout_time = row["lockout_time"]
+            self.lockout_time: int = row["lockout_time"]
+
+    def __eq__(self, o: object) -> bool:
+        if not isinstance(o, ScavHint):
+            return NotImplemented
+
+        if self.id == o.id:
+            return True
+
+        return False
 
 
 class ScavTeam:
@@ -91,23 +104,53 @@ class ScavTeam:
         if row:
             self.group = row["group_id"]
             self.id = self.group
-            self.current_question = row["current_question_id"]
-            self.locked_out_until = row["locked_out_until"]
+            self.current_question: int = row["current_question_id"]
+            self.locked_out_until: datetime.datetime = row["locked_out_until"]
             self.last_hint = row["last_hint_id"]
             self.last_hint_time = row["last_hint_time"]
+            self.hint_cooldown_until = row["hint_cooldown_until"]
+            self.finished: bool = row["finished"]
 
     @property
     def locked_out(self) -> bool:
         """Return a boolean of whether the team is currently locked out of scav."""
 
-        if self.locked_out_until is None:
+        if not self.locked_out_until:
+            logger.debug("Team does not have any lock out info.")
             return False
 
-        cur_time = datetime.datetime.now()
-        if cur_time > self.locked_out_until:
+        cur_time = datetime.datetime.now(dateutil.tz.gettz())
+        logger.debug(f"Current time: {cur_time}")
+        logger.debug(f"Team locked out until: {self.locked_out_until}")
+
+        if cur_time < self.locked_out_until:
             return True
 
         else:
             return False
 
-        raise NotImplementedError()
+    @property
+    def on_cooldown(self) -> bool:
+        """Return whether a team is currently on hint cooldown."""
+
+        if not self.hint_cooldown_until:
+            return False
+
+        cur_time = datetime.datetime.now(dateutil.tz.gettz())
+        if cur_time < self.hint_cooldown_until:
+            return True
+
+        else:
+            return False
+
+    @property
+    def lockout_remaining(self) -> str:
+        """Return the duration of how much time is remaining in the lockout."""
+
+        if self.locked_out:
+            cur_time = datetime.datetime.now(dateutil.tz.gettz())
+            duration = self.locked_out_until - cur_time
+            return str(duration).split(".")[0]
+
+        else:
+            return "00:00"

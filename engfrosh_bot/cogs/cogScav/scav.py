@@ -1,6 +1,6 @@
 # region Imports
 import logging
-from typing import Optional
+from typing import Optional, Union
 import discord
 # import discord
 # import datetime as dt
@@ -158,7 +158,11 @@ class Scav(commands.Cog):
         team = await self.db.get_scav_team(team_id=group_id)
         assert team is not None
         if team.locked_out:
-            await ctx.message.reply("Your team is currently locked out for: ")
+            await ctx.reply(f"Your team is currently locked out for: {team.lockout_remaining}")
+            return False
+
+        if team.finished:
+            await ctx.reply("You're already finished Scav!")
             return False
 
         return True
@@ -228,20 +232,105 @@ class Scav(commands.Cog):
         if self.bot.debug:
             await ctx.message.add_reaction("🔄")
 
+        try:
         res = await self.handle_scav_question(channel_id=ctx.message.channel.id)
         if not res:
             await self.bot.log(f"Failed to send question to <#{ctx.message.channel.id}>")
+        except self.TeamNotFoundError:
+            await self.bot.log(f"Could not find a scav team for channel: {ctx.channel.id}", "ERROR")
+            return
+
+        except self.TeamAlreadyFinishedError:
+            await ctx.message.reply("Your team is already finished scav.")
+            return
+
+    @commands.command()
+    async def scav_lock(self, ctx: commands.Context, minutes: Optional[Union[str, int]] = None):
+        """Lock the current channel."""
+
+        allowed = await self.db.check_user_has_permission(discord_id=ctx.author.id, permission_name="manage_scav")
+        if not allowed:
+            await ctx.reply("You are not allowed to manage scav.")
+            return
+
+        team_id = await self.db.get_group_id(scav_channel_id=ctx.channel.id)
+        if not team_id:
+            ctx.message.reply("Not a valid scav channel.")
+            return
+
+        await ctx.message.delete()
+
+        DEFAULT_MINUTES = 15
+
+        if minutes:
+            minutes = int(minutes)
+        else:
+            minutes = DEFAULT_MINUTES
+
+        await self.db.set_team_locked_out_time(team_id, minutes=minutes)
+
+        channels = await self.db.get_scav_channels(group_id=team_id)
+
+        await self.bot.send_to_all(f"Scav locked for {minutes} minutes.", channels)
+
+    @ commands.command()
+    async def scav_unlock(self, ctx: commands.Context):
+        """Unlock the current channel."""
+
+        allowed = await self.db.check_user_has_permission(discord_id=ctx.author.id, permission_name="manage_scav")
+        if not allowed:
+            await ctx.reply("You are not allowed to manage scav.")
+            return
+
+        team_id = await self.db.get_group_id(scav_channel_id=ctx.channel.id)
+        if not team_id:
+            ctx.message.reply("Not a valid scav channel.")
+            return
+
+        await ctx.message.delete()
+
+        await self.db.set_scav_team_unlocked(team_id)
+
+        channels = await self.db.get_scav_channels(group_id=team_id)
+
+        await self.bot.send_to_all("Scav unlocked.", channels)
 
     @commands.command()
     async def hint(self, ctx: commands.Context):
         """Request hint for the question."""
+
         if self.bot.debug:
             await ctx.message.add_reaction("🔄")
 
-        await ctx.message.reply("Hints are not yet implemented.")
+        allowed = await self.scav_user_allowed(ctx)
+        if not allowed:
+            return
+
+        # Get the team id from the channel
+        team_id = await self.db.get_group_id(scav_channel_id=ctx.channel.id)
+        if not team_id:
+            await self.bot.log("Could not get scav channel.")
+            return
+
+        # TODO add handling hint response times
+
+        # TODO add check if the hint is actually enabled
+
+        hint = await self.db.get_next_hint(team_id=team_id)
+        if not hint:
+            ctx.message.reply("No new hint available.")
+            return
+
+        if hint.file:
+            file = discord.File(self.bot.config["media_root"] + "/" + hint.file, hint.display_filename)
+        else:
+            file = None
+
+        await self.bot.send_to_all(f"Hint: {hint.text}", [ctx.channel.id], file=file)
 
     async def handle_scav_question(self, send_question: bool = True, current_hints: bool = True, new_hint: bool = False, *,
-                                   group_id: Optional[int] = None, channel_id: Optional[int] = None, new_hint_lockout: Optional[int] = None) -> bool:
+                                   group_id: Optional[int] = None, channel_id: Optional[int] = None, 
+                                   new_hint_lockout: Optional[int] = None) -> bool:
         """
         Handle a scav question request.
 
@@ -273,6 +362,11 @@ class Scav(commands.Cog):
 
         else:
             raise Exception
+
+        team = await self.db.get_scav_team(team_id=team_id)
+        assert team is not None
+        if team.finished:
+            raise self.TeamAlreadyFinishedError()
 
         # endregion
 
