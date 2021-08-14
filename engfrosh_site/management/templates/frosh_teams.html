@@ -17,6 +17,17 @@
                 width: 26px;
                 text-align: center;
             }
+
+            td.scav_channel {
+                text-align: center;
+            }
+
+            th {
+                padding-right: 10px;
+                padding-left: 10px;
+                padding-bottom: 5px;
+                text-align: center;
+            }
         </style>
         <script>
             HEX_COLOR_PATTERN = /^#?[0-9A-F]{6}$/i;
@@ -162,6 +173,7 @@
                 <th></th>
                 <th>Team</th>
                 <th>Discord Role?</th>
+                <th>Scav Channel?</th>
                 <th></th>
             </tr>
             {% for team in teams %}
@@ -180,6 +192,11 @@
                     <td class="discord_role team{{team.id}}">
                         <button type="button" onclick="addDiscordRoleButton('{{team.id}}')">Add Role</button>
                     </td>
+                {% endif %}
+                {% if team.scav_channel %}
+                    <td class="scav_channel">{{team.scav_channel}}</td>
+                {% else %}
+                    <td class="scav_channel">❌</td>
                 {% endif %}
             </tr>
             {% endfor %}

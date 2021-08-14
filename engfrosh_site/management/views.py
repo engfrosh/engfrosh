@@ -11,6 +11,8 @@ from engfrosh_common.DiscordAPI.DiscordAPI import DiscordAPI
 from engfrosh_common.DiscordAPI.DiscordUserAPI import DiscordUserAPI
 from authentication.models import DiscordUser
 from frosh.models import FroshRole, Team
+import scavenger.models
+import discord_bot_manager.models
 from discord_bot_manager.models import Role
 from . import registration
 
@@ -214,13 +216,26 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
             else:
                 role_exists = False
 
+            try:
+                scav_team = scavenger.models.Team.objects.get(group=team.group)
+            except ObjectDoesNotExist:
+                scav_channel = None
+                logger.warning(f"No scav team exists for team: {team}")
+            else:
+                try:
+                    scav_channel = discord_bot_manager.models.ScavChannel.objects.get(group=team.group).channel_id
+                except ObjectDoesNotExist:
+                    logger.info(f"No scav channel exists for team: {team}")
+                    scav_channel = None
+
             team_color = team.color_code
 
             t = {
                 "id": team.group.id,
                 "name": team.display_name,
                 "discord_role": role_exists,
-                "color": team_color if team_color else None
+                "color": team_color if team_color else None,
+                "scav_channel": scav_channel
             }
             context["teams"].append(t)
         return render(request, "frosh_teams.html", context)
@@ -233,6 +248,7 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
         if "command" not in req_dict:
             return HttpResponseBadRequest("Bad request body.")
 
+        # ADD DISCORD ROLE TO A TEAM
         if req_dict["command"] == "add_discord_role":
             if "team_id" not in req_dict:
                 return HttpResponseBadRequest("No team id.")
@@ -255,6 +271,7 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
 
             return JsonResponse({"team_id": group.id, "role_id": role.role_id})  # type: ignore
 
+        # CREATE A NEW TEAM
         elif req_dict["command"] == "add_team":
             if "team_name" not in req_dict or not req_dict["team_name"]:
                 return HttpResponseBadRequest("No team name provided.")
@@ -271,8 +288,13 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
             team = Team(display_name=team_name, group=group, color=team_color)
             team.save()
 
+            scav_team = scavenger.models.Team(group=group)
+            scav_team.reset_progress()
+            scav_team.save()
+
             return JsonResponse(team.to_dict())
 
+        # UPDATE AN EXISTING TEAM
         elif req_dict["command"] == "update_team":
             if "team_id" not in req_dict:
                 return HttpResponseBadRequest("No team id.")
