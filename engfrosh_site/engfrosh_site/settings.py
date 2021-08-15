@@ -25,6 +25,9 @@ SECRET_KEY = 'django-insecure-ngg-3z5*no_b9zhnmj83hgv1qh5u_mx-vri57p=r&sym3p@$ru
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Production sets the settings values, but doesn't affect debug parts
+PRODUCTION = False
+
 ALLOWED_HOSTS = [
     "alpha.engfrosh.com",
     "beta.engfrosh.com",
@@ -143,12 +146,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    'files/static'
-]
+# STATICFILES_DIRS with files/static shouldn't be used for production 
+STATICFILES_DIRS = []
+if not PRODUCTION:
+    STATICFILES_DIRS.append('files/static')
 
 # STATIC_ROOT should not be present, at least for development as far as I know.
-# STATIC_ROOT = 'files/static'
+if PRODUCTION:
+    STATIC_ROOT = 'files/static'
 
 MEDIA_ROOT = 'files/media'
 MEDIA_URL = '/media/'
@@ -166,9 +171,19 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
         },
+        'file_debug': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log'
+        },
+        'file_warn': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': 'warning.log'
+        }
     },
     'root': {
-        'handlers': ['console'],
+        'handlers': ['console', 'file_debug', 'file_warn'],
         'level': 'DEBUG',
     },
 }
