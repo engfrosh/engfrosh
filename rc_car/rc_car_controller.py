@@ -1,48 +1,26 @@
 import PiMotor
 import time
 
-BACK_LEFT = PiMotor.Motor("MOTOR1", 2)
-BACK_RIGHT = PiMotor.Motor("MOTOR2", 1)
-FRONT_RIGHT = PiMotor.Motor("MOTOR3", 2)
-FRONT_LEFT = PiMotor.Motor("MOTOR4", 1)
-ALL_MOTORS = PiMotor.LinkedMotors(FRONT_LEFT, FRONT_RIGHT, BACK_LEFT, BACK_RIGHT)
-LEFT_MOTORS = PiMotor.LinkedMotors(FRONT_LEFT, BACK_LEFT)
-RIGHT_MOTORS = PiMotor.LinkedMotors(FRONT_RIGHT, BACK_RIGHT)
-
-ARROW_BACK = PiMotor.Arrow(1)
-ARROW_LEFT = PiMotor.Arrow(2)
-ARROW_FORWARD = PiMotor.Arrow(3)
-ARROW_RIGHT = PiMotor.Arrow(4)
-
 
 class RC_Car:
 
     def __init__(self, speed):
         self.speed = speed
-        self._back_left = BACK_LEFT
-        self._back_right = BACK_RIGHT
-        self._front_left = FRONT_LEFT
-        self._front_right = FRONT_RIGHT
-        self._arrow_forward = ARROW_FORWARD
-        self._arrow_back = ARROW_BACK
-        self._arrow_left = ARROW_LEFT
-        self._arrow_right = ARROW_RIGHT
-        self._all_motors = ALL_MOTORS
-        self._left_motors = LEFT_MOTORS
-        self._right_motors = RIGHT_MOTORS
+        self._back_left = PiMotor.Motor("MOTOR1", 2)
+        self._back_right = PiMotor.Motor("MOTOR2", 1)
+        self._front_left = PiMotor.Motor("MOTOR4", 1)
+        self._front_right = PiMotor.Motor("MOTOR3", 2)
+        self._all_motors = PiMotor.LinkedMotors(self._front_left, self._front_right, self._back_left, self._back_right)
+        self._left_motors = PiMotor.LinkedMotors(self._front_left, self._back_left)
+        self._right_motors = PiMotor.LinkedMotors(self._front_right, self._back_right)
 
-    def turn_left(self, speed=None):
-        if speed is None:
-            speed = self.speed
+        self._arrow_forward = PiMotor.Arrow(3)
+        self._arrow_back = PiMotor.Arrow(1)
+        self._arrow_left = PiMotor.Arrow(2)
+        self._arrow_right = PiMotor.Arrow(4)
 
-        self._arrow_left.on()
-        self._arrow_right.on()
-        self._left_motors.reverse(self.speed)
-        # self._right_motors.forward(self.speed)
-        time.sleep(5)
-        self._arrow_left.off()
-        self._arrow_right.off()
-        self._all_motors.stop()
+    # def handle_command(self, speed:float, direction:str, time:float):
+    #    pass
 
     def test_motor(self, speed):
         self._front_left.forward(speed)
@@ -61,10 +39,17 @@ class RC_Car:
         time.sleep(1)
         self._back_right.stop()
 
+    def back(self, speed):
+        self._all_motors.reverse(self.speed)
+        self._arrow_back.on()
+        time.sleep(0.75)
+        self._all_motors.stop()
+        self._arrow_back.off()
+
     def drive(self, speed):
         self._all_motors.forward(self.speed)
         self._arrow_forward.on()
-        time.sleep(5)
+        time.sleep(0.75)
         self._all_motors.stop()
         self._arrow_forward.off()
 
@@ -81,7 +66,6 @@ class RC_Car:
 
 benny = RC_Car(60)
 
-print(benny.speed)
-benny.drive(70)
-# benny.turn_right(70)
+benny.back(50)
 # benny.turn_left(70)
+# benny.test_motor(60)
