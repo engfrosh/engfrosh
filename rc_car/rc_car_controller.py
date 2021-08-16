@@ -44,8 +44,44 @@ class RC_Car:
         self._arrow_right.off()
         self._all_motors.stop()
 
+    def test_motor(self, speed):
+        self._front_left.forward(speed)
+        time.sleep(1)
+        self._front_left.stop()
+
+        self._front_right.forward(speed)
+        time.sleep(1)
+        self._front_right.stop()
+
+        self._back_left.forward(speed)
+        time.sleep(1)
+        self._back_left.stop()
+
+        self._back_right.forward(speed)
+        time.sleep(1)
+        self._back_right.stop()
+
+    def drive(self, speed):
+        self._all_motors.forward(self.speed)
+        self._arrow_forward.on()
+        time.sleep(5)
+        self._all_motors.stop()
+        self._arrow_forward.off()
+
+    def turn_left(self, speed):
+        self._right_motors.forward(self.speed)
+        time.sleep(1)
+        self._all_motors.stop()
+
+    def turn_right(self, speed):
+        self._left_motors.forward(self.speed)
+        time.sleep(1)
+        self._all_motors.stop()
+
 
 benny = RC_Car(60)
 
 print(benny.speed)
-benny.turn_left()
+benny.drive(70)
+# benny.turn_right(70)
+# benny.turn_left(70)
