@@ -94,11 +94,12 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         # Handle Webpage requests
         # TODO add check that user doesn't yet have a discord account linked.
+
         context = {"users": []}
 
         users = User.objects.all()
         for usr in users:
-            if not usr.is_staff:
+            if not usr.is_superuser:
                 context["users"].append(usr)
 
         return render(request, "create_discord_magic_links.html", context)

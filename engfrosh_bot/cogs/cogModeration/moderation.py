@@ -1,15 +1,24 @@
+"""Moderation COG for Discord Bot."""
+
 import logging
 from discord.ext import commands
 from discord import Message
 from discord.errors import NotFound
 from better_profanity import profanity
+import better_profanity.constants
 from ...EngFroshBot import EngFroshBot
 
 logger = logging.getLogger("Cogs.Moderation")
 
+better_profanity.constants.ALLOWED_CHARACTERS.remove("*")
+
 
 class Moderation(commands.Cog):
+    """Discord Moderation COG."""
+
     def __init__(self, bot: EngFroshBot):
+        """Initialize Moderation COG."""
+
         self.bot = bot
         self.config = bot.config['module_settings']['moderation']
         # TODO add way to get additional words from the database.

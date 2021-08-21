@@ -1,4 +1,30 @@
-# Scav
+# TODO
+
+## Management
+
+[ ] Add _Manage Roles_ page and make it easy to create the default roles for planning, heads, frosh, facils.
+[ ] Add way to create default roles for Directors, Spirit, etc
+[ ] Add email delay to not hit AWS limits
+[ ] Add invite/email all button to the magic links invite page
+[ ] Add tracking and limit the send link page to users who have not linked a discord account
+[ ] Add easy way to change the discord invite email
+[ ] Change discord magic links to not immediately get invalidated
+[ ] Change name of the _magic links_ page to _send invite links_
+[ ] Add support for adding program information when adding users
+[ ] When adding users via magic link check that they don't have a discord account linked first, and don't have an outstanding magic link, don't allow the email button. 
+[ ] Add way to lock and unlock channels and groups of channels 
+
+## Authentication
+
+[ ] Disable the ability to register
+
+## CSS
+
+[ ] Make the _link your discord account_ page look nice as it is the first page seen
+[ ] Test page appearance on different size screens
+[ ] Create a default style sheet and set a font for all the pages
+
+## Scav
 
 [x] Add ability to get new hints
 [x] Add ability for scav managers to lockout and free teams
@@ -8,7 +34,17 @@
 [ ] Add handling question response times
 [ ] Add check if questions are actually enabled before sending them
 [ ] Add check if hints are actually enabled
+[ ] Add enable and disable scav commands 
 
-# Scoin
+## Scoin
 
 [ ] Add more robust permissions
+
+## Moderation
+
+[ ] Make it so edited messages also get checked for moderation
+
+## Logging
+
+[ ] Change logging format so it is actually useful
+
