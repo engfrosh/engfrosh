@@ -287,4 +287,31 @@ so that it runs at start up.
 
 You may also want to change the service file permissions so non root can control them.
 
+#### Add AWS Credentials
 
+- Create an IAM role if one has not already been created, it should only have the ability to send SES messages
+- Add the following to a file at ~/.aws/credentials
+```
+[default]
+aws_access_key_id = YOUR_AWS_ACCESS_KEY_ID
+aws_secret_access_key = YOUR_AWS_SECRET_ACCESS_KEY
+```
+
+
+### Updating Site
+
+_When you make changes to the git repo, you at some point want to put these on the testing
+or production server. The following instructions are how to update an already running site._
+
+- SSH into the server
+- Try git pull to update the branch. If this does not work then add the changes to a branch,
+then revert the changes and then pull the new branch.
+- If you need to update the static files by running `manage.py collectstatic`
+- If needed update the `bot_config.yaml` by copying the relevant deployment file
+- If needed update the `credentials.json` and the `credentials.py` files
+- Update the `settings.py` file with the password for the database and set the PRODUCTION flag to TRUE
+- Update the django secret key to a randome string
+- migrate the database with `manage.py migrate`
+- Restart the site and the bot:
+    - `systemctl restart engfrosh_site`
+    - `systemctl restart engfrosh_bot`

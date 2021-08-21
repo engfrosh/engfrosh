@@ -12,6 +12,7 @@ modules:
     "engfrosh_bot.cogs.cogScav.scav"
     ]
 
+debug: True
 log_level: DEBUG
 
 credentials:
@@ -19,21 +20,21 @@ credentials:
   absolute_path: Null
   # If both are provided, will default to the relative path
 
+bot_prefix: "!"
+
 bot_log_channel: [
   807100215651074109
 ]
 
-bot_prefix: "!"
+timezone: America/Toronto
 
-debug: True
+media_root: "files/media"
+temp_root: "files/temp"
 
 module_settings:
   rabbitmq:
     host: localhost
     queue: django_discord
-
-  # postgres:
-
 
   moderation:
     checkmark: True
@@ -57,9 +58,12 @@ module_settings:
   coin:
     public_commands: True
     public_confirmations: True
+    permission: change_team_coin # Names must be unique as currently written
+
     scoreboard_channels: [
       813043254358442034
     ]
+
     scoreboard:
       header: "Scoin Standings\n=================="
       row: "{place}. {team_name} {coin_amount}"
@@ -67,7 +71,6 @@ module_settings:
       name_length: 25
       coin_length: 10
     permission: change_team_coin # Names must be unique as currently written
-
 
   scav:
     incorrect_message: Null

@@ -91,8 +91,8 @@ class Team(models.Model):
     """Representation of a scavenger team."""
 
     group = models.OneToOneField(Group, CASCADE, primary_key=True)
-    current_question = models.OneToOneField(Question, on_delete=PROTECT, blank=True,
-                                            related_name="scavenger_team", null=True)
+    current_question = models.ForeignKey(Question, on_delete=PROTECT, blank=True,
+                                         related_name="scavenger_team", null=True)
     locked_out_until = models.DateTimeField("Locked Out Until", blank=True, null=True)
     hint_cooldown_until = models.DateTimeField("Hint Cooldown Until", blank=True, null=True)
     last_hint = models.ForeignKey(Hint, blank=True, on_delete=PROTECT, null=True)
@@ -110,7 +110,10 @@ class Team(models.Model):
 
     def reset_progress(self) -> None:
         """Reset the team's current scavenger question to the first enabled question."""
-        first_question = Question.objects.filter(enabled=True).order_by("weight")[0]
+        if Question.objects.filter(enabled=True).exists():
+            first_question = Question.objects.filter(enabled=True).order_by("weight")[0]
+        else:
+            first_question = None
         self.current_question = first_question
         self.last_hint = None
         self.locked_out_until = None
