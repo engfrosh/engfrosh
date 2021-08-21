@@ -146,7 +146,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATICFILES_DIRS with files/static shouldn't be used for production 
+# STATICFILES_DIRS with files/static shouldn't be used for production
 STATICFILES_DIRS = []
 if not PRODUCTION:
     STATICFILES_DIRS.append('files/static')
