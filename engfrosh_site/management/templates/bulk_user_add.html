@@ -9,6 +9,7 @@
         // Load the constants that are modifiable at runtime
         var teams = [{% for t in team_options %}"{{t}}", {% endfor %}];
         var roles = [{% for r in role_options %}"{{r}}", {% endfor %}];
+        var programs = [{% for p in program_options %}"{{p}}", {% endfor %}];
     </script>
     <style>
         th {
@@ -53,6 +54,7 @@
             <th class="email">Email</th>
             <th class="team">Team</th>
             <th class="role">Role</th>
+            <th class="program">Program</th>
             <th class="add_all"><button type="button" onclick="addAllUserButtonPress()">ADD ALL</button></th>
         </tr>
     </table>

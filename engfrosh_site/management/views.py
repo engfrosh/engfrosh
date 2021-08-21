@@ -10,7 +10,7 @@ import credentials
 from engfrosh_common.DiscordAPI.DiscordAPI import DiscordAPI
 from engfrosh_common.DiscordAPI.DiscordUserAPI import DiscordUserAPI
 from authentication.models import DiscordUser
-from frosh.models import FroshRole, Team
+from frosh.models import FroshRole, Team, UniversityProgram
 import scavenger.models
 import discord_bot_manager.models
 from discord_bot_manager.models import Role
@@ -45,9 +45,14 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
         for team in Team.objects.all():
             team_options.append(team.display_name)
 
+        program_options = []
+        for program in UniversityProgram.objects.all():
+            program_options.append(program.name)
+
         context = {
             "team_options": team_options,
-            "role_options": role_options
+            "role_options": role_options,
+            "program_options": program_options
         }
         return render(request, "bulk_user_add.html", context)
 
@@ -65,6 +70,7 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
             email = req_dict["email"]
             team = req_dict["team"]
             role = req_dict["role"]
+            program = req_dict["program"]
         except KeyError:
             return HttpResponseBadRequest("Key Error in Body")
 
@@ -72,11 +78,13 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
             role = FroshRole.objects.get(name=role)
             if team:
                 team = Team.objects.get(display_name=team)
+            if program:
+                program = UniversityProgram.objects.get(name=program)
         except ObjectDoesNotExist:
             return HttpResponseBadRequest("Bad role or team")
 
         try:
-            user = registration.create_user_initialize(name, email, role, team)
+            user = registration.create_user_initialize(name, email, role, team, program)
         except registration.UserAlreadyExistsError:
             return HttpResponseBadRequest("User already exists.")
 

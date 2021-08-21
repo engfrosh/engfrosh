@@ -41,12 +41,14 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
   let emailInput = document.querySelector("." + row_id + ".email_input");
   let selectTeam = document.querySelector("." + row_id + ".team_selection");
   let selectRole = document.querySelector("." + row_id + ".role_selection");
+  let selectProgram = document.querySelector("." + row_id + ".program_selection");
   let button = document.querySelector("button." + row_id);
 
   const name = nameInput.value;
   const email = emailInput.value;
   let team = selectTeam.value;
   const role = selectRole.value;
+  let program = selectProgram.value;
 
   vName = validateName(name);
   vEmail = validateEmail(email);
@@ -55,6 +57,8 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
 
   let failedValidation = false;
   let error_message = "Invalid Entry:\n";
+
+  // TODO validate the program
 
   if (vName !== true) {
     nameInput.style.backgroundColor = "red";
@@ -91,7 +95,11 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
 
     // if no team selected and it is valid, then set team to null 
     if (team === "---") {
-      team = null
+      team = null;
+    }
+
+    if (program === "---") {
+      program = null;
     }
 
     fetch("", {
@@ -107,7 +115,8 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
         "name": name,
         "email": email,
         "team": team,
-        "role": role
+        "role": role,
+        "program": program
       })
     })
       .then(res => {
@@ -118,7 +127,7 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
             console.log("Added User.\n    user id : " + user_id + "\n    username: " + username);
           })
 
-          for (let field of [nameInput, emailInput, selectTeam, selectRole]) {
+          for (let field of [nameInput, emailInput, selectTeam, selectRole, selectProgram]) {
             field.disabled = true;
             field.style.backgroundColor = "grey";
           }
@@ -138,7 +147,7 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
 }
 
 
-function addUserRow(name, email, team, role) {
+function addUserRow(name, email, team, role, program) {
 
   const table = document.getElementById("new-user-table");
 
@@ -201,28 +210,44 @@ function addUserRow(name, email, team, role) {
   }
   roleCell.appendChild(selectRole);
 
+  let programCell = row.insertCell(4);
+  let selectProgram = document.createElement("select");
+  let noneOption = document.createElement("option");
+  noneOption.innerHTML = "---";
+  selectProgram.appendChild(noneOption);
+  for (const pro of programs) {
+    let opt = document.createElement("option");
+    opt.innerHTML = pro;
+    selectProgram.appendChild(opt);
+  }
+  selectProgram.setAttribute("class", row_id + " program_selection");
+  if (program) {
+    selectProgram.value = program;
+  }
+  programCell.appendChild(selectProgram);
+
 
   let submitButton = document.createElement("button");
   submitButton.innerText = "ADD";
   submitButton.setAttribute("onclick", "addUserRowButtonPress('" + row_id + "')")
   submitButton.setAttribute("class", row_id + " submit_button")
-  let submitCell = row.insertCell(4);
+  let submitCell = row.insertCell(5);
   submitCell.appendChild(submitButton);
 };
 
-function handleCSVFile (file) {
-  function checkFirstLine (line) {
+function handleCSVFile(file) {
+  function checkFirstLine(line) {
     let headings = line.split(",");
     for (let i = 0; i < headings.length; i++) {
       headings[i] = headings[i].trim().toLowerCase();
     }
-    if (headings[0] != "name" | headings[1] != "email" | headings[2] != "team" | headings[3] != "role") {
+    if (headings[0] != "name" | headings[1] != "email" | headings[2] != "team" | headings[3] != "role" | headings[4] != "program") {
       return false;
     }
     return true;
   }
 
-  function handleCSVLine (line) {
+  function handleCSVLine(line) {
     if (!line) {
       // If line is blank, ignore and treat as properly handled
       return true;
@@ -230,10 +255,10 @@ function handleCSVFile (file) {
 
     let values = line.split(",");
 
-    if (values.length != 4) {
-      alert("Line improper length: " + line );
-      return false;
-    }
+    // if (values.length != 4) {
+    //   alert("Line improper length: " + line );
+    //   return false;
+    // }
 
     for (let i = 0; i < values.length; i++) {
       values[i] = values[i].trim();
@@ -243,22 +268,22 @@ function handleCSVFile (file) {
     const email = values[1];
     const team = values[2];
     const role = values[3];
+    const program = values[4];
 
-    // console.log("Got User. Name: " + name + " Email: " + email + " Team: " + team + " Role: " + role);
-    
+
     // const vName = validateName(name);
     // const vEmail = validateEmail(email);
     // const vTeam = validateTeam(team, role);
     // const vRole = validateRole(role);
-    // // TODO use the validation
+    // TODO use the validation
 
-    addUserRow(name, email, team, role);
+    addUserRow(name, email, team, role, program);
 
 
   }
 
   let reader = new FileReader();
-  reader.onload = function(event){
+  reader.onload = function (event) {
     let lines = event.target.result.split("\n");
 
     // Check if the file is valid
@@ -276,8 +301,8 @@ function handleCSVFile (file) {
 };
 
 
-function addAllUserButtonPress () {
-  for (let row = 1; row <= current_row; row++)  {
+function addAllUserButtonPress() {
+  for (let row = 1; row <= current_row; row++) {
     let row_id = "rowID" + row;
     let button = document.querySelector("button." + row_id);
     if (!button.disabled) {
