@@ -10,9 +10,12 @@ class RC_Car:
         self._back_right = PiMotor.Motor("MOTOR2", 1)
         self._front_left = PiMotor.Motor("MOTOR4", 1)
         self._front_right = PiMotor.Motor("MOTOR3", 2)
-        self._all_motors = PiMotor.LinkedMotors(self._front_left, self._front_right, self._back_left, self._back_right)
-        self._left_motors = PiMotor.LinkedMotors(self._front_left, self._back_left)
-        self._right_motors = PiMotor.LinkedMotors(self._front_right, self._back_right)
+        self._all_motors = PiMotor.LinkedMotors(
+            self._front_left, self._front_right, self._back_left, self._back_right)
+        self._left_motors = PiMotor.LinkedMotors(
+            self._front_left, self._back_left)
+        self._right_motors = PiMotor.LinkedMotors(
+            self._front_right, self._back_right)
 
         self._arrow_forward = PiMotor.Arrow(3)
         self._arrow_back = PiMotor.Arrow(1)
@@ -22,6 +25,7 @@ class RC_Car:
     # def handle_command(self, speed:float, direction:str, time:float):
     #    pass
 
+    # test function to make sure all motors work
     def test_motor(self, speed):
         self._front_left.forward(speed)
         time.sleep(1)
@@ -63,9 +67,8 @@ class RC_Car:
         time.sleep(1)
         self._all_motors.stop()
 
+#benny = RC_Car(60)
 
-benny = RC_Car(60)
-
-benny.back(50)
+# benny.back(50)
 # benny.turn_left(70)
 # benny.test_motor(60)
