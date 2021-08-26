@@ -3,7 +3,7 @@ import time
 
 class RC_Car:
 
-    def __init__(self,speed):
+    def __init__(self,speed, duration):
         self.speed = speed
         self._back_left = PiMotor.Motor("MOTOR1",2)
         self._back_right = PiMotor.Motor("MOTOR2",1)
@@ -17,9 +17,6 @@ class RC_Car:
         self._arrow_back = PiMotor.Arrow(1)
         self._arrow_left = PiMotor.Arrow(2)
         self._arrow_right = PiMotor.Arrow(4)
-
-    #def handle_command(self, speed:float, direction:str, time:float):
-    #    pass
 
     # test function to make sure all motors work
     def test_motor(self, speed, duration):
