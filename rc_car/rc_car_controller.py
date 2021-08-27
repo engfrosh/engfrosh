@@ -5,6 +5,7 @@ class RC_Car:
 
     def __init__(self,speed, duration):
         self.speed = speed
+        self.duration = duration
         self._back_left = PiMotor.Motor("MOTOR1",2)
         self._back_right = PiMotor.Motor("MOTOR2",1)
         self._front_left = PiMotor.Motor("MOTOR4",1)
@@ -44,8 +45,9 @@ class RC_Car:
         self._arrow_back.off()
 
     def drive(self, speed, duration):
-        self._all_motors.forward(self.speed)
+        self._all_motors.forward(speed)
         self._arrow_forward.on()
+        print(speed, duration) #---------------------------------------------------------------------------------
         time.sleep(duration)
         self._all_motors.stop() 
         self._arrow_forward.off()
