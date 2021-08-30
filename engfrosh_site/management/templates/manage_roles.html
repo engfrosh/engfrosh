@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static '/engfrosh.css' %}">
+        <title>Manage Roles</title>
+        {% csrf_token %}
+        <script>
+            const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        </script>
+        <style>
+            th {
+                padding-right: 10px;
+                padding-left: 10px;
+                padding-bottom: 5px;
+                text-align: center;
+            }
+        </style>
+        <script src="{% static 'manage_roles.js' %}"></script>
+    </head>
+    <body>
+        <a href="{% url 'manage_index' %}">Back to Manage</a><br/>
+        <hr/>
+        <h3>Add Roles</h3>
+        <button type="button">Add EngFrosh Role</button>
+        <button type="button">Add Program Role</button>
+        <div id="add_role_space">
+
+        </div>
+        <hr/>
+        <table>
+            <tr>
+                <th>Role</th>
+                <th>Discord Role?</th>
+            </tr>
+        </table>
+    </body>
+</html>

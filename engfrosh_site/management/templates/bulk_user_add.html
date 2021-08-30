@@ -2,7 +2,8 @@
 <html>
 
 <head>
-    <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static '/engfrosh.css' %}">
     {% csrf_token %}
     <script>
         const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -28,7 +29,6 @@
             text-align: center;
         }
     </style>
-    {% load static %}
     <script src="{% static 'bulk_user_add.js' %}"></script>
     <title></title>
 </head>

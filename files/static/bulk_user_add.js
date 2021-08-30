@@ -58,8 +58,6 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
   let failedValidation = false;
   let error_message = "Invalid Entry:\n";
 
-  // TODO validate the program
-
   if (vName !== true) {
     nameInput.style.backgroundColor = "red";
     failedValidation = true;
@@ -187,7 +185,6 @@ function addUserRow(name, email, team, role, program) {
     selectTeam.appendChild(opt);
   }
   selectTeam.setAttribute("class", row_id + " team_selection")
-  // TODO set team if provided
   if (team) {
     selectTeam.value = team;
   }
@@ -204,7 +201,6 @@ function addUserRow(name, email, team, role, program) {
     selectRole.appendChild(opt);
   }
   selectRole.setAttribute("class", row_id + " role_selection")
-  // TODO set role if provided
   if (role) {
     selectRole.value = role;
   }
@@ -255,11 +251,6 @@ function handleCSVFile(file) {
 
     let values = line.split(",");
 
-    // if (values.length != 4) {
-    //   alert("Line improper length: " + line );
-    //   return false;
-    // }
-
     for (let i = 0; i < values.length; i++) {
       values[i] = values[i].trim();
     }
@@ -270,15 +261,7 @@ function handleCSVFile(file) {
     const role = values[3];
     const program = values[4];
 
-
-    // const vName = validateName(name);
-    // const vEmail = validateEmail(email);
-    // const vTeam = validateTeam(team, role);
-    // const vRole = validateRole(role);
-    // TODO use the validation
-
     addUserRow(name, email, team, role, program);
-
 
   }
 

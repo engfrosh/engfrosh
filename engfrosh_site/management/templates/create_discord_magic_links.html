@@ -2,7 +2,8 @@
 <html>
 
 <head>
-    <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static '/engfrosh.css' %}">
     <title>Manage Discord Magic Links</title>
     {% csrf_token %}
     <script>
@@ -21,7 +22,6 @@
             padding: 5px;
         }
     </style>
-    {% load static %}
     <script src="{% static 'create_discord_magic_links.js' %}"></script>
 </head>
 
