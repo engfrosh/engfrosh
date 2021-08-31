@@ -19,6 +19,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 import frosh.views
+from django.views.generic.base import RedirectView
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 urlpatterns = [
     path('', frosh.views.overall_index),
@@ -26,7 +28,8 @@ urlpatterns = [
     path('discord/', include('discord_bot_manager.urls')),
     path('accounts/', include('authentication.urls')),
     path('teams/', include('frosh.urls')),
-    path('manage/', include('management.urls'))
+    path('manage/', include('management.urls')),
+    path("favicon.ico", RedirectView.as_view(url=staticfiles_storage.url("favicon.ico")))
 ]
 
 if settings.DEBUG:
