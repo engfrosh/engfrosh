@@ -1,6 +1,7 @@
 """Moderation COG for Discord Bot."""
 
 import logging
+import re
 from discord.ext import commands
 from discord import Message
 from discord.errors import NotFound
@@ -25,6 +26,9 @@ class Moderation(commands.Cog):
         self.profanity = profanity
         self.profanity.add_censor_words(self.config['additional_words'])
 
+        logger.info(f"Using additional regex: {self.config['regex_profanity']}")
+        self.regex_profanity = re.compile(self.config["regex_profanity"], flags=re.UNICODE)
+
     @commands.Cog.listener()
     async def on_message(self, ctx: Message):
 
@@ -39,7 +43,8 @@ class Moderation(commands.Cog):
                 pass
             return
 
-        if self.profanity.contains_profanity(str(ctx.content)):
+        message = str(ctx.content)
+        if self.profanity.contains_profanity(message) or self.regex_profanity.search(message):
             # Delete Message
             try:
                 await ctx.delete()
@@ -63,6 +68,7 @@ class Moderation(commands.Cog):
                 await ctx.author.send(msg)
 
         else:
+            logger.debug(f"Allowed message: {message}")
             try:
                 if self.bot.debug:
                     await ctx.add_reaction("☑")

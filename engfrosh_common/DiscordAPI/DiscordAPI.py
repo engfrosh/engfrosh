@@ -120,3 +120,15 @@ class DiscordAPI:
         logger.debug(f"Successfully modified channel overwrites. Channel now: {json_response}")
 
         return json_response
+
+    def get_channel_message(self, channel_id: int, message_id: int):
+        """Get the message object with the specified ids."""
+
+        url = get_api_url(self.api_version) + f"/channels/{channel_id}/messages/{message_id}"
+        response = requests.get(url, headers=self.headers)
+
+        response.raise_for_status()
+
+        json_response = response.json()
+
+        return json_response
