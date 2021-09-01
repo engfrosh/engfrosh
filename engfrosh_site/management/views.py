@@ -13,7 +13,7 @@ from authentication.models import DiscordUser
 from frosh.models import FroshRole, Team, UniversityProgram
 import scavenger.models
 import discord_bot_manager.models
-from discord_bot_manager.models import Role
+from discord_bot_manager.models import ChannelTag, DiscordChannel, Role
 from . import registration
 
 from django.conf import settings
@@ -327,3 +327,73 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
             return HttpResponseBadRequest("Invalid command.")
 
     return HttpResponseBadRequest()
+
+
+
+@permission_required("discord_bot_manager_discordchannel.change_discordchannel")
+def manage_discord_channels(request: HttpRequest) -> HttpResponse:
+    """Page for managing discord channels, such as locking and unlocking."""
+
+    if request.method == "GET":
+
+        context = {}
+
+        channels = DiscordChannel.objects.all()
+        context["channels"] = channels
+
+        return render(request, "discord_channels.html", context)
+
+    else:
+
+        return HttpResponseBadRequest("Bad http request method.")
+
+
+@permission_required("discord_bot_manager_discordchannel.change_discordchannel")
+def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
+    """Page for managing discord channel groups by tags or categories."""
+
+    if request.method == "GET":
+
+        context = {}
+
+        tags = ChannelTag.objects.all()
+        context["tags"] = tags
+
+        # channels = DiscordChannel.objects.all()
+        # context["channels"] = channels
+
+        return render(request, "discord_channel_groups.html", context)
+
+    elif request.method == "POST":
+
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Invalid / missing content type.")
+
+        req_dict = json.loads(request.body)
+        if "command" not in req_dict:
+            return HttpResponseBadRequest("Bad request body, missing command.")
+
+        if req_dict["command"] == "lock_channel_group":
+            try:
+                channel_group = ChannelTag.objects.get(id=req_dict["tag_id"])
+                channel_group.lock()
+            except (ObjectDoesNotExist, KeyError):
+                return HttpResponseBadRequest("Invalid tag id.")
+
+            return HttpResponse(status=204)
+
+        elif req_dict["command"] == "unlock_channel_group":
+            try:
+                channel_group = ChannelTag.objects.get(id=req_dict["tag_id"])
+                channel_group.unlock()
+            except (ObjectDoesNotExist, KeyError):
+                return HttpResponseBadRequest("Invalid tag id.")
+
+            return HttpResponse(status=204)
+
+        else:
+            return HttpResponseBadRequest("Invalid command.")
+
+    else:
+
+        return HttpResponseBadRequest("Bad http request method.")
