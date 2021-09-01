@@ -1,6 +1,7 @@
 """Discord Management COG."""
 
 from typing import Optional
+import discord
 from discord.ext import commands
 from ...EngFroshBot import EngFroshBot
 
@@ -20,7 +21,10 @@ class Management(commands.Cog):
         if ctx.author.id not in self.config["superadmin"]:  # type: ignore
             return
 
-        await ctx.channel.purge()  # type: ignore
+        if isinstance(ctx.channel, discord.TextChannel):
+            await ctx.channel.purge()  # type: ignore
+        else:
+            await ctx.reply("Cannot purge this channel type.")
 
         return
 
