@@ -37,6 +37,9 @@ if __name__ == "__main__":
         except PermissionError:
             pass
     logging.basicConfig(filename=LOG_FILE, level=config["log_level"].upper())
+    stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setLevel("INFO")
+    logging.getLogger().addHandler(stream_handler)
     logger.info("Log file set as: %s", LOG_FILE)
 # endregion
 

@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from datetime import timedelta
 from django.utils.encoding import iri_to_uri
 from django.utils import timezone
-from frosh.models import FroshRole, Team, UserDetails
+from frosh.models import FroshRole, Team, UserDetails, UniversityProgram
 from management.email import send_email
 
 logger = logging.getLogger("Management.Registration")
@@ -93,7 +93,8 @@ def email_magic_link(user: User, hostname: str, login_path: str, sender_email: s
                       body_text=body_text.format(link=link), body_html=body_html.format(link=link))
 
 
-def create_user_initialize(name: str, email: str, role: FroshRole, team: Optional[Team] = None) -> User:
+def create_user_initialize(name: str, email: str, role: FroshRole, team: Optional[Team] = None,
+                           program: Optional[UniversityProgram] = None) -> User:
     """Creates a new user with the specified details, initializes their account with other passed details."""
 
     # Check that the email has not already been added
@@ -124,5 +125,8 @@ def create_user_initialize(name: str, email: str, role: FroshRole, team: Optiona
 
     if team:
         team.group.user_set.add(user)
+
+    if program:
+        program.group.user_set.add(user)
 
     return user

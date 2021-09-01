@@ -4,17 +4,14 @@ import datetime
 # import dateutil
 
 import os
-import sys
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
-# Hack for development to get around import issues
-sys.path.append(PARENT_DIRECTORY)
 
-from engfrosh_common import RabbitMQSender # noqa E402
+from engfrosh_common import RabbitMQSender  # noqa E402
 
-from discord_bot_manager.models import DiscordCommandStatus # noqa E402
+from discord_bot_manager.models import DiscordCommandStatus  # noqa E402
 
 logger = logging.getLogger("DiscordPublisher")
 

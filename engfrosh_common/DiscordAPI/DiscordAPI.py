@@ -1,6 +1,6 @@
 """API calls for performing Discord API actions."""
 
-from typing import Optional
+from typing import Dict, List, Optional, Union
 import requests
 import logging
 from .url_functions import get_api_url
@@ -67,3 +67,56 @@ class DiscordAPI:
         logger.info(f"Created new guild role {role_name} with snowflake: {role_id}")
 
         return role_id
+
+    def get_channel(self, channel_id: int) -> dict:
+        """Get the channel information."""
+
+        url = get_api_url(self.api_version) + f"/channels/{channel_id}"
+        response = requests.get(url, headers=self.headers)
+
+        response.raise_for_status()
+
+        json_response = response.json()
+
+        logger.debug(f"Got channel info: {json_response}")
+
+        return json_response
+
+    def get_channel_overwrites(self, channel_id: int) -> List[Dict[str, Union[str, int]]]:
+        """Get all the current overwrites for a channel."""
+
+        channel = self.get_channel(channel_id)
+
+        return channel["permission_overwrites"]
+
+    def modify_channel_overwrites(self, channel_id: int, overwrites: Union[dict, List[dict]]):
+        """Change the permission overwrites for the given channel.
+
+        Parameters
+        ==========
+            overwrites: a dictionary or a list of dictionaries representing all the overwrites.
+
+        """
+
+        data = {}
+
+        if isinstance(overwrites, dict):
+            overwrites["allow"] = str(overwrites["allow"])
+            overwrites["deny"] = str(overwrites["deny"])
+            data["permission_overwrites"] = [overwrites]
+        elif isinstance(overwrites, list):
+            for i in range(len(overwrites)):
+                overwrites[i]["allow"] = str(overwrites[i]["allow"])
+                overwrites[i]["deny"] = str(overwrites[i]["deny"])
+            data["permission_overwrites"] = overwrites
+
+        url = get_api_url(self.api_version) + f"/channels/{channel_id}"
+        response = requests.patch(url, headers=self.headers, json=data)
+
+        response.raise_for_status()
+
+        json_response = response.json()
+
+        logger.debug(f"Successfully modified channel overwrites. Channel now: {json_response}")
+
+        return json_response

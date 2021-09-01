@@ -61,6 +61,22 @@ class FroshRole(models.Model):
         return self.name
 
 
+class UniversityProgram(models.Model):
+    """Map a role as a course program."""
+
+    name = models.CharField("Program Name", max_length=64, unique=True)
+    group = models.OneToOneField(Group, on_delete=CASCADE, primary_key=True)
+
+    class Meta:
+        """University Program Meta Information."""
+
+        verbose_name = "Program"
+        verbose_name_plural = "Programs"
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class UserDetails(models.Model):
     """Details pertaining to users without fields in the default User."""
 

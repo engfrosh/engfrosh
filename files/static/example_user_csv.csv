@@ -1,4 +1,4 @@
-Name,Email,Team,Role
-Example Name,technical@engfrosh.com,Best Team,Frosh
-Example Person,technical+test@engfrosh.com,Third Team,Facil
-Test Planning,technical+test2@engfrosh.com,,Planning
+Name,Email,Team,Role,Program
+Example Name,technical@engfrosh.com,Best Team,Frosh,Aerospace
+Example Person,technical+test@engfrosh.com,Third Team,Facil,Software
+Test Planning,technical+test2@engfrosh.com,,Planning,

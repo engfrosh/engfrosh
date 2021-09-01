@@ -1,14 +1,37 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}">
         <title>Manage</title>
+        <style>
+            body {
+                text-align: center;
+            }
+
+            a {
+                font-size: large;
+                text-align: center;
+                text-decoration: none;
+                padding: 10pt;
+                border-radius: 6pt;
+                display: block;
+                width: fit-content;
+                margin: auto;
+                background-color: darkblue;
+                color: white;
+            }
+        </style>
     </head>
     <body>
+        <h1>EngFrosh Management</h1><br/>
         <a href="/admin">Server Admin</a><br/>
         <a href="discord/magic-link">Magic Links</a><br/>
         <a href="users/add">Add Users</a><br/>
         <a href="{% url 'add_users_to_discord_guild' %}">Add Users to Server</a><br/>
         <a href="{% url 'manage_frosh_teams' %}">Manage Teams</a><br/>
+        <a href="{% url 'manage_roles' %}">Manage Roles</a><br/>
+        <a href="{% url 'manage_discord_channels' %}">Manage Discord Channels</a><br/>
+        <a href="{% url 'manage_discord_channel_groups' %}">Manage Discord Channel Groups</a><br/>
     </body>
 </html>

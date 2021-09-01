@@ -2,13 +2,15 @@
 <html>
 
 <head>
-    <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}">
     {% csrf_token %}
     <script>
         const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
         // Load the constants that are modifiable at runtime
         var teams = [{% for t in team_options %}"{{t}}", {% endfor %}];
         var roles = [{% for r in role_options %}"{{r}}", {% endfor %}];
+        var programs = [{% for p in program_options %}"{{p}}", {% endfor %}];
     </script>
     <style>
         th {
@@ -27,7 +29,6 @@
             text-align: center;
         }
     </style>
-    {% load static %}
     <script src="{% static 'bulk_user_add.js' %}"></script>
     <title></title>
 </head>
@@ -53,6 +54,7 @@
             <th class="email">Email</th>
             <th class="team">Team</th>
             <th class="role">Role</th>
+            <th class="program">Program</th>
             <th class="add_all"><button type="button" onclick="addAllUserButtonPress()">ADD ALL</button></th>
         </tr>
     </table>
