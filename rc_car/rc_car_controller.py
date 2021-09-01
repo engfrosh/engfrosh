@@ -38,7 +38,7 @@ class RC_Car:
         self._back_right.stop()
 
     def back(self, speed, duration):
-        self._all_motors.reverse(self.speed)
+        self._all_motors.reverse(speed)
         self._arrow_back.on()
         time.sleep(duration)
         self._all_motors.stop() 
@@ -47,20 +47,19 @@ class RC_Car:
     def drive(self, speed, duration):
         self._all_motors.forward(speed)
         self._arrow_forward.on()
-        print(speed, duration) #---------------------------------------------------------------------------------
         time.sleep(duration)
         self._all_motors.stop() 
         self._arrow_forward.off()
 
     def turn_left(self, speed, duration):
-        self._right_motors.forward(self.speed)
+        self._right_motors.forward(speed)
         self._arrow_left.on()
         time.sleep(duration)
         self._all_motors.stop()
         self._arrow_left.off()
 
     def turn_right(self, speed, duration):
-        self._left_motors.forward(self.speed)
+        self._left_motors.forward(speed)
         self._arrow_right.on()
         time.sleep(duration)
         self._all_motors.stop()
