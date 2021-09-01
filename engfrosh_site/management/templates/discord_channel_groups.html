@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static '/engfrosh.css' %}">
+        <script src="{% static 'functions.js' %}"></script>
+        {% csrf_token %}
+        <script>
+            const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        </script>
+        <script src="{% static 'manage_discord_channel_groups.js' %}"></script>
+        <title>Manage Channel Groups</title>
+        <style>
+            button.lock {
+                background-color: red;
+            }
+
+            button.unlock {
+                background-color: green;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="{% url 'manage_index' %}">Back to Manage</a><br />
+        <hr/>
+        <table class="management">
+            <tr>
+                <th>Name</th>
+                <th>Lock</th>
+                <th>Unlock</th>
+            </tr>
+            {% for tag in tags %}
+                <tr>
+                    <td>{{tag.name}}</td>
+                    <td class="button_cell"><button class="lock" type="button" onclick="lockButtonPress({{tag.id}})">Lock</button></td>
+                    <td class="button_cell"><button class="unlock" type="button" onclick="unlockButtonPress({{tag.id}})">Unlock</button></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

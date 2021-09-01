@@ -9,7 +9,8 @@ modules:
   cogs: [
     "engfrosh_bot.cogs.cogModeration.moderation",
     "engfrosh_bot.cogs.cogCoin.coin",
-    "engfrosh_bot.cogs.cogScav.scav"
+    "engfrosh_bot.cogs.cogScav.scav",
+    "engfrosh_bot.cogs.cogManagement.management"
     ]
 
 debug: True
@@ -70,10 +71,13 @@ module_settings:
       # row must contain format placeholders: place, team_name, coin_amount
       name_length: 25
       coin_length: 10
-    permission: change_team_coin # Names must be unique as currently written
 
   scav:
     incorrect_message: Null
 
     settings_names:
       active: "scav_active"
+
+  management:
+    superadmin: [360895010494742529]
+  

@@ -1,3 +1,15 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+table.management td {
+    padding: 5px;
+}
+
+table.management th {
+    padding: 5px;
+}
+
+td.button_cell {
+    text-align: center;
+}

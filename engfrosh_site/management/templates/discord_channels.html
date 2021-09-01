@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static '/engfrosh.css' %}">
+        <!-- <script src="script.js"></script> -->
+        <title></title>
+        <script>
+            function lockButtonPress() {
+                alert("Lock");
+            }
+
+            function unlockButtonPress() {
+                alert("Unlock");
+            }
+        </script>
+    </head>
+    <body>
+        <a href="{% url 'manage_index' %}">Back to Manage</a><br />
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>ID</th>
+                <th>Modify</th>
+            </tr>
+            {% for ch in channels %}
+                <tr>
+                    <td>{{ch.name}}</td>
+                    <td>{{ch.id}}</td>
+                    <td><button type="button" onclick="lockButtonPress()">Lock</button></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

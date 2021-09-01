@@ -12,7 +12,7 @@
 [ ] Change name of the _magic links_ page to _send invite links_
 [x] Add support for adding program information when adding users
 [ ] When adding users via magic link check that they don't have a discord account linked first, and don't have an outstanding magic link, don't allow the email button. 
-[ ] Add way to lock and unlock channels and groups of channels 
+[x] Add way to lock and unlock channels and groups of channels 
 [ ] Add management of programs to make it easy to generate the programs
 
 ## Authentication
@@ -23,14 +23,12 @@
 
 [ ] Make the _link your discord account_ page look nice as it is the first page seen
 [ ] Test page appearance on different size screens
-[ ] Create a default style sheet and set a font for all the pages
+[x] Create a default style sheet and set a font for all the pages
 
 ## Scav
 
-[ ] Add a cooldown for getting hints
 [ ] Add handling question response times
 [ ] Add check if questions are actually enabled before sending them
-[ ] Add check if hints are actually enabled
 [ ] Add enable and disable scav commands 
 
 ## Scoin
