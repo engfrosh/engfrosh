@@ -53,6 +53,8 @@ module_settings:
       "uottawa"
     ]
 
+    regex_profanity: "[Ff\U0001f1eb]\\s*[uU\U0001f1fa]\\s*[cC\U0001f1e8]\\s*[kK\U0001f1f0]"
+
     report_message: "{author} sent a message to channel {channel} that broke the moderation rules:\n\n||{content}||"
     profanity_message: "Your message is not appropriate. It has been deleted from the channel and sent to the moderation team."
 

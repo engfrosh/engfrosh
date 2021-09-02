@@ -91,7 +91,7 @@ async def on_ready():
         rabbit_thread.start()
     # endregion
 
-    logger.info("Logged on and ready...")
+    await client.log("Logged on and ready...")
 
     return
 
