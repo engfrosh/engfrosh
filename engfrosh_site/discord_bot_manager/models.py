@@ -153,7 +153,19 @@ class DiscordChannel(models.Model):
     id = models.PositiveBigIntegerField("Discord Channel ID", primary_key=True)
     name = models.CharField("Discord Channel Name", max_length=100, unique=False, blank=True, default="")
     tags = models.ManyToManyField(ChannelTag, blank=True)
-    type = models.IntegerField("Channel Type", choices=[(0, "GUILD_TEXT"), (1, "DM"), (2, "GUILD_VOICE")])
+    type = models.IntegerField("Channel Type", choices=[
+        (0, "GUILD_TEXT"),
+        (1, "DM"),
+        (2, "GUILD_VOICE"),
+        (3, "GROUP_DM"),
+        (4, "GUILD_CATEGORY"),
+        (5, "GUILD_NEWS"),
+        (6, "GUILD_STORE"),
+        (10, "GUILD_NEWS_THREAD"),
+        (11, "GUILD_PUBLIC_THREAD"),
+        (12, "GUILD_PRIVATE_THREAD"),
+        (13, "GUILD_STAGE_VOICE")
+    ])
     locked_overwrites = models.ManyToManyField(DiscordOverwrite, blank=True)
     unlocked_overwrites = models.ManyToManyField(
         DiscordOverwrite, related_name="unlocked_channel_overwrites", blank=True)
@@ -170,9 +182,18 @@ class DiscordChannel(models.Model):
 
     def __str__(self) -> str:
         if self.name:
-            return self.name
+            name = self.name
         else:
-            return f"<Discord Channel {self.id}>"
+            name = f"<Discord Channel {self.id}>"
+
+        if self.type == 0:
+            return f"TEXT: {name}"
+        elif self.type == 2:
+            return f"VOICE: {name}"
+        elif self.type == 4:
+            return f"CATEGORY: {name}"
+        else:
+            return name
 
     @property
     def overwrites(self) -> List[DiscordOverwrite]:

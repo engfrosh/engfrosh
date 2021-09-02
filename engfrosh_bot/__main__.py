@@ -19,7 +19,6 @@ SCRIPT_NAME = os.path.splitext(os.path.basename(__file__))[0]
 sys.path.append(PARENT_DIRECTORY)
 from engfrosh_common.DatabaseInterface import DatabaseInterface  # noqa E402
 
-logger = logging.getLogger(SCRIPT_NAME)
 
 CONFIG_FILE = CURRENT_DIRECTORY + "/bot_config.yaml"
 
@@ -29,18 +28,30 @@ with open(CONFIG_FILE) as f:
     config = yaml.load(f, Loader=yaml.SafeLoader)
 
 # region Logging Setup
-if __name__ == "__main__":
-    LOG_FILE = CURRENT_DIRECTORY + "/{}.log".format(SCRIPT_NAME)
-    if os.path.exists(LOG_FILE):
-        try:
-            os.remove(LOG_FILE)
-        except PermissionError:
-            pass
-    logging.basicConfig(filename=LOG_FILE, level=config["log_level"].upper())
-    stream_handler = logging.StreamHandler(sys.stdout)
-    stream_handler.setLevel("INFO")
-    logging.getLogger().addHandler(stream_handler)
-    logger.info("Log file set as: %s", LOG_FILE)
+LOG_FILE = CURRENT_DIRECTORY + "/{}.log".format(SCRIPT_NAME)
+if os.path.exists(LOG_FILE):
+    try:
+        os.remove(LOG_FILE)
+    except PermissionError:
+        pass
+
+file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+debug_handler = logging.FileHandler(LOG_FILE)
+debug_handler.setLevel("DEBUG")
+debug_handler.setFormatter(file_formatter)
+
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setLevel(config["log_level"].upper())
+stream_handler.setFormatter(file_formatter)
+
+logging.getLogger().setLevel("DEBUG")
+logging.getLogger().addHandler(stream_handler)
+logging.getLogger().addHandler(debug_handler)
+
+logger = logging.getLogger(SCRIPT_NAME)
+
+logger.info("Log file set as: %s", LOG_FILE)
 # endregion
 
 if config["modules"]["rabbitmq"]:
@@ -77,7 +88,8 @@ async def on_ready():
     """Strats Discord bot and RabbitMQ thread if configured."""
 
     logger.debug("Logged on as {}".format(client.user))
-    await client.change_presence(activity=discord.Game(name="\'!help\' for info!", type=1, url='engfrosh.com'))
+    await client.change_presence(activity=discord.Game(name=f"'{config['bot_prefix']}help' for info!",
+                                                       type=1, url='engfrosh.com'))
 
     # region Launch Queue Listener
     # You shouldn't have to change anything in here.
