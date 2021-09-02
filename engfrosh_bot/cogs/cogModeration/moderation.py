@@ -2,6 +2,8 @@
 
 import logging
 import re
+import confusables
+
 from discord.ext import commands
 from discord import Message
 from discord.errors import NotFound
@@ -12,6 +14,13 @@ from ...EngFroshBot import EngFroshBot
 logger = logging.getLogger("Cogs.Moderation")
 
 better_profanity.constants.ALLOWED_CHARACTERS.remove("*")
+
+COUNTRY_CODES = {
+    "\U0001f1e6": "a", "\U0001f1e7": "b", "\U0001f1e8": "c", "\U0001f1e9": "d", "\U0001f1ea": "e", "\U0001f1eb": "f",
+    "\U0001f1ec": "g", "\U0001f1ed": "h", "\U0001f1ee": "i", "\U0001f1ef": "j", "\U0001f1f0": "k", "\U0001f1f1": "l",
+    "\U0001f1f2": "m", "\U0001f1f3": "n", "\U0001f1f4": "o", "\U0001f1f5": "p", "\U0001f1f6": "q", "\U0001f1f7": "r",
+    "\U0001f1f8": "s", "\U0001f1f9": "t", "\U0001f1fa": "u", "\U0001f1fb": "v", "\U0001f1fc": "w", "\U0001f1fd": "x",
+    "\U0001f1fe": "y", "\U0001f1ff": "z", }
 
 
 class Moderation(commands.Cog):
@@ -29,6 +38,29 @@ class Moderation(commands.Cog):
         logger.info(f"Using additional regex: {self.config['regex_profanity']}")
         self.regex_profanity = re.compile(self.config["regex_profanity"], flags=re.UNICODE)
 
+    def contains_profanity(self, raw_msg: str) -> bool:
+        """Checks if the message contains profanity."""
+
+        if self.profanity.contains_profanity(raw_msg) or self.regex_profanity.search(raw_msg):
+            return True
+
+        # replace any country codes
+        replaced_message = raw_msg
+        if any(c in raw_msg for c in COUNTRY_CODES.keys()):
+            for search, replace in COUNTRY_CODES.items():
+                replaced_message = replaced_message.replace(search, replace)
+
+            if self.profanity.contains_profanity(replaced_message) or self.regex_profanity.search(replaced_message):
+                return True
+
+        normalized = confusables.normalize(replaced_message, True)
+        logger.debug(f"Normalized: {normalized}")
+        for norm in normalized:
+            if self.profanity.contains_profanity(norm) or self.regex_profanity.search(norm):
+                return True
+
+        return False
+
     @commands.Cog.listener()
     async def on_message(self, ctx: Message):
 
@@ -43,8 +75,8 @@ class Moderation(commands.Cog):
                 pass
             return
 
-        message = str(ctx.content)
-        if self.profanity.contains_profanity(message) or self.regex_profanity.search(message):
+        message = ctx.content
+        if self.contains_profanity(message):
             # Delete Message
             try:
                 await ctx.delete()
