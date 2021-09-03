@@ -134,6 +134,37 @@ class Scav(commands.Cog):
         #     settings["profile_picture_set"] = True
         #     save_settings()
 
+    async def update_scoreboard(self):
+        """Update the scoreboard channel with the current standings."""
+
+        logger.debug("Updating Scav board...")
+        teams = await self.bot.db_int.get_all_scav_teams()
+        teams.sort(key=lambda team: team.current_question, reverse=True)
+
+        msg = "```\n"
+
+        cur_place = 0
+        cur_question = None
+        next_place = 1
+
+        for team in teams:
+            if team.current_question == cur_question:
+                place = cur_place
+                next_place += 1
+            else:
+                place = next_place
+                cur_place = next_place
+                next_place += 1
+                cur_question = team.current_question
+
+            msg += f"{place}. {await self.bot.db_int.get_team_display_name(team.group)}: {team.current_question}\n"
+
+        msg += "```"
+
+        channels = self.config["scoreboard_channels"]
+
+        await self.bot.send_to_all(msg, channels, purge_first=True)
+
     async def scav_user_allowed(self, ctx: commands.Context) -> bool:
         """
         Check if the user and channel are correct and allowed to guess / request a hint,
@@ -231,7 +262,7 @@ class Scav(commands.Cog):
             channels = await self.db.get_scav_channels(group_id=team_id)
             await self.bot.send_to_all("Congratulations! You have completed Scav!", channels)
 
-        # TODO Update Standings
+        await self.update_scoreboard()
 
     @commands.command()
     async def question(self, ctx: commands.Context):
@@ -281,7 +312,7 @@ class Scav(commands.Cog):
 
         await self.bot.send_to_all(f"Scav locked for {minutes} minutes.", channels)
 
-    @ commands.command()
+    @commands.command()
     async def scav_unlock(self, ctx: commands.Context):
         """Unlock the current channel."""
 

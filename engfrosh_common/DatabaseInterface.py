@@ -406,6 +406,22 @@ class DatabaseInterface():
 
         return Objects.ScavTeam(row=row)
 
+    async def get_all_scav_teams(self) -> List[Objects.ScavTeam]:
+        """Get all the scav teams."""
+
+        sql = "SELECT * FROM scavenger_team;"
+
+        rows = await self._fetchall(sql)
+        if not rows:
+            logger.warning("Did not get any scav teams.")
+            return []
+
+        teams = []
+        for row in rows:
+            teams.append(Objects.ScavTeam(row=row))
+
+        return teams
+
     async def get_next_hint(self, *, team_id: int) -> Union[None, Objects.ScavHint]:
         """Get the next hint for the team and increment the hint number."""
 

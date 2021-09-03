@@ -80,6 +80,10 @@ module_settings:
     settings_names:
       active: "scav_active"
 
+    scoreboard_channels: [
+      883377344419606599
+    ]
+
   management:
     superadmin: [360895010494742529]
-  
+    admin: []
