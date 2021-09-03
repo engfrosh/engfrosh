@@ -16,9 +16,9 @@ class Management(commands.Cog):
 
     @commands.command()
     async def purge(self, ctx: commands.Context, channel_id: Optional[str] = None):
-        """Purge the channel, only available to superadmin."""
+        """Purge the channel, only available to admin."""
 
-        if ctx.author.id not in self.config["superadmin"]:  # type: ignore
+        if ctx.author.id not in self.config["superadmin"] and ctx.author.id not in self.config["admin"]:  # type: ignore
             return
 
         if isinstance(ctx.channel, discord.TextChannel):

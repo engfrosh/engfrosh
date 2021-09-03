@@ -243,9 +243,13 @@ class DiscordChannel(models.Model):
     def unlock(self) -> bool:
         """Unlock the channel, only affecting the overwrites in the channel info."""
 
+        logger.debug(f"Unlocking channel {self.name}({self.id})")
+
         overwrites = self.overwrite_dict
         for o in self.unlocked_overwrites.all():
             overwrites[o.user_id] = o
+
+        logger.debug(f"Permission Overwrites: {[o.verbose for o in overwrites.values()]}")
 
         encoded_overwrites = []
         for k, v in overwrites.items():

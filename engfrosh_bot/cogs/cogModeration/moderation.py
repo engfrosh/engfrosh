@@ -41,6 +41,8 @@ class Moderation(commands.Cog):
     def contains_profanity(self, raw_msg: str) -> bool:
         """Checks if the message contains profanity."""
 
+        logger.debug(f"Checking for profanity: {raw_msg}")
+
         if self.profanity.contains_profanity(raw_msg) or self.regex_profanity.search(raw_msg):
             return True
 
@@ -55,6 +57,9 @@ class Moderation(commands.Cog):
 
         normalized = confusables.normalize(replaced_message, True)
         logger.debug(f"Normalized: {normalized}")
+        if len(normalized) > 15:
+            normalized = normalized[:15]
+            logger.debug("Limited normalized")
         for norm in normalized:
             if self.profanity.contains_profanity(norm) or self.regex_profanity.search(norm):
                 return True
@@ -63,8 +68,9 @@ class Moderation(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, ctx: Message):
+        """Handle every message received, checking for profanity."""
 
-        if ctx.author == self.bot.user:
+        if ctx.author == self.bot.user or ctx.author.bot:
             return
 
         if ctx.channel.id in self.config["ignored_channels"]:

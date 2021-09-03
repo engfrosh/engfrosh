@@ -8,9 +8,13 @@
     {% csrf_token %}
     <script>
         const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        let user_ids = [
+            {% for user in users %}{{user.id}},{% endfor %}
+        ]
+        user_ids = user_ids.reverse();
     </script>
     <style>
-        button {
+        td.button_cell button {
             background-color: cornflowerblue;
         }
     </style>
@@ -19,7 +23,13 @@
 
 <body>
     <a href="/manage">Back to Manage</a>
+    <hr/>
+
     <h3>Add Users to Discord</h3>
+
+    <button type="button" onclick="add10Button()">Invite 10</button>
+
+    <hr/>
     <table>
         <tr>
             <th>Username</th>

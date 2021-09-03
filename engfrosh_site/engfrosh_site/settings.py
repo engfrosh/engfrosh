@@ -35,9 +35,6 @@ PRODUCTION = False
 
 ALLOWED_HOSTS = [
     "alpha.engfrosh.com",
-    "beta.engfrosh.com",
-    "week.engfrosh.com",
-    # TODO Update settings for different files
     "127.0.0.1",
     "localhost"
 ]
@@ -172,19 +169,27 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        }
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'simple'
         },
         'file_debug': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'debug.log'
+            'filename': 'debug.log',
+            'formatter': 'simple'
         },
         'file_warn': {
             'level': 'WARNING',
             'class': 'logging.FileHandler',
-            'filename': 'warning.log'
+            'filename': 'warning.log',
+            'formatter': 'simple'
         }
     },
     'root': {

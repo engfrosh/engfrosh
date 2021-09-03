@@ -69,3 +69,26 @@ function email_magic_link(user_id) {
     });
 };
 
+function add10Button() {
+  let count = 0;
+
+  let cur_ids;
+  if (user_ids.length > 10) {
+    cur_ids = user_ids.slice(0, 10);
+    user_ids = user_ids.slice(10);
+  }
+  else {
+    cur_ids = user_ids;
+    user_ids = [];
+  }
+
+  for (id of cur_ids) {
+    console.log("Adding user " + id);
+    email_magic_link(id);
+
+    count += 1;
+    if (count >= 10) {
+      return;
+    }
+  }
+}
