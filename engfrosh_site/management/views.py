@@ -10,7 +10,7 @@ import credentials
 from engfrosh_common.DiscordAPI.DiscordAPI import DiscordAPI
 from engfrosh_common.DiscordAPI.DiscordUserAPI import DiscordUserAPI
 from authentication.models import DiscordUser
-from frosh.models import FroshRole, Team, UniversityProgram
+from frosh.models import FroshRole, Team, UniversityProgram, UserDetails
 import scavenger.models
 import discord_bot_manager.models
 from discord_bot_manager.models import ChannelTag, DiscordChannel, Role
@@ -107,7 +107,12 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
 
         users = User.objects.all()
         for usr in users:
-            if not usr.is_superuser:
+            try:
+                email_sent = UserDetails.objects.get(user=usr).invite_email_sent
+            except ObjectDoesNotExist:
+                email_sent = False
+
+            if not usr.is_superuser and not email_sent and not DiscordUser.objects.filter(user=usr).exists():
                 context["users"].append(usr)
 
         return render(request, "create_discord_magic_links.html", context)

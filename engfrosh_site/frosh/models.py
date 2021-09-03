@@ -83,6 +83,7 @@ class UserDetails(models.Model):
     user = models.OneToOneField(User, on_delete=CASCADE, primary_key=True)
     name = models.CharField("Name", max_length=64)
     pronouns = models.CharField("Pronouns", max_length=20, blank=True)
+    invite_email_sent = models.BooleanField("Invite Email Sent", default=False)
 
     class Meta:
         """User Details Meta information."""

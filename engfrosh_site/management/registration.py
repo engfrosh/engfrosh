@@ -4,6 +4,8 @@ import logging
 import random
 import string
 from typing import Optional
+
+from django.core.exceptions import ObjectDoesNotExist
 from authentication.models import MagicLink
 from django.contrib.auth.models import User
 from datetime import timedelta
@@ -89,8 +91,18 @@ def email_magic_link(user: User, hostname: str, login_path: str, sender_email: s
     if not subject:
         subject = DEFAULT_MAGIC_LINK_EMAIL_SUBJECT
 
-    return send_email(user=user, sender_email=sender_email, subject=subject,
-                      body_text=body_text.format(link=link), body_html=body_html.format(link=link))
+    res = send_email(user=user, sender_email=sender_email, subject=subject,
+                     body_text=body_text.format(link=link), body_html=body_html.format(link=link))
+
+    if res:
+        try:
+            user_details = UserDetails.objects.get(user=user)
+        except ObjectDoesNotExist:
+            user_details = UserDetails(user=user, name=user.get_full_name())
+        user_details.invite_email_sent = True
+        user_details.save()
+
+    return res
 
 
 def create_user_initialize(name: str, email: str, role: FroshRole, team: Optional[Team] = None,

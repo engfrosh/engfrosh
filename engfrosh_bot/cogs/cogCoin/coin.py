@@ -42,6 +42,9 @@ class Coin(commands.Cog):
             await ctx.author.send(f"Setting coin for team: {team} failed.")
 
     async def update_coin_board(self):
+        """Update the coin standings channel."""
+
+        logger.debug("Updating coin board...")
         teams = await self.bot.db_int.get_all_frosh_teams()
 
         teams.sort(key=lambda team: team.coin, reverse=True)
@@ -75,8 +78,12 @@ class Coin(commands.Cog):
                 coin_amount=f"{coin_amount}{' ' * (coin_padding - len(str(coin_amount)))}")
         msg += "```"
 
-        self.bot.send_to_all(msg, self.config["scoreboard_channels"], purge_first=True)
+        logger.debug(f"Got coin message: {msg}")
+        channels = self.config["scoreboard_channels"]
+        logger.debug(f"Sending to: {channels}")
+        await self.bot.send_to_all(msg, channels, purge_first=True)
 
 
 def setup(bot):
+    """Setup Coin Cog."""
     bot.add_cog(Coin(bot))
