@@ -144,7 +144,8 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
             if registration.email_magic_link(
                     user, request.get_host(),
                     "/accounts/login", SENDER_EMAIL,
-                    redirect="/accounts/link/discord"):
+                    redirect="/accounts/link/discord",
+                    delete_on_use=False):
                 # Email successfully sent
                 return JsonResponse({"user_id": user.id})
 
@@ -334,7 +335,6 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
     return HttpResponseBadRequest()
 
 
-
 @permission_required("discord_bot_manager_discordchannel.change_discordchannel")
 def manage_discord_channels(request: HttpRequest) -> HttpResponse:
     """Page for managing discord channels, such as locking and unlocking."""
@@ -353,9 +353,16 @@ def manage_discord_channels(request: HttpRequest) -> HttpResponse:
         return HttpResponseBadRequest("Bad http request method.")
 
 
-@permission_required("discord_bot_manager_discordchannel.change_discordchannel")
 def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
     """Page for managing discord channel groups by tags or categories."""
+
+    if not request.user.has_perm("discord_bot_manager_discordchannel.change_discordchannel"):
+        permissions = set()
+        for backend in auth.get_backends():
+            if hasattr(backend, "get_all_permissions"):
+                permissions.update(backend.get_all_permissions(request.user))
+        logger.debug(f"User permissions: {permissions}")
+        return HttpResponseForbidden("Permission Denied")
 
     if request.method == "GET":
 

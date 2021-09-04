@@ -50,7 +50,7 @@ class EngFroshBot(commands.Bot):
 
         return res
 
-    async def log(self, message: str, level: str = "INFO"):
+    async def log(self, message: str, level: str = "INFO", exc_info=None):
         """Log a message to the bot channels and the logger."""
 
         # Print to console
@@ -76,7 +76,7 @@ class EngFroshBot(commands.Bot):
         else:
             level_number = 0
 
-        logger.log(level_number, message)
+        logger.log(level_number, message, exc_info=exc_info)
 
     async def on_error(self, event_method, *args, **kwargs):
         msg = f'Ignoring exception in {event_method}\n{traceback.format_exc()}'
@@ -97,8 +97,8 @@ class EngFroshBot(commands.Bot):
         msg = f'Ignoring exception in command {context.command}:\n{trace}'
         await self.log(msg, "EXCEPTION")
 
-    async def error(self, message):
-        await self.log(message, "ERROR")
+    async def error(self, message, *, exc_info=None):
+        await self.log(message, "ERROR", exc_info=exc_info)
 
-    async def warning(self, message):
-        await self.log(message, "WARNING")
+    async def warning(self, message, *, exc_info=None):
+        await self.log(message, "WARNING", exc_info=exc_info)

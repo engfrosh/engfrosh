@@ -1,9 +1,15 @@
 """Discord Management COG."""
 
-from typing import Optional
+import logging
+import os
+from typing import List, Optional
 import discord
 from discord.ext import commands
+
+from engfrosh_common import Objects
 from ...EngFroshBot import EngFroshBot
+
+logger = logging.getLogger("CogManagement")
 
 
 class Management(commands.Cog):
@@ -69,6 +75,48 @@ class Management(commands.Cog):
 
         else:
             return
+
+    @commands.command()
+    async def distribute_soopp_bingo(self, ctx: commands.Context):
+        """Message all frosh a soopp bingo card."""
+
+        if ctx.author.id not in self.config["superadmin"]:
+            return
+
+        path = "offline-files/soopp-bingo"
+        bingo_cards = [path + "/" + f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+        logger.debug("Got bingo cards:")
+        for bc in bingo_cards:
+            logger.debug(bc)
+
+        group_id = await self.bot.db_int.get_group_id(group_name="Frosh")
+        if not group_id:
+            await self.bot.error("Could not get group id for Frosh group.")
+            return
+
+        all_frosh = await self.bot.db_int.get_all_users_in_group(group_id)
+        discord_users: List[Objects.DiscordUser] = []
+        for frosh in all_frosh:
+            discord_id = await self.bot.db_int.get_discord_user(frosh)
+            if not discord_id:
+                await self.bot.log(f"Could not get discord username for frosh id: {frosh}", "WARNING")
+
+            else:
+                discord_users.append(discord_id)
+
+        if len(discord_users) > len(bingo_cards):
+            await self.bot.error("More frosh than bingo cards, exiting.")
+            return
+
+        for i in range(len(discord_users)):
+            try:
+                usr = await self.bot.fetch_user(discord_users[i].id)
+                await usr.send(content="Here is your SOOPP bingo card!",
+                               file=discord.File(bingo_cards[i], "SOOPP Bingo Card.pdf"))
+            except Exception as e:
+                await self.bot.error(f"Could not message bingo card {bingo_cards[i]} to {discord_users[i].full_username}. See log for details", exc_info=e)
+
+        return
 
 
 def setup(bot):

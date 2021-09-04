@@ -92,6 +92,27 @@ class ScavHint:
         return False
 
 
+class DiscordUser:
+    """Representation of a Discord User."""
+
+    def __init__(self, *, row: Optional[Record] = None) -> None:
+        """Initialize Discord User."""
+
+        if not row:
+            raise ValueError("row currently required.")
+
+        self.id = row["id"]
+        self.discord_id = self.id
+        self.discord_username = row["discord_username"]
+        self.discriminator = row["discriminator"]
+        self.user_id = row["user_id"]
+
+    @property
+    def full_username(self) -> str:
+        """Return the combined username and discriminator."""
+        return f"{self.discord_username}#{self.discriminator}"
+
+
 class ScavTeam:
     """Representation of Scav Teams."""
 

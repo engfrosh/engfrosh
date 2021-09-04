@@ -28,18 +28,25 @@ with open(CONFIG_FILE) as f:
     config = yaml.load(f, Loader=yaml.SafeLoader)
 
 # region Logging Setup
-LOG_FILE = CURRENT_DIRECTORY + "/{}.log".format(SCRIPT_NAME)
-if os.path.exists(LOG_FILE):
-    try:
-        os.remove(LOG_FILE)
-    except PermissionError:
-        pass
+debug_file = "bot_debug.log"
+warning_file = "bot_warning.log"
+
+for f in [debug_file, warning_file]:
+    if os.path.exists(f):
+        try:
+            os.remove(f)
+        except PermissionError:
+            pass
 
 file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-debug_handler = logging.FileHandler(LOG_FILE)
+debug_handler = logging.FileHandler(debug_file)
 debug_handler.setLevel("DEBUG")
 debug_handler.setFormatter(file_formatter)
+
+warning_handler = logging.FileHandler(warning_file)
+warning_handler.setLevel("WARNING")
+warning_handler.setFormatter(file_formatter)
 
 stream_handler = logging.StreamHandler(sys.stdout)
 stream_handler.setLevel(config["log_level"].upper())
@@ -48,10 +55,10 @@ stream_handler.setFormatter(file_formatter)
 logging.getLogger().setLevel("DEBUG")
 logging.getLogger().addHandler(stream_handler)
 logging.getLogger().addHandler(debug_handler)
+logging.getLogger().addHandler(warning_handler)
 
 logger = logging.getLogger(SCRIPT_NAME)
 
-logger.info("Log file set as: %s", LOG_FILE)
 # endregion
 
 if config["modules"]["rabbitmq"]:

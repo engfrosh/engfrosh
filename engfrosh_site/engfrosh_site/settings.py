@@ -157,7 +157,7 @@ if not PRODUCTION:
 if PRODUCTION:
     STATIC_ROOT = 'files/static'
 
-MEDIA_ROOT = 'files/media'
+MEDIA_ROOT = '../files/media'
 MEDIA_URL = '/media/'
 
 # Default primary key field type

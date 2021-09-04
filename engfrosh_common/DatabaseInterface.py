@@ -131,7 +131,7 @@ class DatabaseInterface():
 
     # region GET methods
 
-    async def get_group_id(self, *, group_name: Optional[int] = None, scav_channel_id=None) -> Union[None, int]:
+    async def get_group_id(self, *, group_name: Optional[str] = None, scav_channel_id=None) -> Union[None, int]:
         """Return the group id if it exists, otherwise None."""
 
         if self._is_fake:
@@ -452,6 +452,34 @@ class DatabaseInterface():
             raise Exception("Could not lock team out.")
 
         return next_hint
+
+    async def get_all_users_in_group(self, group_id: int) -> List[int]:
+        """Returns a list of user ids."""
+
+        sql = "SELECT * FROM auth_user_groups WHERE group_id = $1;"
+
+        rows = await self._fetchall(sql, (group_id,))
+        if not rows:
+            logger.warning("Did not get any users in group %i", group_id)
+            return []
+
+        users = []
+        for row in rows:
+            users.append(row["user_id"])
+
+        return users
+
+    async def get_discord_user(self, user_id: int) -> Union[None, Objects.DiscordUser]:
+        """Get the discord user from the django user."""
+
+        sql = "SELECT * FROM authentication_discorduser WHERE user_id = $1;"
+
+        row = await self._fetchrow(sql, (user_id,))
+        if not row:
+            logger.warning("Could not discord user for user id %i", user_id)
+            return None
+
+        return Objects.DiscordUser(row=row)
 
     # endregion
 
