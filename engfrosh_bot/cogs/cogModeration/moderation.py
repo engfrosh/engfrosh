@@ -2,7 +2,7 @@
 
 import logging
 import re
-import confusables
+# import confusables
 
 from discord.ext import commands
 from discord import Message
@@ -55,14 +55,14 @@ class Moderation(commands.Cog):
             if self.profanity.contains_profanity(replaced_message) or self.regex_profanity.search(replaced_message):
                 return True
 
-        normalized = confusables.normalize(replaced_message, True)
-        logger.debug(f"Normalized: {normalized}")
-        if len(normalized) > 15:
-            normalized = normalized[:15]
-            logger.debug("Limited normalized")
-        for norm in normalized:
-            if self.profanity.contains_profanity(norm) or self.regex_profanity.search(norm):
-                return True
+        # normalized = confusables.normalize(replaced_message, True)
+        # logger.debug(f"Normalized: {normalized}")
+        # if len(normalized) > 15:
+        #     normalized = normalized[:15]
+        #     logger.debug("Limited normalized")
+        # for norm in normalized:
+        #     if self.profanity.contains_profanity(norm) or self.regex_profanity.search(norm):
+        #         return True
 
         return False
 

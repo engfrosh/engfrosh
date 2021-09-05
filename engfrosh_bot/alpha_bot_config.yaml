@@ -6,11 +6,12 @@ modules:
   postgres: True
   # Warning, lots of functionality will fail if not using a postgres database.
 
-  cogs: [
-    "engfrosh_bot.cogs.cogModeration.moderation",
-    "engfrosh_bot.cogs.cogCoin.coin",
-    "engfrosh_bot.cogs.cogScav.scav",
-    "engfrosh_bot.cogs.cogManagement.management"
+  cogs:
+    [
+      "engfrosh_bot.cogs.cogModeration.moderation",
+      "engfrosh_bot.cogs.cogCoin.coin",
+      "engfrosh_bot.cogs.cogScav.scav",
+      "engfrosh_bot.cogs.cogManagement.management",
     ]
 
 debug: True
@@ -23,9 +24,9 @@ credentials:
 
 bot_prefix: "!"
 
-bot_log_channel: [
-  863804486262587423
-]
+bot_log_channel: [863804486262587423]
+
+guild: 731598642426675301
 
 timezone: America/Toronto
 
@@ -43,15 +44,9 @@ module_settings:
       channel: True
       dm: True
 
-    ignored_channels: [
-      858741004831555634
-    ]
-    report_channels: [
-      858741004831555634
-    ]
-    additional_words: [
-      "uottawa"
-    ]
+    ignored_channels: [858741004831555634]
+    report_channels: [858741004831555634]
+    additional_words: ["uottawa"]
 
     regex_profanity: "[Ff\U0001f1eb]\\s*[uU\U0001f1fa]\\s*[cC\U0001f1e8]\\s*[kK\U0001f1f0]"
 
@@ -63,9 +58,7 @@ module_settings:
     public_confirmations: True
     permission: change_team_coin # Names must be unique as currently written
 
-    scoreboard_channels: [
-      813043254358442034
-    ]
+    scoreboard_channels: [813043254358442034]
 
     scoreboard:
       header: "Scoin Standings\n=================="
@@ -80,10 +73,15 @@ module_settings:
     settings_names:
       active: "scav_active"
 
-    scoreboard_channels: [
-      883377344419606599
-    ]
+    scoreboard_channels: [883377344419606599]
 
   management:
     superadmin: [360895010494742529]
     admin: []
+    pronouns:
+      he: 884035491454930984
+      she: 884035547495006258
+      they: 884035592537657384
+      ask: 884035612208926840
+
+    pronoun_message: [884038532866400276]

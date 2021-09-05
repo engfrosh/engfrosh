@@ -21,9 +21,10 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.request import HttpRequest
-from django.http.response import HttpResponse, JsonResponse, HttpResponseBadRequest, \
-    HttpResponseNotAllowed, HttpResponseServerError
+from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse, \
+    HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import render
+from django.contrib import auth
 
 
 logger = logging.getLogger("management.views")

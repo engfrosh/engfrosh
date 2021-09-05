@@ -34,6 +34,66 @@ class Management(commands.Cog):
 
         return
 
+    @commands.Cog.listener()
+    async def on_raw_reaction_add(self, payload):
+        """On raw reaction add handling."""
+
+        channel_id = payload.channel_id
+        emoji = payload.emoji
+        user_id = payload.user_id
+
+        if user_id == self.bot.user.id:
+            return
+
+        reaction_type = payload.event_type
+        message_id = payload.message_id
+
+        if message_id not in self.config["pronoun_message"]:
+            return
+
+        guild = self.bot.get_guild(self.bot.config["guild"])
+        if not guild:
+            await self.bot.error(f"Could not get guild {self.bot.config['guild']}")
+            return
+
+        member = payload.member
+
+        await self.bot.log(f"Channel: {channel_id} Emoji: {emoji} {emoji.name} {emoji.id} user_id: {user_id} reaction_type: {reaction_type}")
+
+        if emoji.name == "1️⃣":
+            role = guild.get_role(self.config["pronouns"]["he"])
+            await member.add_roles(role)
+        elif emoji.name == "2️⃣":
+            role = guild.get_role(self.config["pronouns"]["she"])
+            await member.add_roles(role)
+        elif emoji.name == "3️⃣":
+            role = guild.get_role(self.config["pronouns"]["they"])
+            await member.add_roles(role)
+        elif emoji.name == "4️⃣":
+            role = guild.get_role(self.config["pronouns"]["ask"])
+            await member.add_roles(role)
+        else:
+            await self.bot.log(f"Channel: {channel_id} Emoji: {emoji} user_id: {user_id} reaction_type: {reaction_type}")
+            return
+
+    @commands.command()
+    async def send_pronoun_message(self, ctx: commands.Context):
+        """Send pronoun message in this channel."""
+
+        if ctx.author.id not in self.config["superadmin"] + self.config["admin"]:
+            return
+
+        await ctx.message.delete()
+
+        message = await ctx.channel.send("Select your pronouns:\n:one: He/Him\n:two: She/Her\n:three: They/Them\n:four: Ask Me")
+
+        await message.add_reaction("1️⃣")
+        await message.add_reaction("2️⃣")
+        await message.add_reaction("3️⃣")
+        await message.add_reaction("4️⃣")
+
+        return
+
     @commands.command()
     async def get_overwrites(self, ctx: commands.Context, channel_id: Optional[int] = None):
         """Get all the permission overwrites for the current channel."""
