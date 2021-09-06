@@ -1,3 +1,4 @@
+from django.http.response import HttpResponse
 from django.shortcuts import render  # noqa F401
 from django.http import HttpRequest
 from django.contrib.auth.decorators import permission_required
@@ -38,6 +39,17 @@ def coin_standings(request: HttpRequest):
         context["teams"].append(d)
 
     return render(request, "scoin_standings.html", context)
+
+
+def my_coin(request: HttpRequest):
+    """Get the coin standings for your team."""
+
+    teams = Team.objects.filter(group__in=request.user.groups.all())
+
+    if len(teams) > 0:
+        return HttpResponse(f"{teams[0].display_name} has {teams[0].coin_amount} scoin.")
+
+    return HttpResponse("You are not a part of any teams.")
 
 
 def overall_index(request: HttpRequest):
