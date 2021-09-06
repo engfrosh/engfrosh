@@ -14,7 +14,7 @@ from django.utils import timezone
 from frosh.models import FroshRole, Team, UserDetails, UniversityProgram
 from management.email import send_email
 
-from images import LOGO
+from management.images import LOGO
 
 logger = logging.getLogger("Management.Registration")
 

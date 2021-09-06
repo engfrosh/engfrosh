@@ -58,8 +58,6 @@ class Management(commands.Cog):
 
         member = payload.member
 
-        await self.bot.log(f"Channel: {channel_id} Emoji: {emoji} {emoji.name} {emoji.id} user_id: {user_id} reaction_type: {reaction_type}")
-
         if emoji.name == "1️⃣":
             role = guild.get_role(self.config["pronouns"]["he"])
             await member.add_roles(role)

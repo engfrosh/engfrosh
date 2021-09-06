@@ -1,7 +1,7 @@
 from django.http.response import HttpResponse
 from django.shortcuts import render  # noqa F401
 from django.http import HttpRequest
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 
 from .models import Team
 
@@ -41,13 +41,15 @@ def coin_standings(request: HttpRequest):
     return render(request, "scoin_standings.html", context)
 
 
+@login_required(login_url='/accounts/login')
 def my_coin(request: HttpRequest):
     """Get the coin standings for your team."""
 
     teams = Team.objects.filter(group__in=request.user.groups.all())
 
     if len(teams) > 0:
-        return HttpResponse(f"{teams[0].display_name} has {teams[0].coin_amount} scoin.")
+        context = {"team": teams[0]}
+        return render(request, "team_scoin.html", context)
 
     return HttpResponse("You are not a part of any teams.")
 

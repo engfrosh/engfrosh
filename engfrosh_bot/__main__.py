@@ -127,21 +127,6 @@ async def superhelp(ctx):
     await ctx.channel.send(embed=embed)
 
 
-@client.command(pass_context=True)
-async def react(ctx):
-    """TEST FUNCTION. Add a reaction to the message."""
-    await ctx.message.add_reaction("🍋")
-
-
-@client.event
-async def on_reaction_add(reaction, user):
-    """Reacts to the message when the user reacts to one of the bot's messagges."""
-    if reaction.message.author == client.user:
-        if reaction.emoji == '👍':
-            await reaction.message.channel.send('Hi there!')
-    return
-
-
 # endregion
 
 # region Discord application commands

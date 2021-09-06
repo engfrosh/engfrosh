@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}">
+        <!-- <script src="script.js"></script> -->
+        <title>Your Scoin</title>
+        <style>
+            body {
+                text-align: center;
+                background-color: #100C21;
+                color: #AF731F;
+            }
+
+            img.scoin {
+                padding: 30pt;
+                height: 200pt;
+                width: auto;
+                object-fit: scale-down;
+            }
+
+            h1 {
+                font-size: 60pt;
+                margin-top: 10pt;
+            }
+
+            h2 {
+                font-size: 120pt;
+                margin-top: 10pt;
+            }
+        </style>
+    </head>
+    <body>
+        <img class="scoin" src="{% static 'scoin.png' %}" alt="Spirit Coin"/>
+        <h1>{{ team.display_name }}</h1><br/>
+        <h2>{{ team.coin_amount }}</h2>
+    </body>
+</html>

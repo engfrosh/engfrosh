@@ -40,7 +40,7 @@
 
 <body>
     <div class="login_box">
-        <a href="discord/" type="button" class="login_button discord">Login with Discord</a>
+        <a href="{% url 'discord_login' %}" type="button" class="login_button discord">Login with Discord</a>
         <br/>
         {% if encoded_redirect %}
             <a href="/admin/login/?next={{encoded_redirect}}" type="button" class="login_button admin">Login as Staff</a> 

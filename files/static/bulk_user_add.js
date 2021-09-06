@@ -21,7 +21,7 @@ function validateTeam(team, role) {
   // Check against list
   // No team is valid as planning are not on a team 
   if (team === "---" | !team) {
-    if (role !== "Planning") {
+    if (role !== "Planning" & role !== "Guest" & role !== "SOOPP" & role !== "Alumni") {
       return "No team selected";
     }
   }

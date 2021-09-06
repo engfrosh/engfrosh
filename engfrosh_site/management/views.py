@@ -357,7 +357,7 @@ def manage_discord_channels(request: HttpRequest) -> HttpResponse:
 def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
     """Page for managing discord channel groups by tags or categories."""
 
-    if not request.user.has_perm("discord_bot_manager_discordchannel.change_discordchannel"):
+    if not request.user.has_perm("discord_bot_manager.change_discordchannel"):
         permissions = set()
         for backend in auth.get_backends():
             if hasattr(backend, "get_all_permissions"):

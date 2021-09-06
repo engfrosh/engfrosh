@@ -10,7 +10,7 @@ admin.site.register([Team, FroshRole, UniversityProgram])
 class UserDetailsAdmin(admin.ModelAdmin):
     """User Details Admin."""
 
-    search_fields = ('user', 'name')
+    search_fields = ('user__username', 'name')
 
 
 admin.site.register(UserDetails, UserDetailsAdmin)
