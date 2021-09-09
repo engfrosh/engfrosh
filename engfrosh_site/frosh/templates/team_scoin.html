@@ -31,7 +31,11 @@
         </style>
     </head>
     <body>
-        <img class="scoin" src="{% static 'scoin.png' %}" alt="Spirit Coin"/>
+        {% if team.display_name == "Bean Battery" %}
+            <img class="scoin" src="{% static 'bean_scoin.png' %}" alt="Spirit Coin"/>
+        {% else %}
+            <img class="scoin" src="{% static 'scoin.png' %}" alt="Spirit Coin"/>
+        {% endif %}
         <h1>{{ team.display_name }}</h1><br/>
         <h2>{{ team.coin_amount }}</h2>
     </body>

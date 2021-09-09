@@ -33,10 +33,10 @@ logger.debug("Set current directory as: %s", CURRENT_DIRECTORY)
 # endregion
 
 MAPPINGS = {
-    "up": Key.up,
-    "down": Key.down,
-    "left": Key.left,
-    "right": Key.right,
+    "up": "i",
+    "down": "k",
+    "left": "j",
+    "right": "l",
     "A": "z",
     "B": "x",
     "L": "a",
@@ -74,7 +74,7 @@ async def on_message(message: discord.Message):
     for key, value in MAPPINGS.items():
         if message.content.lower() in config["commands"][key]:
             ctrl.press(value)
-            time.sleep(0.1)
+            time.sleep(0.08)
             ctrl.release(value)
             logger.debug(f"Sent Press: {value}")
             print(value)
