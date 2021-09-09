@@ -70,10 +70,12 @@ DEFAULT_MAGIC_LINK_EMAIL_HTML = \
             <h1>Welcome to EngFrosh, Dawn of Energy!</h1><br/>
             <p><a href='{link}' >Here</a> is your magic link to log into the EngFrosh site.</p>
             <br/>
-            <p>If you need any help or any questions, please email <a href="mailto:questions@engfrosh.com">questions@engfrosh.com</a>
+            <p>If you need any help or any questions,
+            please email <a href="mailto:questions@engfrosh.com">questions@engfrosh.com</a>
             <br/>
             <br/>
             {link}
+            </p>
         </body>
     </html>
     """

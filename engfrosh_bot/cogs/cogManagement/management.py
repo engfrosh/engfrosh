@@ -71,7 +71,8 @@ class Management(commands.Cog):
             role = guild.get_role(self.config["pronouns"]["ask"])
             await member.add_roles(role)
         else:
-            await self.bot.log(f"Channel: {channel_id} Emoji: {emoji} user_id: {user_id} reaction_type: {reaction_type}")
+            await self.bot.log(
+                f"Channel: {channel_id} Emoji: {emoji} user_id: {user_id} reaction_type: {reaction_type}")
             return
 
     @commands.command()
@@ -83,7 +84,8 @@ class Management(commands.Cog):
 
         await ctx.message.delete()
 
-        message = await ctx.channel.send("Select your pronouns:\n:one: He/Him\n:two: She/Her\n:three: They/Them\n:four: Ask Me")
+        message = await ctx.channel.send(
+            "Select your pronouns:\n:one: He/Him\n:two: She/Her\n:three: They/Them\n:four: Ask Me")
 
         await message.add_reaction("1️⃣")
         await message.add_reaction("2️⃣")
@@ -172,7 +174,9 @@ class Management(commands.Cog):
                 await usr.send(content="Here is your SOOPP bingo card!",
                                file=discord.File(bingo_cards[i], "SOOPP Bingo Card.pdf"))
             except Exception as e:
-                await self.bot.error(f"Could not message bingo card {bingo_cards[i]} to {discord_users[i].full_username}. See log for details", exc_info=e)
+                await self.bot.error(
+                    f"Could not message bingo card {bingo_cards[i]} to {discord_users[i].full_username}. \
+                    See log for details", exc_info=e)
 
         return
 
