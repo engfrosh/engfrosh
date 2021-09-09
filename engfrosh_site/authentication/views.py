@@ -156,6 +156,8 @@ def discord_register_callback(request: HttpRequest):
     user = request.user
     if user.is_anonymous:
         user = None
+        # If disallowing registration to pre registered people.
+        return HttpResponse("Registration failed, please contact questions@engfrosh.com")
 
     callback_url = request.build_absolute_uri(request.path)
 

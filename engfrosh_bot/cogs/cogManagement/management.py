@@ -166,14 +166,21 @@ class Management(commands.Cog):
             await self.bot.error("More frosh than bingo cards, exiting.")
             return
 
+        successes = 0
+        failures = 0
         for i in range(len(discord_users)):
             try:
                 usr = await self.bot.fetch_user(discord_users[i].id)
                 await usr.send(content="Here is your SOOPP bingo card!",
                                file=discord.File(bingo_cards[i], "SOOPP Bingo Card.pdf"))
+                successes += 1
             except Exception as e:
                 await self.bot.error(f"Could not message bingo card {bingo_cards[i]} to {discord_users[i].full_username}. See log for details", exc_info=e)
+                failures += 1
 
+        final_msg = f"Sent bingo cards to {successes}. Had {failures} failures."
+        await ctx.reply(final_msg)
+        await self.bot.log(final_msg)
         return
 
 
