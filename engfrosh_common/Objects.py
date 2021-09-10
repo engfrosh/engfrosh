@@ -175,3 +175,19 @@ class ScavTeam:
 
         else:
             return "00:00"
+
+
+class DiscordVirtualTeam:
+    """Representation of Discord Virtual Teams."""
+
+    def __init__(
+            self, role_id: Optional[int] = None, num_members: Optional[int] = None,
+            *, row: Optional[Record] = None) -> None:
+
+        if row:
+            self.role_id = row["role_id"]
+            self.num_member = row["num_members"]
+
+        else:
+            self.role_id = role_id
+            self.num_member = num_members

@@ -2,9 +2,9 @@
 
 from django.contrib import admin
 
-from .models import Team, FroshRole, UserDetails, UniversityProgram, DiscordBingoCards
+from .models import Team, FroshRole, UserDetails, UniversityProgram, DiscordBingoCards, VirtualTeam
 
-admin.site.register([Team, FroshRole, UniversityProgram])
+admin.site.register([Team, FroshRole, UniversityProgram, VirtualTeam])
 
 
 class UserDetailsAdmin(admin.ModelAdmin):

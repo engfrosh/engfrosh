@@ -481,6 +481,36 @@ class DatabaseInterface():
 
         return Objects.DiscordUser(row=row)
 
+    async def get_all_virtual_teams(self) -> List[Objects.DiscordVirtualTeam]:
+        """Get all the virtual teams."""
+
+        sql = "SELECT * FROM frosh_virtualteam;"
+
+        rows = await self._fetchall(sql)
+
+        if not rows:
+            return []
+
+        virtual_teams = []
+        for row in rows:
+            virtual_teams.append(Objects.DiscordVirtualTeam(row=row))
+
+        return virtual_teams
+
+    async def increment_virtual_team_count(self, discord_role_id: int):
+        """Update the member count by 1."""
+
+        sql = "UPDATE frosh_virtualteam SET num_members = num_members + 1 WHERE role_id = $1;"
+
+        await self._execute(sql, (discord_role_id,))
+
+    async def create_virtual_team(self, discord_role_id: int, num_members: int = 0):
+        """Creates a new virtual team."""
+
+        sql = "INSERT INTO frosh_virtualteam VALUES ($1, $2);"
+
+        await self._execute(sql, (discord_role_id, num_members))
+
     # endregion
 
     # region UPDATE methods

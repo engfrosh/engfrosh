@@ -8,6 +8,8 @@ import discord
 from discord.ext import commands
 import random
 
+from engfrosh_common import Objects
+
 # from engfrosh_common import Objects
 from ...EngFroshBot import EngFroshBot
 
@@ -116,7 +118,35 @@ class Management(commands.Cog):
             return
 
         elif message_id in self.config["virtual_team_message"]:
-            pass
+            virtual_teams = await self.bot.db_int.get_all_virtual_teams()
+            virtual_team_ids = [vt.role_id for vt in virtual_teams]
+            if any([role.id in virtual_team_ids for role in member.roles]):
+                await member.send("You are already part of a virtual team!")
+                return
+
+            guild = self.bot.get_guild(self.bot.config["guild"])
+            if not guild:
+                await self.bot.error("Could not get guild.")
+                return
+
+            allowed_teams = []
+            for vt in virtual_teams:
+                if vt.num_member < self.config["num_members_per_team"]:
+                    allowed_teams.append(vt)
+
+            num_added = 0
+            while len(allowed_teams) < 2:
+                team_name = f"VTeam {len(virtual_teams) + 1 + num_added}"
+                new_role = await guild.create_role(name=team_name)
+                await self.bot.db_int.create_virtual_team(new_role.id)
+                allowed_teams.append(Objects.DiscordVirtualTeam(new_role.id, 0))
+                num_added += 1
+
+            role = guild.get_role(random.choice(allowed_teams).role_id)
+            await member.add_roles(role)
+
+            await self.bot.db_int.increment_virtual_team_count(role.id)
+            await member.send(f"You've been added to virtual team {role.name}")
 
             return
 

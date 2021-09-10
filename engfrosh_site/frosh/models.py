@@ -109,3 +109,19 @@ class DiscordBingoCards(models.Model):
 
     def __str__(self) -> str:
         return f"<Bingo Card {self.bingo_card} assigned to {self.discord_id}>"
+
+
+class VirtualTeam(models.Model):
+    """Tracks Virtual Teams and their discord ids."""
+
+    role_id = models.PositiveBigIntegerField(primary_key=True)
+    num_members = models.PositiveIntegerField(unique=False, default=0)
+
+    class Meta:
+        """Virtual Team Meta Information."""
+
+        verbose_name = "Virtual Team"
+        verbose_name_plural = "Virtual Teams"
+
+    def __str__(self) -> str:
+        return f"<Virtual Team {self.role_id} with {self.num_members} members>"
