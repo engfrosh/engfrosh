@@ -634,6 +634,36 @@ class DatabaseInterface():
 
         return None
 
+    async def check_bingo_card_used(self, card: int) -> bool:
+        """Returns True if the card exists, False if it does not exist."""
+
+        sql = "SELECT * FROM frosh_discordbingocards WHERE bingo_card = $1;"
+
+        row = await self._fetchone(sql, (card,))
+        if row:
+            return True
+
+        return False
+
+    async def check_user_has_bingo_card(self, discord_user_id: int) -> bool:
+        """Returns True if the user already has a bingo card, otherwise False."""
+
+        sql = "SELECT * FROM frosh_discordbingocards WHERE discord_id = $1;"
+
+        row = await self._fetchone(sql, (discord_user_id,))
+        if row:
+            # logger.debug(f"User already has card: {row}")
+            return True
+
+        return False
+
+    async def add_bingo_card(self, card: int, discord_user_id: int):
+        """Adds the specified card to the database for the user."""
+
+        sql = "INSERT INTO frosh_discordbingocards VALUES ($1, $2);"
+
+        await self._execute(sql, (discord_user_id, card))
+
     # endregion
 
     # region Other Actions

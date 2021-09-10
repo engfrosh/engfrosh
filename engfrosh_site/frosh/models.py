@@ -93,3 +93,19 @@ class UserDetails(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name} ({self.user.username})"
+
+
+class DiscordBingoCards(models.Model):
+    """Lists bingo cards and their assigned discord ids."""
+
+    discord_id = models.PositiveBigIntegerField(db_index=True, unique=True)
+    bingo_card = models.PositiveIntegerField(primary_key=True)
+
+    class Meta:
+        """Discord Bingo Card Meta Information."""
+
+        verbose_name = "Discord Bingo Card"
+        verbose_name_plural = "Discord Bingo Cards"
+
+    def __str__(self) -> str:
+        return f"<Bingo Card {self.bingo_card} assigned to {self.discord_id}>"
