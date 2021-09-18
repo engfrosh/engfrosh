@@ -2,8 +2,6 @@ from django.contrib import admin
 
 from .models import DiscordUser, MagicLink
 
-admin.site.register([MagicLink])
-
 
 class DiscordUserAdmin(admin.ModelAdmin):
     """Admin for Discord Users."""
@@ -13,3 +11,11 @@ class DiscordUserAdmin(admin.ModelAdmin):
 
 
 admin.site.register(DiscordUser, DiscordUserAdmin)
+
+
+class MagicLinkAdmin(admin.ModelAdmin):
+    """Admin for Magic Links."""
+
+    list_display = ('user', 'expiry', 'delete_immediately')
+
+admin.site.register(MagicLink, MagicLinkAdmin)

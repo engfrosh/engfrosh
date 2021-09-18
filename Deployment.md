@@ -37,6 +37,8 @@ $ sudo -i -u postgres
 $ psql
 ```
 
+psql -d engfrosh 
+
 To exit:
 ```
 # \q
