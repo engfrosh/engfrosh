@@ -6,8 +6,6 @@ import sys
 import logging
 import os
 import json
-import threading
-import asyncio
 import yaml
 from .EngFroshBot import EngFroshBot
 
@@ -61,9 +59,6 @@ logger = logging.getLogger(SCRIPT_NAME)
 
 # endregion
 
-if config["modules"]["rabbitmq"]:
-    from . import rabbit_listener
-
 # Load Credentials
 if config["credentials"]["relative_path"]:
     path = CURRENT_DIRECTORY + "/" + config["credentials"]["relative_path"]
@@ -92,22 +87,12 @@ for cog in config["modules"]["cogs"]:
 
 @client.event
 async def on_ready():
-    """Strats Discord bot and RabbitMQ thread if configured."""
+    """Starts Discord bot"""
 
     logger.debug("Logged on as {}".format(client.user))
     await client.change_presence(activity=discord.Game(name=f"'{config['bot_prefix']}help' for info!",
                                                        type=1, url='engfrosh.com'))
 
-    # region Launch Queue Listener
-    # You shouldn't have to change anything in here.
-    # To add more functions add them to handle_queued_command
-    if config["modules"]["rabbitmq"]:
-        discord_loop = asyncio.get_running_loop()
-        host = config["module_settings"]["rabbitmq"]["host"]
-        queue = config["module_settings"]["rabbitmq"]["queue"]
-        rabbit_thread = threading.Thread(target=rabbit_listener.rabbit_main,
-                                         args=(discord_loop, discord_queue_callback, host, queue))
-        rabbit_thread.start()
     # endregion
 
     await client.log("Logged on and ready...")
