@@ -76,7 +76,9 @@ ROOT_URLCONF = 'engfrosh_site.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            './engfrosh_site/engfrosh_site/templates'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

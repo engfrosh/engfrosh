@@ -1,42 +1,21 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        {% load static %}
-        <!-- <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}"> -->
-        <link rel="stylesheet" type="text/css" href="{% static 'output.css' %}">
-        <title>Manage</title>
-        <!-- <style>
-            body {
-                text-align: center;
-            }
+{% extends 'base_generic.html' %}
 
-            a {
-                font-size: large;
-                text-align: center;
-                text-decoration: none;
-                padding: 10pt;
-                border-radius: 6pt;
-                display: block;
-                width: fit-content;
-                margin: auto;
-                /* background-color: darkblue; */
-                color: black;
-            }
-        </style> -->
-    </head>
-    <body>
-        <div class="m-4">
-            <h1 class="text-center p-2 text-2xl">EngFrosh Management</h1><br/>
-            <div class="flex flex-col space-y-3 mx-auto container text-white text-center max-w-sm">
-                <a href="/admin" class="bg-red-800 rounded-lg p-2">Server Admin</a>
-                <a href="discord/magic-link" class="bg-red-800 rounded-lg p-2">Magic Links</a>
-                <a href="users/add" class="bg-red-800 rounded-lg p-2">Add Users</a>
-                <a href="{% url 'add_users_to_discord_guild' %}" class="bg-red-800 rounded-lg p-2">Add Users to Server</a>
-                <a href="{% url 'manage_frosh_teams' %}" class="bg-red-800 rounded-lg p-2">Manage Teams</a>
-                <!-- <a href="{#% url 'manage_roles' %#}">Manage Roles</a> -->
-                <a href="{% url 'manage_discord_channels' %}" class="bg-red-800 rounded-lg p-2">Manage Discord Channels</a>
-                <a href="{% url 'manage_discord_channel_groups' %}" class="bg-red-800 rounded-lg p-2">Manage Discord Channel Groups</a>
-            </div>
-        </div>
-    </body>
-</html>
+{% block page_title %}
+Manage
+{% endblock page_title %}
+
+{% block body %}
+<div class="m-4">
+    <h1 class="text-center p-2 text-2xl">EngFrosh Management</h1><br/>
+    <div class="flex flex-col space-y-3 mx-auto container text-white text-center max-w-sm">
+        <a href="/admin" class="bg-red-800 rounded-lg p-2">Server Admin</a>
+        <a href="discord/magic-link" class="bg-red-800 rounded-lg p-2">Magic Links</a>
+        <a href="users/add" class="bg-red-800 rounded-lg p-2">Add Users</a>
+        <a href="{% url 'add_users_to_discord_guild' %}" class="bg-red-800 rounded-lg p-2">Add Users to Server</a>
+        <a href="{% url 'manage_frosh_teams' %}" class="bg-red-800 rounded-lg p-2">Manage Teams</a>
+        <!-- <a href="{#% url 'manage_roles' %#}">Manage Roles</a> -->
+        <a href="{% url 'manage_discord_channels' %}" class="bg-red-800 rounded-lg p-2">Manage Discord Channels</a>
+        <a href="{% url 'manage_discord_channel_groups' %}" class="bg-red-800 rounded-lg p-2">Manage Discord Channel Groups</a>
+    </div>
+</div>
+{% endblock body %}
