@@ -1,18 +1,25 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-    <meta charset="utf-8">
     <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="{% static 'output.css' %}">
-        <title>{% block page_title %}{% endblock %}</title>
+        <title>
+            {% block page_title %}
+                DEFAULT page_title
+            {% endblock page_title %}
+        </title>
         {% csrf_token %}
-        <script>
-            const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        </script>
-        {% block js_functions %}{% endblock js_functions %}
+        <script>const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;</script>
+        {% block js_functions %}
+        {% endblock js_functions %}
     </head>
-    <body>
-        {% block body %}{% endblock %}
-        {% block page_js %}{% endblock %}
+    <body class="bg-white dark:bg-background-night dark:text-slate-400 dark:shadow-slate-400 shadow-black">
+        {% block body %}
+            DEFAULT body
+        {% endblock body %}
+        {% block page_js %}
+        {% endblock page_js %}
     </body>
 </html>

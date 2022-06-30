@@ -2,7 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+/* @layer components {
+    .btn-theme {
+        @apply bg-red-800 rounded-lg p-2;
+    }
+} */
+
+/* body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -16,4 +22,8 @@ table.management th {
 
 td.button_cell {
     text-align: center;
-}
+} */
+
+/* button {
+    @apply ring ring-white dark:ring-black;
+} */

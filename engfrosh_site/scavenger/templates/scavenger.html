@@ -1,0 +1,25 @@
+{% extends 'base_generic.html' %}
+{% block page_title %}
+    Scav
+{% endblock page_title %}
+{% block body %}
+    <div class="p-6">
+        <h1>Scavenger</h1>
+        <div class="space-y-4 mt-4 ">
+            <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto">
+                <p>Clue goes here</p>
+            </div>
+            <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto">
+                <p>Photo Answer</p>
+                <p>Take and submit a photo of a frosh in front of the answer</p>
+                <label for="file">Choose an image to upload</label>
+                <input type="file" accept="image/*" capture="user"/>
+            </div>
+            <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto">
+                <p>Text Answer</p>
+                <input type="text"
+                       class="border-2 rounded border-slate-900 dark:border-slate-400"/>
+            </div>
+        </div>
+    </div>
+{% endblock body %}

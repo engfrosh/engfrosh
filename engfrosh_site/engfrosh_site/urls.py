@@ -29,6 +29,7 @@ urlpatterns = [
     path('accounts/', include('authentication.urls')),
     path('teams/', include('frosh.urls')),
     path('manage/', include('management.urls')),
+    path("scavenger/", include('scavenger.urls')),
     path("favicon.ico", RedirectView.as_view(url=staticfiles_storage.url("favicon.ico")))
 ]
 
