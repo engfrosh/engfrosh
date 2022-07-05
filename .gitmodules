@@ -1,3 +1,6 @@
 [submodule "puzzle-database"]
 	path = puzzle-database
 	url = https://github.com/engfrosh/puzzle-database.git
+[submodule "engfrosh_site/common_models"]
+	path = engfrosh_site/common_models
+	url = https://github.com/engfrosh/common_models.git

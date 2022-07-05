@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'authentication.apps.AuthenticationConfig',
     'frosh.apps.FroshConfig',
     'scavenger.apps.ScavengerConfig',
-    'management.apps.ManagementConfig'
+    'management.apps.ManagementConfig',
+    'common_models.apps.CommonModelsConfig'
 ]
 
 MIDDLEWARE = [
