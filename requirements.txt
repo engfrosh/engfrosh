@@ -16,7 +16,7 @@ defusedxml==0.7.1
 Deprecated==1.2.12
 discord==1.7.3
 discord.py==1.7.3
-Django==3.2.5
+Django==3.2.14
 idna==2.10
 jmespath==0.10.0
 joblib==1.0.1
