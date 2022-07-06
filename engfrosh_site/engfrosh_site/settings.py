@@ -101,8 +101,8 @@ WSGI_APPLICATION = 'engfrosh_site.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "engfrosh",
-        "USER": "django_engfrosh",
+        "NAME": "engfrosh_dev_2022_07_05",
+        "USER": "engfrosh_site",
         "PASSWORD": "there-exercise-fenegle",
         "HOST": "localhost",
         "PORT": "5432",
