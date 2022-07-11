@@ -27,7 +27,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('discord/', include('discord_bot_manager.urls')),
     path('accounts/', include('authentication.urls')),
-    path('teams/', include('frosh.urls')),
+    path('teams/', include('frosh.team_urls')),
+    path('user/', include('frosh.user_urls')),
     path('manage/', include('management.urls')),
     path("scavenger/", include('scavenger.urls')),
     path("favicon.ico", RedirectView.as_view(url=staticfiles_storage.url("favicon.ico")))
