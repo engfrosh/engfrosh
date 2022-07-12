@@ -3,4 +3,4 @@ from django.shortcuts import render  # noqa F401
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    return render(request, "scavenger.html")
+    return render(request, "scavenger_index.html")

@@ -87,63 +87,63 @@ class Hint(models.Model):
         return f"{self.question} - Hint {self.weight}"
 
 
-class Team(models.Model):
-    """Representation of a scavenger team."""
+# class Team(models.Model):
+#     """Representation of a scavenger team."""
 
-    group = models.OneToOneField(Group, CASCADE, primary_key=True)
-    current_question = models.ForeignKey(Question, on_delete=PROTECT, blank=True,
-                                         related_name="scavenger_team", null=True)
-    locked_out_until = models.DateTimeField("Locked Out Until", blank=True, null=True)
-    hint_cooldown_until = models.DateTimeField("Hint Cooldown Until", blank=True, null=True)
-    last_hint = models.ForeignKey(Hint, blank=True, on_delete=PROTECT, null=True)
-    last_hint_time = models.DateTimeField(blank=True, null=True)
-    finished = models.BooleanField("Finished Scavenger", default=False)
+#     group_id = models.OneToOneField(Group, CASCADE, primary_key=True)
+    # current_question = models.ForeignKey(Question, on_delete=PROTECT, blank=True,
+    #                                      related_name="scavenger_team", null=True)
+    # locked_out_until = models.DateTimeField("Locked Out Until", blank=True, null=True)
+    # hint_cooldown_until = models.DateTimeField("Hint Cooldown Until", blank=True, null=True)
+    # last_hint = models.ForeignKey(Hint, blank=True, on_delete=PROTECT, null=True)
+    # last_hint_time = models.DateTimeField(blank=True, null=True)
+    # finished = models.BooleanField("Finished Scavenger", default=False)
 
-    class Meta:
-        """Meta information for scavenger teams."""
+    # class Meta:
+    #     """Meta information for scavenger teams."""
 
-        verbose_name = "Scavenger Team"
-        verbose_name_plural = "Scavenger Teams"
+    #     verbose_name = "Scavenger Team"
+    #     verbose_name_plural = "Scavenger Teams"
 
-    def __str__(self) -> str:
-        return self.group.name
+    # def __str__(self) -> str:
+    #     return self.group.name
 
-    def reset_progress(self) -> None:
-        """Reset the team's current scavenger question to the first enabled question."""
-        if Question.objects.filter(enabled=True).exists():
-            first_question = Question.objects.filter(enabled=True).order_by("weight")[0]
-        else:
-            first_question = None
-        self.current_question = first_question
-        self.last_hint = None
-        self.locked_out_until = None
-        self.hint_cooldown_until = None
-        self.finished = False
-        self.save()
+    # def reset_progress(self) -> None:
+    #     """Reset the team's current scavenger question to the first enabled question."""
+    #     if Question.objects.filter(enabled=True).exists():
+    #         first_question = Question.objects.filter(enabled=True).order_by("weight")[0]
+    #     else:
+    #         first_question = None
+    #     self.current_question = first_question
+    #     self.last_hint = None
+    #     self.locked_out_until = None
+    #     self.hint_cooldown_until = None
+    #     self.finished = False
+    #     self.save()
 
-    def remove_blocks(self) -> None:
-        """Remove lockouts and cooldowns."""
+    # def remove_blocks(self) -> None:
+    #     """Remove lockouts and cooldowns."""
 
-        self.locked_out_until = None
-        self.hint_cooldown_until = None
+    #     self.locked_out_until = None
+    #     self.hint_cooldown_until = None
 
-        self.save()
+    #     self.save()
 
-    def lockout(self, duration: Optional[datetime.timedelta] = None) -> None:
-        """Lockout team for seconds."""
+    # def lockout(self, duration: Optional[datetime.timedelta] = None) -> None:
+    #     """Lockout team for seconds."""
 
-        if duration is None:
-            duration = datetime.timedelta(minutes=15)
+    #     if duration is None:
+    #         duration = datetime.timedelta(minutes=15)
 
-        now = timezone.now()
-        until = now + duration
-        self.locked_out_until = until
-        self.save()
+    #     now = timezone.now()
+    #     until = now + duration
+    #     self.locked_out_until = until
+    #     self.save()
 
 
 class QuestionTime(models.Model):
     id = models.AutoField(primary_key=True)
-    team = models.ForeignKey(Team, CASCADE)
+    # team = models.ForeignKey(Team, CASCADE)
     question = models.ForeignKey(Question, PROTECT)
     end_time = models.DateTimeField("Completed At")
 

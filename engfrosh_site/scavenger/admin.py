@@ -3,7 +3,7 @@
 import datetime
 from django.contrib import admin
 
-from .models import Question, Hint, Team, QuestionTime, Settings
+from .models import Question, Hint, QuestionTime, Settings
 
 admin.site.register([Hint, QuestionTime, Settings])
 
@@ -44,17 +44,5 @@ def lockout_15_minutes(modeladmin, request, queryset):
     for obj in queryset:
         obj.lockout(datetime.timedelta(minutes=15))
 
-
-class TeamAdmin(admin.ModelAdmin):
-    """Admin for Scavenger Teams."""
-
-    actions = [
-        reset_scavenger_progress,
-        remove_lockouts_cooldowns,
-        lockout_15_minutes
-    ]
-
-
-admin.site.register(Team, TeamAdmin)
 
 # endregion
