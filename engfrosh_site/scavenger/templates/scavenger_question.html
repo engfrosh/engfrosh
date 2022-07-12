@@ -4,10 +4,22 @@
 {% endblock page_title %}
 {% block body %}
     <div class="p-6">
-        <h1>Scavenger</h1>
         <div class="space-y-4 mt-4 ">
-            <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto">
-                <p>Clue goes here</p>
+            <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto text-center">
+                {% if puzzle.puzzle_text %}<p class="m-4">{{ puzzle.puzzle_text }}</p>{% endif %}
+                {% if puzzle.puzzle_file %}
+                    {% if puzzle.puzzle_file_download %}
+                        <a class="bg-main dark:bg-main-night rounded-lg p-2 text-white m-2"
+                           href="{{ puzzle.puzzle_file.url }}"
+                           download="{{ puzzle.puzzle_file_display_filename }}">Download</a>
+                    {% elif puzzle.puzzle_file_is_image %}
+                        <img src="{{ puzzle.puzzle_file.url }}">
+                    {% else %}
+                        <a class="bg-main dark:bg-main-night rounded-lg p-2 text-white m-2"
+                           href="{{ puzzle.puzzle_file.url }}"
+                           target="_blank">See Puzzle</a>
+                    {% endif %}
+                {% endif %}
             </div>
             <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto">
                 <p>Photo Answer</p>
