@@ -1,0 +1,24 @@
+{% extends 'base_manage_subpage.html' %}
+{% block page_title %}
+    Manage Discord Servers
+{% endblock page_title %}
+{% block top_title %}
+    Manage Discord Servers
+{% endblock top_title %}
+{% block active %}
+    <button type="button">Setup New Server</button>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>ID</th>
+            <th>Modify</th>
+        </tr>
+        <tr>
+            <td>Example Channel Name</td>
+            <td>Example ID #</td>
+            <td>
+                <button type="button">Modify</button>
+            </td>
+        </tr>
+    </table>
+{% endblock active %}

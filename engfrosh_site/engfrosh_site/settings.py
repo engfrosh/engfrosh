@@ -58,7 +58,8 @@ INSTALLED_APPS = [
     'authentication.apps.AuthenticationConfig',
     'frosh.apps.FroshConfig',
     'scavenger.apps.ScavengerConfig',
-    'management.apps.ManagementConfig'
+    'management.apps.ManagementConfig',
+    'common_models.apps.CommonModelsConfig'
 ]
 
 MIDDLEWARE = [
@@ -76,7 +77,9 @@ ROOT_URLCONF = 'engfrosh_site.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            './engfrosh_site/engfrosh_site/templates'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -98,8 +101,8 @@ WSGI_APPLICATION = 'engfrosh_site.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "engfrosh",
-        "USER": "django_engfrosh",
+        "NAME": "engfrosh_dev_2022_07_05",
+        "USER": "engfrosh_site",
         "PASSWORD": "there-exercise-fenegle",
         "HOST": "localhost",
         "PORT": "5432",
@@ -157,7 +160,7 @@ if not PRODUCTION:
 if PRODUCTION:
     STATIC_ROOT = 'files/static'
 
-MEDIA_ROOT = '../files/media'
+MEDIA_ROOT = './files/media'
 MEDIA_URL = '/media/'
 
 # Default primary key field type

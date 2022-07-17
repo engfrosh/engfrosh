@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="{% static 'output.css' %}">
+        <title>
+            {% block page_title %}
+                DEFAULT page_title
+            {% endblock page_title %}
+        </title>
+        {% csrf_token %}
+        <script>const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;</script>
+        {% block js_functions %}
+        {% endblock js_functions %}
+    </head>
+    <body class="bg-white dark:bg-background-night dark:text-slate-400 dark:shadow-slate-400 shadow-black min-h-screen flex flex-col">
+        <main class="flex-grow">
+            {% block body %}
+                DEFAULT body
+            {% endblock body %}
+        </main>
+        <footer class="h-fit bg-main dark:bg-main-night text-center w-full text-white">
+            {% block footer %}
+            {% endblock footer %}
+            <p class="my-3">
+                Get Help: <a href="mailto:questions@engfrosh.com">questions@engfrosh.com</a>
+            </p>
+        </footer>
+        {% block page_js %}
+        {% endblock page_js %}
+    </body>
+</html>

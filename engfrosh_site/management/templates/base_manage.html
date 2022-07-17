@@ -1,0 +1,16 @@
+{% extends 'base_generic.html' %}
+{% block body %}
+    <div class="m-4">
+        {% block nav_bar %}
+            <h1 class="text-center p-2 text-2xl">
+                {% block top_title %}
+                    DEFAULT top_title
+                {% endblock top_title %}
+            </h1>
+            <br/>
+        {% endblock nav_bar %}
+        {% block active %}
+            DEFAULT active
+        {% endblock active %}
+    </div>
+{% endblock body %}

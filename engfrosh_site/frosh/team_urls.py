@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
     path('coin/', views.coin_standings),
-    path('mycoin', views.my_coin)
+    path('mycoin', views.my_coin),
 ]

@@ -353,6 +353,12 @@ def manage_discord_channels(request: HttpRequest) -> HttpResponse:
 
         return HttpResponseBadRequest("Bad http request method.")
 
+# TODO: Require permission for manage servers
+def manage_discord_servers(request: HttpRequest) -> HttpResponse:
+    """Page for managing and creating discord servers."""
+
+    return render(request, "manage_discord_server.html")
+
 
 def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
     """Page for managing discord channel groups by tags or categories."""
