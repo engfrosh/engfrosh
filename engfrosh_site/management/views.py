@@ -10,7 +10,7 @@ import credentials
 from pyaccord.DiscordAPIClient import DiscordAPIClient
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordUser
-from frosh.models import FroshRole, Team, UniversityProgram, UserDetails
+from common_models.models import FroshRole, Team, UniversityProgram, UserDetails
 import scavenger.models
 import common_models.models
 from common_models.models import ChannelTag, DiscordChannel, Role
