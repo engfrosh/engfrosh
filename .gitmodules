@@ -1,3 +1,6 @@
 [submodule "engfrosh_site/common_models"]
 	path = engfrosh_site/common_models
 	url = https://github.com/engfrosh/common_models.git
+[submodule "pyaccord"]
+	path = pyaccord
+	url = https://github.com/grantmwilson/pyaccord.git

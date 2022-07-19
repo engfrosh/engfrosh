@@ -7,13 +7,13 @@ import os
 
 import credentials
 
-from engfrosh_common.DiscordAPI.DiscordAPI import DiscordAPI
-from engfrosh_common.DiscordAPI.DiscordUserAPI import DiscordUserAPI
-from authentication.models import DiscordUser
+from pyaccord.DiscordAPIClient import DiscordAPIClient
+from pyaccord.DiscordUserAPI import DiscordUserAPI
+from common_models.models import DiscordUser
 from frosh.models import FroshRole, Team, UniversityProgram, UserDetails
 import scavenger.models
-import discord_bot_manager.models
-from discord_bot_manager.models import ChannelTag, DiscordChannel, Role
+import common_models.models
+from common_models.models import ChannelTag, DiscordChannel, Role
 from . import registration
 
 from django.conf import settings
@@ -239,7 +239,7 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
                 logger.warning(f"No scav team exists for team: {team}")
             else:
                 try:
-                    scav_channel = discord_bot_manager.models.ScavChannel.objects.get(group=team.group).channel_id
+                    scav_channel = common_models.models.ScavChannel.objects.get(group=team.group).channel_id
                 except ObjectDoesNotExist:
                     logger.info(f"No scav channel exists for team: {team}")
                     scav_channel = None
@@ -354,6 +354,8 @@ def manage_discord_channels(request: HttpRequest) -> HttpResponse:
         return HttpResponseBadRequest("Bad http request method.")
 
 # TODO: Require permission for manage servers
+
+
 def manage_discord_servers(request: HttpRequest) -> HttpResponse:
     """Page for managing and creating discord servers."""
 

@@ -25,7 +25,6 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 urlpatterns = [
     path('', frosh.views.overall_index),
     path('admin/', admin.site.urls),
-    path('discord/', include('discord_bot_manager.urls')),
     path('accounts/', include('authentication.urls')),
     path('teams/', include('frosh.team_urls')),
     path('user/', include('frosh.user_urls')),
