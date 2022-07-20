@@ -1,0 +1,1 @@
+- Revoke all discord Oauth tokens and all bot tokens

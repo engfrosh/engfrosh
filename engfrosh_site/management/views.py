@@ -11,7 +11,7 @@ from pyaccord.DiscordAPIClient import DiscordAPIClient
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordUser
 from common_models.models import FroshRole, Team, UniversityProgram, UserDetails
-import scavenger.models
+import common_models.models
 import common_models.models
 from common_models.models import ChannelTag, DiscordChannel, Role
 from . import registration

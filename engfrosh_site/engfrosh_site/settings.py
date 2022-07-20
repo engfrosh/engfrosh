@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import sys
+import os
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,23 +23,49 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(BASE_DIR.parent))
 
 
+# Check the deploy type
+deploy_type = os.environ.get("ENGFROSH_DEPLOY_TYPE")
+development = False
+production = False
+if deploy_type is None:
+    logging.warning("ENGFROSH_DEPLOY_TYPE environment variable not set, assuming production.")
+elif deploy_type == "DEV":
+    logging.info("DEVELOPMENT DEPLOYMENT VERSION")
+    development = True
+elif deploy_type == "PROD":
+    logging.info("PRODUCTION DEPLOYMENT VERSION")
+    production = True
+else:
+    logging.warning(f"UNKNOWN DEPLOYMENT TYPE: {deploy_type}")
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ngg-3z5*no_b9zhnmj83hgv1qh5u_mx-vri57p=r&sym3p@$ru'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+if not SECRET_KEY and production:
+    raise Exception("No secret key provided in production!")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
 # Production sets the settings values, but doesn't affect debug parts
-PRODUCTION = False
+if development:
+    DEBUG = True
+    PRODUCTION = False
+else:
+    DEBUG = False
+    PRODUCTION = True
 
-ALLOWED_HOSTS = [
-    "alpha.engfrosh.com",
-    "127.0.0.1",
-    "localhost"
-]
+if development:
+    ALLOWED_HOSTS = [
+        "127.0.0.1",
+        "localhost"
+    ]
+else:
+    ALLOWED_HOSTS = [
+        "alpha.engfrosh.com"
+    ]
+
 
 # TODO Change Where these settings live, put them in the database
 # Discord API Settings
