@@ -2,9 +2,9 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="{% static 'output.css' %}">
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'output.css' %}"/>
         <title>
             {% block page_title %}
                 DEFAULT page_title
@@ -12,10 +12,11 @@
         </title>
         {% csrf_token %}
         <script>const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;</script>
+        <script src="{% static 'functions.js' %}"></script>
         {% block js_functions %}
         {% endblock js_functions %}
     </head>
-    <body class="bg-white dark:bg-background-night dark:text-slate-400 dark:shadow-slate-400 shadow-black min-h-screen flex flex-col">
+    <body class="bg-white dark:bg-background-night dark:text-slate-400 dark:border-slate-400 dark:shadow-slate-400 shadow-black min-h-screen flex flex-col">
         <main class="flex-grow">
             {% block body %}
                 DEFAULT body

@@ -1,4 +1,5 @@
 {% extends 'base_manage_subpage.html' %}
+{% load static %}
 {% block page_title %}
     Manage Discord Servers
 {% endblock page_title %}
@@ -6,19 +7,33 @@
     Manage Discord Servers
 {% endblock top_title %}
 {% block active %}
-    <button type="button">Setup New Server</button>
+    <button class="bg-main dark:bg-main-night rounded text-white p-2 max-w-fit max-h-fit text-sm mb-4 mr-2"
+            type="button"
+            onclick="setupNewServerButtonPress()">
+        Setup New Server
+    </button>
+    <button class="bg-main dark:bg-main-night rounded text-white p-2 max-w-fit max-h-fit text-sm mb-4 mr-2"
+            type="button"
+            onclick="scanForServersButtonPress()">
+        Scan for Servers
+    </button>
     <table>
         <tr>
             <th>Name</th>
             <th>ID</th>
             <th>Modify</th>
         </tr>
-        <tr>
-            <td>Example Channel Name</td>
-            <td>Example ID #</td>
-            <td>
-                <button type="button">Modify</button>
-            </td>
-        </tr>
+        {% for guild in active_guilds %}
+            <tr class="py-1">
+                <td class="px-2">{{ guild.name }}</td>
+                <td class="px-2">{{ guild.id }}</td>
+                <td class="px-2">
+                    <button type="button" class="rounded border p-1">Modify</button>
+                </td>
+            </tr>
+        {% endfor %}
     </table>
 {% endblock active %}
+{% block js_functions %}
+    <script src="{% static 'manage_discord_server.js' %}"></script>
+{% endblock js_functions %}

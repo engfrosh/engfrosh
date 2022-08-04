@@ -47,6 +47,10 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 if not SECRET_KEY and production:
     raise Exception("No secret key provided in production!")
 
+DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN")
+if not DISCORD_BOT_TOKEN:
+    logging.warning("No discord bot token provided")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 # Production sets the settings values, but doesn't affect debug parts
 if development:
@@ -67,9 +71,8 @@ else:
     ]
 
 
-# TODO Change Where these settings live, put them in the database
 # Discord API Settings
-DEFAULT_DISCORD_API_VERSION = 9
+DEFAULT_DISCORD_API_VERSION = 10
 DEFAULT_DISCORD_SCOPE = ["identify", "guilds.join"]
 
 

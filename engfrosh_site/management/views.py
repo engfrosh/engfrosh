@@ -6,12 +6,11 @@ import json
 import os
 
 import credentials
+import pyaccord
 
-from pyaccord.DiscordAPIClient import DiscordAPIClient
 from pyaccord.DiscordUserAPI import DiscordUserAPI
-from common_models.models import DiscordUser
+from common_models.models import DiscordGuild, DiscordUser
 from common_models.models import FroshRole, Team, UniversityProgram, UserDetails
-import common_models.models
 import common_models.models
 from common_models.models import ChannelTag, DiscordChannel, Role
 from . import registration
@@ -233,12 +232,13 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
                 role_exists = False
 
             try:
-                scav_team = scavenger.models.Team.objects.get(group=team.group)
+                scav_team = common_models.models.Team.objects.get(group=team.group)
             except ObjectDoesNotExist:
                 scav_channel = None
                 logger.warning(f"No scav team exists for team: {team}")
             else:
                 try:
+                    # TODO: need to fix the scav channels
                     scav_channel = common_models.models.ScavChannel.objects.get(group=team.group).channel_id
                 except ObjectDoesNotExist:
                     logger.info(f"No scav channel exists for team: {team}")
@@ -274,7 +274,7 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
             except ObjectDoesNotExist:
                 return HttpResponseBadRequest("Invalid team id")
 
-            discord_api = DiscordAPI(credentials.BOT_TOKEN, api_version=settings.DEFAULT_DISCORD_API_VERSION)
+            discord_api = pyaccord.Client(credentials.BOT_TOKEN, api_version=settings.DEFAULT_DISCORD_API_VERSION)
 
             try:
                 role_id = discord_api.create_guild_role(credentials.GUILD_ID, name=team.display_name, color=team.color)
@@ -304,10 +304,12 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
             team = Team(display_name=team_name, group=group, color=team_color)
             team.save()
 
-            scav_team = scavenger.models.Team(group=group)
+            scav_team = common_models.models.Team(group=group)
+            # TODO: need to fix this method
             scav_team.reset_progress()
             scav_team.save()
 
+            # TODO: fix this method
             return JsonResponse(team.to_dict())
 
         # UPDATE AN EXISTING TEAM
@@ -353,13 +355,59 @@ def manage_discord_channels(request: HttpRequest) -> HttpResponse:
 
         return HttpResponseBadRequest("Bad http request method.")
 
-# TODO: Require permission for manage servers
 
-
+@permission_required("common_models.view_discordguild")
 def manage_discord_servers(request: HttpRequest) -> HttpResponse:
     """Page for managing and creating discord servers."""
 
-    return render(request, "manage_discord_server.html")
+    if request.method == "GET":
+
+        context = {
+            "active_guilds": DiscordGuild.objects.filter(deleted=False)
+        }
+
+        return render(request, "manage_discord_server.html", context)
+
+    elif request.method == "POST":
+
+        if not request.user.has_perm("common_models.change_discordguild"):
+            return HttpResponseForbidden("Permission denied")
+
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Invalid / missing content type.")
+
+        req_dict = json.loads(request.body)
+        if "command" not in req_dict:
+            return HttpResponseBadRequest("Bad request body, missing command.")
+
+        match req_dict["command"]:
+            case "scan_for_guilds":
+                scan_res = DiscordGuild.scan_and_update_guilds()
+                logger.info(f"Scanned and updated guilds with results: {scan_res}")
+                return JsonResponse({"scan_results": {"num_added": scan_res.num_added,
+                                                      "num_existing_updated": scan_res.num_existing_updated,
+                                                      "num_existing_not_updated": scan_res.num_existing_not_updated,
+                                                      "num_removed": scan_res.num_removed}})
+
+            case "create_new_guild":
+                if not request.user.has_perm("common_models.add_discordguild"):
+                    return HttpResponseForbidden("Permission denied")
+
+                if "name" not in req_dict:
+                    return HttpResponseBadRequest("Missing new guild's name")
+
+                guild_res = DiscordGuild.create_new_guild(name=req_dict["name"])
+
+                return JsonResponse({"guild": {
+                    "name": guild_res.name,
+                    "id": guild_res.id
+                }})
+
+            case _:
+                return HttpResponseBadRequest("Invalid command.")
+
+    else:
+        return HttpResponseBadRequest("Bad http request method.")
 
 
 def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
