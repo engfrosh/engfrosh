@@ -9,7 +9,7 @@ import credentials
 import pyaccord
 
 from pyaccord.DiscordUserAPI import DiscordUserAPI
-from common_models.models import DiscordGuild, DiscordUser
+from common_models.models import DiscordGuild, DiscordUser, Puzzle
 from common_models.models import FroshRole, Team, UniversityProgram, UserDetails
 import common_models.models
 from common_models.models import ChannelTag, DiscordChannel, Role
@@ -157,6 +157,7 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
         return HttpResponseNotAllowed(['GET', 'POST'])
 
     return HttpResponseServerError()
+# endregion
 
 
 @permission_required("auth_user.change_user")
@@ -466,3 +467,18 @@ def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
     else:
 
         return HttpResponseBadRequest("Bad http request method.")
+
+
+@permission_required("common_models.view_puzzle")
+def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
+    """Page for managing scavenger puzzles."""
+
+    if request.method == "GET":
+
+        context = {
+            "puzzles": Puzzle.objects.all()
+        }
+
+        return render(request, "manage_scavenger_puzzles.html", context)
+
+    return HttpResponse("Hey there!")

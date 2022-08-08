@@ -1,1 +1,15 @@
 {% extends 'base_generic.html' %}
+{% block page_title %}
+    Scav
+{% endblock page_title %}
+{% block body %}
+    Here are the questions available to you
+    {% if not team %}
+        You are not part of a team
+    {% else %}
+        Here is your team:
+        {{ team.display_name }}
+        Here are your puzzles:
+        {% for puz in puzzles %}[1: {{ puz.name }}]{% endfor %}
+    {% endif %}
+{% endblock body %}
