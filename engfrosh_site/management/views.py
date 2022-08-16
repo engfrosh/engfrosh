@@ -307,7 +307,7 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
 
             scav_team = common_models.models.Team(group=group)
             # TODO: need to fix this method
-            scav_team.reset_progress()
+            scav_team.reset_scavenger_progress()
             scav_team.save()
 
             # TODO: fix this method

@@ -1,3 +1,0 @@
-pynput==1.7.3
-discord
-pyyaml

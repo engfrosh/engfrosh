@@ -3,13 +3,45 @@
     Scav
 {% endblock page_title %}
 {% block body %}
-    Here are the questions available to you
     {% if not team %}
         You are not part of a team
     {% else %}
         Here is your team:
         {{ team.display_name }}
-        Here are your puzzles:
-        {% for puz in puzzles %}[1: {{ puz.name }}]{% endfor %}
+        <h1>Active Puzzles</h1>
+        {% for puz in active_puzzles %}
+            <div class="">
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td>{{ puz.name }}</td>
+                        <td>
+                            <a class="bg-main dark:bg-main-night rounded text-white p-1" href="puzzle/{{ puz.secret_id }}">Go To Puzzle</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        {% endfor %}
+        <hr>
+        <h1>Completed Puzzles</h1>
+        {% for puz in completed_puzzles %}
+            <div class="">
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td>{{ puz.name }}</td>
+                        <td>
+                            <a class="bg-main dark:bg-main-night rounded text-white p-1" href="puzzle/{{ puz.secret_id }}">Go To Puzzle</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        {% endfor %}
     {% endif %}
 {% endblock body %}
