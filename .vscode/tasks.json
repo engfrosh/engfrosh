@@ -36,11 +36,14 @@
             "problemMatcher": [],
             "presentation": {
                 "echo": true,
-                "reveal": "always",
+                "reveal": "never",
                 "focus": false,
                 "panel": "dedicated",
                 "showReuseMessage": true,
                 "clear": false
+            },
+            "runOptions": {
+                "runOn": "folderOpen",
             }
         }
     ]
