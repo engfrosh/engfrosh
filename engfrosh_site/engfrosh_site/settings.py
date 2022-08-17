@@ -67,13 +67,17 @@ if development:
     ]
 else:
     ALLOWED_HOSTS = [
-        "alpha.engfrosh.com"
+        "mars.engfrosh.com"
     ]
 
 
 # Discord API Settings
 DEFAULT_DISCORD_API_VERSION = 10
 DEFAULT_DISCORD_SCOPE = ["identify", "guilds.join"]
+
+
+# Model Defaults
+DEFAULT_SCAVENGER_PUZZLE_REQUIRE_PHOTO_UPLOAD = True
 
 
 # Application definition

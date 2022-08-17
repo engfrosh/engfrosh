@@ -1,11 +1,13 @@
 from typing import Optional, Union
 from django.http import HttpRequest, HttpResponse
+from django.http.response import HttpResponseNotAllowed, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render  # noqa F401
 
 from common_models.models import Puzzle, Team
 from django.contrib.auth.decorators import login_required, permission_required
 
 import logging
+import json
 
 logger = logging.getLogger("engfrosh_site.scavenger.views")
 
@@ -48,9 +50,27 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
     if not (puz and puz.is_viewable_for_team(team)):
         return HttpResponse("You do not have access to this puzzle.")
 
-    context = {
-        "puzzle": puz,
-        "view_only": puz.is_completed_for_team(team)
-    }
+    if request.method == "GET":
 
-    return render(request, "scavenger_question.html", context)
+        context = {
+            "puzzle": puz,
+            "view_only": puz.is_completed_for_team(team)
+        }
+
+        return render(request, "scavenger_question.html", context)
+
+    elif request.method == "POST":
+
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Not application/json content type")
+
+        req_dict = json.loads(request.body)
+
+        if "answer" not in req_dict:
+            return HttpResponseBadRequest("No answer provided in json body")
+
+        correct, completed = puz.check_team_guess(team, req_dict["answer"])
+        return JsonResponse({"correct": correct, "scavenger_completed": completed})
+
+    else:
+        return HttpResponseNotAllowed(["GET", "POST"])
