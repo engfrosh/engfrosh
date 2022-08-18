@@ -19,15 +19,10 @@ def index(request: HttpRequest) -> HttpResponse:
     if not team:
         return render(request, "scavenger_index.html", context={"team": None})
 
-    active_puzzles = team.active_puzzles
-    completed_puzzles = team.completed_puzzles
-    logger.debug(f"{[p.name for p in active_puzzles]}")
-
     context = {
         "team": team,
-        # "puzzles": team.active_puzzles
-        "active_puzzles": active_puzzles,
-        "completed_puzzles": completed_puzzles
+        "active_puzzles": team.active_puzzles,
+        "completed_puzzles": team.completed_puzzles
     }
 
     return render(request, "scavenger_index.html", context=context)
@@ -69,8 +64,16 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
         if "answer" not in req_dict:
             return HttpResponseBadRequest("No answer provided in json body")
 
-        correct, completed = puz.check_team_guess(team, req_dict["answer"])
-        return JsonResponse({"correct": correct, "scavenger_completed": completed})
+        correct, stream_completed, next_puzzle = puz.check_team_guess(team, req_dict["answer"])
+
+        if next_puzzle:
+            next_puzzle_id = next_puzzle.secret_id
+        else:
+            next_puzzle_id = ""
+
+        return JsonResponse({"correct": correct, "scavenger_stream_completed": stream_completed,
+                             "next_puzzle_id": next_puzzle_id, "require_verification_photo": False})
+        # TODO add verification photo submission
 
     else:
         return HttpResponseNotAllowed(["GET", "POST"])

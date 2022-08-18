@@ -49,7 +49,7 @@
     function submitAnswerButtonPress() {
         let answerInput = document.getElementById("answerText");
         const answer = answerInput.value;
-        alert("Trying to submit: " + answer);
+        // alert("Trying to submit: " + answer);
         if (!answer) {
             alert("No answer provided...");
         } else {
@@ -59,7 +59,15 @@
                 res => {
                     if (res.ok) {
                         res.json().then(data => {
-                            alert("(" + data["correct"] + " " + data["scavenger_completed"] + ")");
+
+                            if (data["correct"]) {
+                                window.location.href = "../" + data["next_puzzle_id"];
+                            } else {
+                                alert("Sorry, that is incorrect.");
+                            }
+
+
+                            // alert("(" + data["correct"] + " " + data["scavenger_stream_completed"] + " " + data["next_puzzle_id"] + ")");
                         });
                     } else {
                         res.text().then(data => {

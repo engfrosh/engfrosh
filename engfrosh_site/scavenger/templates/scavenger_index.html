@@ -8,40 +8,48 @@
     {% else %}
         Here is your team:
         {{ team.display_name }}
+
+        {% if team.scavenger_finished %}
+        <h1 class="text-5xl">Congratulation on Completing Scav!</h1>
+        {% else %}
+        
         <h1>Active Puzzles</h1>
-        {% for puz in active_puzzles %}
-            <div class="">
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td>{{ puz.name }}</td>
-                        <td>
-                            <a class="bg-main dark:bg-main-night rounded text-white p-1" href="puzzle/{{ puz.secret_id }}">Go To Puzzle</a>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        {% endfor %}
-        <hr>
+        <div class="">
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th></th>
+                </tr>
+                {% for puz in active_puzzles %}
+                <tr>
+                    <td>{{ puz.name }}</td>
+                    <td>
+                        <a class="bg-main dark:bg-main-night rounded text-white p-1"
+                        href="puzzle/{{ puz.secret_id }}">Go To Puzzle</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+        <hr/>
         <h1>Completed Puzzles</h1>
-        {% for puz in completed_puzzles %}
-            <div class="">
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th></th>
-                    </tr>
+        <div class="">
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th></th>
+                </tr>
+                {% for puz in completed_puzzles %}
                     <tr>
                         <td>{{ puz.name }}</td>
                         <td>
-                            <a class="bg-main dark:bg-main-night rounded text-white p-1" href="puzzle/{{ puz.secret_id }}">Go To Puzzle</a>
+                            <a class="bg-main dark:bg-main-night rounded text-white p-1"
+                               href="puzzle/{{ puz.secret_id }}">Go To Puzzle</a>
                         </td>
                     </tr>
-                </table>
-            </div>
-        {% endfor %}
+                {% endfor %}
+            </table>
+        </div>
     {% endif %}
 {% endblock body %}
