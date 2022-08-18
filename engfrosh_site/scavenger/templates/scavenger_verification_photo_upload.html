@@ -1,0 +1,50 @@
+{% extends 'base_generic.html' %}
+{% block page_title %}
+    Upload Verification Photo
+{% endblock page_title %}
+{% block body %}
+    <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto">
+        <p>Take and submit a photo of a frosh in front of the answer</p>
+        <label for="file">Choose an image to upload</label>
+        <input type="file"
+               accept="image/*"
+               capture="user"
+               name="photo_upload"
+               id="image_file"/>
+        <button class="bg-main dark:bg-main-night rounded text-white p-1"
+                onclick="uploadPhoto()">Upload</button>
+    </div>
+{% endblock body %}
+{% block js_functions %}
+    <script>
+        function uploadPhoto() {
+            alert("Uploading...");
+
+            let file = document.getElementById("image_file").files[0];
+            let formData = new FormData();
+            formData.append("photo_upload", file);
+            fetch("", {
+                method: "POST",
+                mode: "cors",
+                credentials: "same-origin",
+                headers: {
+                    "X-CSRFToken": csrf_token
+                },
+                body: formData
+            }).then(res => {
+                if (res.ok) {
+                    alert("Upload Success!");
+                } else {
+                    res.text().then(data => {
+                        alert("Not Okay: " + data);
+                    });
+                }
+            });
+        }
+
+
+    </script>
+{% endblock js_functions %}
+{% block page_js %}
+    <script></script>
+{% endblock page_js %}

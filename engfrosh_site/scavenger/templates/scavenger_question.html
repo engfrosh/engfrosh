@@ -22,12 +22,7 @@
                 {% endif %}
             </div>
             {% if not view_only %}
-                {% comment %} <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto">
-                    <p>Photo Answer</p>
-                    <p>Take and submit a photo of a frosh in front of the answer</p>
-                    <label for="file">Choose an image to upload</label>
-                    <input type="file" accept="image/*" capture="user"/>
-                </div> {% endcomment %}
+                
                 <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto">
                     <p>Text Answer</p>
                     <input type="text"
@@ -61,7 +56,7 @@
                         res.json().then(data => {
 
                             if (data["correct"]) {
-                                window.location.href = "../" + data["next_puzzle_id"];
+                                window.location.href = data["next"];
                             } else {
                                 alert("Sorry, that is incorrect.");
                             }
