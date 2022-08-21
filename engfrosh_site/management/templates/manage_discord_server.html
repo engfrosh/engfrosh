@@ -22,6 +22,7 @@
             <th>Name</th>
             <th>ID</th>
             <th>Modify</th>
+            <th></th>
         </tr>
         {% for guild in active_guilds %}
             <tr class="py-1">
@@ -29,6 +30,11 @@
                 <td class="px-2">{{ guild.id }}</td>
                 <td class="px-2">
                     <button type="button" class="rounded border p-1">Modify</button>
+                </td>
+                <td class="px-2">
+                    <button type="button"
+                            class="rounded border p-1"
+                            onclick="get1UseInviteButtonPress('{{ guild.id }}')">1 Use Invite</button>
                 </td>
             </tr>
         {% endfor %}

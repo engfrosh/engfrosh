@@ -13,6 +13,7 @@ from common_models.models import DiscordGuild, DiscordUser, Puzzle
 from common_models.models import FroshRole, Team, UniversityProgram, UserDetails
 import common_models.models
 from common_models.models import ChannelTag, DiscordChannel, Role
+from pyaccord.invite import Invite
 from . import registration
 
 from django.conf import settings
@@ -403,6 +404,29 @@ def manage_discord_servers(request: HttpRequest) -> HttpResponse:
                     "name": guild_res.name,
                     "id": guild_res.id
                 }})
+
+            case "get_one_use_invite":
+                if not request.user.has_perm("common_models.change_discordguild"):
+                    return HttpResponseForbidden("Permission denied")
+
+                if "guild_id" not in req_dict:
+                    return HttpResponseBadRequest("Missing guild id")
+
+                logger.debug(f"Invite requested with request body: {req_dict}")
+
+                try:
+                    guild = DiscordGuild.objects.get(id=int(req_dict["guild_id"]))
+                except DiscordGuild.DoesNotExist:
+                    return HttpResponseBadRequest("Guild with that id not available.")
+
+                invite: Invite = guild.create_invite(unique=True, max_uses=1)
+
+                return JsonResponse({
+                    "invite": {
+                        "full_url": invite.full_url,
+                        "code": invite.code
+                    }
+                })
 
             case _:
                 return HttpResponseBadRequest("Invalid command.")

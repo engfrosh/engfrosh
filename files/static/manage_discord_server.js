@@ -53,3 +53,26 @@ function scanForServersButtonPress() {
     }
   )
 }
+
+function get1UseInviteButtonPress(serverId) {
+  postToServer(csrf_token, {
+    "command": "get_one_use_invite",
+    "guild_id": serverId
+  }).then(
+    res => {
+      if (res.ok) {
+        res.json().then(data => {
+          navigator.clipboard.writeText(data["invite"]["full_url"]).then(
+            copied_data => {
+              alert("Copied invite to clipboard: " + data["invite"]["full_url"]);
+            }
+          );
+        });
+      } else {
+        res.text().then(data => {
+          alert("Failed to get invite: " + data);
+        });
+      }
+    }
+  );
+}
