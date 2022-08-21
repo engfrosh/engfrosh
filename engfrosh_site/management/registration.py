@@ -6,12 +6,12 @@ import string
 from typing import Optional
 
 from django.core.exceptions import ObjectDoesNotExist
-from authentication.models import MagicLink
+from common_models.models import MagicLink
 from django.contrib.auth.models import User
 from datetime import timedelta
 from django.utils.encoding import iri_to_uri
 from django.utils import timezone
-from frosh.models import FroshRole, Team, UserDetails, UniversityProgram
+from common_models.models import FroshRole, Team, UserDetails, UniversityProgram
 from management.email import send_email
 
 from management.images import LOGO

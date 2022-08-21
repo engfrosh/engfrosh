@@ -1,0 +1,30 @@
+{% extends 'base_manage_subpage.html' %}
+{% load static %}
+{% block page_title %}
+    Manage Scavenger Questions
+{% endblock page_title %}
+{% block top_title %}
+    Manage Scavenger Questions
+{% endblock top_title %}
+{% block active %}
+    <table>
+        <tr class="text-center">
+            <th>ID</th>
+            <th>Name</th>
+            <th>Enabled</th>
+        </tr>
+        {% for puzzle in puzzles %}
+            <tr >
+                <td class="px-3 text-center">{{ puzzle.id }}</td>
+                <td class="px-3 text-start">{{ puzzle.name }}</td>
+                <td class="px-3 text-center">
+                    {% if puzzle.enabled %}
+                        ✅
+                    {% else %}
+                        ❌
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock active %}

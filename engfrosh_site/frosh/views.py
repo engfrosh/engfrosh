@@ -3,7 +3,7 @@ from django.shortcuts import render  # noqa F401
 from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required, permission_required
 
-from .models import Team
+from common_models.models import Team
 
 # Create your views here.
 
@@ -57,3 +57,8 @@ def my_coin(request: HttpRequest):
 def overall_index(request: HttpRequest):
     """The home page at the root of the site."""
     return render(request, "overall_index.html")
+
+
+def user_home(request: HttpRequest) -> HttpResponse:
+    """The home page for regular users."""
+    return render(request, "user_home.html")

@@ -4,7 +4,7 @@ __Use a virtual environment__ (if you are developing python)
 
 ## Getting Setup
 
-First install venv:
+First install virtualenv:
 ```bash
 $ pip install virtualenv
 ```
@@ -12,7 +12,7 @@ $ pip install virtualenv
 Then set it up for your project, run the following at the top of the repository's 
 directory tree.
 ```bash
-$ python -m venv venv
+$ python -m virtualenv venv -p python3.10
 ```
 Make sure you run this command with your intended version of python.
 

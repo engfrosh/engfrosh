@@ -1,11 +1,15 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        {% load static %}
-        <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}">
-        <title>EngFrosh Dawn of Energy</title>
-    </head>
-    <body>
-        <h1>Welcome to EngFrosh, Dawn of Energy</h1>
-    </body>
-</html>
+{% extends 'base_generic.html' %}
+{% load static %}
+{% block page_title %}
+    EngFrosh
+{% endblock page_title %}
+{% block body %}
+    <img src="{% static 'engfrosh_color_long.svg' %}" alt="EngFrosh Logo">
+    {% comment %} <div class="flex flex-col min-h-full">
+        <div class="flex-grow bg-background-night">Click me</div>
+    </div> {% endcomment %}
+    <div class="h-full text-center">
+        <a href="{% url 'user_home' %}"
+           class="bg-main dark:bg-main-night rounded-lg text-4xl p-4 mx-auto text-white">Blast Off!</a>
+    </div>
+{% endblock body %}

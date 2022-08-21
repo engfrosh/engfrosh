@@ -1,7 +1,17 @@
 # TODO
 
-## Management
+[ ] Upgrade Postgres versions used
+[ ] Make a much more thorough welcome message and details for this year
+[ ] Create ticket interaction system to manage issues people are having
+[ ] Ability to let people get codes to authenticate the first time to create a username and password
 
+
+## Discord
+[ ] Rebuild Discord bot so that it is independant of the webserver and just interacts through the database or web API calls to the web server
+[ ] Rebuild Discord bot using nextcord
+[ ] Update Discord bot to use slash commands (reference the engfrosh/scavenger-discord bot)
+
+## Management
 [ ] Add _Manage Roles_ page and make it easy to create the default roles for planning, heads, frosh, facils.
 [ ] Add way to create default roles for Directors, Spirit, etc
 [ ] Add email delay to not hit AWS limits
@@ -14,30 +24,33 @@
 [ ] Add management of programs to make it easy to generate the programs
 
 ## Authentication
-
+[ ] How do we want to do invites
 [ ] Disable the ability to register
+[ ] Look into authenticating with carleton or microsoft account (Microsoft Identity Platform)
 
 ## CSS
-
 [ ] Make the _link your discord account_ page look nice as it is the first page seen
 [ ] Test page appearance on different size screens
-[x] Create a default style sheet and set a font for all the pages
 
 ## Scav
-
+[ ] How do we want to do scav
 [ ] Add handling question response times
 [ ] Add check if questions are actually enabled before sending them
 [ ] Add enable and disable scav commands 
+[ ] Add QR answer support
+[ ] Have scav be available after the week to let people see the whole thing 
 
 ## Scoin
-
-[ ] Add more robust permissions
+[ ] Do we want Scoin still
+[ ] Add setting to edit whether scoin exists or not
+<!-- [ ] Add more robust permissions -->
 
 ## Moderation
-
 [ ] Make it so edited messages also get checked for moderation
+[ ] Fix word list so names and common words are not captured or limited
 
 ## Logging
-
 [ ] Change logging format so it is actually useful
 
+## Trade Up
+[ ] Add trade up log

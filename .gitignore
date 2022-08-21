@@ -8,6 +8,7 @@ files/media/*
 files/static/admin/*
 bot_config.yaml
 offline-files/soopp-bingo/*.pdf
+jstools/node_modules/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

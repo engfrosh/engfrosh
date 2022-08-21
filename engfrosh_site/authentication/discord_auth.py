@@ -7,13 +7,13 @@ import os
 from typing import Union
 
 import credentials
-from .models import DiscordUser, MagicLink
+from common_models.models import DiscordUser, MagicLink
 
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from engfrosh_common.DiscordAPI.DiscordUserAPI import DiscordUserAPI
+from pyaccord.DiscordUserAPI import DiscordUserAPI
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)

@@ -1,0 +1,88 @@
+{% extends 'base_generic.html' %}
+{% block page_title %}
+    Scav
+{% endblock page_title %}
+{% block body %}
+    <div class="p-6">
+        <div class="space-y-4 mt-4 ">
+            <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto text-center">
+                {% if puzzle.puzzle_text %}<p class="m-4">{{ puzzle.puzzle_text }}</p>{% endif %}
+                {% if puzzle.puzzle_file %}
+                    {% if puzzle.puzzle_file_download %}
+                        <a class="bg-main dark:bg-main-night rounded-lg p-2 text-white m-2"
+                           href="{{ puzzle.puzzle_file.url }}"
+                           download="{{ puzzle.puzzle_file_display_filename }}">Download</a>
+                    {% elif puzzle.puzzle_file_is_image %}
+                        <img src="{{ puzzle.puzzle_file.url }}">
+                    {% else %}
+                        <a class="bg-main dark:bg-main-night rounded-lg p-2 text-white m-2"
+                           href="{{ puzzle.puzzle_file.url }}"
+                           target="_blank">See Puzzle</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+            {% if not view_only %}
+                
+                <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto">
+                    <p>Text Answer</p>
+                    <input type="text"
+                           id="answerText"
+                           class="border-2 rounded border-slate-900 dark:border-slate-400 text-black"/>
+                    <button type="button"
+                            id="answerSubmitButton"
+                            onclick="submitAnswerButtonPress()"
+                            class="bg-main dark:bg-main-night rounded text-white p-1">
+                        Submit
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock body %}
+{% block js_functions %}
+    <script>
+    function submitAnswerButtonPress() {
+        let answerInput = document.getElementById("answerText");
+        const answer = answerInput.value;
+        // alert("Trying to submit: " + answer);
+        if (!answer) {
+            alert("No answer provided...");
+        } else {
+            postToServer(csrf_token, {
+                "answer": answer
+            }).then(
+                res => {
+                    if (res.ok) {
+                        res.json().then(data => {
+
+                            if (data["correct"]) {
+                                window.location.href = data["next"];
+                            } else {
+                                alert("Sorry, that is incorrect.");
+                            }
+
+
+                            // alert("(" + data["correct"] + " " + data["scavenger_stream_completed"] + " " + data["next_puzzle_id"] + ")");
+                        });
+                    } else {
+                        res.text().then(data => {
+                            alert(data);
+                        });
+                    }
+                }
+            )
+        }
+    }
+    </script>
+{% endblock js_functions %}
+{% block page_js %}
+    <script>
+    let answerInput = document.getElementById("answerText");
+    answerInput.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            document.getElementById("answerSubmitButton").click();
+        }
+    });
+
+    </script>
+{% endblock page_js %}

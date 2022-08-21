@@ -1,37 +1,28 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        {% load static %}
-        <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}">
-        <title>Manage</title>
-        <style>
-            body {
-                text-align: center;
-            }
-
-            a {
-                font-size: large;
-                text-align: center;
-                text-decoration: none;
-                padding: 10pt;
-                border-radius: 6pt;
-                display: block;
-                width: fit-content;
-                margin: auto;
-                background-color: darkblue;
-                color: white;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>EngFrosh Management</h1><br/>
-        <a href="/admin">Server Admin</a><br/>
-        <a href="discord/magic-link">Magic Links</a><br/>
-        <a href="users/add">Add Users</a><br/>
-        <a href="{% url 'add_users_to_discord_guild' %}">Add Users to Server</a><br/>
-        <a href="{% url 'manage_frosh_teams' %}">Manage Teams</a><br/>
-        <!-- <a href="{#% url 'manage_roles' %#}">Manage Roles</a><br/> -->
-        <a href="{% url 'manage_discord_channels' %}">Manage Discord Channels</a><br/>
-        <a href="{% url 'manage_discord_channel_groups' %}">Manage Discord Channel Groups</a><br/>
-    </body>
-</html>
+{% extends 'base_manage.html' %}
+{% block page_title %}
+   EngFrosh Management
+{% endblock page_title %}
+{% block top_title %}
+   EngFrosh Management
+{% endblock top_title %}
+{% block active %}
+   <div class="flex flex-col space-y-3 mx-auto container text-white text-center max-w-sm">
+      <a href="/admin" class="bg-main dark:bg-main-night rounded-lg p-2">Server Admin</a>
+      <a href="discord/magic-link"
+         class="bg-main dark:bg-main-night rounded-lg p-2">Magic Links</a>
+      <a href="users/add" class="bg-main dark:bg-main-night rounded-lg p-2">Add Users</a>
+      <a href="{% url 'add_users_to_discord_guild' %}"
+         class="bg-main dark:bg-main-night rounded-lg p-2">Add Users to Server</a>
+      <a href="{% url 'manage_frosh_teams' %}"
+         class="bg-main dark:bg-main-night rounded-lg p-2">Manage Teams</a>
+      <!-- <a href="{#% url 'manage_roles' %#}">Manage Roles</a> -->
+      <a href="{% url 'manage_discord_channels' %}"
+         class="bg-main dark:bg-main-night rounded-lg p-2">Manage Discord Channels</a>
+      <a href="{% url 'manage_discord_channel_groups' %}"
+         class="bg-main dark:bg-main-night rounded-lg p-2">Manage Discord Channel Groups</a>
+      <a href="{% url 'manage_discord_servers' %}"
+         class="bg-main dark:bg-main-night rounded-lg p-2">Manage Discord Servers</a>
+      <a href="{% url 'manage_scavenger_puzzles' %}"
+         class="bg-main dark:bg-main-night rounded-lg p-2">Manage Scavenger Puzzles 🧩</a>
+   </div>
+{% endblock active %}

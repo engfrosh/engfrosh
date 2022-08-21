@@ -12,10 +12,10 @@ from typing import List, Union
 
 import credentials
 
-from authentication.models import DiscordUser
-from discord_bot_manager.models import Role
+from common_models.models import DiscordUser
+from common_models.models import Role
 from .discord_auth import register
-from engfrosh_common.DiscordAPI.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  # noqa E402
+from pyaccord.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  # noqa E402
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
