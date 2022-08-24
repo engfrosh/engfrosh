@@ -1,15 +1,17 @@
 # Deploying to AWS
 
 ### Deploy an AWS EC2 Server
-- Ubuntu 20.04 
+- Ubuntu 22.04
     - Tested, others may work
 - Tested on t2.micro (free), actual production deployment may require more powerful
-- EBS storage, 
-    - gp3, 
+    - the cheapest is t3a.nano which should be fine for staging
+- EBS storage,
+    - gp3,
     - size 10 (for now),
     - Encryption, default key is fine
     - leave the other defaults
 - Add a security group with SSH, HTTP, and HTTPS
+    - Note, if you are recreating a server, you will probably need to clear the entry in ~/.ssh/known_hosts
 - Add or create a new key pair
 
 
@@ -17,16 +19,19 @@
 - Create an elastic IP and assign it
 - add IP to DNS as a subdomain
 
-#### Update your server
-```sh
-$ sudo apt update
-$ sudo apt upgrade
+
+### Clone the repo
+Clone main for development or a release for production.
+
+```
+$ git clone https://github.com/engfrosh/engfrosh.git
 ```
 
 
-### Install Postgres
+### Run Setup
+
 ```sh
-$ sudo apt install postgresql postgresql-contrib nginx python3-pip gunicorn certbot python3-certbot-nginx
+sudo ~/engfrosh/setup.sh
 ```
 
 #### Setup Postgres
@@ -37,7 +42,7 @@ $ sudo -i -u postgres
 $ psql
 ```
 
-psql -d engfrosh 
+psql -d engfrosh
 
 To exit:
 ```
@@ -48,18 +53,26 @@ $ exit
 ##### Create Users
 
 ```sql
-# CREATE USER django_engfrosh WITH PASSWORD '[my password]';
-# CREATE USER discord_engfrosh WITH PASSWORD '[my password]';
+# CREATE USER engfrosh_site WITH PASSWORD '[my password]';
+# CREATE USER engfrosh_bot WITH PASSWORD '[my password]';
 ```
 
 ##### Create Database
-```sql
-# CREATE DATABASE engfrosh WITH OWNER django_engfrosh;
+
+```
+# \i ~/engfrosh/setup.sql
 ```
 
-### Install Nginx
-[source](https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04)
+Then for permissions updates
 
+```
+# \i ~/engfrosh/update_permissions.sql
+```
+
+Will probably need to rerun this after more tables are created.
+
+
+### Nginx
 
 You can check the status and also check by going to the web address.
 ```sh
@@ -69,7 +82,7 @@ $ systemctl status nginx
 
 #### Management Commands:
 
-Check that it is installed and running by going to the domain you specified earlier, you 
+Check that it is installed and running by going to the domain you specified earlier, you
 should see a welcome to nginx site.
 
 To stop your web server, type:
@@ -98,19 +111,10 @@ To re-enable the service to start up at boot, you can type:
 sudo systemctl enable nginx
 ```
 
-### Clone the repo
-Clone main for development or a release for production.
-
-```
-git clone https://github.com/engfrosh/engfrosh.git
-```
 
 ### Install requirements
-```
-sudo pip install -r requirements.txt
-```
 
-Fix any dependency errors
+Fix any python dependency errors
 - psycopg2-binary if there is a compiling error
 - install the proper version of requests for Django
 
@@ -119,13 +123,13 @@ Fix any dependency errors
 
 - migrate Django database
 - create Django super user
-- run the Django server and ideally using VS Code or something check that at least some 
-pages come up 
+- run the Django server and ideally using VS Code or something check that at least some
+pages come up
 
 Now test Gunicorn with Django, run `gunicorn engfrosh_site.wsgi` do this from
 the folder with manage.py
 
-you can also run it as `gunicorn --bind 0.0.0.0:5000 engfrosh_site.wsgi` which will bind 
+you can also run it as `gunicorn --bind 0.0.0.0:5000 engfrosh_site.wsgi` which will bind
 a different port to listen on.
 
 #### Create the service
@@ -203,8 +207,8 @@ Your site should now be at least somewhat up.
 sudo rm /etc/nginx/sites-enabled/default
 ``` -->
 
-setup static files. run `manage.py collectstatic` to put the static files into the static 
-root, you will have to rerun this whenever files change. 
+setup static files. run `manage.py collectstatic` to put the static files into the static
+root, you will have to rerun this whenever files change.
 
 You also need to watch that the environment puts it in the right spot, you may
 want to change the static files root for in deployment.
@@ -215,16 +219,16 @@ want to change the static files root for in deployment.
 Make sure that your server name is correct.
 
 ```
-sudo certbot --nginx -d alpha.engfrosh.com
+sudo certbot --nginx -d mars.engfrosh.com
 ```
 
 ## RabbitMQ
 [source](https://www.rabbitmq.com/install-debian.html#apt-quick-start-cloudsmith)
 
-Run the `install-rabbitmq.sh` file. 
+Run the `install-rabbitmq.sh` file.
 
 ## Discord Bot
-Add a `credentials.json` to the engfrosh_bot folder based on the template. 
+Add a `credentials.json` to the engfrosh_bot folder based on the template.
 
 Make sure to change the bot config to the production one.
 
@@ -251,7 +255,7 @@ Got to bot and add it as a bot.
 - update the database credentials as well in that file
 - Uncheck public bot
 
-- Go back to OAuth and check bot, then administrator (for now) and then use the link to add the bot to your server. 
+- Go back to OAuth and check bot, then administrator (for now) and then use the link to add the bot to your server.
 
 - For your discord server, make it a community server is desired.
 
@@ -285,7 +289,7 @@ and check that the bot is indeed running
 ```
 systemctl enable engfrosh_bot
 ```
-so that it runs at start up. 
+so that it runs at start up.
 
 You may also want to change the service file permissions so non root can control them.
 
