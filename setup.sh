@@ -8,7 +8,7 @@ pip install -r requirements.txt
 cd ~/
 
 apt update
-apt upgrade
+apt upgrade -y
 
 apt install postgresql postgresql-contrib nginx python3-pip gunicorn certbot python3-certbot-nginx
 

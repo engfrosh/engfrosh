@@ -31,8 +31,10 @@ $ git clone https://github.com/engfrosh/engfrosh.git
 ### Run Setup
 
 ```sh
-sudo ~/engfrosh/setup.sh
+sudo sh ~/engfrosh/setup.sh
 ```
+
+Reboot to apply any kernal changes or other issues
 
 #### Setup Postgres
 
@@ -60,13 +62,13 @@ $ exit
 ##### Create Database
 
 ```
-# \i ~/engfrosh/setup.sql
+# \i home/ubuntu/engfrosh/setup.sql
 ```
 
 Then for permissions updates
 
 ```
-# \i ~/engfrosh/update_permissions.sql
+# \i /home/ubuntu/engfrosh/update_permissions.sql
 ```
 
 Will probably need to rerun this after more tables are created.
@@ -118,8 +120,13 @@ Fix any python dependency errors
 - psycopg2-binary if there is a compiling error
 - install the proper version of requests for Django
 
-- create a credentials.py file in authentication.
-- change the database password for Django
+<!-- - create a credentials.py file in authentication. -->
+- Add the following environment variables to `/etc/environment`, `sudo nano /etc/environment`
+    - ENGFROSH_DEPLOY_TYPE="PROD"
+    - DJANGO_SECRET_KEY
+        - use `python -m scripts/gen_secret_key.py`
+    - DISCORD_BOT_TOKEN
+- change the database info for Django in the settings file
 
 - migrate Django database
 - create Django super user
@@ -153,6 +160,8 @@ ExecStart=gunicorn --workers 3 --bind unix:/home/ubuntu/engfrosh/engfrosh_site/e
 WantedBy=multi-user.target
 ```
 
+<!-- TODO Fix env variables missing for services -->
+
 Now run
 ```
 sudo systemctl start engfrosh_site
@@ -165,16 +174,16 @@ To have it start on boot
 
 # Configure nginx
 
-write to `/etc/nginx/sites-available/alpha.engfrosh.com` the following
+write to `/etc/nginx/sites-available/mars.engfrosh.com` the following
 ```
 server {
     listen 80;
-    server_name alpha.engfrosh.com;
+    server_name mars.engfrosh.com;
     client_max_body_size 4G;
 
 
     location /static/ {
-        root /home/ubuntu/engfrosh/files;
+        root /usr/share/engfrosh_site/files;
     }
 
     location / {
@@ -189,9 +198,14 @@ server {
 }
 ```
 
+mkdir engfrosh_site
+chmod 777 engfrosh_site
+
+test: unix:/usr/share/engfrosh_site/engfrosh_site.sock
+
 now link the config to enable it
 ```
-sudo ln -s /etc/nginx/sites-available/alpha.engfrosh.com /etc/nginx/sites-enabled
+sudo ln -s /etc/nginx/sites-available/mars.engfrosh.com /etc/nginx/sites-enabled
 ```
 
 test `sudo nginx -t`
@@ -210,8 +224,22 @@ sudo rm /etc/nginx/sites-enabled/default
 setup static files. run `manage.py collectstatic` to put the static files into the static
 root, you will have to rerun this whenever files change.
 
+`python3 engfrosh_site/manage.py collectstatic`
+
 You also need to watch that the environment puts it in the right spot, you may
 want to change the static files root for in deployment.
+
+```
+cp files/static/* /usr/share/engfrosh_site/files/static/
+```
+
+### Add environmnet variables to service
+
+add under [Service] 
+```
+EnvironmentFile=/etc/engfrosh_site_environment
+```
+which is just a file with the needed env variables as above
 
 
 ### Add Https
@@ -221,11 +249,6 @@ Make sure that your server name is correct.
 ```
 sudo certbot --nginx -d mars.engfrosh.com
 ```
-
-## RabbitMQ
-[source](https://www.rabbitmq.com/install-debian.html#apt-quick-start-cloudsmith)
-
-Run the `install-rabbitmq.sh` file.
 
 ## Discord Bot
 Add a `credentials.json` to the engfrosh_bot folder based on the template.
@@ -238,8 +261,8 @@ Create a new discord application [here](https://discord.com/developers/applicati
 
 Under OAuth2 add the redirects:
 ```
-https://alpha.engfrosh.com/accounts/login/discord/callback/
-https://alpha.engfrosh.com/accounts/register/discord/callback/
+https://mars.engfrosh.com/accounts/login/discord/callback/
+https://mars.engfrosh.com/accounts/register/discord/callback/
 ```
 <!-- For development user the callbacks:
 ```

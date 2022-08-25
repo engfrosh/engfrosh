@@ -49,7 +49,8 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
 
         context = {
             "puzzle": puz,
-            "view_only": puz.is_completed_for_team(team)
+            "view_only": puz.is_completed_for_team(team),
+            "guess": request.GET.get("answer", "")
         }
 
         return render(request, "scavenger_question.html", context)
@@ -70,7 +71,7 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
         if require_verification_photo:
             next_page = "verification_photo/"
         elif next_puzzle:
-            next_page = next_puzzle.secret_id
+            next_page = "../" + next_puzzle.secret_id
         else:
             next_page = ""
 

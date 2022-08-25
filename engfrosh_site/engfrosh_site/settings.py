@@ -62,8 +62,7 @@ else:
 
 if development:
     ALLOWED_HOSTS = [
-        "127.0.0.1",
-        "localhost"
+        "127.0.0.1"
     ]
 else:
     ALLOWED_HOSTS = [
@@ -112,7 +111,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            './engfrosh_site/engfrosh_site/templates'
+            './engfrosh_site/engfrosh_site/templates',
+            './engfrosh_site/templates'
         ],
         'APP_DIRS': True,
         'OPTIONS': {

@@ -14,6 +14,7 @@ from common_models.models import FroshRole, Team, UniversityProgram, UserDetails
 import common_models.models
 from common_models.models import ChannelTag, DiscordChannel, Role
 from pyaccord.invite import Invite
+from pyaccord.permissions import Permissions
 from . import registration
 
 from django.conf import settings
@@ -39,6 +40,15 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
 
     if request.method == "GET":
         role_options = []
+
+        DEFAULT_ROLES = ("Frosh", "Facil", "Head", "Planning")
+        for role in DEFAULT_ROLES:
+            if not FroshRole.objects.filter(name=role).exists():
+                group = Group(name=role)
+                group.save()
+                fr = FroshRole(name=role, group=group)
+                fr.save()
+
         for role in FroshRole.objects.all():
             role_options.append(role.name)
 
@@ -239,12 +249,13 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
                 scav_channel = None
                 logger.warning(f"No scav team exists for team: {team}")
             else:
-                try:
-                    # TODO: need to fix the scav channels
-                    scav_channel = common_models.models.ScavChannel.objects.get(group=team.group).channel_id
-                except ObjectDoesNotExist:
-                    logger.info(f"No scav channel exists for team: {team}")
-                    scav_channel = None
+                # try:
+                #     # TODO: need to fix the scav channels
+                #     # scav_channel = common_models.models.ScavChannel.objects.get(group=team.group).channel_id
+                # except ObjectDoesNotExist:
+                #     logger.info(f"No scav channel exists for team: {team}")
+                #     scav_channel = None
+                scav_channel = None
 
             team_color = team.color_code
 
@@ -435,6 +446,47 @@ def manage_discord_servers(request: HttpRequest) -> HttpResponse:
         return HttpResponseBadRequest("Bad http request method.")
 
 
+@permission_required("common_models.change_discordguild")
+def modify_discord_server(request: HttpRequest, slug: str) -> HttpResponse:
+
+    guild = DiscordGuild.objects.get(id=int(slug))
+
+    if request.method == "GET":
+
+        context = {
+            "guild": guild
+        }
+
+        return render(request, "modify_discord_server.html", context)
+
+    elif request.method == "POST":
+
+        if not request.user.has_perm("common_models.change_discordguild"):
+            return HttpResponseForbidden("Permission denied")
+
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Invalid / missing content type.")
+
+        req_dict = json.loads(request.body)
+        if "command" not in req_dict:
+            return HttpResponseBadRequest("Bad request body, missing command.")
+
+        match req_dict["command"]:
+            case "add_admin":
+
+                role = guild.create_role("ADMIN", permissions=[Permissions.ADMINISTRATOR])
+
+                guild.add_role_to_member(discord_member_id=req_dict["discord_user_id"], discord_role=role)
+
+                return HttpResponse()
+
+            case _:
+                return HttpResponseBadRequest("Invalid command.")
+
+    else:
+        return HttpResponseNotAllowed(("GET",))
+
+
 def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
     """Page for managing discord channel groups by tags or categories."""
 
@@ -499,10 +551,32 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
 
     if request.method == "GET":
 
+        for puz in Puzzle.objects.all():
+            if not puz.qr_code:
+                puz._generate_qr_code()
+
         context = {
             "puzzles": Puzzle.objects.all()
         }
 
         return render(request, "manage_scavenger_puzzles.html", context)
 
-    return HttpResponse("Hey there!")
+    elif request.method == "POST":
+
+        return HttpResponse("Not Implemented")
+        
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Invalid / missing content type.")
+
+        req_dict = json.loads(request.body)
+        if "command" not in req_dict:
+            return HttpResponseBadRequest("Bad request body, missing command.")
+
+        # match req_dict["command"]:
+        #     case "get_qr_code"
+
+
+
+    else:
+        return HttpResponseNotAllowed(("GET", "POST"))
+

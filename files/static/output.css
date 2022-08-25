@@ -908,11 +908,6 @@ td.button_cell {
     background-color: rgb(241 90 36 / var(--tw-bg-opacity));
   }
 
-  .dark\:bg-main {
-    --tw-bg-opacity: 1;
-    background-color: rgb(177 0 255 / var(--tw-bg-opacity));
-  }
-
   .dark\:text-slate-400 {
     --tw-text-opacity: 1;
     color: rgb(148 163 184 / var(--tw-text-opacity));

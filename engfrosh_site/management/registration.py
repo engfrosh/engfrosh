@@ -59,16 +59,17 @@ def get_magic_link(user: User, hostname: str, login_path: str,
 
 
 DEFAULT_MAGIC_LINK_EMAIL_TEXT = \
-    """Welcome to EngFrosh, Dawn of Energy!
-Here is your magic link to log into the EngFrosh site: {link}
+    """Welcome to EngFrosh, Destination Mars!
+Here is your magic link to log into the EngFrosh site and Discord server: {link}
 
 If you need any help or any questions, please email questions@engfrosh.com"""
+
 DEFAULT_MAGIC_LINK_EMAIL_HTML = \
     """<html lang='en'>
         <body>
             <img src='data:image/jpg;base64,{logo}' alt='EngFrosh logo' style='text-align: center;' /><br/>
-            <h1>Welcome to EngFrosh, Dawn of Energy!</h1><br/>
-            <p><a href='{link}' >Here</a> is your magic link to log into the EngFrosh site.</p>
+            <h1>Welcome to EngFrosh, Destination Mars!</h1><br/>
+            <p><a href='{link}' >Here</a> is your magic link to log into the EngFrosh site and Discord server.</p>
             <br/>
             <p>If you need any help or any questions,
             please email <a href="mailto:questions@engfrosh.com">questions@engfrosh.com</a>
@@ -80,7 +81,7 @@ DEFAULT_MAGIC_LINK_EMAIL_HTML = \
     </html>
     """
 # Note, google tends to get rid of some link elements.
-DEFAULT_MAGIC_LINK_EMAIL_SUBJECT = "Welcome to EngFrosh Dawn of Energy!"
+DEFAULT_MAGIC_LINK_EMAIL_SUBJECT = "Welcome to EngFrosh Destination Mars Discord and Website!"
 
 
 def email_magic_link(user: User, hostname: str, login_path: str, sender_email: str, *,
