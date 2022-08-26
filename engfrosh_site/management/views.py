@@ -356,7 +356,7 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
                 team.color = req_dict["team_color"]
                 team.save()
 
-            return JsonResponse(team.to_dict())
+            return JsonResponse(team.to_dict)
 
         else:
             return HttpResponseBadRequest("Invalid command.")
