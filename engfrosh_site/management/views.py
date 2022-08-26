@@ -1,6 +1,7 @@
 """Views for management pages."""
 
 import logging
+from typing import List, Union
 import requests
 import json
 import os
@@ -200,6 +201,7 @@ def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
             # Get user information
             logger.debug(f"Trying to add website user with id {req_dict['user_id']}")
             discord_user = DiscordUser.objects.get(user=req_dict["user_id"])
+            user = User.objects.get(user=req_dict["user_id"])
             if not discord_user:
                 return HttpResponseBadRequest("User does not exist / have a discord account linked.")
 
@@ -207,8 +209,20 @@ def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
                                       access_token=discord_user.access_token, refresh_token=discord_user.refresh_token,
                                       expiry=discord_user.expiry)
 
+            groups = user.groups.all()
+            discord_role_ids: Union[List[int], None] = []
+            for g in groups:
+                try:
+                    discord_role_ids.append(DiscordRole.objects.get(group_id=g).role_id)
+                except ObjectDoesNotExist:
+                    continue
+
+            if not discord_role_ids:
+                discord_role_ids = None
+
             # TODO Make guild id dynamic
-            res = user_api.add_user_to_guild(credentials.GUILD_ID, user_id=discord_user.id)
+            res = user_api.add_user_to_guild(credentials.GUILD_ID, user_id=discord_user.id,
+                                             roles=discord_role_ids, nickname=user.get_full_name())
 
             if res:
                 # Add succeeded
@@ -564,7 +578,7 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
     elif request.method == "POST":
 
         return HttpResponse("Not Implemented")
-        
+
         if request.content_type != "application/json":
             return HttpResponseBadRequest("Invalid / missing content type.")
 
@@ -575,8 +589,5 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
         # match req_dict["command"]:
         #     case "get_qr_code"
 
-
-
     else:
         return HttpResponseNotAllowed(("GET", "POST"))
-
