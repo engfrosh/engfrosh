@@ -304,12 +304,12 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
             discord_api = pyaccord.Client(credentials.BOT_TOKEN, api_version=settings.DEFAULT_DISCORD_API_VERSION)
 
             try:
-                role_id = discord_api.create_guild_role(credentials.GUILD_ID, name=team.display_name, color=team.color)
+                role = discord_api.create_guild_role(credentials.GUILD_ID, name=team.display_name, color=team.color)
             except requests.HTTPError as e:
-                logger.error(f"HTTP Error. \nRequest: {e.request} \nResponse: {e.response}")
+                logger.error(f"HTTP Error. \nRequest: {e.request} \nResponse: {e.response.text}")
                 return HttpResponseServerError("Could not add guild role.")
 
-            role = DiscordRole(role_id=role_id, group_id=group)
+            role = DiscordRole(role_id=role.id, group_id=group)
             role.save()
 
             return JsonResponse({"team_id": group.id, "role_id": role.role_id})  # type: ignore
