@@ -331,12 +331,11 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
             team = Team(display_name=team_name, group=group, color=team_color)
             team.save()
 
-            scav_team = common_models.models.Team(group=group)
+            # scav_team = common_models.models.Team(group=group)
             # TODO: need to fix this method
-            scav_team.reset_scavenger_progress()
-            scav_team.save()
+            team.reset_scavenger_progress()
+            team.save()
 
-            # TODO: fix this method
             return JsonResponse(team.to_dict)
 
         # UPDATE AN EXISTING TEAM
