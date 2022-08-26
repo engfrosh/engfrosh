@@ -323,7 +323,7 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
             scav_team.save()
 
             # TODO: fix this method
-            return JsonResponse(team.to_dict())
+            return JsonResponse(team.to_dict)
 
         # UPDATE AN EXISTING TEAM
         elif req_dict["command"] == "update_team":
