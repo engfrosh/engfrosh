@@ -105,7 +105,7 @@ def email_magic_link(user: User, hostname: str, login_path: str, sender_email: s
         subject = DEFAULT_MAGIC_LINK_EMAIL_SUBJECT
 
     res = send_email(user=user, sender_email=sender_email, subject=subject,
-                     body_text=body_text.format(link=link), body_html=body_html.format(link=link, logo=LOGO))
+                     body_text=body_text.format(link=link), body_html=body_html.format(link=link, logo=""))
 
     if res:
         try:
