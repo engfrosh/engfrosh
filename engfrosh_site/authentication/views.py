@@ -13,7 +13,7 @@ from typing import List, Union
 import credentials
 
 from common_models.models import DiscordUser
-from common_models.models import Role
+from common_models.models import DiscordRole
 from .discord_auth import register
 from pyaccord.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  # noqa E402
 
@@ -181,7 +181,7 @@ def discord_register_callback(request: HttpRequest):
             discord_role_ids: Union[List[int], None] = []
             for g in groups:
                 try:
-                    discord_role_ids.append(Role.objects.get(group_id=g).role_id)
+                    discord_role_ids.append(DiscordRole.objects.get(group_id=g).role_id)
                 except ObjectDoesNotExist:
                     continue
 

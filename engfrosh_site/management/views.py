@@ -12,7 +12,7 @@ from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordGuild, DiscordUser, Puzzle
 from common_models.models import FroshRole, Team, UniversityProgram, UserDetails
 import common_models.models
-from common_models.models import ChannelTag, DiscordChannel, Role
+from common_models.models import ChannelTag, DiscordChannel, DiscordRole
 from pyaccord.invite import Invite
 from pyaccord.permissions import Permissions
 from . import registration
@@ -238,7 +238,7 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         context = {"teams": []}
         for team in Team.objects.all():
-            if Role.objects.filter(group_id=team.group).exists():
+            if DiscordRole.objects.filter(group_id=team.group).exists():
                 role_exists = True
             else:
                 role_exists = False
@@ -295,7 +295,7 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
                 logger.error(f"HTTP Error. \nRequest: {e.request} \nResponse: {e.response}")
                 return HttpResponseServerError("Could not add guild role.")
 
-            role = Role(role_id=role_id, group_id=group)
+            role = DiscordRole(role_id=role_id, group_id=group)
             role.save()
 
             return JsonResponse({"team_id": group.id, "role_id": role.role_id})  # type: ignore
