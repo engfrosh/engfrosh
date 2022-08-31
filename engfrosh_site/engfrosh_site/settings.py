@@ -189,12 +189,13 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = []
 if not PRODUCTION:
     STATICFILES_DIRS.append('files/static')
+    MEDIA_ROOT = './files/media'
 
 # STATIC_ROOT should not be present, at least for development as far as I know.
 if PRODUCTION:
-    STATIC_ROOT = 'files/static'
+    STATIC_ROOT = '/usr/share/engfrosh_site/files/static'
+    MEDIA_ROOT = '/usr/share/engfrosh_site/files/media'
 
-MEDIA_ROOT = './files/media'
 MEDIA_URL = '/media/'
 
 # Default primary key field type

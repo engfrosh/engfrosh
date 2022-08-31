@@ -569,7 +569,7 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
                 puz._generate_qr_code()
 
         context = {
-            "puzzles": Puzzle.objects.all()
+            "puzzles": Puzzle.objects.all().order_by("order")
         }
 
         return render(request, "manage_scavenger_puzzles.html", context)

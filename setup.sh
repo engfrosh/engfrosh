@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/bash
 
 cd ~/engfrosh
 git submodule init
