@@ -1,0 +1,47 @@
+{% extends "base_generic.html" %}
+{% block page_title %}
+    Trade Up
+{% endblock page_title %}
+{% block body %}
+    <p>Upload a photo of the trade happening</p>
+    <label for="file">Choose an image to upload</label>
+    <input type="file"
+           accept="image/*"
+           capture="user"
+           name="photo_upload"
+           id="image_file"/>
+    <button class="bg-main dark:bg-main-night rounded text-white p-1"
+            onclick="uploadPhoto()">Upload</button>
+{% endblock body %}
+{% block js_functions %}
+    <script>
+        function uploadPhoto() {
+            {% comment %} alert("Uploading..."); {% endcomment %}
+
+            let file = document.getElementById("image_file").files[0];
+            let formData = new FormData();
+            formData.append("photo_upload", file);
+            fetch("", {
+                method: "POST",
+                mode: "cors",
+                credentials: "same-origin",
+                headers: {
+                    "X-CSRFToken": csrf_token
+                },
+                body: formData
+            }).then(res => {
+                if (res.ok) {
+                    alert("Upload Success!");
+                    location.reload();
+                    {% comment %} window.location.href = "/scavenger/"; {% endcomment %}
+                } else {
+                    res.text().then(data => {
+                        alert("Not Okay: " + data);
+                    });
+                }
+            });
+        }
+
+
+    </script>
+{% endblock js_functions %}

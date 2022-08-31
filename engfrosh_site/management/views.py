@@ -21,11 +21,12 @@ from . import registration
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import permission_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse, \
     HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib import auth
 
 
@@ -238,12 +239,17 @@ def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
 
     return HttpResponseServerError()
 
-# TODO Limit access to staff
 
-
+@staff_member_required
 def manage_index(request: HttpRequest) -> HttpResponse:
     """Home page for management."""
     return render(request, "manage.html")
+
+
+@staff_member_required
+def initialize_database(request: HttpRequest) -> HttpResponse:
+    common_models.models.initialize_database()
+    return redirect("manage_index")
 
 
 @permission_required("frosh_team.change_team")

@@ -4,8 +4,15 @@
         {% if scavenger_enabled %}
             <a href="{% url 'scavenger_index' %}"
                class="bg-main dark:bg-main-night rounded-lg p-2">Scav</a>
+        {% else %}
+            <p class="rounded-lg p-2 border">Scav Disabled</p>
         {% endif %}
-        <a class="bg-main dark:bg-main-night rounded-lg p-2">Spirit Challenges</a>
+        {% if trade_up_enabled %}
+            <a href="{% url 'trade_up_home' %}"
+               class="bg-main dark:bg-main-night rounded-lg p-2">Trade Up</a>
+        {% else %}
+            <p class="rounded-lg p-2 border">Trade Up Disabled</p>
+        {% endif %}
         <a class="bg-main dark:bg-main-night rounded-lg p-2">Get Help</a>
     </div>
 {% endblock active %}

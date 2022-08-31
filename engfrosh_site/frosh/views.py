@@ -1,9 +1,9 @@
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseNotAllowed, HttpResponseForbidden
 from django.shortcuts import render  # noqa F401
 from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required, permission_required
 
-from common_models.models import Team
+from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto
 
 # Create your views here.
 
@@ -65,7 +65,41 @@ def user_home(request: HttpRequest) -> HttpResponse:
     team = Team.from_user(request.user)
 
     context = {
-        "scavenger_enabled": team.scavenger_enabled if team else False
+        "scavenger_enabled": team.scavenger_enabled if team else False,
+        "trade_up_enabled": team.trade_up_enabled if team else False
     }
 
     return render(request, "user_home.html", context)
+
+
+def trade_up(request: HttpRequest) -> HttpResponse:
+    """Upload page for trade up."""
+
+    team = Team.from_user(request.user)
+    if not team:
+        return HttpResponse("Sorry you aren't on a team. If this is incorrect, please contact supoort")
+
+    if not team.trade_up_enabled:
+        return HttpResponseForbidden("Trade up is not enabled")
+
+    match request.method:
+        case "GET":
+
+            context = {}
+
+            return render(request, "trade_up_upload.html", context)
+
+        case "POST":
+
+            photo = VerificationPhoto()
+            photo.photo = request.FILES["photo_upload"]
+            photo.save()
+
+            tta = TeamTradeUpActivity(team=team, verification_photo=photo)
+            tta.save()
+
+            return HttpResponse("Success")
+
+        case _:
+
+            return HttpResponseNotAllowed(["GET", "POST"])
