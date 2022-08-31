@@ -10,7 +10,7 @@ import credentials
 import pyaccord
 
 from pyaccord.DiscordUserAPI import DiscordUserAPI
-from common_models.models import DiscordGuild, DiscordUser, Puzzle
+from common_models.models import DiscordGuild, DiscordUser, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, UserDetails
 import common_models.models
 from common_models.models import ChannelTag, DiscordChannel, DiscordRole
@@ -587,6 +587,49 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
 
         # match req_dict["command"]:
         #     case "get_qr_code"
+
+    else:
+        return HttpResponseNotAllowed(("GET", "POST"))
+
+
+@permission_required("common_models.change_puzzle")
+def approve_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
+    """Page for approving verification images."""
+
+    if request.method == "GET":
+
+        context = {"puzzle_activities_awaiting_verification": list(
+            filter(TeamPuzzleActivity._is_awaiting_verification, TeamPuzzleActivity.objects.all()))}
+
+        return render(request, "approve_scavenger_puzzles.html", context)
+
+    elif request.method == "POST":
+
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Invalid / missing content type.")
+
+        req_dict = json.loads(request.body)
+        if "command" not in req_dict:
+            return HttpResponseBadRequest("Bad request body, missing command.")
+
+        match req_dict["command"]:
+
+            case "approve_verification_photo":
+
+                if "photo_id" not in req_dict:
+                    return HttpResponseBadRequest("No photo_id provided.")
+
+                photo_id = req_dict["photo_id"]
+                try:
+                    photo = VerificationPhoto.objects.get(id=photo_id)
+                except VerificationPhoto.DoesNotExist:
+                    return HttpResponseBadRequest("Invalid photo id.")
+
+                photo.approve()
+                return HttpResponse("Success")
+
+            case _:
+                return HttpResponseBadRequest("Invalid command.")
 
     else:
         return HttpResponseNotAllowed(("GET", "POST"))

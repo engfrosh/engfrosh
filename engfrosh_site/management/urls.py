@@ -13,5 +13,6 @@ urlpatterns = [
     path('discord/channels', views.manage_discord_channels, name="manage_discord_channels"),
     path('discord/channel-groups', views.manage_discord_channel_groups, name="manage_discord_channel_groups"),
     path('discord/servers', views.manage_discord_servers, name="manage_discord_servers"),
-    path('scavenger/puzzles', views.manage_scavenger_puzzles, name="manage_scavenger_puzzles")
+    path('scavenger/puzzles', views.manage_scavenger_puzzles, name="manage_scavenger_puzzles"),
+    path('scavenger/approve_photos', views.approve_scavenger_puzzles, name="approve_scavenger_puzzles")
 ]
