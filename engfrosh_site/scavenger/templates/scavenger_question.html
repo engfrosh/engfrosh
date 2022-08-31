@@ -36,6 +36,8 @@
                         Submit
                     </button>
                 </div>
+            {% elif not scavenger_enabled_for_team %}
+                Scavenger is not currently enabled
             {% endif %}
         </div>
     </div>

@@ -18,7 +18,7 @@
 {% block js_functions %}
     <script>
         function uploadPhoto() {
-            alert("Uploading...");
+            {% comment %} alert("Uploading..."); {% endcomment %}
 
             let file = document.getElementById("image_file").files[0];
             let formData = new FormData();
@@ -34,6 +34,7 @@
             }).then(res => {
                 if (res.ok) {
                     alert("Upload Success!");
+                    window.location.href = "/scavenger/";
                 } else {
                     res.text().then(data => {
                         alert("Not Okay: " + data);

@@ -61,4 +61,11 @@ def overall_index(request: HttpRequest):
 
 def user_home(request: HttpRequest) -> HttpResponse:
     """The home page for regular users."""
-    return render(request, "user_home.html")
+
+    team = Team.from_user(request.user)
+
+    context = {
+        "scavenger_enabled": team.scavenger_enabled if team else False
+    }
+
+    return render(request, "user_home.html", context)

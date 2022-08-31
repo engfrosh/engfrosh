@@ -3,7 +3,7 @@ from django.http import HttpRequest, HttpResponse
 from django.http.response import HttpResponseNotAllowed, HttpResponseBadRequest, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render  # noqa F401
 
-from common_models.models import Puzzle, Team, VerificationPhoto
+from common_models.models import BooleanSetting, Puzzle, Team, VerificationPhoto
 from django.contrib.auth.decorators import login_required, permission_required
 
 import logging
@@ -19,10 +19,16 @@ def index(request: HttpRequest) -> HttpResponse:
     if not team:
         return render(request, "scavenger_index.html", context={"team": None})
 
+    if not team.scavenger_enabled:
+        return HttpResponse("Scavenger not currently enabled")
+
     context = {
+        "scavenger_enabled_for_team": team.scavenger_enabled,
         "team": team,
         "active_puzzles": team.active_puzzles,
-        "completed_puzzles": team.completed_puzzles
+        "verified_puzzles": team.verified_puzzles,
+        "completed_puzzles_awaiting_verification": team.completed_puzzles_awaiting_verification,
+        "completed_puzzles_requiring_photo_upload": team.completed_puzzles_requiring_photo_upload
     }
 
     return render(request, "scavenger_index.html", context=context)
@@ -49,7 +55,8 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
 
         context = {
             "puzzle": puz,
-            "view_only": puz.is_completed_for_team(team),
+            "view_only": puz.is_completed_for_team(team) or not team.scavenger_enabled,
+            "scavenger_enabled_for_team": team.scavenger_enabled,
             "guess": request.GET.get("answer", "")
         }
 
@@ -64,6 +71,9 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
 
         if "answer" not in req_dict:
             return HttpResponseBadRequest("No answer provided in json body")
+
+        if not team.scavenger_enabled:
+            return HttpResponseForbidden("Scavenger not currently enabled.")
 
         correct, stream_completed, next_puzzle, require_verification_photo = puz.check_team_guess(
             team, req_dict["answer"])
