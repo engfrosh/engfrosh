@@ -1,13 +1,15 @@
-from typing import Optional, Union
+from typing import Union
 from django.http import HttpRequest, HttpResponse
 from django.http.response import HttpResponseNotAllowed, HttpResponseBadRequest, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render  # noqa F401
 
-from common_models.models import BooleanSetting, Puzzle, Team, VerificationPhoto
+from common_models.models import DiscordChannel, Puzzle, Team, VerificationPhoto
 from django.contrib.auth.decorators import login_required, permission_required
 
 import logging
 import json
+
+from django.urls import reverse
 
 logger = logging.getLogger("engfrosh_site.scavenger.views")
 
@@ -129,6 +131,9 @@ def puzzle_photo_verification_view(request: HttpRequest, slug: str) -> HttpRespo
 
             pa.verification_photo = photo
             pa.save()
+
+            DiscordChannel.send_to_scavenger_updates_channels(
+                f"""{team.display_name} has uploaded a photo for {puz.name} that needs verification.\n{request.build_absolute_uri(reverse("approve_scavenger_puzzles"))}""")
 
             return HttpResponse()
 
