@@ -3,12 +3,13 @@ function buttonCopyGenerator(text, button) {
     navigator.clipboard.writeText(text)
       .then(data => {
         button.textContent = "Copied";
-        button.style.backgroundColor = "White";
+        button.style.backgroundColor = "Gray";
+        button.disabled = true;
       });
   };
 };
 
-function get_magic_link(user_id) {
+function get_new_magic_link(user_id) {
   fetch("", {
     method: "POST",
     mode: "cors",
@@ -17,7 +18,7 @@ function get_magic_link(user_id) {
       'X-CSRFToken': csrf_token,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ "command": "return_link", "user_id": user_id })
+    body: JSON.stringify({ "command": "return_new_link", "user_id": user_id })
   })
     .then(res => {
       if (res.ok) {
@@ -28,8 +29,10 @@ function get_magic_link(user_id) {
           button.textContent = "Copy Link";
           button.onclick = buttonCopyGenerator(data["link"], button);
           let email_button = document.querySelector("td.email_link." + cls + " button");
-          email_button.disabled = true;
-        })
+          if (email_button) {
+            email_button.disabled = true;
+          }
+        });
       }
       else {
         alert("Bad response " + res.status + " Could not get link.")
@@ -37,6 +40,64 @@ function get_magic_link(user_id) {
       }
     });
 };
+
+function get_existing_magic_link(user_id) {
+  fetch("", {
+    method: "POST",
+    mode: "cors",
+    credentials: "same-origin",
+    headers: {
+      'X-CSRFToken': csrf_token,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ "command": "return_existing_link", "user_id": user_id })
+  })
+    .then(res => {
+      if (res.ok) {
+        res.json().then(data => {
+          const cls = "user_" + user_id;
+          const button = document.querySelector("td.get_link." + cls + " button");
+          button.style.backgroundColor = "green";
+          button.textContent = "Copy Link";
+          button.onclick = buttonCopyGenerator(data["link"], button);
+          let email_button = document.querySelector("td.email_link." + cls + " button");
+          if (email_button) {
+            email_button.disabled = true;
+          }
+        });
+      }
+      else {
+        alert("Bad response " + res.status + " Could not get link.")
+
+      }
+    });
+};
+
+function get_qr_code_magic_link(user_id) {
+  postToServer(csrf_token, {
+    "command": "return_qr_code",
+    "user_id": user_id
+  })
+    .then(res => {
+      if (res.ok) {
+        res.json().then(data => {
+          window.location.href = data["qr_code_link"]
+          //   const cls = "user_" + user_id;
+          //   const button = document.querySelector("td.create_link." + cls + " button");
+          //   button.style.backgroundColor = "green";
+          //   button.textContent = "Copy Link";
+          //   button.onclick = buttonCopyGenerator(data["link"], button);
+          //   let email_button = document.querySelector("td.email_link." + cls + " button");
+          //   email_button.disabled = true;
+        });
+      }
+      else {
+        res.text().then(data => {
+          alert("Error:\n" + data);
+        });
+      }
+    });
+}
 
 function email_magic_link(user_id) {
   fetch("", {
@@ -56,7 +117,7 @@ function email_magic_link(user_id) {
           const cls = "user_" + user_id;
           let button = document.querySelector("td.email_link." + cls + " button");
           button.style.backgroundColor = "green";
-          button.textContent = "Email Sent!";
+          button.textContent = "Email Sent";
           button.disabled = true;
           let link_button = document.querySelector("td.create_link." + cls + " button");
           link_button.disabled = true;

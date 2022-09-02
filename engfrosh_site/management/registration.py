@@ -14,7 +14,6 @@ from django.utils import timezone
 from common_models.models import FroshRole, Team, UserDetails, UniversityProgram
 from management.email import send_email
 
-from management.images import LOGO
 
 logger = logging.getLogger("Management.Registration")
 
@@ -25,7 +24,7 @@ class UserAlreadyExistsError(Exception):
 
 def get_magic_link(user: User, hostname: str, login_path: str,
                    expires_in: Optional[timedelta] = None,
-                   delete_on_use: bool = True, redirect: str = None) -> str:
+                   delete_on_use: bool = True, redirect: Optional[str] = None) -> str:
     """Returns the full url as specified. Invalidates any previous magic links.
 
     Args:

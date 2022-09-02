@@ -1,54 +1,75 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}">
-    <title>Manage Discord Magic Links</title>
-    {% csrf_token %}
-    <script>
-        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        let user_ids = [
-            {% for user in users %}{{user.id}},{% endfor %}
-        ]
-        user_ids = user_ids.reverse();
-    </script>
-    <style>
-        td.button_cell button {
-            background-color: cornflowerblue;
-        }
-    </style>
-    <script src="{% static 'create_discord_magic_links.js' %}"></script>
-</head>
-
-<body>
-    <a href="/manage">Back to Manage</a>
-    <hr/>
-
-    <h3>Add Users to Discord</h3>
-
-    <button type="button" onclick="add10Button()">Invite 10</button>
-
+{% extends "base_manage_subpage.html" %}
+{% load static %}
+{% block page_title %}
+    Manage Discord Magic Links
+{% endblock page_title %}
+{% block top_title %}
+    Manage Discord Magic Links
+{% endblock top_title %}
+{% block active %}
+    <p>Use this page to give users links to join the discord server</p>
+    <button type="button"
+            class="bg-main dark:bg-main-night rounded text-white p-1 m-2"
+            onclick="add10Button()">
+        Email 10
+    </button>
     <hr/>
     <table>
         <tr>
-            <th>Username</th>
-            <th>Create Link</th>
-            <th>Email Link</th>
+            <th class="px-2">User</th>
+            <th class="px-2">Create New Link</th>
+            <th class="px-2">Get Link</th>
+            <th class="px-2">Email Link</th>
+            <th class="px-2">QR-Code</th>
         </tr>
         {% for user in users %}
-        <tr>
-            <td>{{user.username}}</td>
-            <td class="user_{{user.id}} create_link button_cell">
-                <button onclick="get_magic_link({{user.id}})" type="button">Add</button>
-            </td>
-            <td class="user_{{user.id}} email_link button_cell">
-                <button type="button" onclick="email_magic_link({{user.id}})">Email</button>
-            </td>
-        </tr>
+            <tr>
+                <td class="px-2">{{ user.username }}</td>
+                <td class="user_{{ user.id }} create_link button_cell text-center px-2">
+                    <button class="p-0.5 bg-main dark:bg-main-night text-white rounded px-1"
+                            onclick="get_new_magic_link({{ user.id }})"
+                            type="button">
+                        Create
+                    </button>
+                </td>
+                <td class="user_{{ user.id }} get_link button_cell text-center px-2">
+                    <button class="p-0.5 bg-main dark:bg-main-night text-white rounded px-1"
+                            onclick="get_existing_magic_link({{ user.id }})"
+                            type="button">
+                        Get
+                    </button>
+                </td>
+                <td class="user_{{ user.id }} email_link button_cell text-center px-2">
+                    {% if not user.email_sent %}
+                        <button class="p-0.5 bg-main dark:bg-main-night text-white rounded px-1"
+                                type="button"
+                                onclick="email_magic_link({{ user.id }})">
+                            Email
+                        </button>
+                    {% else %}
+                        <p class="p-0.5 rounded border px-1">Email Sent</p>
+                    {% endif %}
+                </td>
+                <td class="px-2 text-center">
+                    <button class="p-0.5 bg-main dark:bg-main-night text-white rounded px-1"
+                            type="button"
+                            onclick="get_qr_code_magic_link({{ user.id }})">
+                        Get
+                    </button>
+                </td>
+            </tr>
         {% endfor %}
     </table>
-    
-</body>
+{% endblock active %}
+{% block page_js %}
+    <script>
+    let user_ids = [
+        {% for user in users %}{% if not user.email_sent %}{{user.id}},{% endif %}{% endfor %}
+    ]
+    user_ids = user_ids.reverse();
 
-</html>
+    </script>
+{% endblock page_js %}
+{% block js_functions %}
+    <script src="{% static 'create_discord_magic_links.js' %}"></script>
+{% endblock js_functions %}

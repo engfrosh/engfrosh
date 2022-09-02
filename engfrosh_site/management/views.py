@@ -10,7 +10,7 @@ import credentials
 import pyaccord
 
 from pyaccord.DiscordUserAPI import DiscordUserAPI
-from common_models.models import DiscordGuild, DiscordUser, Puzzle, TeamPuzzleActivity, VerificationPhoto
+from common_models.models import DiscordGuild, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, UserDetails
 import common_models.models
 from common_models.models import ChannelTag, DiscordChannel, DiscordRole
@@ -112,6 +112,9 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
 @permission_required("auth_user.change_user")
 def get_discord_link(request: HttpRequest) -> HttpResponse:
     """View to get discord linking links for users or send link emails to users."""
+
+    # TODO add so heads can access for their teams
+
     if request.method == "GET":
         # Handle Webpage requests
         # TODO add check that user doesn't yet have a discord account linked.
@@ -125,8 +128,12 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
             except ObjectDoesNotExist:
                 email_sent = False
 
-            if not usr.is_superuser and not email_sent and not DiscordUser.objects.filter(user=usr).exists():
-                context["users"].append(usr)
+            if not usr.is_superuser and not DiscordUser.objects.filter(user=usr).exists():
+                context["users"].append({
+                    "username": usr.username,
+                    "id": usr.id,
+                    "email_sent": bool(email_sent)
+                })
 
         return render(request, "create_discord_magic_links.html", context)
 
@@ -136,40 +143,85 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
             return HttpResponseBadRequest()
 
         req_dict = json.loads(request.body)
-        if "user_id" not in req_dict and "command" not in req_dict and req_dict["command"] not in {
-                "return_link", "send_link_email"}:
-            return HttpResponseBadRequest()
+
+        if "command" not in req_dict:
+            return HttpResponseBadRequest("Missing command")
+
+        if "user_id" not in req_dict:
+            return HttpResponseBadRequest("Missing user_id")
 
         user = User.objects.get(id=req_dict["user_id"])
 
-        if req_dict["command"] == "return_link":
-            link = registration.get_magic_link(
-                user, request.get_host(),
-                "/accounts/login", redirect="/accounts/link/discord")
-            if not link:
-                logger.error("Could not get magic link for user %s", user)
-                return HttpResponseServerError("Could not get link for user.")
-            return JsonResponse({"user_id": user.id, "link": link})
+        match req_dict["command"]:
 
-        elif req_dict["command"] == "send_link_email":
-            # TODO Update the email to be dynamic
-            SENDER_EMAIL = "noreply@engfrosh.com"
-            if registration.email_magic_link(
+            # TODO should first sync and eliminate expired links
+
+            case "return_new_link":
+                link = registration.get_magic_link(
                     user, request.get_host(),
-                    "/accounts/login", SENDER_EMAIL,
-                    redirect="/accounts/link/discord",
-                    delete_on_use=False):
-                # Email successfully sent
-                return JsonResponse({"user_id": user.id})
+                    "/accounts/login", redirect="/accounts/link/discord")
+                if not link:
+                    logger.error("Could not get magic link for user %s", user)
+                    return HttpResponseServerError("Could not get link for user.")
+                return JsonResponse({"user_id": user.id, "link": link})  # TODO fix to include https://
 
-            else:
-                # Email failed for some reason
-                return HttpResponseServerError()
+            case "return_existing_link":
+                try:
+                    mlink = MagicLink.objects.get(user=user)
+                except MagicLink.DoesNotExist:
+                    link = registration.get_magic_link(
+                        user, request.get_host(),
+                        "/accounts/login", redirect="/accounts/link/discord")
+                    if not link:
+                        logger.error("Could not get magic link for user %s", user)
+                        return HttpResponseServerError("Could not get link for user.")
+                    return JsonResponse({"user_id": user.id, "link": link})  # TODO fix to include https://
+
+                return JsonResponse(
+                    {"user_id": user.id, "link": mlink.full_link(
+                        hostname=request.get_host(),
+                        login_path="/accounts/login", redirect="/accounts/link/discord")})  # TODO fix to include https://
+
+            case "send_link_email":
+                # TODO Update the email to be dynamic
+                SENDER_EMAIL = "noreply@engfrosh.com"
+                if registration.email_magic_link(
+                        user, request.get_host(),
+                        "/accounts/login", SENDER_EMAIL,
+                        redirect="/accounts/link/discord",
+                        delete_on_use=False):
+                    # Email successfully sent
+                    return JsonResponse({"user_id": user.id})
+
+                else:
+                    # Email failed for some reason
+                    return HttpResponseServerError()
+
+            case "return_qr_code":
+                try:
+                    mlink = MagicLink.objects.get(user=user)
+                except MagicLink.DoesNotExist:
+                    link = registration.get_magic_link(
+                        user, request.get_host(),
+                        "/accounts/login", redirect="/accounts/link/discord")
+                    if not link:
+                        logger.error("Could not get magic link for user %s", user)
+                        return HttpResponseServerError("Could not get link for user.")
+                    mlink = MagicLink.objects.get(user=user)
+
+                mlink._generate_qr_code(
+                    hostname=request.get_host(),
+                    login_path="/accounts/login", redirect="/accounts/link/discord")
+
+                return JsonResponse(
+                    {"user_id": user.id, "qr_code_link": mlink.qr_code.url})
+
+            case _:
+                return HttpResponseBadRequest(f"Invalid command: {req_dict['command']}")
 
     else:
         return HttpResponseNotAllowed(['GET', 'POST'])
 
-    return HttpResponseServerError()
 # endregion
 
 
