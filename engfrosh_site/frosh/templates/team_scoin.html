@@ -1,42 +1,11 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        {% load static %}
-        <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}">
-        <!-- <script src="script.js"></script> -->
-        <title>Your Scoin</title>
-        <style>
-            body {
-                text-align: center;
-                background-color: #100C21;
-                color: #AF731F;
-            }
-
-            img.scoin {
-                padding: 30pt;
-                height: 200pt;
-                width: auto;
-                object-fit: scale-down;
-            }
-
-            h1 {
-                font-size: 60pt;
-                margin-top: 10pt;
-            }
-
-            h2 {
-                font-size: 120pt;
-                margin-top: 10pt;
-            }
-        </style>
-    </head>
-    <body>
-        {% if team.display_name == "Bean Battery" %}
-            <img class="scoin" src="{% static 'bean_scoin.png' %}" alt="Spirit Coin"/>
-        {% else %}
-            <img class="scoin" src="{% static 'scoin.png' %}" alt="Spirit Coin"/>
-        {% endif %}
-        <h1>{{ team.display_name }}</h1><br/>
-        <h2>{{ team.coin_amount }}</h2>
-    </body>
-</html>
+{% extends "base_generic.html" %}
+{% block page_title %}
+    Your Skash
+{% endblock page_title %}
+{% block body %}
+    <div class="text-center">
+        <h1 class="text-7xl mt-28 text-accent">{{ team.display_name }}</h1>
+        <br/>
+        <h2 class="text-9xl mt-20 text-accent">{{ team.coin_amount }}</h2>
+    </div>
+{% endblock body %}
