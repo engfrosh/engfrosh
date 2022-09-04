@@ -59,7 +59,8 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
             "puzzle": puz,
             "view_only": puz.is_completed_for_team(team) or not team.scavenger_enabled,
             "scavenger_enabled_for_team": team.scavenger_enabled,
-            "guess": request.GET.get("answer", "")
+            "guess": request.GET.get("answer", ""),
+            "requires_photo": puz.requires_verification_photo_by_team(team)
         }
 
         return render(request, "scavenger_question.html", context)

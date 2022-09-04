@@ -4,7 +4,7 @@
 {% endblock page_title %}
 {% block body %}
     <div class="p-6">
-        <div class="space-y-4 mt-4 ">
+        <div class="space-y-4 mt-4 text-center">
             <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto text-center">
                 {% if puzzle.puzzle_text %}<p class="m-4">{{ puzzle.puzzle_text }}</p>{% endif %}
                 {% if puzzle.puzzle_file %}
@@ -22,8 +22,7 @@
                 {% endif %}
             </div>
             {% if not view_only %}
-                
-                <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto">
+                <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto m-4">
                     <p>Text Answer</p>
                     <input type="text"
                            id="answerText"
@@ -36,10 +35,15 @@
                         Submit
                     </button>
                 </div>
-            {% elif not scavenger_enabled_for_team %}
-                Scavenger is not currently enabled
-            {% endif %}
-        </div>
+            {% elif requires_photo %}
+            </div>
+            <div class="m-10 text-center">
+                <a href="verification_photo"
+                   class="bg-main dark:bg-main-night rounded text-white p-6">Upload Photo</a>
+            </div>
+        {% elif not scavenger_enabled_for_team %}
+            Scavenger is not currently enabled
+        {% endif %}
     </div>
 {% endblock body %}
 {% block js_functions %}
