@@ -67,6 +67,9 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
 
     elif request.method == "POST":
 
+        if not request.user.has_perm("common_models.guess_scavenger_puzzle"):
+            return HttpResponseBadRequest("You are not allowed to guess.")
+
         if request.content_type != "application/json":
             return HttpResponseBadRequest("Not application/json content type")
 
