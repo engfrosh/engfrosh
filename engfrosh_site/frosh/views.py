@@ -58,7 +58,7 @@ def overall_index(request: HttpRequest):
     """The home page at the root of the site."""
     return render(request, "overall_index.html")
 
-
+@login_required(login_url='/accounts/login')
 def user_home(request: HttpRequest) -> HttpResponse:
     """The home page for regular users."""
 
@@ -95,7 +95,9 @@ def trade_up(request: HttpRequest) -> HttpResponse:
             photo.photo = request.FILES["photo_upload"]
             photo.save()
 
-            tta = TeamTradeUpActivity(team=team, verification_photo=photo)
+            object_name = request.POST.get("object_name")
+
+            tta = TeamTradeUpActivity(team=team, verification_photo=photo, object_name=object_name)
             tta.save()
 
             return HttpResponse("Success")

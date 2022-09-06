@@ -20,7 +20,7 @@ from pyaccord.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  #
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.encoding import uri_to_iri
 from django.conf import settings
@@ -53,6 +53,13 @@ def link_discord(request: HttpRequest):
 # endregion
 
 # region Logins
+
+
+def logout_page(request: HttpRequest) -> HttpResponse:
+
+    logout(request)
+
+    return HttpResponse("You are now logged out.")
 
 
 def login_page(request: HttpRequest):

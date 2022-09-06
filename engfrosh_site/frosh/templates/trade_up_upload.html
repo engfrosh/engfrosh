@@ -3,13 +3,17 @@
     Trade Up
 {% endblock page_title %}
 {% block body %}
-    <p>Upload a photo of the trade happening</p>
-    <label for="file">Choose an image to upload</label>
+    <p>Add the name of the object you trade for and upload a photo of the trade happening</p>
+    <label for="text">Object name:</label>
+    <input type="text" name="text_box" id="object_name"/>
+    <br/>
+    <label for="file">Image to upload:</label>
     <input type="file"
            accept="image/*"
            capture="user"
            name="photo_upload"
            id="image_file"/>
+    <br/>
     <button class="bg-main dark:bg-main-night rounded text-white p-1"
             onclick="uploadPhoto()">Upload</button>
 {% endblock body %}
@@ -19,8 +23,14 @@
             {% comment %} alert("Uploading..."); {% endcomment %}
 
             let file = document.getElementById("image_file").files[0];
+            let itemName = document.getElementById("object_name").value;
+            if (!file || !itemName) {
+                alert("File and Object Text Requried.");
+                return;
+            }
             let formData = new FormData();
             formData.append("photo_upload", file);
+            formData.append("object_name", itemName);
             fetch("", {
                 method: "POST",
                 mode: "cors",

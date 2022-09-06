@@ -7,6 +7,7 @@ urlpatterns = [
     # Logins
     path("login", views.login_page, name="login"),
     path("login/", views.login_page),
+    path("logout/", views.logout_page, name="logout"),
     path("login/discord/", views.discord_login, name="discord_login"),
     path("login/discord/callback/", views.discord_login_callback, name="discord_login_callback"),
     path("login/failed/", views.login_failed, name="login_failed"),
