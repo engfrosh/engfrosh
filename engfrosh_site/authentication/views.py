@@ -94,6 +94,7 @@ def login_page(request: HttpRequest):
 def discord_login(request: HttpRequest):
     """Redirects user to discord authentication to log in."""
     callback_url = request.build_absolute_uri("callback/")
+    # TODO add redirect for the next page here
 
     return redirect(
         build_oauth_authorize_url(

@@ -254,7 +254,7 @@ def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
             # Get user information
             logger.debug(f"Trying to add website user with id {req_dict['user_id']}")
             discord_user = DiscordUser.objects.get(user=req_dict["user_id"])
-            user = User.objects.get(user=req_dict["user_id"])
+            user = User.objects.get(id=req_dict["user_id"])
             if not discord_user:
                 return HttpResponseBadRequest("User does not exist / have a discord account linked.")
 
