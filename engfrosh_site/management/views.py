@@ -11,7 +11,7 @@ import pyaccord
 
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordGuild, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
-from common_models.models import FroshRole, Team, UniversityProgram, UserDetails
+from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity
 import common_models.models
 from common_models.models import ChannelTag, DiscordChannel, DiscordRole
 from pyaccord.invite import Invite
@@ -36,7 +36,7 @@ CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 
-@permission_required("auth_user.add_user")
+@permission_required("auth.add_user")
 def bulk_register_users(request: HttpRequest) -> HttpResponse:
     """View for bulk user adding."""
 
@@ -109,7 +109,7 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
 # region Link Discord
 
 
-@permission_required("auth_user.change_user")
+@permission_required("auth.change_user", login_url='/accounts/login')
 def get_discord_link(request: HttpRequest) -> HttpResponse:
     """View to get discord linking links for users or send link emails to users."""
 
@@ -121,7 +121,7 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
 
         context = {"users": []}
 
-        users = User.objects.all()
+        users = User.objects.all().order_by("username")
         for usr in users:
             try:
                 email_sent = UserDetails.objects.get(user=usr).invite_email_sent
@@ -225,7 +225,7 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
 # endregion
 
 
-@permission_required("auth_user.change_user")
+@permission_required("auth.change_user")
 def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
     """Add users to to the discord server."""
 
@@ -292,13 +292,13 @@ def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
     return HttpResponseServerError()
 
 
-@staff_member_required
+@staff_member_required(login_url='/accounts/login')
 def manage_index(request: HttpRequest) -> HttpResponse:
     """Home page for management."""
     return render(request, "manage.html")
 
 
-@staff_member_required
+@staff_member_required(login_url='/accounts/login')
 def initialize_database(request: HttpRequest) -> HttpResponse:
     common_models.models.initialize_database()
     return redirect("manage_index")
@@ -650,7 +650,7 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
         return HttpResponseNotAllowed(("GET", "POST"))
 
 
-@permission_required("common_models.change_puzzle")
+@permission_required("common_models.change_puzzle", login_url='/accounts/login')
 def approve_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
     """Page for approving verification images."""
 
@@ -691,3 +691,28 @@ def approve_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
 
     else:
         return HttpResponseNotAllowed(("GET", "POST"))
+
+
+@permission_required("common_models.view_team")
+def trade_up_viewer(request: HttpRequest) -> HttpResponse:
+
+    context = {
+        "teams": []
+    }
+
+    for team in Team.objects.all():
+
+        items = []
+        for item in TeamTradeUpActivity.objects.filter(team=team).order_by("entered_at"):
+            items.append({
+                "time": item.entered_at,
+                "name": item.object_name,
+                "photo": item.verification_photo
+            })
+
+        context["teams"].append({
+            "name": team.display_name,
+            "items": items
+        })
+
+    return render(request, "trade_up_viewer.html", context)

@@ -15,5 +15,6 @@ urlpatterns = [
     path('discord/servers', views.manage_discord_servers, name="manage_discord_servers"),
     path('scavenger/puzzles', views.manage_scavenger_puzzles, name="manage_scavenger_puzzles"),
     path('scavenger/approve-photos', views.approve_scavenger_puzzles, name="approve_scavenger_puzzles"),
-    path('database/initialize', views.initialize_database, name="initialize_database")
+    path('database/initialize', views.initialize_database, name="initialize_database"),
+    path('trade-up/view-all', views.trade_up_viewer, name="trade_up_viewer")
 ]

@@ -13,7 +13,7 @@
             "env": {
                 "ENGFROSH_DEPLOY_TYPE": "DEV",
                 "DJANGO_SECRET_KEY": "django-insecure-ngg-3z5*no_b9zhnmj83hgv1qh5u_mx-vri57p=r&sym3p@$ru",
-                "DISCORD_BOT_TOKEN": "ODM3NTAxNjMxMzA2MjY4NzA0.GiuHYs.iW3Gi7oCwIYbuIoEJkmUbTBo_eqTpvXYrrQz7E"
+                "DISCORD_BOT_TOKEN": ""
             }
         },
         {

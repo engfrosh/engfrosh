@@ -81,6 +81,7 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
         if not team.scavenger_enabled:
             return HttpResponseForbidden("Scavenger not currently enabled.")
 
+        logger.debug(f"Answer submitted by team {team} with answer: {req_dict['answer']} through the website")
         correct, stream_completed, next_puzzle, require_verification_photo = puz.check_team_guess(
             team, req_dict["answer"])
 
@@ -130,6 +131,8 @@ def puzzle_photo_verification_view(request: HttpRequest, slug: str) -> HttpRespo
                 return HttpResponseForbidden()
 
             photo = VerificationPhoto()
+            if "photo_upload" not in request.FILES:
+                return HttpResponseBadRequest("No image file provided.")
             photo.photo = request.FILES["photo_upload"]
             photo.save()
 

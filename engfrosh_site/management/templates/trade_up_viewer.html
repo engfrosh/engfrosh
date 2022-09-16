@@ -1,0 +1,29 @@
+{% extends 'base_manage_subpage.html' %}
+{% load static %}
+{% block page_title %}
+    View Trade Up
+{% endblock page_title %}
+{% block top_title %}
+    View Trade Up
+{% endblock top_title %}
+{% block active %}
+    {% for team in teams %}
+        <h1 class="text-xl">{{ team.name }}</h1>
+        <table>
+            <tr>
+                <th>Time</th>
+                <th>Item</th>
+                <th>Photo</th>
+            </tr>
+            {% for item in team.items %}
+                <tr>
+                    <td>{{ item.time }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>
+                        <a href="{{ item.photo.photo.url }}" class="rounded border">Photo</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
+{% endblock active %}
