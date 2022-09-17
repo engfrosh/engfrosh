@@ -13,3 +13,11 @@
 
 - add any fixes that aren't in git
     - currently just copying and pasting via vs code
+
+- stop the server
+- remove the instance
+- delete the ebs volume
+- remove any backup images
+- release any elastic ips
+- check for anything else running or being stored
+- release the dns record
