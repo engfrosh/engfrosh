@@ -49,3 +49,4 @@ tzdata==2022.2
 urllib3==1.26.11
 yarl==1.8.1
 zipp==3.8.1
+credentials==1.1
