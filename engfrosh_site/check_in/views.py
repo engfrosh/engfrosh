@@ -23,7 +23,11 @@ def check_in_view(request: HttpRequest, id: int) -> HttpResponse:
     names = []
     for g in frosh_groups:
         names += [g.name]
-    team = groups.exclude(name__in=names).first().name
+    team = groups.exclude(name__in=names).first()
+    if team == None:
+        team = "None"
+    else:
+        team = team.name
     
     CheckInConsumer.notify_trigger(location,size,team)
 
@@ -46,3 +50,7 @@ def check_in_index(request: HttpRequest) -> HttpResponse:
             return render(request, "check_in.html", {'form': CheckInForm(), 'error': 'Invalid Name!'})
     else:
         return render(request, "check_in.html", {'form': CheckInForm()}) 
+
+@staff_member_required(login_url='/accounts/login/')
+def check_in_monitor(request: HttpRequest) -> HttpResponse:
+    return render(request, "monitor.html")
