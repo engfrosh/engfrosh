@@ -302,7 +302,10 @@ def manage_index(request: HttpRequest) -> HttpResponse:
 def initialize_database(request: HttpRequest) -> HttpResponse:
     common_models.models.initialize_database()
     return redirect("manage_index")
-
+@staff_member_required(login_url='/accounts/login')
+def initialize_scav(request: HttpRequest) -> HttpResponse:
+    common_models.models.initialize_scav()
+    return redirect("manage_index")
 
 @permission_required("frosh_team.change_team")
 def manage_frosh_teams(request: HttpRequest) -> HttpResponse:

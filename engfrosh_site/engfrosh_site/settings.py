@@ -62,7 +62,8 @@ else:
 
 if development:
     ALLOWED_HOSTS = [
-        "127.0.0.1"
+        "127.0.0.1",
+        "localhost"
     ]
 else:
     ALLOWED_HOSTS = [
@@ -92,7 +93,8 @@ INSTALLED_APPS = [
     'frosh.apps.FroshConfig',
     'scavenger.apps.ScavengerConfig',
     'management.apps.ManagementConfig',
-    'common_models.apps.CommonModelsConfig'
+    'common_models.apps.CommonModelsConfig',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -126,7 +128,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'engfrosh_site.wsgi.application'
+ASGI_APPLICATION = 'engfrosh_site.asgi.application'
 
 
 # Database
@@ -203,6 +205,12 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CHANNEL_LAYERS = {
+    'default': {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    },
+}
 
 # Logging
 LOGGING = {
