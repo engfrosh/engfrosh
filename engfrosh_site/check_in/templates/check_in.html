@@ -1,0 +1,35 @@
+{% extends 'base_generic.html' %}
+{% block page_title %}
+    Check In
+{% endblock page_title %}
+{% block body %}
+    <div class="p-6">
+        <div class="space-y-4 mt-4 text-center">
+            <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto m-4">
+                <form>
+                    {% csrf_token %}
+                    {{ form }}
+                    <input type="submit" value="Search">
+                </form>
+                <p style="color: red;">{{error}}</p>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Shirt Size</th>
+                        <th>Checked In</th>
+                        <th>Check In</th>
+                    </tr>
+                {% for user in data %}
+                    <tr>
+                        <td>{{user.name}}</td>
+                        <td>{{user.shirt_size}}</td>
+                        <td>{{user.checked_in}}</td>
+                        <td><a href="/check-in/check-in/{{user.user}}">Check In</a></td>
+                    </tr>
+                {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+    </div>
+{% endblock body %}

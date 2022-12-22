@@ -83,6 +83,7 @@ DEFAULT_SCAVENGER_PUZZLE_REQUIRE_PHOTO_UPLOAD = True
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -94,7 +95,8 @@ INSTALLED_APPS = [
     'scavenger.apps.ScavengerConfig',
     'management.apps.ManagementConfig',
     'common_models.apps.CommonModelsConfig',
-    'channels'
+    'check_in.apps.CheckInConfig',
+    'channels',
 ]
 
 MIDDLEWARE = [

@@ -1,8 +1,7 @@
-from channels.routing import route
-from consumers import ws_connect, ws_disconnect
+from django.urls import path
+import check_in.consumers
 
-channel_routing = [
-    route('websocket.connect', ws_connect),
-    route('websocket.disconnect', ws_disconnect)
+websocket_urlpatterns = [
+    path('ws/check_in/', check_in.consumers.CheckInConsumer.as_asgi())
 ]
 
