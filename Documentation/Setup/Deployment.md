@@ -68,6 +68,7 @@ Also copy `credentials.example` to `credentials` and fill in all variables
 ```sh
 sudo ./rebuild.sh
 sudo ./setup_ssl.sh
+sudo docker exec -it engfrosh python3 /home/ubuntu/engfrosh/engfrosh_site/manage.py createsuperuser
 ```
 
 Note that it is safe to ignore the errors from nginx before `setup_ssl.sh` is called as it will be unable to find the SSL certificates
