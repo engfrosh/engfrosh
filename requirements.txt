@@ -50,3 +50,6 @@ urllib3==1.26.11
 yarl==1.8.1
 zipp==3.8.1
 credentials==1.1
+channels==4.0.0
+daphne==4.0.0
+msal==1.20.0

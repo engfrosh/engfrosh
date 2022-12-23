@@ -1,0 +1,26 @@
+{% extends 'base_generic.html' %}
+{% block page_title %}
+    Check In
+{% endblock page_title %}
+{% block body %}
+    <p id="status">Connected</p>
+    <script>
+        let socket = new WebSocket('ws://'+window.location.host+"/ws/check_in/");
+        socket.opopen = function(e){
+            alert("Connected to server!");
+            document.getElementById("status").innerHTML = "Connected";
+        }
+        socket.onclose = function(e){
+            alert("Disconnected from server!");
+            document.getElementById("status").innerHTML = "Disconnected";
+        }
+        socket.onerror = function(e){
+            alert("Received error from server!");
+            document.getElementById("status").innerHTML = "Error";
+        }
+        socket.onmessage = function(e){
+            data = JSON.parse(e.data)
+            alert("Location: "+data['location']+". Size: "+data['size']+". Team: "+data['team'])
+        }
+    </script>
+{% endblock body %}
