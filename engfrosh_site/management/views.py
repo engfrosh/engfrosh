@@ -8,10 +8,11 @@ import os
 
 import credentials
 
+from django.contrib import auth
 import pyaccord
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
-from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity
+from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity, ChannelTag
 import common_models.models
 from common_models.models import DiscordRole
 from . import registration
@@ -23,7 +24,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, JsonResponse, \
-    HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError
+    HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError, HttpResponseForbidden
 from django.shortcuts import render, redirect
 
 
@@ -239,6 +240,7 @@ def manage_discord_channels(request: HttpRequest) -> HttpResponse:
     else:
 
         return HttpResponseBadRequest("Bad http request method.")
+
 
 def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
     """Page for managing discord channel groups by tags or categories."""
