@@ -10,7 +10,7 @@ import credentials
 
 import pyaccord
 from pyaccord.DiscordUserAPI import DiscordUserAPI
-from common_models.models import DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
+from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity
 import common_models.models
 from common_models.models import DiscordRole
@@ -220,6 +220,25 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
         return HttpResponseNotAllowed(['GET', 'POST'])
 
 # endregion
+
+
+@permission_required("discord_bot_manager_discordchannel.change_discordchannel")
+def manage_discord_channels(request: HttpRequest) -> HttpResponse:
+    """Page for managing discord channels, such as locking and unlocking."""
+
+    # TODO: Rewrite all of this to make it better
+    if request.method == "GET":
+
+        context = {}
+
+        channels = DiscordChannel.objects.all()
+        context["channels"] = channels
+
+        return render(request, "discord_channels.html", context)
+
+    else:
+
+        return HttpResponseBadRequest("Bad http request method.")
 
 
 @permission_required("auth.change_user")
