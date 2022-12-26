@@ -7,15 +7,12 @@ import json
 import os
 
 import credentials
-import pyaccord
 
 from pyaccord.DiscordUserAPI import DiscordUserAPI
-from common_models.models import DiscordGuild, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
+from common_models.models import DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity
 import common_models.models
-from common_models.models import ChannelTag, DiscordChannel, DiscordRole
-from pyaccord.invite import Invite
-from pyaccord.permissions import Permissions
+from common_models.models import DiscordRole
 from . import registration
 
 from django.conf import settings
@@ -24,10 +21,9 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.request import HttpRequest
-from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse, \
+from django.http.response import HttpResponse, JsonResponse, \
     HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import render, redirect
-from django.contrib import auth
 
 
 logger = logging.getLogger("management.views")
@@ -175,7 +171,7 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
                     if not link:
                         logger.error("Could not get magic link for user %s", user)
                         return HttpResponseServerError("Could not get link for user.")
-                    return JsonResponse({"user_id": user.id, "link": link})  # TODO fix to include https://
+                    return JsonResponse({"user_id": user.id, "link": link})  # TODO fix to include https
 
                 return JsonResponse(
                     {"user_id": user.id, "link": mlink.full_link(
@@ -302,10 +298,13 @@ def manage_index(request: HttpRequest) -> HttpResponse:
 def initialize_database(request: HttpRequest) -> HttpResponse:
     common_models.models.initialize_database()
     return redirect("manage_index")
+
+
 @staff_member_required(login_url='/accounts/login')
 def initialize_scav(request: HttpRequest) -> HttpResponse:
     common_models.models.initialize_scav()
     return redirect("manage_index")
+
 
 @permission_required("frosh_team.change_team")
 def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
@@ -319,7 +318,7 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
                 role_exists = False
 
             try:
-                scav_team = common_models.models.Team.objects.get(group=team.group)
+                common_models.models.Team.objects.get(group=team.group)
             except ObjectDoesNotExist:
                 scav_channel = None
                 logger.warning(f"No scav team exists for team: {team}")
