@@ -58,6 +58,7 @@ def overall_index(request: HttpRequest):
     """The home page at the root of the site."""
     return render(request, "overall_index.html")
 
+
 @login_required(login_url='/accounts/login')
 def user_home(request: HttpRequest) -> HttpResponse:
     """The home page for regular users."""

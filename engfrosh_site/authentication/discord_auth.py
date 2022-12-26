@@ -11,7 +11,6 @@ from common_models.models import DiscordUser, MagicLink
 
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
-from django.utils import timezone
 
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 
