@@ -240,6 +240,63 @@ def manage_discord_channels(request: HttpRequest) -> HttpResponse:
 
         return HttpResponseBadRequest("Bad http request method.")
 
+def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
+    """Page for managing discord channel groups by tags or categories."""
+
+    if not request.user.has_perm("discord_bot_manager.change_discordchannel"):
+        permissions = set()
+        for backend in auth.get_backends():
+            if hasattr(backend, "get_all_permissions"):
+                permissions.update(backend.get_all_permissions(request.user))
+        logger.debug(f"User permissions: {permissions}")
+        return HttpResponseForbidden("Permission Denied")
+
+    if request.method == "GET":
+
+        context = {}
+
+        tags = ChannelTag.objects.all()
+        context["tags"] = tags
+
+        # channels = DiscordChannel.objects.all()
+        # context["channels"] = channels
+
+        return render(request, "discord_channel_groups.html", context)
+
+    elif request.method == "POST":
+
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Invalid / missing content type.")
+
+        req_dict = json.loads(request.body)
+        if "command" not in req_dict:
+            return HttpResponseBadRequest("Bad request body, missing command.")
+
+        if req_dict["command"] == "lock_channel_group":
+            try:
+                channel_group = ChannelTag.objects.get(id=req_dict["tag_id"])
+                channel_group.lock()
+            except (ObjectDoesNotExist, KeyError):
+                return HttpResponseBadRequest("Invalid tag id.")
+
+            return HttpResponse(status=204)
+
+        elif req_dict["command"] == "unlock_channel_group":
+            try:
+                channel_group = ChannelTag.objects.get(id=req_dict["tag_id"])
+                channel_group.unlock()
+            except (ObjectDoesNotExist, KeyError):
+                return HttpResponseBadRequest("Invalid tag id.")
+
+            return HttpResponse(status=204)
+
+        else:
+            return HttpResponseBadRequest("Invalid command.")
+
+    else:
+
+        return HttpResponseBadRequest("Bad http request method.")
+
 
 @permission_required("auth.change_user")
 def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
