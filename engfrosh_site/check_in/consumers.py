@@ -17,7 +17,7 @@ class CheckInConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_discard)(
             'default',
             self.channel_name
-        }
+        )
 
     def receive(self, text_data):
         pass

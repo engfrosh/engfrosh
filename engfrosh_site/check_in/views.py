@@ -1,11 +1,10 @@
 from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse
 from django.contrib.admin.views.decorators import staff_member_required
-import json
 from common_models.models import UserDetails, FroshRole
-from django.core.serializers.json import DjangoJSONEncoder
 from .forms import CheckInForm
 from .consumers import CheckInConsumer
+
 
 @staff_member_required(login_url='/accounts/login/')
 def check_in_view(request: HttpRequest, id: int) -> HttpResponse:
@@ -37,7 +36,7 @@ def check_in_view(request: HttpRequest, id: int) -> HttpResponse:
 
 @staff_member_required(login_url='/accounts/login/')
 def check_in_index(request: HttpRequest) -> HttpResponse:
-    if request.GET.get('name', None) != None:
+    if request.GET.get('name', None) is not None:
         form = CheckInForm(request.GET)
         if form.is_valid():
             name = form.cleaned_data['name']

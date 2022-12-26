@@ -8,6 +8,7 @@ import os
 
 import credentials
 
+import pyaccord
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity
@@ -176,7 +177,7 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
                 return JsonResponse(
                     {"user_id": user.id, "link": mlink.full_link(
                         hostname=request.get_host(),
-                        login_path="/accounts/login", redirect="/accounts/link/discord")})  # TODO fix to include https://
+                        login_path="/accounts/login", redirect="/accounts/link/discord")})  # TODO fix to include https
 
             case "send_link_email":
                 # TODO Update the email to be dynamic
