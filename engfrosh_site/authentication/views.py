@@ -173,7 +173,9 @@ def discord_register_callback(request: HttpRequest):
         user = register(discord_oauth_code=oauth_code, callback_url=callback_url, user=user)
     except DiscordUserAlreadyExistsError:
         return HttpResponse(
-            "There is already a discord account associated with your id. You may already be in the server, you can check by logging into discord directly. If not, please contact the administrator.")
+            "There is already a discord account associated with your id." +
+            " You may already be in the server, you can check by logging into discord directly." +
+            " If not, please contact the administrator.")
 
     if not user:
         logger.error("Could not register user.")
