@@ -79,13 +79,13 @@ After SSL is setup you need to run
 sudo docker restart engfrosh
 ```
 
-### Run Build On Planning Bot Container
+### Run Build On Discord Bot Container
 
 ```sh
-cd ~/engfrosh-docker/
+cd ~/engfrosh-docker/discord-bot/
 ```
 
-Now copy `environment.example` to `environment` and fill in all variables
+Now copy `environment.example` to `environment` as well as `example_configs.py` to `configs.py` and fill in all variables
 
 ```sh
 sudo ./rebuild.sh
