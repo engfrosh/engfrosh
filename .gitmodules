@@ -3,4 +3,4 @@
 	url = https://github.com/engfrosh/common_models.git
 [submodule "pyaccord"]
 	path = pyaccord
-	url = https://github.com/grantmwilson/pyaccord.git
+	url = https://github.com/engfrosh/pyaccord.git
