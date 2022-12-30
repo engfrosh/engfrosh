@@ -82,6 +82,7 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
             team = req_dict["team"]
             role = req_dict["role"]
             program = req_dict["program"]
+            size = req_dict["size"]
         except KeyError:
             return HttpResponseBadRequest("Key Error in Body")
 
@@ -95,7 +96,7 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
             return HttpResponseBadRequest("Bad role or team")
 
         try:
-            user = registration.create_user_initialize(name, email, role, team, program)
+            user = registration.create_user_initialize(name, email, role, team, program, size)
         except registration.UserAlreadyExistsError:
             return HttpResponseBadRequest("User already exists.")
 
