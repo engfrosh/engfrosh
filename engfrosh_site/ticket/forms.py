@@ -16,8 +16,9 @@ class TicketUpdateForm(forms.Form):
         (2, 'MORE INFO'),
         (3, 'CLOSED')
     ])
+
     def __init__(self, *args, initial=None, **kwargs):
-        super(TicketUpdateForm,self).__init__(*args, **kwargs)
+        super(TicketUpdateForm, self).__init__(*args, **kwargs)
         print(initial)
         if initial is not None:
             self.fields['status'].initial = initial

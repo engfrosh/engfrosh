@@ -42,7 +42,8 @@ def view_ticket(request: HttpRequest, id: int):
         return redirect('create_ticket')
     if not can_view_ticket(ticket, request.user):
         return redirect('create_ticket')
-    context = {'ticket': ticket, 'comment_form': TicketCommentForm(), 'update_form': TicketUpdateForm(initial=ticket.status)}
+    context = {'ticket': ticket, 'comment_form': TicketCommentForm(),
+               'update_form': TicketUpdateForm(initial=ticket.status)}
     return render(request, "view_ticket.html", context)
 
 
