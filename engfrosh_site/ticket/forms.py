@@ -3,11 +3,11 @@ from django import forms
 
 class TicketForm(forms.Form):
     title = forms.CharField(label='Title', max_length=200)
-    body = forms.CharField(label='Body', max_length=3000, widget=forms.Textarea(attrs={"rows":"5"}))
+    body = forms.CharField(label='Body', max_length=3000, widget=forms.Textarea(attrs={"rows": "5"}))
 
 
 class TicketCommentForm(forms.Form):
-    body = forms.CharField(label='Body', max_length=3000, widget=forms.Textarea(attrs={"rows":"5"}))
+    body = forms.CharField(label='Body', max_length=3000, widget=forms.Textarea(attrs={"rows": "5"}))
 
 
 class TicketUpdateForm(forms.Form):

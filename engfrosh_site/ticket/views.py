@@ -5,7 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from .forms import TicketForm, TicketCommentForm, TicketUpdateForm
 from django.shortcuts import redirect
-from common_models.models import Ticket, TicketComment, DiscordChannel
+from common_models.models import Ticket, DiscordChannel
+from management.email import send_email
+
 
 @login_required(login_url='/accounts/login')
 def create_ticket(request: HttpRequest):
@@ -26,10 +28,12 @@ def create_ticket(request: HttpRequest):
                 f"""{request.build_absolute_uri("/tickets/view/"+str(ticket.id))}""")
             return redirect('view/'+str(ticket.id))
 
+
 def can_view_ticket(ticket: Ticket, user: User):
     if ticket.user is user:
         return True
     return user.is_staff
+
 
 @login_required(login_url='/accounts/login')
 def view_ticket(request: HttpRequest, id: int):
@@ -40,6 +44,7 @@ def view_ticket(request: HttpRequest, id: int):
         return redirect('create')
     context = {'ticket': ticket, 'comment_form': TicketCommentForm(), 'update_form': TicketUpdateForm()}
     return render(request, "view_ticket.html", context)
+
 
 @login_required(login_url='/accounts/login')
 def create_comment(request: HttpRequest, id: int):
@@ -58,9 +63,14 @@ def create_comment(request: HttpRequest, id: int):
             DiscordChannel.send_to_updates_channels(
                 f"""@here Ticket {ticket.id} has a new comment. """ +
                 f"""{request.build_absolute_uri("/tickets/view/"+str(ticket.id))}""")
+        else:
+            send_email(user=ticket.user, sender_email="noreply@engfrosh.com", subject="EngFrosh Ticket",
+                       body_text="Your ticket has new comments, view them at " +
+                                 f"""{request.build_absolute_uri("/tickets/view/"+str(ticket.id))}""")
         return redirect('/tickets/view/'+str(ticket.id))
     else:
         return HttpResponse('Invalid request!')
+
 
 @login_required(login_url='/accounts/login')
 @staff_member_required()
@@ -81,6 +91,7 @@ def ticket_action(request: HttpRequest, id: int):
     else:
         return HttpResponse('Invalid request!')
     pass
+
 
 @login_required(login_url='/accounts/login')
 @staff_member_required()
