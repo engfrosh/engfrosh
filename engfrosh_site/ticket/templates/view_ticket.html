@@ -2,29 +2,9 @@
 {% block page_title %}
    Ticket {{ ticket.id }}
 {% endblock page_title %}
-{% block style %}
-
-.ticket{
-    display: inline-block;
-    text-align: center;
-    margin: 2px;
-    padding: 2px;
-    border: 1px solid black;
-    background-color: white;
-    color: black;
-}
-.form{
-    margin-top: 20px;
-    display: inline-block;
-}
-.form form{
-    display: inline-block;
-}
-
-{% endblock style %}
 {% block body %}
-<div style="text-align: center; width=100%;">
-    <div class="ticket">
+<div class="text-center">
+    <div class="inline-block text-center m-2 bg-white w-fit p-2 text-black">
         <h1>{{ ticket.title }}</h1>
         <p>Created By: {{ ticket.user }}</p>
         <p>Time: {{ ticket.opened }}</p>
@@ -34,7 +14,7 @@
     </div>
     <br>
     {% for comment in ticket.get_comments %}
-        <div class="ticket">
+        <div class="inline-block text-center m-2 bg-white w-fit w-fit p-2 text-black">
             <p>Created By: {{ comment.user }}</p>
             <p>Time: {{ comment.created }}</p>
             <br>
@@ -42,14 +22,14 @@
         </div>
         <br>
     {% endfor %}
-    <div class="form">
-        <form action="{{ ticket.id }}/comment" method="POST">
+    <div class="inline-block my-20">
+        <form class="inline-block" action="{{ ticket.id }}/comment" method="POST">
             {% csrf_token %}
             <h1>Create Comment</h1>
             {{ comment_form.as_p }}
             <input type="submit" value="Submit">
         </form>
-        <form action="{{ ticket.id }}/action" method="POST">
+        <form class="inline-block" action="{{ ticket.id }}/action" method="POST">
             {% csrf_token %}
             <h1>Update Ticket</h1>
             {{ update_form.as_p }}

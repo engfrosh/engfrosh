@@ -2,30 +2,17 @@
 {% block page_title %}
    Tickets
 {% endblock page_title %}
-{% block style %}
-
-.ticket{
-    display: inline-block;
-    text-align: center;
-    margin: 2px;
-    padding: 2px;
-    border: 1px solid black;
-    background-color: white;
-    color: black;
-}
-
-{% endblock style %}
 {% block body %}
-<div style="text-align: center; width=100%;">
+<div class="text-center">
     {% for ticket in tickets %}
-        <div class="ticket">
-            <p>Time: {{ ticket.opened }}</p>
+        <div class="inline-block text-center m-2 bg-white w-fit p-2">
+            <p class="text-black">Time: {{ ticket.opened }}</p>
             {% if ticket.get_status_display == 'NEW' %}
-                <p style="color: red;">Status: {{ ticket.get_status_display }}</p>
+                <p class="text-red-600">Status: {{ ticket.get_status_display }}</p>
             {% else %}
-                <p>Status: {{ ticket.get_status_display }}</p>
+                <p class="text-blue-600">Status: {{ ticket.get_status_display }}</p>
             {% endif %}
-            <a href="{{ ticket.id }}">Ticket {{ ticket.id }}</a>
+            <a class="text-sky-600" href="{{ ticket.id }}">Ticket {{ ticket.id }}</a>
         </div>
         <br>
     {% endfor %}
