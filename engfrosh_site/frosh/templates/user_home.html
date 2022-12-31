@@ -16,6 +16,7 @@
         {% endif %}
         <a href="{% url 'my_skash' %}"
            class="bg-main dark:bg-main-night rounded-lg p-2">Team Skash</a>
-        {% comment %} <a class="bg-main dark:bg-main-night rounded-lg p-2">Get Help</a> {% endcomment %}
+        <a href="{% url 'create_ticket' %}"
+           class="bg-main dark:bg-main-night rounded-lg p-2">Get Help</a>
     </div>
 {% endblock active %}

@@ -20,7 +20,11 @@
     {% for ticket in tickets %}
         <div class="ticket">
             <p>Time: {{ ticket.opened }}</p>
-            <p>Status: {{ ticket.get_status_display }}</p>
+            {% if ticket.get_status_display == 'NEW' %}
+                <p style="color: red;">Status: {{ ticket.get_status_display }}</p>
+            {% else %}
+                <p>Status: {{ ticket.get_status_display }}</p>
+            {% endif %}
             <a href="{{ ticket.id }}">Ticket {{ ticket.id }}</a>
         </div>
         <br>
