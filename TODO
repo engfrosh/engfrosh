@@ -2,7 +2,7 @@
 
 [+] Upgrade Postgres versions used
 [ ] Make a much more thorough welcome message and details for this year
-[ ] Create ticket interaction system to manage issues people are having
+[+] Create ticket interaction system to manage issues people are having
 [ ] Ability to let people get codes to authenticate the first time to create a username and password
 
 

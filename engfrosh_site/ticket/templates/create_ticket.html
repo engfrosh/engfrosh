@@ -1,0 +1,13 @@
+{% extends 'base_generic.html' %}
+{% block page_title %}
+   Create Ticket
+{% endblock page_title %}
+{% block body %}
+
+<form action="create" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Create">
+</form>
+
+{% endblock %}
