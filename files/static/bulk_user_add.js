@@ -42,6 +42,7 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
   let selectTeam = document.querySelector("." + row_id + ".team_selection");
   let selectRole = document.querySelector("." + row_id + ".role_selection");
   let selectProgram = document.querySelector("." + row_id + ".program_selection");
+  let sizeInput = document.querySelector("." + row_id + ".size_input")
   let button = document.querySelector("button." + row_id);
 
   const name = nameInput.value;
@@ -49,6 +50,7 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
   let team = selectTeam.value;
   const role = selectRole.value;
   let program = selectProgram.value;
+  const size = sizeInput.value
 
   vName = validateName(name);
   vEmail = validateEmail(email);
@@ -114,7 +116,8 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
         "email": email,
         "team": team,
         "role": role,
-        "program": program
+        "program": program,
+        "size": size
       })
     })
       .then(res => {
@@ -125,7 +128,7 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
             console.log("Added User.\n    user id : " + user_id + "\n    username: " + username);
           })
 
-          for (let field of [nameInput, emailInput, selectTeam, selectRole, selectProgram]) {
+          for (let field of [nameInput, emailInput, selectTeam, selectRole, selectProgram, sizeInput]) {
             field.disabled = true;
             field.style.backgroundColor = "grey";
           }
@@ -145,7 +148,7 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
 }
 
 
-function addUserRow(name, email, team, role, program) {
+function addUserRow(name, email, team, role, program, size) {
 
   const table = document.getElementById("new-user-table");
 
@@ -222,12 +225,20 @@ function addUserRow(name, email, team, role, program) {
   }
   programCell.appendChild(selectProgram);
 
+  let sizeCell = row.insertCell(5);
+  let sizeInput = document.createElement("input");
+  sizeInput.setAttribute("type", "text");
+  sizeInput.setAttribute("class", row_id + " size_input")
+  if (size) {
+    sizeInput.value = size;
+  }
+  sizeCell.appendChild(sizeInput);
 
   let submitButton = document.createElement("button");
   submitButton.innerText = "ADD";
   submitButton.setAttribute("onclick", "addUserRowButtonPress('" + row_id + "')")
   submitButton.setAttribute("class", row_id + " submit_button")
-  let submitCell = row.insertCell(5);
+  let submitCell = row.insertCell(6);
   submitCell.appendChild(submitButton);
 };
 
@@ -237,7 +248,7 @@ function handleCSVFile(file) {
     for (let i = 0; i < headings.length; i++) {
       headings[i] = headings[i].trim().toLowerCase();
     }
-    if (headings[0] != "name" | headings[1] != "email" | headings[2] != "team" | headings[3] != "role" | headings[4] != "program") {
+    if (headings[0] != "name" | headings[1] != "email" | headings[2] != "team" | headings[3] != "role" | headings[4] != "program" | headings[5] != "shirt size") {
       return false;
     }
     return true;
@@ -260,8 +271,9 @@ function handleCSVFile(file) {
     const team = values[2];
     const role = values[3];
     const program = values[4];
+    const size = values[5];
 
-    addUserRow(name, email, team, role, program);
+    addUserRow(name, email, team, role, program, size);
 
   }
 
