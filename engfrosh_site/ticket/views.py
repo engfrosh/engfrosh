@@ -77,7 +77,6 @@ def create_comment(request: HttpRequest, id: int):
 @login_required(login_url='/accounts/login')
 @staff_member_required()
 def ticket_action(request: HttpRequest, id: int):
-    print(request.POST)
     ticket = Ticket.objects.filter(id=id).first()
     if ticket is None:
         return redirect('create_ticket')
@@ -85,7 +84,6 @@ def ticket_action(request: HttpRequest, id: int):
         return redirect('create_ticket')
     if request.method == 'POST':
         form = TicketUpdateForm(request.POST)
-        print(request.POST)
         if not form.is_valid():
             return redirect("/tickets/view/"+str(ticket.id))
         data = form.cleaned_data
