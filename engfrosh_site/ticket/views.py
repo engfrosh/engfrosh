@@ -65,6 +65,7 @@ def create_comment(request: HttpRequest, id: int):
                 f"""{request.build_absolute_uri("/tickets/view/"+str(ticket.id))}""")
         else:
             send_email(user=ticket.user, sender_email="noreply@engfrosh.com", subject="EngFrosh Ticket",
+                       body_html="",
                        body_text="Your ticket has new comments, view them at " +
                                  f"""{request.build_absolute_uri("/tickets/view/"+str(ticket.id))}""")
         return redirect('/tickets/view/'+str(ticket.id))
