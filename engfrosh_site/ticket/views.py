@@ -42,7 +42,7 @@ def view_ticket(request: HttpRequest, id: int):
         return redirect('create_ticket')
     if not can_view_ticket(ticket, request.user):
         return redirect('create_ticket')
-    context = {'ticket': ticket, 'comment_form': TicketCommentForm(), 'update_form': TicketUpdateForm()}
+    context = {'ticket': ticket, 'comment_form': TicketCommentForm(), 'update_form': TicketUpdateForm(initial=ticket.status)}
     return render(request, "view_ticket.html", context)
 
 
@@ -76,6 +76,7 @@ def create_comment(request: HttpRequest, id: int):
 @login_required(login_url='/accounts/login')
 @staff_member_required()
 def ticket_action(request: HttpRequest, id: int):
+    print(request.POST)
     ticket = Ticket.objects.filter(id=id).first()
     if ticket is None:
         return redirect('create_ticket')
@@ -83,8 +84,9 @@ def ticket_action(request: HttpRequest, id: int):
         return redirect('create_ticket')
     if request.method == 'POST':
         form = TicketUpdateForm(request.POST)
+        print(request.POST)
         if not form.is_valid():
-            return redirect('')
+            return redirect("/tickets/view/"+str(ticket.id))
         data = form.cleaned_data
         ticket.status = data['status']
         ticket.save()
