@@ -33,6 +33,7 @@ urlpatterns = [
     path("trade-up/", include("frosh.trade_up_urls")),
     path("favicon.ico", RedirectView.as_view(url=staticfiles_storage.url("favicon.ico"))),
     path("check-in/", include('check_in.urls')),
+    path("tickets/", include('ticket.urls')),
 ]
 
 if settings.DEBUG:

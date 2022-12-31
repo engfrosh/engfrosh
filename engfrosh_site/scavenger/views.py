@@ -139,7 +139,7 @@ def puzzle_photo_verification_view(request: HttpRequest, slug: str) -> HttpRespo
             pa.verification_photo = photo
             pa.save()
 
-            DiscordChannel.send_to_scavenger_updates_channels(
+            DiscordChannel.send_to_updates_channels(
                 f"""{team.display_name} has uploaded a photo for {puz.name} that needs verification.""" +
                 f""""\n{request.build_absolute_uri(reverse("approve_scavenger_puzzles"))}""")
 
