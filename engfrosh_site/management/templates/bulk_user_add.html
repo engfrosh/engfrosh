@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}">
-    {% csrf_token %}
-    <script>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}">
+        {% csrf_token %}
+        <script>
         const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
         // Load the constants that are modifiable at runtime
-        var teams = [{% for t in team_options %}"{{t}}", {% endfor %}];
-        var roles = [{% for r in role_options %}"{{r}}", {% endfor %}];
-        var programs = [{% for p in program_options %}"{{p}}", {% endfor %}];
-    </script>
-    <style>
+        var teams = [{% for t in team_options %}"{{t}}",{% endfor %}];
+        var roles = [{% for r in role_options %}"{{r}}",{% endfor %}];
+        var programs = [{% for p in program_options %}"{{p}}",{% endfor %}];
+        </script>
+        <style>
         th {
             width: 100px;
         }
@@ -25,19 +24,29 @@
             width: 300px;
         }
 
+        input.size_input {
+            width: 50px;
+            text-align: center;
+        }
+
         td {
             text-align: center;
         }
-    </style>
-    <script src="{% static 'bulk_user_add.js' %}"></script>
-    <title></title>
-</head>
-
-<body>
-    <a href="/manage">Back to Manage</a><br />
-    <hr/>
-    <p>Upload CSV: <input type="file" id="file_selector" accept=".csv"></input></p>
-    <a href="{% static 'example_user_csv.csv' %}">Example CSV</a><br/>
+        </style>
+        <script src="{% static 'bulk_user_add.js' %}"></script>
+        <title></title>
+    </head>
+    <body>
+        <a href="/manage">Back to Manage</a>
+        <br />
+        <hr/>
+        <p>
+            Upload CSV:
+            <input type="file" id="file_selector" accept=".csv">
+        </input>
+    </p>
+    <a href="{% static 'example_users_csv.csv' %}">Example CSV</a>
+    <br/>
     <script>
         const fileSelector = document.getElementById("file_selector")
         fileSelector.addEventListener('change', (event) => {
@@ -56,9 +65,10 @@
             <th class="role">Role</th>
             <th class="program">Program</th>
             <th class="size">Shirt Size</th>
-            <th class="add_all"><button type="button" onclick="addAllUserButtonPress()">ADD ALL</button></th>
+            <th class="add_all">
+                <button type="button" onclick="addAllUserButtonPress()">ADD ALL</button>
+            </th>
         </tr>
     </table>
 </body>
-
 </html>

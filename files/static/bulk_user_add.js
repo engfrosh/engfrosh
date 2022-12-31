@@ -128,7 +128,7 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
             console.log("Added User.\n    user id : " + user_id + "\n    username: " + username);
           })
 
-          for (let field of [nameInput, emailInput, selectTeam, selectRole, selectProgram]) {
+          for (let field of [nameInput, emailInput, selectTeam, selectRole, selectProgram, sizeInput]) {
             field.disabled = true;
             field.style.backgroundColor = "grey";
           }
