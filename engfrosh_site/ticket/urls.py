@@ -7,5 +7,5 @@ urlpatterns = [
     path('view/<int:id>', views.view_ticket),
     path('view/<int:id>/comment', views.create_comment),
     path('view/<int:id>/action', views.ticket_action),
-    path('view/', views.view_all_tickets),
+    path('view/', views.view_all_tickets, name="view_tickets"),
 ]

@@ -65,10 +65,10 @@ def create_comment(request: HttpRequest, id: int):
                 f"""@here Ticket {ticket.id} has a new comment. """ +
                 f"""{request.build_absolute_uri("/tickets/view/"+str(ticket.id))}""")
         else:
+            body = f"""Your ticket has new comments, view them at {request.build_absolute_uri("/tickets/view/"+str(ticket.id))}"""  # noqa: E501
             send_email(user=ticket.user, sender_email="noreply@engfrosh.com", subject="EngFrosh Ticket",
-                       body_html="",
-                       body_text="Your ticket has new comments, view them at " +
-                                 f"""{request.build_absolute_uri("/tickets/view/"+str(ticket.id))}""")
+                       body_html=body,
+                       body_text=body)
         return redirect('/tickets/view/'+str(ticket.id))
     else:
         return HttpResponse('Invalid request!')
@@ -96,7 +96,9 @@ def ticket_action(request: HttpRequest, id: int):
 
 
 @login_required(login_url='/accounts/login')
-@staff_member_required()
 def view_all_tickets(request: HttpRequest):
-    tickets = list(Ticket.objects.exclude(status=3).order_by('opened'))
+    if request.user.is_staff:
+        tickets = list(Ticket.objects.exclude(status=3).order_by('opened'))
+    else:
+        tickets = list(Ticket.objects.filter(user=request.user).exclude(status=3).order_by('opened'))
     return render(request, 'view_tickets.html', {'tickets': tickets})
