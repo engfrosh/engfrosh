@@ -1,0 +1,22 @@
+{% extends 'base_manage_subpage.html' %}
+{% load static %}
+{% block page_title %}
+    Manage Discord Nick
+{% endblock page_title %}
+{% block top_title %}
+    Manage Discord Nick
+{% endblock top_title %}
+{% block active %}
+<a class="bg-main dark:bg-main-night rounded text-white p-2 max-w-fit max-h-fit text-sm mr-2"
+           href="{% url 'manage_discord_nicks' %}">Back to Nicks</a><br>
+{% if error == True %}
+    <p class="text-red-600">Invalid nick or color!</p>
+{% elif error == False %}
+    <p class="text-green-600">Successfully set nick</p>
+{% endif %}
+<form class="my-5" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Change Nick" class="text-blue-600">
+</form>
+{% endblock active %}

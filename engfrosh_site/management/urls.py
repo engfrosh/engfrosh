@@ -17,4 +17,6 @@ urlpatterns = [
     path('users/add-to-guild', views.add_discord_user_to_guild, name="add_users_to_discord_guild"),
     path('discord/channels', views.manage_discord_channels, name="manage_discord_channels"),
     path('discord/channel-groups', views.manage_discord_channel_groups, name="manage_discord_channel_groups"),
+    path('discord/nicks', views.manage_discord_nicks, name="manage_discord_nicks"),
+    path('discord/nicks/<int:id>', views.manage_discord_nick, name="manage_discord_nick"),
 ]

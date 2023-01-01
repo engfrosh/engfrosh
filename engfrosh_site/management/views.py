@@ -12,10 +12,12 @@ from django.contrib import auth
 import pyaccord
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
-from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity, ChannelTag
+from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity
+from common_models.models import ChannelTag, DiscordGuild
 import common_models.models
 from common_models.models import DiscordRole
 from . import registration
+from . import forms
 
 from django.conf import settings
 from django.contrib.auth.models import User, Group
@@ -598,3 +600,36 @@ def trade_up_viewer(request: HttpRequest) -> HttpResponse:
         })
 
     return render(request, "trade_up_viewer.html", context)
+
+
+@permission_required("manage_discord_nicks", login_url='/accounts/login')
+def manage_discord_nicks(request: HttpRequest) -> HttpResponse:
+    search = request.GET.get('filter', '')
+    users = DiscordUser.objects.filter(user__username__icontains=search)
+    users |= DiscordUser.objects.filter(discord_username__icontains=search)
+    return render(request, "manage_discord_nicks.html", {"users": users})
+
+
+@permission_required("manage_discord_nicks", login_url='/accounts/login')
+def manage_discord_nick(request: HttpRequest, id: int) -> HttpResponse:
+    if request.method == "GET":
+        user = DiscordUser.objects.filter(id=id).first()
+        form = forms.DiscordNickForm(nick=user.discord_username)
+        return render(request, "manage_discord_nick.html", {"user": user, "form": form})
+    elif request.method == "POST":
+        user = DiscordUser.objects.filter(id=id).first()
+        form = forms.DiscordNickForm(request.POST)
+        context = {"user": user, "form": form, "error": False}
+        if form.is_valid():
+            nick = form.cleaned_data['nickname']
+            color = form.cleaned_data['color'][1:]
+            guild = DiscordGuild.objects.all().first()
+            name = "color-"+str(color)
+            role = guild.get_role(name)
+            if role is None:
+                role = guild.create_role(name=name, position=settings.COLOR_POSITION, color=int(color, 16))
+            guild.add_role_to_member(user.id, role)
+            guild.change_nick(user.id, nick)
+        else:
+            context['error'] = True
+        return render(request, "manage_discord_nick.html", context)
