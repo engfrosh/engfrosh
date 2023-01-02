@@ -36,8 +36,7 @@
 [ ] How do we want to do scav
 [ ] Add handling question response times
 [ ] Add check if questions are actually enabled before sending them
-[ ] Add enable and disable scav commands 
-[ ] Add QR answer support
+[ ] Add enable and disable scav commands =
 [ ] Have scav be available after the week to let people see the whole thing 
 
 ## Scoin
