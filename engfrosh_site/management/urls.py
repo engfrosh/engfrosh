@@ -8,6 +8,7 @@ urlpatterns = [
     path('users/add', views.bulk_register_users),
     path('teams', views.manage_frosh_teams, name="manage_frosh_teams"),
     path('', views.manage_index, name="manage_index"),
+    path('announcements', views.announcements, name="announcements"),
     # path('roles', views.manage_roles, name="manage_roles"),
     path('scavenger/puzzles', views.manage_scavenger_puzzles, name="manage_scavenger_puzzles"),
     path('scavenger/approve-photos', views.approve_scavenger_puzzles, name="approve_scavenger_puzzles"),

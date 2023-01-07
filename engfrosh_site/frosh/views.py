@@ -3,7 +3,7 @@ from django.shortcuts import render  # noqa F401
 from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required, permission_required
 
-from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto
+from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, Announcement
 
 # Create your views here.
 
@@ -56,7 +56,8 @@ def my_coin(request: HttpRequest):
 
 def overall_index(request: HttpRequest):
     """The home page at the root of the site."""
-    return render(request, "overall_index.html")
+    announcements = Announcement.objects.order_by("-created")
+    return render(request, "overall_index.html", {'announcements': announcements})
 
 
 @login_required(login_url='/accounts/login')
