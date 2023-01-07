@@ -37,7 +37,7 @@
 [ ] Add handling question response times
 [ ] Add check if questions are actually enabled before sending them
 [ ] Add enable and disable scav commands 
-[ ] Add QR answer support
+[+] Add QR answer support
 [ ] Have scav be available after the week to let people see the whole thing 
 
 ## Scoin
@@ -46,7 +46,7 @@
 <!-- [ ] Add more robust permissions -->
 
 ## Moderation
-[ ] Make it so edited messages also get checked for moderation
+[+] Make it so edited messages also get checked for moderation
 [ ] Fix word list so names and common words are not captured or limited
 
 ## Logging
