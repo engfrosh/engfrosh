@@ -18,6 +18,7 @@ import logging
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+COLOR_POSITION = 3
 
 # Hack for development to get around import issues
 sys.path.append(str(BASE_DIR.parent))
