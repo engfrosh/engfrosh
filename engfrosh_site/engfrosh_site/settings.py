@@ -98,6 +98,7 @@ INSTALLED_APPS = [
     'common_models.apps.CommonModelsConfig',
     'check_in.apps.CheckInConfig',
     'ticket.apps.TicketConfig',
+    'counter.apps.CounterConfig',
     'channels',
 ]
 
