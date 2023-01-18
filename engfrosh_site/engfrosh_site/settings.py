@@ -68,7 +68,8 @@ if development:
     ]
 else:
     ALLOWED_HOSTS = [
-        "mars.engfrosh.com"
+        ".engfrosh.com",
+        "engfrosh.com"
     ]
 
 
