@@ -64,7 +64,9 @@ else:
 if development:
     ALLOWED_HOSTS = [
         "127.0.0.1",
-        "localhost"
+        "localhost",
+        ".engfrosh.com",
+        "engfrosh.com"
     ]
 else:
     ALLOWED_HOSTS = [
