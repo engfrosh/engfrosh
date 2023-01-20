@@ -74,6 +74,12 @@ else:
         "engfrosh.com"
     ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.engfrosh.com",
+    "https://engfrosh.com",
+    "http://*.engfrosh.com",
+    "http://engfrosh.com"
+]
 
 # Discord API Settings
 DEFAULT_DISCORD_API_VERSION = 10
