@@ -35,7 +35,4 @@ urlpatterns = [
     path("check-in/", include('check_in.urls')),
     path("tickets/", include('ticket.urls')),
     path("counter", include('counter.urls')),
-]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
