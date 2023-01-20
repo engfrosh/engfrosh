@@ -81,6 +81,10 @@ CSRF_TRUSTED_ORIGINS = [
     "http://engfrosh.com"
 ]
 
+# This fixes oauth uri's going to http:// by default
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Discord API Settings
 DEFAULT_DISCORD_API_VERSION = 10
 DEFAULT_DISCORD_SCOPE = ["identify", "guilds.join"]
