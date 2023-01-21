@@ -65,13 +65,13 @@ if development:
     ALLOWED_HOSTS = [
         "127.0.0.1",
         "localhost",
-        "engfrosh.com",
-        ".engfrosh.com"
+        "heads.engfrosh.com",
+        "engfrosh.com"
     ]
 else:
     ALLOWED_HOSTS = [
-        "engfrosh.com",
-        ".engfrosh.com"
+        "heads.engfrosh.com",
+        "engfrosh.com"
     ]
 
 CSRF_TRUSTED_ORIGINS = [
