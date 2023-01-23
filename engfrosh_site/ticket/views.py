@@ -65,7 +65,7 @@ def create_comment(request: HttpRequest, id: int):
                 f"""@here Ticket {ticket.id} has a new comment. """ +
                 f"""{request.build_absolute_uri("/tickets/view/"+str(ticket.id))}""")
         else:
-            body = f"""Your ticket has new comments, view them at {request.build_absolute_uri("/tickets/view/"+str(ticket.id))}"""  # noqa: E501
+            body = f"""Your ticket has new comments, view them at <a href='{request.build_absolute_uri("/tickets/view/"+str(ticket.id))}'>Here</a>"""  # noqa: E501
             send_email(user=ticket.user, sender_email="noreply@engfrosh.com", subject="EngFrosh Ticket",
                        body_html=body,
                        body_text=body)
