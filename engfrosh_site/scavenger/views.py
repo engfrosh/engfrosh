@@ -50,7 +50,7 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
     except Puzzle.DoesNotExist:
         puz = None
 
-    if not (puz and puz.is_viewable_for_team(team)):
+    if not (puz and puz.is_viewable_for_team(team)) or request.user.has_perm('common_models.bypass_scav_rules'):
         return HttpResponse("You do not have access to this puzzle.")
 
     if request.method == "GET":
