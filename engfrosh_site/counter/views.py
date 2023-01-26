@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 
 # This is hard coded because I'm lazy, it doesn't actual do anything important so this is fine
-PASSWORD = "spiritstuffgoeshere"
+PASSWORD = "MGarvaennt"
 
 
 @login_required(login_url='/accounts/login')
