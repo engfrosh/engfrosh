@@ -49,15 +49,15 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
         puz: Union[Puzzle, None] = Puzzle.objects.get(secret_id=slug)
     except Puzzle.DoesNotExist:
         puz = None
-
-    if not (puz and puz.is_viewable_for_team(team)) or request.user.has_perm('common_models.bypass_scav_rules'):
+    bypass = request.user.has_perm('common_models.bypass_scav_rules')
+    if not (puz and puz.is_viewable_for_team(team)) and not bypass:
         return HttpResponse("You do not have access to this puzzle.")
 
     if request.method == "GET":
 
         context = {
             "puzzle": puz,
-            "view_only": puz.is_completed_for_team(team) or not team.scavenger_enabled,
+            "view_only": not bypass and puz.is_completed_for_team(team) or not team.scavenger_enabled,
             "scavenger_enabled_for_team": team.scavenger_enabled,
             "guess": request.GET.get("answer", ""),
             "requires_photo": puz.requires_verification_photo_by_team(team)
@@ -82,19 +82,26 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
             return HttpResponseForbidden("Scavenger not currently enabled.")
 
         logger.debug(f"Answer submitted by team {team} with answer: {req_dict['answer']} through the website")
-        correct, stream_completed, next_puzzle, require_verification_photo = puz.check_team_guess(
-            team, req_dict["answer"])
+        if not bypass:
+            correct, stream_completed, next_puzzle, require_verification_photo = puz.check_team_guess(
+                team, req_dict["answer"])
 
-        if require_verification_photo:
-            next_page = "verification_photo/"
-        elif next_puzzle:
-            next_page = "../" + next_puzzle.secret_id
+            if require_verification_photo:
+                next_page = "verification_photo/"
+            elif next_puzzle:
+                next_page = "../" + next_puzzle.secret_id
+            else:
+                next_page = ""
+
+            return JsonResponse({"correct": correct, "scavenger_stream_completed": stream_completed,
+                                "next": next_page})
         else:
-            next_page = ""
-
-        return JsonResponse({"correct": correct, "scavenger_stream_completed": stream_completed,
-                             "next": next_page})
-
+            if puz.answer.lower() == req_dict["answer"].lower():
+                return JsonResponse({"correct": True, "scavenger_stream_completed": None,
+                                "next": "/scavenger/"})
+            else:
+                return JsonResponse({"correct": False, "scavenger_stream_completed": None,
+                                "next": ""})
     else:
         return HttpResponseNotAllowed(["GET", "POST"])
 
