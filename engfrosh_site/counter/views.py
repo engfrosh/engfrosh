@@ -10,4 +10,4 @@ PASSWORD = "spiritstuffgoeshere"
 @login_required(login_url='/accounts/login')
 @staff_member_required()
 def counter(request: HttpRequest):
-    return render(request, "counter.html", {"password": PASSWORD, "hours": 16, "minutes": 0, "seconds": 0})
+    return render(request, "counter.html", {"password": PASSWORD, "hours": 15, "minutes": 0, "seconds": 0})
