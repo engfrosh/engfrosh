@@ -85,7 +85,6 @@ class DiscordAuthBackend(BaseBackend):
                 if magic_link := MagicLink.objects.get(token=magic_link_token):
                     # if magic_link.expiry > timezone.now():
                     user = magic_link.user
-                    magic_link.delete()
                     return user
                     # else:
                     #     # Link is expired

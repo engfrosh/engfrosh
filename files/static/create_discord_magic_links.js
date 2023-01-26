@@ -129,8 +129,16 @@ function email_magic_link(user_id) {
       }
     });
 };
+/**
+    This is absolutely cursed
+    From: https://stackoverflow.com/a/9748670
+*/
+function sleep(delay) {
+    var start = new Date().getTime();
+    while (new Date().getTime() < start + delay);
+}
 
-function add10Button() {
+function add50Button() {
   let count = 0;
 
   let cur_ids;
@@ -144,12 +152,13 @@ function add10Button() {
   }
 
   for (id of cur_ids) {
-    console.log("Adding user " + id);
+    //console.log("Adding user " + id);
     email_magic_link(id);
-
+    
     count += 1;
-    if (count >= 10) {
+    if (count >= 50) {
       return;
     }
+    sleep(100); // Sleep for 100ms to not hit rate limits
   }
 }
