@@ -87,7 +87,7 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
                 team, req_dict["answer"])
             if correct:
                 DiscordChannel.send_to_updates_channels(
-                    f"""{team.display_name} has submitted an answer to the scav site!""")
+                    f"""{team.display_name} has submitted an answer for puzzle {puz.name} (order {puz.order})!""")
 
             if require_verification_photo:
                 next_page = "verification_photo/"
