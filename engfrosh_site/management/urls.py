@@ -11,6 +11,7 @@ urlpatterns = [
     # path('roles', views.manage_roles, name="manage_roles"),
     path('scavenger/puzzles', views.manage_scavenger_puzzles, name="manage_scavenger_puzzles"),
     path('scavenger/approve-photos', views.approve_scavenger_puzzles, name="approve_scavenger_puzzles"),
+    path('scavenger/scoreboard', views.scavenger_scoreboard, name="scavenger_scoreboard"),
     path('database/initialize', views.initialize_database, name="initialize_database"),
     path('database/scavinit', views.initialize_scav, name="initialize_scav"),
     path('trade-up/view-all', views.trade_up_viewer, name="trade_up_viewer"),

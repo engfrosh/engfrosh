@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}">
+    <!-- <script src="script.js"></script> -->
+    <title>Manage Frosh Teams</title>
+    {% csrf_token %}
+    <script>
+        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    </script>
+    <style>
+        td.discord_role {
+            text-align: center;
+        }
+
+        td.color_box {
+            width: 26px;
+            text-align: center;
+        }
+
+        td.scav_channel {
+            text-align: center;
+        }
+
+        th {
+            padding-right: 10px;
+            padding-left: 10px;
+            padding-bottom: 5px;
+            text-align: center;
+        }
+    </style>
+    <script src="{% static 'functions.js' %}"></script>
+</head>
+
+<body>
+    <a href="{% url 'manage_index' %}">Back to Manage</a><br />
+    <table>
+        <tr>
+            <th>Team</th>
+            <th>Puzzle Name</th>
+            <th>Current Puzzle (Order)</th>
+        </tr>
+        {% for act in status %}
+        <tr>
+            <td class="color_box">{{ act.team.display_name }}</td>
+            {% if act.team.scavenger_finished %}
+            <td class="color_box">Finished Scav</td>
+            {% else %}
+            <td class="color_box">{{ act.puzzle.name }}</td>
+            <td class="color_box">#{{ act.puzzle.order }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+
+</html>
