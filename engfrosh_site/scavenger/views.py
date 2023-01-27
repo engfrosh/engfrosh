@@ -85,6 +85,9 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
         if not bypass:
             correct, stream_completed, next_puzzle, require_verification_photo = puz.check_team_guess(
                 team, req_dict["answer"])
+            if correct:
+                DiscordChannel.send_to_updates_channels(
+                    f"""{team.display_name} has submitted an answer to the scav site!""")
 
             if require_verification_photo:
                 next_page = "verification_photo/"
@@ -98,10 +101,10 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
         else:
             if puz.answer.lower() == req_dict["answer"].lower():
                 return JsonResponse({"correct": True, "scavenger_stream_completed": None,
-                                "next": "/scavenger/"})
+                                    "next": "/scavenger/"})
             else:
                 return JsonResponse({"correct": False, "scavenger_stream_completed": None,
-                                "next": ""})
+                                    "next": ""})
     else:
         return HttpResponseNotAllowed(["GET", "POST"])
 
