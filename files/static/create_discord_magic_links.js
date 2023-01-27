@@ -142,9 +142,9 @@ function add50Button() {
   let count = 0;
 
   let cur_ids;
-  if (user_ids.length > 10) {
-    cur_ids = user_ids.slice(0, 10);
-    user_ids = user_ids.slice(10);
+  if (user_ids.length > 50) {
+    cur_ids = user_ids.slice(0, 50);
+    user_ids = user_ids.slice(50);
   }
   else {
     cur_ids = user_ids;
