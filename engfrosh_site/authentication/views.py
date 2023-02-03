@@ -9,7 +9,7 @@ Includes views for:
 import logging
 import os
 from typing import List, Union
-
+from urllib.parse import urlparse
 import credentials
 
 from common_models.models import DiscordUser
@@ -71,6 +71,9 @@ def login_page(request: HttpRequest):
     if not request.user.is_anonymous:
         # Todo add way to log out
         if redirect_location:
+            is_absolute = bool(urlparse.urlparse(redirect_location).netloc)
+            if is_absolute:
+                return HttpResponse("Warning: Absolute redirect url detected!")
             return redirect(redirect_location)
         else:
             return HttpResponse("You are already logged in.")
