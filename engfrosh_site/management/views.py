@@ -19,6 +19,7 @@ from common_models.models import DiscordRole
 from . import registration
 from . import forms
 
+from django.utils.html import escape
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import permission_required
@@ -224,7 +225,8 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
                     {"user_id": user.id, "qr_code_link": mlink.qr_code.url})
 
             case _:
-                return HttpResponseBadRequest(f"Invalid command: {req_dict['command']}")
+                command = escape(req_dict['command'])
+                return HttpResponseBadRequest(f"Invalid command: {command}")
 
     else:
         return HttpResponseNotAllowed(['GET', 'POST'])
