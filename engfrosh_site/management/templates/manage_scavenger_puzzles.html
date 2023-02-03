@@ -16,7 +16,7 @@
         </tr>
         {% for puzzle in puzzles %}
             <tr >
-                <td class="px-3 text-center">{{ puzzle.id }}</td>
+                <td class="px-3 text-center"><a href={% url 'edit_scavenger_puzzle' id=puzzle.id %}>{{ puzzle.id }}</a></td>
                 <td class="px-3 text-center">{{ puzzle.order }}</td>
                 <td class="px-3 text-start">{{ puzzle.name }}</td>
                 <td class="px-3 text-center">

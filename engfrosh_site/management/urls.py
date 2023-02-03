@@ -10,6 +10,7 @@ urlpatterns = [
     path('', views.manage_index, name="manage_index"),
     # path('roles', views.manage_roles, name="manage_roles"),
     path('scavenger/puzzles', views.manage_scavenger_puzzles, name="manage_scavenger_puzzles"),
+    path('scavenger/puzzles/<int:id>', views.edit_scavenger_puzzle, name="edit_scavenger_puzzle"),
     path('scavenger/approve-photos', views.approve_scavenger_puzzles, name="approve_scavenger_puzzles"),
     path('scavenger/scoreboard', views.scavenger_scoreboard, name="scavenger_scoreboard"),
     path('database/initialize', views.initialize_database, name="initialize_database"),

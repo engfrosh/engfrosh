@@ -1,4 +1,5 @@
 from django import forms
+from common_models.models import Puzzle
 
 
 class DiscordNickForm(forms.Form):
@@ -13,3 +14,9 @@ class DiscordNickForm(forms.Form):
             self.fields['nickname'].value = nick
         if col is not None:
             self.fields['color'].value = col
+
+
+class PuzzleForm(forms.ModelForm):
+    class Meta:
+        model = Puzzle
+        exclude = ['id', 'secret_id', 'created_at']

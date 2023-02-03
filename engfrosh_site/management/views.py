@@ -540,6 +540,36 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
         return HttpResponseNotAllowed(("GET", "POST"))
 
 
+@permission_required("common_models.manage_scav")
+def edit_scavenger_puzzle(request: HttpRequest, id: int) -> HttpResponse:
+    """Page for editing scavenger puzzles"""
+    puzzle = Puzzle.objects.filter(id=id).first()
+    if puzzle is None:
+        return HttpResponseBadRequest("Invalid puzzle id!")
+    if request.method == "GET":
+        context = {
+            "puzzle": puzzle,
+            "form": forms.PuzzleForm(instance=puzzle)
+        }
+        return render(request, "edit_scavenger_puzzle.html", context)
+    elif request.method == "POST":
+        form = forms.PuzzleForm(request.POST, instance=puzzle)
+        if not form.is_valid:
+            context = {
+                "error": True,
+                "puzzle": puzzle,
+                "form": form
+            }
+            return render(request, "edit_scavenger_puzzle.html", context)
+        form.save()
+        teams = Team.objects.all()
+        for team in teams:
+            team.refresh_scavenger_progress()
+        return redirect("manage_scavenger_puzzles")
+    else:
+        return HttpResponseNotAllowed(("GET", "POST"))
+
+
 @permission_required("common_models.change_puzzle", login_url='/accounts/login')
 def approve_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
     """Page for approving verification images."""
