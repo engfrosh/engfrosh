@@ -54,3 +54,4 @@ channels==4.0.0
 daphne==4.0.0
 msal==1.20.0
 djangorestframework==3.14.0
+django-unixdatetimefield==1.2.0
