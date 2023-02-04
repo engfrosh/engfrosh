@@ -11,10 +11,10 @@ class VerificationPhotoAPI(APIView):
 
     def post(self, request, format=None):
         if not request.user.has_perm('common_models.photo_api'):
-            return Response("{\"Error\": \"Forbidden\"}", status=status.HTTP_403_FORBIDDEN)
+            return Response({"Error": "Forbidden"}, status=status.HTTP_403_FORBIDDEN, content_type="application/json")
         photo = VerificationPhoto()
         serializer = VerificationPhotoSerializer(photo, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response("{\"id\": " + str(photo.id) + "}")
+            return Response({"id": photo.id}, content_type="application/json")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
