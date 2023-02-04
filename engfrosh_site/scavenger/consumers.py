@@ -4,21 +4,21 @@ from channels.generic.websocket import WebsocketConsumer
 from channels.layers import get_channel_layer
 
 
-class CheckInConsumer(WebsocketConsumer):
+class ScavConsumer(WebsocketConsumer):
 
     def connect(self):
         self.user = self.scope["user"]
-        if not self.user.has_perm("common_models.check_in"):
+        if not self.user.has_perm("common_models.manage_scav"):
             self.close()
         async_to_sync(self.channel_layer.group_add)(
-            'checkin',
+            'scav',
             self.channel_name
         )
         self.accept()
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
-            'checkin',
+            'scav',
             self.channel_name
         )
 
@@ -27,12 +27,12 @@ class CheckInConsumer(WebsocketConsumer):
 
     def send_notification(self, event):
         self.send(text_data=json.dumps({
-            'location': event['location'],
-            'size': event['size'],
+            'photo': event['photo'],
+            'id': event['id'],
             'team': event['team']
         }))
 
-    def notify_trigger(location: str, size: str, team: str) -> None:
+    def notify_trigger(photo: str, team: str, id: int) -> None:
         channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)('default', {'type': 'send_notification',
-                                                            'location': location, 'size': size, 'team': team})
+        async_to_sync(channel_layer.group_send)('scav', {'type': 'send_notification',
+                                                            'photo': photo, 'id': id, 'team': team})

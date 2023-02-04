@@ -13,6 +13,7 @@ urlpatterns = [
     path('scavenger/puzzles/<int:id>', views.edit_scavenger_puzzle, name="edit_scavenger_puzzle"),
     path('scavenger/approve-photos', views.approve_scavenger_puzzles, name="approve_scavenger_puzzles"),
     path('scavenger/scoreboard', views.scavenger_scoreboard, name="scavenger_scoreboard"),
+    path('scavenger/monitor', views.scavenger_monitor, name="scavenger_monitor"),
     path('database/initialize', views.initialize_database, name="initialize_database"),
     path('database/scavinit', views.initialize_scav, name="initialize_scav"),
     path('trade-up/view-all', views.trade_up_viewer, name="trade_up_viewer"),

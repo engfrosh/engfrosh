@@ -117,6 +117,11 @@ def scavenger_scoreboard(request: HttpRequest) -> HttpResponse:
     return render(request, "scavenger_scoreboard.html", {"status": status})
 
 
+@permission_required("common_models.manage_scav", login_url='/accounts/login')
+def scavenger_monitor(request: HttpRequest) -> HttpResponse:
+    return render(request, "scavenger_monitor.html")
+
+
 @permission_required("auth.change_user", login_url='/accounts/login')
 def get_discord_link(request: HttpRequest) -> HttpResponse:
     """View to get discord linking links for users or send link emails to users."""

@@ -2,7 +2,7 @@ from typing import Union
 from django.http import HttpRequest, HttpResponse
 from django.http.response import HttpResponseNotAllowed, HttpResponseBadRequest, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render  # noqa F401
-
+from scavenger.consumers import ScavConsumer
 from common_models.models import DiscordChannel, Puzzle, Team, VerificationPhoto
 from django.contrib.auth.decorators import login_required
 
@@ -152,7 +152,7 @@ def puzzle_photo_verification_view(request: HttpRequest, slug: str) -> HttpRespo
             DiscordChannel.send_to_updates_channels(
                 f"""{team.display_name} has uploaded a photo for {puz.name} that needs verification.""" +
                 f""""\n{request.build_absolute_uri(reverse("approve_scavenger_puzzles"))}""")
-
+            ScavConsumer.notify_trigger(photo.photo.url, team.display_name, photo.id)
             return HttpResponse()
 
         case _:

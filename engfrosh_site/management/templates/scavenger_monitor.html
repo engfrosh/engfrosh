@@ -1,0 +1,63 @@
+{% extends 'base_generic.html' %}
+{% block page_title %}
+    Approval Monitor
+{% endblock page_title %}
+{% block body %}
+    <p id="status">Disconnected</p>
+    <div id="approval">
+        <h1>Approvals</h1>
+    </div>
+    <script>
+        let socket = new WebSocket('ws://'+window.location.host+"/ws/scav/approval");
+        socket.onopen = function(e){
+            document.getElementById("status").innerHTML = "Connected";
+        }
+        socket.onclose = function(e){
+            alert("Disconnected from server!");
+            document.getElementById("status").innerHTML = "Disconnected";
+        }
+        socket.onerror = function(e){
+            alert("Received error from server!");
+            document.getElementById("status").innerHTML = "Error";
+        }
+        function approvePhotoButtonPress(photoID) {
+            postToServerURL(csrf_token, {
+                "command": "approve_verification_photo",
+                "photo_id": photoID
+            }, "/manage/scavenger/approve-photos").then(
+                res => {
+                    if (!res.ok) {
+                        res.text().then(data => {
+                            alert("Failed to approve: " + data);
+                        });
+                    }
+                }
+            );
+        }
+        socket.onmessage = function(e){
+            data = JSON.parse(e.data);
+            const team = data['team'];
+            const id = data['id'];
+            const photo = data['photo'];
+            const approvalDiv = document.getElementById('approval');
+            const dataDiv = document.createElement("div");
+            dataDiv.id = "approval-" + id;
+            dataDiv.class = "px-3 text-center";
+            const label = document.createElement("h3");
+            label.innerHTML = "Team: "+team;
+            dataDiv.appendChild(label);
+            const img = document.createElement("img");
+            img.src = photo;
+            dataDiv.appendChild(img);
+            const button = document.createElement("button");
+            button.id = "btn-" + id;
+            button.innerHTML = "Approve";
+            button.onclick = function(){
+                approvePhotoButtonPress(id);
+                dataDiv.remove();
+            };
+            dataDiv.appendChild(button);
+            approvalDiv.appendChild(dataDiv);
+        }
+    </script>
+{% endblock body %}
