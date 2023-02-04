@@ -98,6 +98,7 @@ DEFAULT_SCAVENGER_PUZZLE_REQUIRE_PHOTO_UPLOAD = True
 
 INSTALLED_APPS = [
     'daphne',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -111,7 +112,7 @@ INSTALLED_APPS = [
     'common_models.apps.CommonModelsConfig',
     'check_in.apps.CheckInConfig',
     'ticket.apps.TicketConfig',
-    'counter.apps.CounterConfig',
+    'api.apps.APIConfig',
     'channels',
 ]
 
