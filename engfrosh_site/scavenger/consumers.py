@@ -35,4 +35,4 @@ class ScavConsumer(WebsocketConsumer):
     def notify_trigger(photo: str, team: str, id: int) -> None:
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)('scav', {'type': 'send_notification',
-                                                            'photo': photo, 'id': id, 'team': team})
+                                                         'photo': photo, 'id': id, 'team': team})
