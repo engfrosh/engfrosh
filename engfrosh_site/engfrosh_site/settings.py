@@ -155,12 +155,12 @@ ASGI_APPLICATION = 'engfrosh_site.asgi.application'
 
 DATABASES = {
     'default': {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "engfrosh_dev_2022_07_05",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "engfrosh",
         "USER": "engfrosh_site",
         "PASSWORD": "there-exercise-fenegle",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "HOST": "127.0.0.1",
+        "PORT": "3306",
     }}
 
 
