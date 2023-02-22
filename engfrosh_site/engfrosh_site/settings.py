@@ -71,20 +71,18 @@ if development:
     ALLOWED_HOSTS = [
         "127.0.0.1",
         "localhost",
-        "heads.engfrosh.com",
-        "engfrosh.com"
+        "nem.mycses.ca",
     ]
 else:
     ALLOWED_HOSTS = [
-        "heads.engfrosh.com",
-        "engfrosh.com"
+        "nem.mycses.ca",
     ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://*.engfrosh.com",
-    "https://engfrosh.com",
-    "http://*.engfrosh.com",
-    "http://engfrosh.com"
+    "https://*.mycses.ca",
+    "https://mycses.ca",
+    "http://*.mycses.ca",
+    "http://mycses.ca"
 ]
 
 # This fixes oauth uri's going to http:// by default
