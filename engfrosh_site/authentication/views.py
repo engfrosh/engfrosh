@@ -33,7 +33,7 @@ PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 def index(request: HttpRequest):
     """Generic accounts home."""
-    return render(request, "index.html")
+    return render(request, "index.html", {"reg_req": settings.REGISTER_REQ})
 
 
 @login_required()

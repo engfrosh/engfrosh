@@ -39,6 +39,12 @@ elif deploy_type == "PROD":
 else:
     logging.warning(f"UNKNOWN DEPLOYMENT TYPE: {deploy_type}")
 
+REGISTER_REQ = os.environ.get("ENGFROSH_REG_REQ")
+if not REGISTER_REQ:
+    REGISTER_REQ = True
+else:
+    REGISTER_REQ = False
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -113,7 +119,6 @@ INSTALLED_APPS = [
     'check_in.apps.CheckInConfig',
     'ticket.apps.TicketConfig',
     'api.apps.APIConfig',
-    'calendar.apps.CalendarConfig',
     'channels',
 ]
 
