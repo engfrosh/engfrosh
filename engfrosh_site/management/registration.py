@@ -144,8 +144,9 @@ def create_user_initialize(name: str, email: str, role: FroshRole, team: Optiona
 
     user_details = UserDetails(user=user, name=name, shirt_size=size)
     user_details.save()
-
-    role.group.user_set.add(user)
+    
+    if role:
+        role.group.user_set.add(user)
 
     if team:
         team.group.user_set.add(user)

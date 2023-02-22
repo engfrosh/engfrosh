@@ -16,7 +16,8 @@ from common_models.models import DiscordUser
 from common_models.models import DiscordRole
 from .discord_auth import DiscordUserAlreadyExistsError, register
 from pyaccord.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  # noqa E402
-
+from django.contrib.auth.models import Group
+from common_models.models import Team
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
@@ -24,6 +25,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.encoding import uri_to_iri
 from django.conf import settings
+import uuid
+from management import registration
 
 logger = logging.getLogger("Authentication.Views")
 
@@ -60,6 +63,25 @@ def logout_page(request: HttpRequest) -> HttpResponse:
     logout(request)
 
     return HttpResponse("You are now logged out.")
+
+
+def sign_up(request: HttpRequest) -> HttpResponse:
+    if request.method == "GET":
+        return render(request, "sign_up.html")
+    elif request.method == "POST":
+        team_name = str(uuid.uuid4())
+        group = Group(name=team_name)
+        group.save()
+        team = Team(display_name=team_name, group=group, color=None)
+        team.save()
+
+        team.reset_scavenger_progress()
+        team.save()
+        user = registration.create_user_initialize("Anon", "none-" + team_name + "@test.xyz", "", team, "", "")
+        user.backend='django.contrib.auth.backends.ModelBackend'
+        user.save()
+        login(request, user)
+        return redirect("register")
 
 
 def login_page(request: HttpRequest):

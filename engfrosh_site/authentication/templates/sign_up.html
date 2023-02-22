@@ -4,7 +4,7 @@
 <head>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}">
-    <title>Login</title>
+    <title>Sign Up</title>
     <style>
         .login_button {
             font-family: "Ginto Nord", "Whitney", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
@@ -40,15 +40,11 @@
 
 <body>
     <div class="login_box">
-        <a href="{% url 'discord_login' %}" type="button" class="login_button discord">Login with Discord</a>
-        <br/>
-        {% if encoded_redirect %}
-            <a href="/admin/login/?next={{encoded_redirect}}" type="button" class="login_button admin">Login as Staff</a> 
-        {% else %}
-            <a href="/admin/login/" type="button" class="login_button admin">Login as Staff</a> 
-        {% endif %}
-        <br/>
-        <a href="{% url 'sign_up' %}" type="button" class="login_button admin">Sign Up</a>
+        <form method="POST">
+            {% csrf_token %}
+            <p>To sign up simply press the button below</p>
+            <input type="submit" value="Sign Up">
+        </form>
     </div>
 </body>
 
