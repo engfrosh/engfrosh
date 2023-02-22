@@ -78,7 +78,7 @@ def sign_up(request: HttpRequest) -> HttpResponse:
         team.reset_scavenger_progress()
         team.save()
         user = registration.create_user_initialize("Anon", "none-" + team_name + "@test.xyz", "", team, "", "")
-        user.backend='django.contrib.auth.backends.ModelBackend'
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
         user.save()
         login(request, user)
         return redirect("register")
