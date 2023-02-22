@@ -227,9 +227,11 @@ def discord_register_callback(request: HttpRequest):
 
             if not discord_role_ids:
                 discord_role_ids = None
-
+            nick = user.get_full_name()
+            if nick == "Anon":
+                nick = None
             if user_api.add_user_to_guild(credentials.GUILD_ID, user_id=discord_user.id,
-                                          roles=discord_role_ids, nickname=user.get_full_name()):
+                                          roles=discord_role_ids, nickname=nick):
                 logger.info(f"Successfully added user {discord_user} to discord server.")
 
             else:
