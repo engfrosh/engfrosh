@@ -42,7 +42,7 @@
     <div class="login_box">
         <form method="POST">
             {% csrf_token %}
-            <p>To sign up simply press the button below</p>
+            {{ form.as_p }}
             <input type="submit" value="Sign Up">
         </form>
     </div>

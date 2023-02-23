@@ -27,6 +27,7 @@ from django.utils.encoding import uri_to_iri
 from django.conf import settings
 import uuid
 from management import registration
+from .forms import SignUpForm
 
 logger = logging.getLogger("Authentication.Views")
 
@@ -67,9 +68,14 @@ def logout_page(request: HttpRequest) -> HttpResponse:
 
 def sign_up(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
-        return render(request, "sign_up.html")
+        form = SignUpForm()
+        return render(request, "sign_up.html", {"form": form})
     elif request.method == "POST":
-        team_name = str(uuid.uuid4())
+        form = SignUpForm(request.POST)
+        if not form.is_valid():
+            return render(request, "sign_up.html", {"form": form})
+        data = form.cleaned_data
+        team_name = data['name'].replace(" ", "-") + "_" + str(uuid.uuid4())[:8]
         group = Group(name=team_name)
         group.save()
         team = Team(display_name=team_name, group=group, color=None)
@@ -77,7 +83,7 @@ def sign_up(request: HttpRequest) -> HttpResponse:
 
         team.reset_scavenger_progress()
         team.save()
-        user = registration.create_user_initialize("Anon", "none-" + team_name + "@test.xyz", "", team, "", "")
+        user = registration.create_user_initialize(data['name'], data['email'], "", team, "", "")
         user.backend = 'django.contrib.auth.backends.ModelBackend'
         user.save()
         login(request, user)
