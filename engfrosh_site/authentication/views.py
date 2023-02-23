@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 import credentials
 
 from common_models.models import DiscordUser
-from common_models.models import DiscordRole
+from common_models.models import DiscordRole, FroshRole
 from .discord_auth import DiscordUserAlreadyExistsError, register
 from pyaccord.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  # noqa E402
 from django.contrib.auth.models import Group
@@ -75,6 +75,15 @@ def sign_up(request: HttpRequest) -> HttpResponse:
         if not form.is_valid():
             return render(request, "sign_up.html", {"form": form})
         data = form.cleaned_data
+        # Facil is the only option this will create so that people are able to answer scav puzzles
+        DEFAULT_ROLES = ("Facil",)
+        for role in DEFAULT_ROLES:
+            if not FroshRole.objects.filter(name=role).exists():
+                group = Group(name=role)
+                group.save()
+                fr = FroshRole(name=role, group=group)
+                fr.save()
+        role = FroshRole.objects.get(name="Facil")
         team_name = data['name'].replace(" ", "-") + "_" + str(uuid.uuid4())[:8]
         group = Group(name=team_name)
         group.save()
@@ -83,7 +92,7 @@ def sign_up(request: HttpRequest) -> HttpResponse:
 
         team.reset_scavenger_progress()
         team.save()
-        user = registration.create_user_initialize(data['name'], data['email'], "", team, "", "")
+        user = registration.create_user_initialize(data['name'], data['email'], role, team, "", "")
         user.backend = 'django.contrib.auth.backends.ModelBackend'
         user.save()
         login(request, user)
