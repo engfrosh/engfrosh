@@ -113,8 +113,9 @@ INSTALLED_APPS = [
     'check_in.apps.CheckInConfig',
     'ticket.apps.TicketConfig',
     'api.apps.APIConfig',
-    'schedule.apps.CalendarConfig',
+    'froshschedule.apps.CalendarConfig',
     'channels',
+    'schedule'
 ]
 
 MIDDLEWARE = [
