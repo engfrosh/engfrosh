@@ -1,7 +1,8 @@
 from django.urls import path, include
 
-# from . import views
+from . import views
 
 urlpatterns = [
-    path('', include('schedule.urls'))
+    path('', views.index, name="schedule_index"),
+    path('api/', include('schedule.urls')),
 ]

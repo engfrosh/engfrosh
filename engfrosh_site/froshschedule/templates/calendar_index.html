@@ -1,0 +1,21 @@
+{% extends "base_user.html" %}
+{% load static %}
+{% block page_title %}EngFrosh Calendar{% endblock page_title %}
+{% block active %}
+    <link rel='stylesheet' type='text/css' href="{% static 'fullcalendar.css' %}" />
+    <link rel='stylesheet' type='text/css' href="{% static 'jquery-ui/jquery-ui.min.css' %}" />
+    <script type='text/javascript' src="{% static 'jquery/dist/jquery.js' %}"></script>
+    <script type='text/javascript' src="{% static 'moment.js' %}"></script>
+    <script type='text/javascript' src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
+    <script type='text/javascript' src="{% static 'fullcalendar.js' %}"></script>
+    <div id="calendar">
+    </div>
+    <script type='text/javascript'>
+        $(document).ready(function() {
+            $('#calendar').fullCalendar({
+                events: '/calendar/api/api/occurrences'
+            });
+        });
+    </script>
+{% endblock active %}
+
