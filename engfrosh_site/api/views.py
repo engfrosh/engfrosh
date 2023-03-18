@@ -4,7 +4,7 @@ from .serializers import VerificationPhotoSerializer
 from rest_framework.response import Response
 from common_models.models import VerificationPhoto
 from datetime import datetime
-from schedule.models import Calendar, Event, Occurrence
+from schedule.models import Calendar, Occurrence
 import pytz
 
 
@@ -21,6 +21,8 @@ class VerificationPhotoAPI(APIView):
             serializer.save()
             return Response({"id": photo.id}, content_type="application/json")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class CalendarAPI(APIView):
     authentication_classes = {authentication.SessionAuthentication, authentication.BasicAuthentication}
     permission_classes = {permissions.IsAuthenticated}
@@ -40,9 +42,10 @@ class CalendarAPI(APIView):
             try:
                 calendar = Calendar.objects.get_calendar_for_object(group)
                 calendars.update({calendar})
-            except:
+            except Exception:
                 continue
-        # This is ripped right from the django-scheduler code https://github.com/llazzaro/django-scheduler/blob/8aa6f877f17e5b05f17d7c39e93d8e73625b0a65/schedule/views.py#L357
+        # This is ripped right from the django-scheduler code
+        # https://github.com/llazzaro/django-scheduler/blob/8aa6f877f17e5b05f17d7c39e93d8e73625b0a65/schedule/views.py#L357
         response_data = []
         i = 1
         if Occurrence.objects.all().exists():
@@ -51,7 +54,7 @@ class CalendarAPI(APIView):
         for calendar in calendars:
             # create flat list of events from each calendar
             for event in calendar.events.all():
-                if event.start <= end_time and (event.end_recurring_period is None or event.end_recurring_period > start_time):
+                if event.start <= end_time and (event.end_recurring_period is None or event.end_recurring_period > start_time):  # noqa: E501
                     event_list += [event]
         for event in event_list:
             occurrences = event.get_occurrences(start_time, end_time)
