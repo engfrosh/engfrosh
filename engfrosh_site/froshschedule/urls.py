@@ -4,5 +4,4 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name="schedule_index"),
-    path('api/', include('schedule.urls')),
 ]
