@@ -2,7 +2,6 @@
 {% load static %}
 {% block page_title %}EngFrosh Calendar{% endblock page_title %}
 {% block active %}
-    <link rel='stylesheet' type='text/css' href="{% static 'fullcalendar.css' %}" />
     <link rel='stylesheet' type='text/css' href="{% static 'jquery-ui/jquery-ui.min.css' %}" />
     <script type='text/javascript' src="{% static 'jquery/dist/jquery.js' %}"></script>
     <script type='text/javascript' src="{% static 'moment.js' %}"></script>
@@ -12,9 +11,11 @@
     </div>
     <script type='text/javascript'>
         $(document).ready(function() {
-            $('#calendar').fullCalendar({
-                events: '/api/calendar'
+            var calendar = document.getElementById("calendar");
+            var obj = new FullCalendar.Calendar(calendar, {
+                initialView: 'dayGridMonth'
             });
+            obj.render();
         });
     </script>
 {% endblock active %}
