@@ -44,6 +44,11 @@ class CalendarAPI(APIView):
                 calendars.update({calendar})
             except Exception:
                 continue
+        try:
+            calendar = Calendar.objects.get_calendar_for_object(user)
+            calendars.update({calendar})
+        except Exception:
+            pass
         # This is ripped right from the django-scheduler code
         # https://github.com/llazzaro/django-scheduler/blob/8aa6f877f17e5b05f17d7c39e93d8e73625b0a65/schedule/views.py#L357
         response_data = []
