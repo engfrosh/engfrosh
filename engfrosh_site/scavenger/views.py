@@ -13,6 +13,9 @@ from django.urls import reverse
 
 logger = logging.getLogger("engfrosh_site.scavenger.views")
 
+@login_required(login_url='/accounts/login')
+def stream_view(request: HttpRequest) -> HttpResponse:
+    return render(request, "branch_completed.html", context={})
 
 @login_required(login_url='/accounts/login')
 def index(request: HttpRequest) -> HttpResponse:
@@ -94,7 +97,7 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
             elif next_puzzle:
                 next_page = "../" + next_puzzle.secret_id
             else:
-                next_page = ""
+                next_page = "../../stream_completed"
 
             return JsonResponse({"correct": correct, "scavenger_stream_completed": stream_completed,
                                 "next": next_page})
