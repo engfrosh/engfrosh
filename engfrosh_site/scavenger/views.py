@@ -13,9 +13,11 @@ from django.urls import reverse
 
 logger = logging.getLogger("engfrosh_site.scavenger.views")
 
+
 @login_required(login_url='/accounts/login')
 def stream_view(request: HttpRequest) -> HttpResponse:
     return render(request, "branch_completed.html", context={})
+
 
 @login_required(login_url='/accounts/login')
 def index(request: HttpRequest) -> HttpResponse:
