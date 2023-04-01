@@ -80,7 +80,7 @@ DEFAULT_MAGIC_LINK_EMAIL_HTML = \
     </html>
     """
 # Note, google tends to get rid of some link elements.
-DEFAULT_MAGIC_LINK_EMAIL_SUBJECT = "Welcome to EngFrosh Head's Day Discord and Website!"
+DEFAULT_MAGIC_LINK_EMAIL_SUBJECT = "Welcome to the EngFrosh Discord and Website!"
 
 
 def email_magic_link(user: User, hostname: str, login_path: str, sender_email: str, *,
