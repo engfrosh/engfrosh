@@ -65,12 +65,12 @@ if development:
     ALLOWED_HOSTS = [
         "127.0.0.1",
         "localhost",
-        "heads.engfrosh.com",
+        "server.engfrosh.com",
         "engfrosh.com"
     ]
 else:
     ALLOWED_HOSTS = [
-        "heads.engfrosh.com",
+        "server.engfrosh.com",
         "engfrosh.com"
     ]
 
