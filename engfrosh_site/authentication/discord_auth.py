@@ -11,6 +11,7 @@ from common_models.models import DiscordUser, MagicLink
 
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
+from django.contrib.auth import logout
 
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 
@@ -78,6 +79,11 @@ class DiscordAuthBackend(BaseBackend):
         """Authenticates users with discord or magic link."""
 
         logger.debug("Trying to authenticate with DiscordAuthBackend.authenticate")
+
+        if request.user.is_authenticated:
+            logger.debug("User is already logged in!")
+            logout(request)
+            logger.debug("Logged out user!")
 
         if magic_link_token:
             logger.debug("Trying to authenticate with magic link token")
