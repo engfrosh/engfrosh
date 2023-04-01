@@ -71,7 +71,7 @@ def login_page(request: HttpRequest):
     if not request.user.is_anonymous:
         # Todo add way to log out
         if redirect_location:
-            is_absolute = bool(urlparse.urlparse(redirect_location).netloc)
+            is_absolute = bool(urlparse(redirect_location).netloc)
             if is_absolute:
                 return HttpResponse("Warning: Absolute redirect url detected!")
             return redirect(redirect_location)
