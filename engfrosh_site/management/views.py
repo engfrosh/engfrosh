@@ -214,6 +214,8 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
                         login_path="/accounts/login", redirect="/accounts/link/discord")})  # TODO fix to include https
 
             case "send_link_email":
+                if not request.user.is_superuser:
+                    return HttpResponseBadRequest("You can't send emails.")
                 # TODO Update the email to be dynamic
                 SENDER_EMAIL = "noreply@engfrosh.com"
                 if registration.email_magic_link(
