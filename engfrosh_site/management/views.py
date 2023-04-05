@@ -716,6 +716,7 @@ def manage_discord_nicks(request: HttpRequest) -> HttpResponse:
         else:
             return HttpResponseBadRequest("Invalid command.")
 
+
 @permission_required("common_models.manage_discord_nicks", login_url='/accounts/login')
 def manage_discord_nick(request: HttpRequest, id: int) -> HttpResponse:
     if request.method == "GET":
