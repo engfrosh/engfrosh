@@ -29,6 +29,7 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse, JsonResponse, \
     HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError, HttpResponseForbidden
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import user_passes_test
 
 
 logger = logging.getLogger("management.views")
@@ -406,13 +407,13 @@ def manage_index(request: HttpRequest) -> HttpResponse:
     return render(request, "manage.html")
 
 
-@staff_member_required(login_url='/accounts/login')
+@user_passes_test(lambda u: u.is_superuser)
 def initialize_database(request: HttpRequest) -> HttpResponse:
     common_models.models.initialize_database()
     return redirect("manage_index")
 
 
-@staff_member_required(login_url='/accounts/login')
+@user_passes_test(lambda u: u.is_superuser)
 def initialize_scav(request: HttpRequest) -> HttpResponse:
     common_models.models.initialize_scav()
     return redirect("manage_index")
