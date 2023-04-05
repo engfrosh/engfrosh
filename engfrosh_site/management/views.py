@@ -549,17 +549,34 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
 
     elif request.method == "POST":
 
-        return HttpResponse("Not Implemented")
-
         if request.content_type != "application/json":
             return HttpResponseBadRequest("Invalid / missing content type.")
 
         req_dict = json.loads(request.body)
         if "command" not in req_dict:
             return HttpResponseBadRequest("Bad request body, missing command.")
-
-        # match req_dict["command"]:
-        #     case "get_qr_code"
+        if req_dict['command'] == 'toggle':
+            if "puzzle" not in req_dict:
+                return HttpResponseBadRequest("Bad request body, missing puzzle.")
+            puzzle_id = req_dict['puzzle']
+            puzzle = Puzzle.objects.filter(id=puzzle_id).first()
+            if puzzle.enabled:
+                puzzle.enabled = False
+                puzzle.save()
+                next_puzzle = puzzle.stream.get_next_enabled_puzzle(puzzle)
+                for activity in TeamPuzzleActivity.objects.filter(puzzle=puzzle).all():
+                    if not activity.puzzle_completed_at:
+                        if next_puzzle is None:
+                            activity.delete()
+                        else:
+                            activity.puzzle = next_puzzle
+                            activity.save()
+            else:
+                puzzle.enabled = True
+                puzzle.save()
+            return HttpResponse("Successfully toggled puzzle")
+        else:
+            return HttpResponseBadRequest("Invalid command.")
 
     else:
         return HttpResponseNotAllowed(("GET", "POST"))
