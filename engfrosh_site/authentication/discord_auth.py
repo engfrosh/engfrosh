@@ -41,7 +41,7 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
     discord_user_info = discord_api.get_user_info()
 
     discord_user_id = discord_user_info["id"]
-    discord_username = discord_user_info["username"]
+    discord_username = discord_user_info["username"].encode("utf-8").decode('utf-8', 'ignore').encode("utf-8")
     discord_discriminator = discord_user_info["discriminator"]
 
     # Check if user is already registered
