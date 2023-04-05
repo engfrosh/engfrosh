@@ -680,15 +680,43 @@ def trade_up_viewer(request: HttpRequest) -> HttpResponse:
     return render(request, "trade_up_viewer.html", context)
 
 
-@permission_required("manage_discord_nicks", login_url='/accounts/login')
+@permission_required("common_models.view_discord_nicks", login_url='/accounts/login')
 def manage_discord_nicks(request: HttpRequest) -> HttpResponse:
-    search = request.GET.get('filter', '')
-    users = DiscordUser.objects.filter(user__username__icontains=search)
-    users |= DiscordUser.objects.filter(discord_username__icontains=search)
-    return render(request, "manage_discord_nicks.html", {"users": users})
+    if request.method == "GET":
+        search = request.GET.get('filter', '')
+        if request.user.is_staff:
+            users = DiscordUser.objects.filter(user__username__icontains=search)
+            users |= DiscordUser.objects.filter(discord_username__icontains=search)
+        else:
+            team = Team.from_user(request.user)
+            group = team.group
+            users = DiscordUser.objects.filter(user__username__icontains=search, user__groups__id__in=[group.id])
+            users |= DiscordUser.objects.filter(discord_username__icontains=search, user__groups__id__in=[group.id])
+        return render(request, "manage_discord_nicks.html", {"users": users})
+    elif request.method == "POST":
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Not application/json content type")
+        req_dict = json.loads(request.body)
+        if "command" not in req_dict:
+            return HttpResponseBadRequest("No command in request")
+        if req_dict['command'] == 'delete':
+            if request.user.is_staff:
+                users = DiscordUser.objects.all()
+            else:
+                team = Team.from_user(request.user)
+                group = team.group
+                users = DiscordUser.objects.filter(user__groups__id__in=[group.id]).all()
+            if "user" not in req_dict:
+                return HttpResponseBadRequest("No user in request.")
+            user = DiscordUser.objects.filter(id=req_dict['user']).first()
+            if user not in users:
+                return HttpResponseBadRequest("Invalid user.")
+            user.delete()
+            return HttpResponse("Unlinked discord account.")
+        else:
+            return HttpResponseBadRequest("Invalid command.")
 
-
-@permission_required("manage_discord_nicks", login_url='/accounts/login')
+@permission_required("common_models.manage_discord_nicks", login_url='/accounts/login')
 def manage_discord_nick(request: HttpRequest, id: int) -> HttpResponse:
     if request.method == "GET":
         user = DiscordUser.objects.filter(id=id).first()
