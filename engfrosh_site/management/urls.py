@@ -4,7 +4,7 @@ from . import views
 from django.urls import path
 
 urlpatterns = [
-    path('discord/magic-link', views.get_discord_link),
+    path('discord/magic-link', views.get_discord_link, name="magic_links"),
     path('users/add', views.bulk_register_users),
     path('teams', views.manage_frosh_teams, name="manage_frosh_teams"),
     path('', views.manage_index, name="manage_index"),

@@ -122,19 +122,25 @@ def scavenger_monitor(request: HttpRequest) -> HttpResponse:
     return render(request, "scavenger_monitor.html")
 
 
-@permission_required("auth.change_user", login_url='/accounts/login')
+@permission_required("common_models.view_links", login_url='/accounts/login')
 def get_discord_link(request: HttpRequest) -> HttpResponse:
     """View to get discord linking links for users or send link emails to users."""
 
-    # TODO add so heads can access for their teams
-
     if request.method == "GET":
+        if not request.user.is_staff:
+            team = Team.from_user(request.user)
+            all_users = User.objects.all().order_by("username")
+            users = []
+            for user in all_users:
+                if team.group in user.groups.all():
+                    users += [user]
+        else:
+            users = User.objects.all().order_by("username")
         # Handle Webpage requests
         # TODO add check that user doesn't yet have a discord account linked.
 
         context = {"users": []}
 
-        users = User.objects.all().order_by("username")
         for usr in users:
             try:
                 email_sent = UserDetails.objects.get(user=usr).invite_email_sent
@@ -164,7 +170,18 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
             return HttpResponseBadRequest("Missing user_id")
 
         user = User.objects.get(id=req_dict["user_id"])
-
+        if not request.user.is_staff:
+            team = Team.from_user(request.user)
+            all_users = User.objects.all().order_by("username")
+            users = []
+            for u in all_users:
+                if team.group in user.groups.all():
+                    users += [u]
+        else:
+            users = User.objects.all().order_by("username")
+        print(user in users, user, users)
+        if user not in users:
+            return HttpResponseBadRequest("Invalid user")
         match req_dict["command"]:
 
             # TODO should first sync and eliminate expired links
