@@ -11,7 +11,7 @@ from common_models.models import DiscordUser, MagicLink
 
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
-from django.utils import timezone
+from django.contrib.auth import logout
 
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 
@@ -41,7 +41,7 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
     discord_user_info = discord_api.get_user_info()
 
     discord_user_id = discord_user_info["id"]
-    discord_username = discord_user_info["username"]
+    discord_username = discord_user_info["username"].encode("utf-8").decode('utf-8', 'ignore').encode("utf-8")
     discord_discriminator = discord_user_info["discriminator"]
 
     # Check if user is already registered
@@ -80,13 +80,17 @@ class DiscordAuthBackend(BaseBackend):
 
         logger.debug("Trying to authenticate with DiscordAuthBackend.authenticate")
 
+        if request.user.is_authenticated:
+            logger.debug("User is already logged in!")
+            logout(request)
+            logger.debug("Logged out user!")
+
         if magic_link_token:
             logger.debug("Trying to authenticate with magic link token")
             try:
                 if magic_link := MagicLink.objects.get(token=magic_link_token):
                     # if magic_link.expiry > timezone.now():
                     user = magic_link.user
-                    magic_link.link_used()
                     return user
                     # else:
                     #     # Link is expired

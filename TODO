@@ -1,19 +1,20 @@
 # TODO
 
-[ ] Upgrade Postgres versions used
+[+] Upgrade Postgres versions used
 [ ] Make a much more thorough welcome message and details for this year
-[ ] Create ticket interaction system to manage issues people are having
+[+] Create ticket interaction system to manage issues people are having
 [ ] Ability to let people get codes to authenticate the first time to create a username and password
 
 
 ## Discord
-[ ] Rebuild Discord bot so that it is independant of the webserver and just interacts through the database or web API calls to the web server
-[ ] Rebuild Discord bot using nextcord
-[ ] Update Discord bot to use slash commands (reference the engfrosh/scavenger-discord bot)
+[+] Rebuild Discord bot so that it is independant of the webserver and just interacts through the database or web API calls to the web server
+[+] Rebuild Discord bot using nextcord
+[+] Update Discord bot to use slash commands (reference the engfrosh/scavenger-discord bot)
+[ ] Make it so you can @ roles for /scav_lock and /scav_unlock
 
 ## Management
 [ ] Add _Manage Roles_ page and make it easy to create the default roles for planning, heads, frosh, facils.
-[ ] Add way to create default roles for Directors, Spirit, etc
+[+] Add way to create default roles for Directors, Spirit, etc
 [ ] Add email delay to not hit AWS limits
 [ ] Add invite/email all button to the magic links invite page
 [ ] Add tracking and limit the send link page to users who have not linked a discord account
@@ -26,7 +27,7 @@
 ## Authentication
 [ ] How do we want to do invites
 [ ] Disable the ability to register
-[ ] Look into authenticating with carleton or microsoft account (Microsoft Identity Platform)
+[+] Look into authenticating with carleton or microsoft account (Microsoft Identity Platform)
 
 ## CSS
 [ ] Make the _link your discord account_ page look nice as it is the first page seen
@@ -37,7 +38,7 @@
 [ ] Add handling question response times
 [ ] Add check if questions are actually enabled before sending them
 [ ] Add enable and disable scav commands 
-[ ] Add QR answer support
+[+] Add QR answer support
 [ ] Have scav be available after the week to let people see the whole thing 
 
 ## Scoin
@@ -46,7 +47,7 @@
 <!-- [ ] Add more robust permissions -->
 
 ## Moderation
-[ ] Make it so edited messages also get checked for moderation
+[+] Make it so edited messages also get checked for moderation
 [ ] Fix word list so names and common words are not captured or limited
 
 ## Logging

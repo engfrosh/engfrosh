@@ -58,7 +58,7 @@ def get_magic_link(user: User, hostname: str, login_path: str,
 
 
 DEFAULT_MAGIC_LINK_EMAIL_TEXT = \
-    """Welcome to EngFrosh, Destination Mars!
+    """Welcome to EngFrosh!
 Here is your magic link to log into the EngFrosh site and Discord server: {link}
 
 If you need any help or any questions, please email questions@engfrosh.com"""
@@ -67,7 +67,7 @@ DEFAULT_MAGIC_LINK_EMAIL_HTML = \
     """<html lang='en'>
         <body>
             <img src='data:image/jpg;base64,{logo}' alt='EngFrosh logo' style='text-align: center;' /><br/>
-            <h1>Welcome to EngFrosh, Destination Mars!</h1><br/>
+            <h1>Welcome to EngFrosh!</h1><br/>
             <p><a href='{link}' >Here</a> is your magic link to log into the EngFrosh site and Discord server.</p>
             <br/>
             <p>If you need any help or any questions,
@@ -80,7 +80,7 @@ DEFAULT_MAGIC_LINK_EMAIL_HTML = \
     </html>
     """
 # Note, google tends to get rid of some link elements.
-DEFAULT_MAGIC_LINK_EMAIL_SUBJECT = "Welcome to EngFrosh Destination Mars Discord and Website!"
+DEFAULT_MAGIC_LINK_EMAIL_SUBJECT = "Welcome to the EngFrosh Discord and Website!"
 
 
 def email_magic_link(user: User, hostname: str, login_path: str, sender_email: str, *,
@@ -118,7 +118,7 @@ def email_magic_link(user: User, hostname: str, login_path: str, sender_email: s
 
 
 def create_user_initialize(name: str, email: str, role: FroshRole, team: Optional[Team] = None,
-                           program: Optional[UniversityProgram] = None) -> User:
+                           program: Optional[UniversityProgram] = None, size: Optional[str] = None) -> User:
     """Creates a new user with the specified details, initializes their account with other passed details."""
 
     # Check that the email has not already been added
@@ -142,7 +142,7 @@ def create_user_initialize(name: str, email: str, role: FroshRole, team: Optiona
     user.last_name = last_name
     user.save()
 
-    user_details = UserDetails(user=user, name=name)
+    user_details = UserDetails(user=user, name=name, shirt_size=size)
     user_details.save()
 
     role.group.user_set.add(user)

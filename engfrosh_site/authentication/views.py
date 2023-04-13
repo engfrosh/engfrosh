@@ -9,7 +9,7 @@ Includes views for:
 import logging
 import os
 from typing import List, Union
-
+from urllib.parse import urlparse
 import credentials
 
 from common_models.models import DiscordUser
@@ -71,6 +71,9 @@ def login_page(request: HttpRequest):
     if not request.user.is_anonymous:
         # Todo add way to log out
         if redirect_location:
+            is_absolute = bool(urlparse(redirect_location).netloc)
+            if is_absolute:
+                return HttpResponse("Warning: Absolute redirect url detected!")
             return redirect(redirect_location)
         else:
             return HttpResponse("You are already logged in.")
@@ -173,7 +176,9 @@ def discord_register_callback(request: HttpRequest):
         user = register(discord_oauth_code=oauth_code, callback_url=callback_url, user=user)
     except DiscordUserAlreadyExistsError:
         return HttpResponse(
-            "There is already a discord account associated with your id. You may already be in the server, you can check by logging into discord directly. If not, please contact the administrator.")
+            "There is already a discord account associated with your id." +
+            " You may already be in the server, you can check by logging into discord directly." +
+            " If not, please contact the administrator.")
 
     if not user:
         logger.error("Could not register user.")

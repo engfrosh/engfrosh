@@ -6,7 +6,7 @@
     <p id="status">Connected</p>
     <script>
         let socket = new WebSocket('ws://'+window.location.host+"/ws/check_in/");
-        socket.opopen = function(e){
+        socket.onopen = function(e){
             alert("Connected to server!");
             document.getElementById("status").innerHTML = "Connected";
         }

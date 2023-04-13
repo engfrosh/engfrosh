@@ -1,0 +1,45 @@
+{% extends 'base_generic.html' %}
+{% block page_title %}
+   Ticket {{ ticket.id }}
+{% endblock page_title %}
+{% block body %}
+<div class="text-center">
+    <div class="inline-block text-center m-2 bg-white w-fit p-2">
+        <h1 class="text-black">{{ ticket.title }}</h1>
+        <p class="text-black">Created By: {{ ticket.user }}</p>
+        <p class="text-black">Time: {{ ticket.opened }}</p>
+        {% if ticket.get_status_display == 'NEW' %}
+            <p class="text-red-600">Status: {{ ticket.get_status_display }}</p>
+        {% else %}
+            <p class="text-blue-600">Status: {{ ticket.get_status_display }}</p>
+        {% endif %}
+        <br>
+        <p class="text-black">{{ ticket.body }}</p>
+    </div>
+    <br>
+    {% for comment in ticket.get_comments %}
+        <div class="inline-block text-center m-2 bg-white w-fit w-fit p-2 text-black">
+            <p>Created By: {{ comment.user }}</p>
+            <p>Time: {{ comment.created }}</p>
+            <br>
+            <p>{{ comment.body }}</p>
+        </div>
+        <br>
+    {% endfor %}
+    <div class="inline-block my-20">
+        <form class="inline-block" action="{{ ticket.id }}/comment" method="POST">
+            {% csrf_token %}
+            <h1>Create Comment</h1>
+            {{ comment_form.as_p }}
+            <input type="submit" value="Submit">
+        </form>
+        <form class="inline-block" action="{{ ticket.id }}/action" method="POST">
+            {% csrf_token %}
+            <h1>Update Ticket</h1>
+            {{ update_form.as_p }}
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+
+{% endblock %}

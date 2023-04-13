@@ -33,7 +33,7 @@ urlpatterns = [
     path("trade-up/", include("frosh.trade_up_urls")),
     path("favicon.ico", RedirectView.as_view(url=staticfiles_storage.url("favicon.ico"))),
     path("check-in/", include('check_in.urls')),
-]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path("tickets/", include('ticket.urls')),
+    path("api/", include('api.urls')),
+    path("calendar/", include('froshschedule.urls'))
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -7,27 +7,29 @@ import json
 import os
 
 import credentials
+
+from django.contrib import auth
 import pyaccord
-
 from pyaccord.DiscordUserAPI import DiscordUserAPI
-from common_models.models import DiscordGuild, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
+from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity
+from common_models.models import ChannelTag, DiscordGuild
 import common_models.models
-from common_models.models import ChannelTag, DiscordChannel, DiscordRole
-from pyaccord.invite import Invite
-from pyaccord.permissions import Permissions
+from common_models.models import DiscordRole
 from . import registration
+from . import forms
 
+from django.utils.html import escape
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import permission_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.request import HttpRequest
-from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse, \
-    HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError
+from django.http.response import HttpResponse, JsonResponse, \
+    HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError, HttpResponseForbidden
 from django.shortcuts import render, redirect
-from django.contrib import auth
+from django.contrib.auth.decorators import user_passes_test
 
 
 logger = logging.getLogger("management.views")
@@ -84,6 +86,7 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
             team = req_dict["team"]
             role = req_dict["role"]
             program = req_dict["program"]
+            size = req_dict["size"]
         except KeyError:
             return HttpResponseBadRequest("Key Error in Body")
 
@@ -97,7 +100,7 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
             return HttpResponseBadRequest("Bad role or team")
 
         try:
-            user = registration.create_user_initialize(name, email, role, team, program)
+            user = registration.create_user_initialize(name, email, role, team, program, size)
         except registration.UserAlreadyExistsError:
             return HttpResponseBadRequest("User already exists.")
 
@@ -109,19 +112,36 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
 # region Link Discord
 
 
-@permission_required("auth.change_user", login_url='/accounts/login')
+@permission_required("common_models.manage_scav", login_url='/accounts/login')
+def scavenger_scoreboard(request: HttpRequest) -> HttpResponse:
+    status = list(TeamPuzzleActivity.objects.filter(puzzle_completed_at=None).order_by('-puzzle__order'))
+    return render(request, "scavenger_scoreboard.html", {"status": status})
+
+
+@permission_required("common_models.manage_scav", login_url='/accounts/login')
+def scavenger_monitor(request: HttpRequest) -> HttpResponse:
+    return render(request, "scavenger_monitor.html")
+
+
+@permission_required("common_models.view_links", login_url='/accounts/login')
 def get_discord_link(request: HttpRequest) -> HttpResponse:
     """View to get discord linking links for users or send link emails to users."""
 
-    # TODO add so heads can access for their teams
-
     if request.method == "GET":
+        if not request.user.is_staff:
+            team = Team.from_user(request.user)
+            all_users = User.objects.all().order_by("username")
+            users = []
+            for user in all_users:
+                if team.group in user.groups.all():
+                    users += [user]
+        else:
+            users = User.objects.all().order_by("username")
         # Handle Webpage requests
         # TODO add check that user doesn't yet have a discord account linked.
 
         context = {"users": []}
 
-        users = User.objects.all().order_by("username")
         for usr in users:
             try:
                 email_sent = UserDetails.objects.get(user=usr).invite_email_sent
@@ -151,7 +171,18 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
             return HttpResponseBadRequest("Missing user_id")
 
         user = User.objects.get(id=req_dict["user_id"])
-
+        if not request.user.is_staff:
+            team = Team.from_user(request.user)
+            all_users = User.objects.all().order_by("username")
+            users = []
+            for u in all_users:
+                if team.group in user.groups.all():
+                    users += [u]
+        else:
+            users = User.objects.all().order_by("username")
+        print(user in users, user, users)
+        if user not in users:
+            return HttpResponseBadRequest("Invalid user")
         match req_dict["command"]:
 
             # TODO should first sync and eliminate expired links
@@ -175,14 +206,16 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
                     if not link:
                         logger.error("Could not get magic link for user %s", user)
                         return HttpResponseServerError("Could not get link for user.")
-                    return JsonResponse({"user_id": user.id, "link": link})  # TODO fix to include https://
+                    return JsonResponse({"user_id": user.id, "link": link})  # TODO fix to include https
 
                 return JsonResponse(
                     {"user_id": user.id, "link": mlink.full_link(
                         hostname=request.get_host(),
-                        login_path="/accounts/login", redirect="/accounts/link/discord")})  # TODO fix to include https://
+                        login_path="/accounts/login", redirect="/accounts/link/discord")})  # TODO fix to include https
 
             case "send_link_email":
+                if not request.user.is_superuser:
+                    return HttpResponseBadRequest("You can't send emails.")
                 # TODO Update the email to be dynamic
                 SENDER_EMAIL = "noreply@engfrosh.com"
                 if registration.email_magic_link(
@@ -217,12 +250,90 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
                     {"user_id": user.id, "qr_code_link": mlink.qr_code.url})
 
             case _:
-                return HttpResponseBadRequest(f"Invalid command: {req_dict['command']}")
+                command = escape(req_dict['command'])
+                return HttpResponseBadRequest(f"Invalid command: {command}")
 
     else:
         return HttpResponseNotAllowed(['GET', 'POST'])
 
 # endregion
+
+
+@permission_required("discord_bot_manager_discordchannel.change_discordchannel")
+def manage_discord_channels(request: HttpRequest) -> HttpResponse:
+    """Page for managing discord channels, such as locking and unlocking."""
+
+    # TODO: Rewrite all of this to make it better
+    if request.method == "GET":
+
+        context = {}
+
+        channels = DiscordChannel.objects.all()
+        context["channels"] = channels
+
+        return render(request, "discord_channels.html", context)
+
+    else:
+
+        return HttpResponseBadRequest("Bad http request method.")
+
+
+def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
+    """Page for managing discord channel groups by tags or categories."""
+
+    if not request.user.has_perm("discord_bot_manager.change_discordchannel"):
+        permissions = set()
+        for backend in auth.get_backends():
+            if hasattr(backend, "get_all_permissions"):
+                permissions.update(backend.get_all_permissions(request.user))
+        logger.debug(f"User permissions: {permissions}")
+        return HttpResponseForbidden("Permission Denied")
+
+    if request.method == "GET":
+
+        context = {}
+
+        tags = ChannelTag.objects.all()
+        context["tags"] = tags
+
+        # channels = DiscordChannel.objects.all()
+        # context["channels"] = channels
+
+        return render(request, "discord_channel_groups.html", context)
+
+    elif request.method == "POST":
+
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Invalid / missing content type.")
+
+        req_dict = json.loads(request.body)
+        if "command" not in req_dict:
+            return HttpResponseBadRequest("Bad request body, missing command.")
+
+        if req_dict["command"] == "lock_channel_group":
+            try:
+                channel_group = ChannelTag.objects.get(id=req_dict["tag_id"])
+                channel_group.lock()
+            except (ObjectDoesNotExist, KeyError):
+                return HttpResponseBadRequest("Invalid tag id.")
+
+            return HttpResponse(status=204)
+
+        elif req_dict["command"] == "unlock_channel_group":
+            try:
+                channel_group = ChannelTag.objects.get(id=req_dict["tag_id"])
+                channel_group.unlock()
+            except (ObjectDoesNotExist, KeyError):
+                return HttpResponseBadRequest("Invalid tag id.")
+
+            return HttpResponse(status=204)
+
+        else:
+            return HttpResponseBadRequest("Invalid command.")
+
+    else:
+
+        return HttpResponseBadRequest("Bad http request method.")
 
 
 @permission_required("auth.change_user")
@@ -298,14 +409,17 @@ def manage_index(request: HttpRequest) -> HttpResponse:
     return render(request, "manage.html")
 
 
-@staff_member_required(login_url='/accounts/login')
+@user_passes_test(lambda u: u.is_superuser)
 def initialize_database(request: HttpRequest) -> HttpResponse:
     common_models.models.initialize_database()
     return redirect("manage_index")
-@staff_member_required(login_url='/accounts/login')
+
+
+@user_passes_test(lambda u: u.is_superuser)
 def initialize_scav(request: HttpRequest) -> HttpResponse:
     common_models.models.initialize_scav()
     return redirect("manage_index")
+
 
 @permission_required("frosh_team.change_team")
 def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
@@ -319,17 +433,11 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
                 role_exists = False
 
             try:
-                scav_team = common_models.models.Team.objects.get(group=team.group)
+                common_models.models.Team.objects.get(group=team.group)
             except ObjectDoesNotExist:
                 scav_channel = None
                 logger.warning(f"No scav team exists for team: {team}")
             else:
-                # try:
-                #     # TODO: need to fix the scav channels
-                #     # scav_channel = common_models.models.ScavChannel.objects.get(group=team.group).channel_id
-                # except ObjectDoesNotExist:
-                #     logger.info(f"No scav channel exists for team: {team}")
-                #     scav_channel = None
                 scav_channel = None
 
             team_color = team.color_code
@@ -425,200 +533,6 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
     return HttpResponseBadRequest()
 
 
-@permission_required("discord_bot_manager_discordchannel.change_discordchannel")
-def manage_discord_channels(request: HttpRequest) -> HttpResponse:
-    """Page for managing discord channels, such as locking and unlocking."""
-
-    if request.method == "GET":
-
-        context = {}
-
-        channels = DiscordChannel.objects.all()
-        context["channels"] = channels
-
-        return render(request, "discord_channels.html", context)
-
-    else:
-
-        return HttpResponseBadRequest("Bad http request method.")
-
-
-@permission_required("common_models.view_discordguild")
-def manage_discord_servers(request: HttpRequest) -> HttpResponse:
-    """Page for managing and creating discord servers."""
-
-    if request.method == "GET":
-
-        context = {
-            "active_guilds": DiscordGuild.objects.filter(deleted=False)
-        }
-
-        return render(request, "manage_discord_server.html", context)
-
-    elif request.method == "POST":
-
-        if not request.user.has_perm("common_models.change_discordguild"):
-            return HttpResponseForbidden("Permission denied")
-
-        if request.content_type != "application/json":
-            return HttpResponseBadRequest("Invalid / missing content type.")
-
-        req_dict = json.loads(request.body)
-        if "command" not in req_dict:
-            return HttpResponseBadRequest("Bad request body, missing command.")
-
-        match req_dict["command"]:
-            case "scan_for_guilds":
-                scan_res = DiscordGuild.scan_and_update_guilds()
-                logger.info(f"Scanned and updated guilds with results: {scan_res}")
-                return JsonResponse({"scan_results": {"num_added": scan_res.num_added,
-                                                      "num_existing_updated": scan_res.num_existing_updated,
-                                                      "num_existing_not_updated": scan_res.num_existing_not_updated,
-                                                      "num_removed": scan_res.num_removed}})
-
-            case "create_new_guild":
-                if not request.user.has_perm("common_models.add_discordguild"):
-                    return HttpResponseForbidden("Permission denied")
-
-                if "name" not in req_dict:
-                    return HttpResponseBadRequest("Missing new guild's name")
-
-                guild_res = DiscordGuild.create_new_guild(name=req_dict["name"])
-
-                return JsonResponse({"guild": {
-                    "name": guild_res.name,
-                    "id": guild_res.id
-                }})
-
-            case "get_one_use_invite":
-                if not request.user.has_perm("common_models.change_discordguild"):
-                    return HttpResponseForbidden("Permission denied")
-
-                if "guild_id" not in req_dict:
-                    return HttpResponseBadRequest("Missing guild id")
-
-                logger.debug(f"Invite requested with request body: {req_dict}")
-
-                try:
-                    guild = DiscordGuild.objects.get(id=int(req_dict["guild_id"]))
-                except DiscordGuild.DoesNotExist:
-                    return HttpResponseBadRequest("Guild with that id not available.")
-
-                invite: Invite = guild.create_invite(unique=True, max_uses=1)
-
-                return JsonResponse({
-                    "invite": {
-                        "full_url": invite.full_url,
-                        "code": invite.code
-                    }
-                })
-
-            case _:
-                return HttpResponseBadRequest("Invalid command.")
-
-    else:
-        return HttpResponseBadRequest("Bad http request method.")
-
-
-@permission_required("common_models.change_discordguild")
-def modify_discord_server(request: HttpRequest, slug: str) -> HttpResponse:
-
-    guild = DiscordGuild.objects.get(id=int(slug))
-
-    if request.method == "GET":
-
-        context = {
-            "guild": guild
-        }
-
-        return render(request, "modify_discord_server.html", context)
-
-    elif request.method == "POST":
-
-        if not request.user.has_perm("common_models.change_discordguild"):
-            return HttpResponseForbidden("Permission denied")
-
-        if request.content_type != "application/json":
-            return HttpResponseBadRequest("Invalid / missing content type.")
-
-        req_dict = json.loads(request.body)
-        if "command" not in req_dict:
-            return HttpResponseBadRequest("Bad request body, missing command.")
-
-        match req_dict["command"]:
-            case "add_admin":
-
-                role = guild.create_role("ADMIN", permissions=[Permissions.ADMINISTRATOR])
-
-                guild.add_role_to_member(discord_member_id=req_dict["discord_user_id"], discord_role=role)
-
-                return HttpResponse()
-
-            case _:
-                return HttpResponseBadRequest("Invalid command.")
-
-    else:
-        return HttpResponseNotAllowed(("GET",))
-
-
-def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
-    """Page for managing discord channel groups by tags or categories."""
-
-    if not request.user.has_perm("discord_bot_manager.change_discordchannel"):
-        permissions = set()
-        for backend in auth.get_backends():
-            if hasattr(backend, "get_all_permissions"):
-                permissions.update(backend.get_all_permissions(request.user))
-        logger.debug(f"User permissions: {permissions}")
-        return HttpResponseForbidden("Permission Denied")
-
-    if request.method == "GET":
-
-        context = {}
-
-        tags = ChannelTag.objects.all()
-        context["tags"] = tags
-
-        # channels = DiscordChannel.objects.all()
-        # context["channels"] = channels
-
-        return render(request, "discord_channel_groups.html", context)
-
-    elif request.method == "POST":
-
-        if request.content_type != "application/json":
-            return HttpResponseBadRequest("Invalid / missing content type.")
-
-        req_dict = json.loads(request.body)
-        if "command" not in req_dict:
-            return HttpResponseBadRequest("Bad request body, missing command.")
-
-        if req_dict["command"] == "lock_channel_group":
-            try:
-                channel_group = ChannelTag.objects.get(id=req_dict["tag_id"])
-                channel_group.lock()
-            except (ObjectDoesNotExist, KeyError):
-                return HttpResponseBadRequest("Invalid tag id.")
-
-            return HttpResponse(status=204)
-
-        elif req_dict["command"] == "unlock_channel_group":
-            try:
-                channel_group = ChannelTag.objects.get(id=req_dict["tag_id"])
-                channel_group.unlock()
-            except (ObjectDoesNotExist, KeyError):
-                return HttpResponseBadRequest("Invalid tag id.")
-
-            return HttpResponse(status=204)
-
-        else:
-            return HttpResponseBadRequest("Invalid command.")
-
-    else:
-
-        return HttpResponseBadRequest("Bad http request method.")
-
-
 @permission_required("common_models.view_puzzle")
 def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
     """Page for managing scavenger puzzles."""
@@ -637,18 +551,65 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
 
     elif request.method == "POST":
 
-        return HttpResponse("Not Implemented")
-
         if request.content_type != "application/json":
             return HttpResponseBadRequest("Invalid / missing content type.")
 
         req_dict = json.loads(request.body)
         if "command" not in req_dict:
             return HttpResponseBadRequest("Bad request body, missing command.")
+        if req_dict['command'] == 'toggle':
+            if "puzzle" not in req_dict:
+                return HttpResponseBadRequest("Bad request body, missing puzzle.")
+            puzzle_id = req_dict['puzzle']
+            puzzle = Puzzle.objects.filter(id=puzzle_id).first()
+            if puzzle.enabled:
+                puzzle.enabled = False
+                puzzle.save()
+                next_puzzle = puzzle.stream.get_next_enabled_puzzle(puzzle)
+                for activity in TeamPuzzleActivity.objects.filter(puzzle=puzzle).all():
+                    if not activity.puzzle_completed_at:
+                        if next_puzzle is None:
+                            activity.delete()
+                        else:
+                            activity.puzzle = next_puzzle
+                            activity.save()
+            else:
+                puzzle.enabled = True
+                puzzle.save()
+            return HttpResponse("Successfully toggled puzzle")
+        else:
+            return HttpResponseBadRequest("Invalid command.")
 
-        # match req_dict["command"]:
-        #     case "get_qr_code"
+    else:
+        return HttpResponseNotAllowed(("GET", "POST"))
 
+
+@permission_required("common_models.manage_scav")
+def edit_scavenger_puzzle(request: HttpRequest, id: int) -> HttpResponse:
+    """Page for editing scavenger puzzles"""
+    puzzle = Puzzle.objects.filter(id=id).first()
+    if puzzle is None:
+        return HttpResponseBadRequest("Invalid puzzle id!")
+    if request.method == "GET":
+        context = {
+            "puzzle": puzzle,
+            "form": forms.PuzzleForm(instance=puzzle)
+        }
+        return render(request, "edit_scavenger_puzzle.html", context)
+    elif request.method == "POST":
+        form = forms.PuzzleForm(request.POST, instance=puzzle)
+        if not form.is_valid:
+            context = {
+                "error": True,
+                "puzzle": puzzle,
+                "form": form
+            }
+            return render(request, "edit_scavenger_puzzle.html", context)
+        form.save()
+        teams = Team.objects.all()
+        for team in teams:
+            team.refresh_scavenger_progress()
+        return redirect("manage_scavenger_puzzles")
     else:
         return HttpResponseNotAllowed(("GET", "POST"))
 
@@ -719,3 +680,65 @@ def trade_up_viewer(request: HttpRequest) -> HttpResponse:
         })
 
     return render(request, "trade_up_viewer.html", context)
+
+
+@permission_required("common_models.view_discord_nicks", login_url='/accounts/login')
+def manage_discord_nicks(request: HttpRequest) -> HttpResponse:
+    if request.method == "GET":
+        search = request.GET.get('filter', '')
+        if request.user.is_staff:
+            users = DiscordUser.objects.filter(user__username__icontains=search)
+            users |= DiscordUser.objects.filter(discord_username__icontains=search)
+        else:
+            team = Team.from_user(request.user)
+            group = team.group
+            users = DiscordUser.objects.filter(user__username__icontains=search, user__groups__id__in=[group.id])
+            users |= DiscordUser.objects.filter(discord_username__icontains=search, user__groups__id__in=[group.id])
+        return render(request, "manage_discord_nicks.html", {"users": users})
+    elif request.method == "POST":
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Not application/json content type")
+        req_dict = json.loads(request.body)
+        if "command" not in req_dict:
+            return HttpResponseBadRequest("No command in request")
+        if req_dict['command'] == 'delete':
+            if request.user.is_staff:
+                users = DiscordUser.objects.all()
+            else:
+                team = Team.from_user(request.user)
+                group = team.group
+                users = DiscordUser.objects.filter(user__groups__id__in=[group.id]).all()
+            if "user" not in req_dict:
+                return HttpResponseBadRequest("No user in request.")
+            user = DiscordUser.objects.filter(id=req_dict['user']).first()
+            if user not in users:
+                return HttpResponseBadRequest("Invalid user.")
+            user.delete()
+            return HttpResponse("Unlinked discord account.")
+        else:
+            return HttpResponseBadRequest("Invalid command.")
+
+
+@permission_required("common_models.manage_discord_nicks", login_url='/accounts/login')
+def manage_discord_nick(request: HttpRequest, id: int) -> HttpResponse:
+    if request.method == "GET":
+        user = DiscordUser.objects.filter(id=id).first()
+        form = forms.DiscordNickForm(nick=user.discord_username)
+        return render(request, "manage_discord_nick.html", {"user": user, "form": form})
+    elif request.method == "POST":
+        user = DiscordUser.objects.filter(id=id).first()
+        form = forms.DiscordNickForm(request.POST)
+        context = {"user": user, "form": form, "error": False}
+        if form.is_valid():
+            nick = form.cleaned_data['nickname']
+            color = form.cleaned_data['color'][1:]
+            guild = DiscordGuild.objects.all().first()
+            name = "color-"+str(color)
+            role = guild.get_role(name)
+            if role is None:
+                role = guild.create_role(name=name, position=settings.COLOR_POSITION, color=int(color, 16))
+            guild.add_role_to_member(user.id, role)
+            guild.change_nick(user.id, nick)
+        else:
+            context['error'] = True
+        return render(request, "manage_discord_nick.html", context)

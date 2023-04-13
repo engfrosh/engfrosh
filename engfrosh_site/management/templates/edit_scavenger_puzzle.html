@@ -1,0 +1,18 @@
+{% extends 'base_manage_subpage.html' %}
+{% load static %}
+{% block page_title %}
+    Edit Scavenger Puzzle
+{% endblock page_title %}
+{% block top_title %}
+    Edit Scavenger Puzzle
+{% endblock top_title %}
+{% block active %}
+    {% if error == True %}
+        <p class="text-red-600">Invalid puzzle!</p>
+    {% endif %}
+    <form class="my-5" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Change Puzzle" class="text-blue-600">
+    </form>
+{% endblock active %}

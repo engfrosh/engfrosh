@@ -16,6 +16,19 @@
         {% endif %}
         <a href="{% url 'my_skash' %}"
            class="bg-main dark:bg-main-night rounded-lg p-2">Team Skash</a>
-        {% comment %} <a class="bg-main dark:bg-main-night rounded-lg p-2">Get Help</a> {% endcomment %}
+        <a href="{% url 'create_ticket' %}"
+           class="bg-main dark:bg-main-night rounded-lg p-2">Get Help</a>
+        {% if request.user.is_staff %}
+        <a href="{% url 'manage_index' %}"
+           class="bg-main dark:bg-main-night rounded-lg p-2">Management</a>
+        {% endif %}
+        {% if perms.common_models.view_links %}
+        <a href="{% url 'magic_links' %}"
+           class="bg-main dark:bg-main-night rounded-lg p-2">View Magic Links</a>
+        {% endif %}
+        {% if perms.common_models.view_discord_nicks %}
+        <a href="{% url 'manage_discord_nicks' %}"
+           class="bg-main dark:bg-main-night rounded-lg p-2">Unlink Discord Users</a>
+        {% endif %}
     </div>
 {% endblock active %}
