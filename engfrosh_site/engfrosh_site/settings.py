@@ -52,6 +52,14 @@ DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN")
 if not DISCORD_BOT_TOKEN:
     logging.warning("No discord bot token provided")
 
+MICROSOFT_TOKEN = os.environ.get("MICROSOFT_TOKEN")
+if not MICROSOFT_TOKEN:
+    logging.warning("No microsoft token has been provided")
+MICROSOFT_ID = os.environ.get("MICROSOFT_ID")
+if not MICROSOFT_ID:
+    logging.warning("No microsoft client id has been provided")
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
 # Production sets the settings values, but doesn't affect debug parts
 if development:
