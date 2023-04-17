@@ -28,7 +28,6 @@ from django.utils.encoding import uri_to_iri
 from django.conf import settings
 from django.contrib.auth.models import User
 
-import requests
 import msal
 
 logger = logging.getLogger("Authentication.Views")
@@ -59,8 +58,8 @@ def msTokenCallback(request: HttpRequest):
     if 'code' not in params or 'state' not in params or 'session_state' not in params:
         return HttpResponseBadRequest("Missing code and session state!")
     code = params['code']
-    state = params['state']
-    session_state = params['session_state']
+    # state = params['state']
+    # session_state = params['session_state']
     AUTHORITY = "https://login.microsoftonline.com/common"
     app = msal.ConfidentialClientApplication(settings.MICROSOFT_ID, authority=AUTHORITY,
                                              client_credential=settings.MICROSOFT_TOKEN)
