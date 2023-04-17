@@ -78,7 +78,7 @@ def msTokenCallback(request: HttpRequest):
     discord = DiscordUser.objects.filter(user=user).first()
     if discord is None:
         return redirect("link_discord")
-    return redirect("home")
+    return redirect("user_home")
 
 
 @login_required()

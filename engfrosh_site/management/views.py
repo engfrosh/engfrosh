@@ -152,7 +152,8 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
                 context["users"].append({
                     "username": usr.username,
                     "id": usr.id,
-                    "email_sent": bool(email_sent)
+                    "email_sent": bool(email_sent),
+                    "email": usr.email
                 })
 
         return render(request, "create_discord_magic_links.html", context)
@@ -180,7 +181,6 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
                     users += [u]
         else:
             users = User.objects.all().order_by("username")
-        print(user in users, user, users)
         if user not in users:
             return HttpResponseBadRequest("Invalid user")
         match req_dict["command"]:
@@ -216,6 +216,8 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
             case "send_link_email":
                 if not request.user.is_superuser:
                     return HttpResponseBadRequest("You can't send emails.")
+                if '@cmail.carleton.ca' in user.email:
+                    return JsonResponse({"user_id": user.id})
                 # TODO Update the email to be dynamic
                 SENDER_EMAIL = "noreply@engfrosh.com"
                 if registration.email_magic_link(
