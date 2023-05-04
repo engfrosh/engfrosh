@@ -63,13 +63,19 @@ def generate_tree(team: Team):
     for stream in streams:
         xindex = unlocks[stream.id]-1
         puzzles = Puzzle.objects.filter(stream=stream, enabled=True)
+        first = True
         for puzzle in puzzles:
             x = xindex * HSPACING + XOFFSET
             y = index * VSPACING + YOFFSET
             starts[puzzle.id] = (x+CIRC_WIDTH/2, y+CIRC_WIDTH/2)
             xy = [(x, y), (x+CIRC_WIDTH, y+CIRC_WIDTH)]
+            if not first:
+                mid_y = (2*y+CIRC_WIDTH)/2
+                rxy = [(x, mid_y), (x-HSPACING, mid_y)]
+                d.line(rxy, (0, 0, 255), LINE_WIDTH)
             d.ellipse(xy, fill=(0, 0, 255), outline=(0, 0, 0))
             xindex += 1
+            first = False
         index += direction
         # direction *= -1 * int(count/2)
         count += 1
