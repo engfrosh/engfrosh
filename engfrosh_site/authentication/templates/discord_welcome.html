@@ -5,13 +5,15 @@
 {% block active %}
 <div class="text-center">
     <h3 class="text-xl my-16">You are successfully connected to Discord</h3>
+    <a class="button discord bg-main dark:bg-main-night rounded text-white py-3 px-6 m-8"
+               href="{% url 'user_home' %}">User Home Page</a>
     {% if guild_id %}
         {% if channel_id %}
             <a class="button discord bg-main dark:bg-main-night rounded text-white py-3 px-6 m-8"
-               href="https://discord.com/channels/{{ guild_id }}/{{ channel_id }}">Go to Server</a>
+               href="https://discord.com/channels/{{ guild_id }}/{{ channel_id }}">Go to Discord Server</a>
         {% else %}
             <a class="button discord bg-main dark:bg-main-night rounded text-white py-3 px-6 m-8"
-               href="https://discord.com/channels/{{ guild_id }}">Go to Server</a>
+               href="https://discord.com/channels/{{ guild_id }}">Go to Discord Server</a>
         {% endif %}
     {% endif %}
     <p class="p-3 m-6">If you need help or were not added to the server please contact us.</p>

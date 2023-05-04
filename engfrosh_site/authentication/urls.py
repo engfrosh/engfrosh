@@ -20,5 +20,7 @@ urlpatterns = [
     path("permission-denied/", views.permission_denied, name="permission_denied"),
     path("welcome/", views.home_page),
     path("home/", views.home_page, name="home"),
-    path("link/discord", views.link_discord, name="link_discord")
+    path("link/discord", views.link_discord, name="link_discord"),
+    path("msLogin", views.msLogin, name="msLogin"),
+    path("msTokenCallback", views.msTokenCallback, name="msTokenCallback")
 ]
