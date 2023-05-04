@@ -11,6 +11,8 @@ import json
 
 from django.urls import reverse
 
+from scavenger.tree import generate_tree
+
 logger = logging.getLogger("engfrosh_site.scavenger.views")
 
 
@@ -21,8 +23,9 @@ def stream_view(request: HttpRequest) -> HttpResponse:
 
 @login_required(login_url='/accounts/login')
 def index(request: HttpRequest) -> HttpResponse:
-
+    generate_tree(None)
     team = Team.from_user(request.user)
+
     if not team:
         return render(request, "scavenger_index.html", context={"team": None})
 
