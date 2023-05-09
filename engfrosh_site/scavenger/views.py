@@ -23,8 +23,8 @@ def stream_view(request: HttpRequest) -> HttpResponse:
 
 @login_required(login_url='/accounts/login')
 def index(request: HttpRequest) -> HttpResponse:
-    generate_tree(None)
     team = Team.from_user(request.user)
+    generate_tree(team)
 
     if not team:
         return render(request, "scavenger_index.html", context={"team": None})
@@ -74,10 +74,8 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
         return render(request, "scavenger_question.html", context)
 
     elif request.method == "POST":
-
         if not request.user.has_perm("common_models.guess_scavenger_puzzle"):
             return HttpResponseBadRequest("You are not allowed to guess.")
-
         if request.content_type != "application/json":
             return HttpResponseBadRequest("Not application/json content type")
 
@@ -85,10 +83,8 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
 
         if "answer" not in req_dict:
             return HttpResponseBadRequest("No answer provided in json body")
-
         if not team.scavenger_enabled:
             return HttpResponseForbidden("Scavenger not currently enabled.")
-
         logger.debug(f"Answer submitted by team {team} with answer: {req_dict['answer']} through the website")
         if not bypass:
             correct, stream_completed, next_puzzle, require_verification_photo = puz.check_team_guess(
@@ -96,7 +92,6 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
             if correct:
                 DiscordChannel.send_to_updates_channels(
                     f"""{team.display_name} has submitted an answer for puzzle {puz.name} (order {puz.order})!""")
-
             if require_verification_photo:
                 next_page = "verification_photo/"
             elif next_puzzle:

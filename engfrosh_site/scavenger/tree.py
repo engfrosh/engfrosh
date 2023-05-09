@@ -10,6 +10,10 @@ YOFFSET = 75
 CIRC_WIDTH = 20
 LINE_WIDTH = 2
 
+BRANCH_COLOR = (0, 0, 255)
+DEFAULT_COLOR = (0, 255, 0)
+COMPLETED_COLOR = (0, 255, 255)
+
 
 def generate_tree(team: Team):
     streams = PuzzleStream.objects.filter(enabled=True)
@@ -36,15 +40,33 @@ def generate_tree(team: Team):
     d = ImageDraw.Draw(img)
     # Draw all streams first
     direction = 1
-    index = 0
+    index = v_count/2
     count = 1
-    streams = PuzzleStream.objects.filter(default=True, enabled=True)
+    streams = PuzzleStream.objects.filter(enabled=True)
     starts = {}
-    for stream in streams:
+    completed = {}
+    for i in range(len(streams)):
+        lowest = None
+        for s in streams:
+            if completed.get(s.id, False) is False:
+                if lowest is None or unlocks[s.id] < unlocks[lowest.id]:
+                    lowest = s
+        stream = lowest
+        completed[stream.id] = True
         xindex = unlocks[stream.id]
+        if not lowest.default:
+            xindex -= 1
         puzzles = Puzzle.objects.filter(stream=stream, enabled=True)
         first = True
         for puzzle in puzzles:
+            color = BRANCH_COLOR
+            if stream.default:
+                color = DEFAULT_COLOR
+            try:
+                if puzzle.is_completed_for_team(team):
+                    color = COMPLETED_COLOR
+            except Exception:
+                pass
             x = xindex * HSPACING + XOFFSET
             y = index * VSPACING + YOFFSET
             starts[puzzle.id] = (x+CIRC_WIDTH/2, y+CIRC_WIDTH/2)
@@ -52,33 +74,13 @@ def generate_tree(team: Team):
             if not first:
                 mid_y = (2*y+CIRC_WIDTH)/2
                 rxy = [(x, mid_y), (x-HSPACING, mid_y)]
-                d.line(rxy, (0, 255, 0), LINE_WIDTH)
-            d.ellipse(xy, (0, 255, 0))
+                d.line(rxy, color, LINE_WIDTH)
+            d.ellipse(xy, color)
             xindex += 1
             first = False
         index += direction
-        # direction *= -1 * int(count/2)
         count += 1
-    streams = PuzzleStream.objects.filter(default=False, enabled=True)
-    for stream in streams:
-        xindex = unlocks[stream.id]-1
-        puzzles = Puzzle.objects.filter(stream=stream, enabled=True)
-        first = True
-        for puzzle in puzzles:
-            x = xindex * HSPACING + XOFFSET
-            y = index * VSPACING + YOFFSET
-            starts[puzzle.id] = (x+CIRC_WIDTH/2, y+CIRC_WIDTH/2)
-            xy = [(x, y), (x+CIRC_WIDTH, y+CIRC_WIDTH)]
-            if not first:
-                mid_y = (2*y+CIRC_WIDTH)/2
-                rxy = [(x, mid_y), (x-HSPACING, mid_y)]
-                d.line(rxy, (0, 0, 255), LINE_WIDTH)
-            d.ellipse(xy, fill=(0, 0, 255), outline=(0, 0, 0))
-            xindex += 1
-            first = False
-        index += direction
-        # direction *= -1 * int(count/2)
-        count += 1
+        direction = (abs(direction)/direction) * -1 * count
     for puzzle in Puzzle.objects.filter(stream_branch__isnull=False):
         stream = puzzle.stream_branch
         stream_puzzle = stream.first_enabled_puzzle
