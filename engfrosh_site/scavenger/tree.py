@@ -85,4 +85,4 @@ def generate_tree(team: Team):
         stream = puzzle.stream_branch
         stream_puzzle = stream.first_enabled_puzzle
         d.line([starts[puzzle.id], starts[stream_puzzle.id]], (255, 0, 0), LINE_WIDTH)
-    img.save("tree.png", "PNG")
+    return img

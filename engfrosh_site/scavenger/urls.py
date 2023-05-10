@@ -10,5 +10,6 @@ urlpatterns = [
     path('puzzle//', RedirectView.as_view(pattern_name="scavenger_index", permanent=False)),
     path('puzzle/<slug:slug>/', views.puzzle_view),
     path("puzzle/<slug:slug>/verification_photo/", views.puzzle_photo_verification_view),
-    path("stream_completed", views.stream_view)
+    path("stream_completed", views.stream_view),
+    path("tree", views.tree_view),
 ]

@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 import logging
 import json
-
+import io
 from django.urls import reverse
 
 from scavenger.tree import generate_tree
@@ -24,7 +24,6 @@ def stream_view(request: HttpRequest) -> HttpResponse:
 @login_required(login_url='/accounts/login')
 def index(request: HttpRequest) -> HttpResponse:
     team = Team.from_user(request.user)
-    generate_tree(team)
 
     if not team:
         return render(request, "scavenger_index.html", context={"team": None})
@@ -42,6 +41,17 @@ def index(request: HttpRequest) -> HttpResponse:
     }
 
     return render(request, "scavenger_index.html", context=context)
+
+
+@login_required(login_url='/accounts/login')
+def tree_view(request: HttpRequest) -> HttpResponse:
+    team = Team.from_user(request.user)
+    if team:
+        img = generate_tree(team)
+        data = io.BytesIO()
+        img.save(data, format='JPEG')
+        return HttpResponse(data.getbuffer(), content_type="image/jpeg")
+    return HttpResponse("You are not on a team!")
 
 
 @login_required(login_url='/accounts/login')
