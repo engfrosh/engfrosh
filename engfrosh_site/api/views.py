@@ -2,10 +2,26 @@ from rest_framework import permissions, authentication, status
 from rest_framework.views import APIView
 from .serializers import VerificationPhotoSerializer
 from rest_framework.response import Response
-from common_models.models import VerificationPhoto
+from common_models.models import VerificationPhoto, Team
 from datetime import datetime
 from schedule.models import Calendar, Occurrence
 import pytz
+
+
+class TreeAPI(APIView):
+    authentication_classes = {authentication.SessionAuthentication, authentication.BasicAuthentication}
+    permission_classes = {permissions.IsAuthenticated}
+
+    def get(self, request, format=None):
+        if not request.user.has_perm('common_models.photo_api'):
+            return Response({"Error": "Forbidden"}, status=status.HTTP_403_FORBIDDEN, content_type="application/json")
+        from scavenger.views import update_tree
+        id = request.GET.get("id")
+        if id is None:
+            return Response("Invalid request", status=status.HTTP_400_BAD_REQUEST)
+        team = Team.objects.filter(group_id=id).first()
+        update_tree(team)
+        return Response({"success": True})
 
 
 class VerificationPhotoAPI(APIView):

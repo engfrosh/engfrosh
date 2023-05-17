@@ -5,6 +5,9 @@
 {% block body %}
     <div class="p-6">
         <div class="space-y-4 mt-4 text-center">
+            {% if bypass %}
+                <h1 class="text-red-600 text-xl">Warning: Scav rule bypass is enabled, puzzle progress will not be saved!</h1>
+            {% endif %}
             <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto text-center">
                 {% if puzzle.puzzle_text %}<p class="m-4">{{ puzzle.puzzle_text }}</p>{% endif %}
                 {% if puzzle.puzzle_file %}
