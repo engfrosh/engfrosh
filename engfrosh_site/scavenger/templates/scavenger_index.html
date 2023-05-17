@@ -8,6 +8,9 @@
     {% else %}
         Here is your team:
         {{ team.display_name }}
+        {% if bypass %}
+            <h1 class="text-red-600 text-xl">Warning: Scav rule bypass is enabled, puzzle progress will not be saved!</h1>
+        {% endif %}
         {% if team.scavenger_finished %}
             <h1 class="text-5xl">Congratulation on Completing Scav!</h1>
         {% else %}
@@ -77,7 +80,7 @@
                 </div>
                 <hr/>
             {% endif %}
-            <img src="tree?{% now "U" %}" width="500" height="500">
+            <img src="{{ team.scav_tree.url }}?{% now "U" %}" width="500" height="500">
             {% if verified_puzzles %}
                 <h1>Verified and Completed Puzzles</h1>
                 <div class="">

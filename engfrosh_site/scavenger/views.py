@@ -10,6 +10,7 @@ import logging
 import json
 import io
 from django.urls import reverse
+from django.db import models
 
 from scavenger.tree import generate_tree
 
@@ -31,9 +32,12 @@ def index(request: HttpRequest) -> HttpResponse:
     if not team.scavenger_enabled:
         return HttpResponse("Scavenger not currently enabled")
 
+    bypass = request.user.has_perm('common_models.bypass_scav_rules')
+
     context = {
         "scavenger_enabled_for_team": team.scavenger_enabled,
         "team": team,
+        "bypass": bypass,
         "active_puzzles": team.active_puzzles,
         "verified_puzzles": team.verified_puzzles,
         "completed_puzzles_awaiting_verification": team.completed_puzzles_awaiting_verification,
@@ -43,15 +47,13 @@ def index(request: HttpRequest) -> HttpResponse:
     return render(request, "scavenger_index.html", context=context)
 
 
-@login_required(login_url='/accounts/login')
-def tree_view(request: HttpRequest) -> HttpResponse:
-    team = Team.from_user(request.user)
-    if team:
-        img = generate_tree(team)
-        data = io.BytesIO()
-        img.save(data, format='JPEG')
-        return HttpResponse(data.getbuffer(), content_type="image/jpeg")
-    return HttpResponse("You are not on a team!")
+def update_tree(team):
+    img = generate_tree(team)
+    if team.scav_tree is None:
+        team.scav_tree = models.ImageField()
+    data = io.BytesIO()
+    img.save(data, format='JPEG')
+    team.scav_tree.save(str(team.id), data)
 
 
 @login_required(login_url='/accounts/login')
@@ -78,6 +80,7 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
             "view_only": not bypass and puz.is_completed_for_team(team) or not team.scavenger_enabled,
             "scavenger_enabled_for_team": team.scavenger_enabled,
             "guess": request.GET.get("answer", ""),
+            "bypass": bypass,
             "requires_photo": puz.requires_verification_photo_by_team(team)
         }
 
@@ -108,7 +111,7 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
                 next_page = "../" + next_puzzle.secret_id
             else:
                 next_page = "../../stream_completed"
-
+            update_tree(team)
             return JsonResponse({"correct": correct, "scavenger_stream_completed": stream_completed,
                                 "next": next_page})
         else:

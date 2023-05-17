@@ -15,7 +15,7 @@ BRANCH_COLOR = (0, 0, 255)
 DEFAULT_COLOR = (0, 255, 0)
 COMPLETED_COLOR = (0, 255, 255)
 
-MAX_LOOKAHEAD = 100
+MAX_LOOKAHEAD = 1
 
 
 def generate_tree(team: Team):
@@ -77,9 +77,13 @@ def generate_tree(team: Team):
         first = True
         firstEnabled = True
         lastShown = None
+        curr_count = 0
+        stream_active = True
         for j in range(len(puzzles)):
             puzzle = puzzles[j]
             if lastShown is not None and lastShown.order < puzzle.order:
+                continue
+            if not stream_active and curr_count > MAX_LOOKAHEAD and lastShown is None:
                 continue
             color = BRANCH_COLOR
             if stream.default:
@@ -99,6 +103,8 @@ def generate_tree(team: Team):
                 d.line(rxy, color, LINE_WIDTH)
             # d.ellipse(xy, color)
             activity = TeamPuzzleActivity.objects.filter(team=team, puzzle=puzzle).first()
+            if first and activity is None:
+                stream_active = False
             if activity is not None and firstEnabled and not activity.is_completed:
                 r = randint(0, 255)
                 g = randint(0, 255)
@@ -112,6 +118,7 @@ def generate_tree(team: Team):
             else:
                 circles += [(xy, color, False)]
             xindex += 1
+            curr_count += 1
             first = False
         index += direction
         count += 1
