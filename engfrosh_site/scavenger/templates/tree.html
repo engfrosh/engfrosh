@@ -8,12 +8,12 @@
         }
     </script>
     {% for rect in rectangles %}
-        <line id="{{ rect.id }}" stroke-width="{{ rect.width }}" onclick="onTreeElemClick(event)" fill="{{ rect.colour }}" x1="{{ rect.x1 }}" y1="{{ rect.y1 }}" x2="{{ rect.x2 }}" y2="{{ rect.y2 }}"/>
+        <line style="stroke:{{ rect.colour }};stroke-width:{{ rect.width }};" x1="{{ rect.x1 }}" y1="{{ rect.y1 }}" x2="{{ rect.x2 }}" y2="{{ rect.y2 }}"/>
     {% endfor %}
     {% for cir in circles %}
         <circle id="{{ cir.id }}" onclick="onTreeElemClick(event)" fill="{{ cir.colour }}" cx="{{ cir.x }}" cy="{{ cir.y }}" r="{{ cir.radius }}"/>
     {% endfor %}
     {% for im in images %}
-        <image id="{{ im.id }}" onclick="onTreeElemClick(event)" x="{{ im.x }}" y="{{ im.y }}" width="{{ im.width }}" height="{{ im.height }}" src="data:image/jpeg;base64,{{ im.encoded }}"/>
+        <image id="{{ im.id }}" onclick="onTreeElemClick(event)" x="{{ im.x }}" y="{{ im.y }}" width="{{ im.width }}" height="{{ im.height }}" href="data:image/jpeg;base64,{{ im.encoded }}"/>
     {% endfor %}
 </svg>

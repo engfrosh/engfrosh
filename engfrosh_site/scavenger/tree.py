@@ -4,13 +4,14 @@ from random import randint
 from django.template.loader import render_to_string
 import base64
 
-HSPACING = 50
-VSPACING = 50
+HSPACING = 100
+VSPACING = 100
 
 XOFFSET = 50
 YOFFSET = 25
 
-CIRC_WIDTH = 20
+CIRC_WIDTH = 65
+IMG_WIDTH = CIRC_WIDTH * 1.5
 LINE_WIDTH = 2
 
 BRANCH_COLOR = (0, 0, 255)
@@ -144,12 +145,12 @@ def generate_tree(team: Team):
         box = cir[0]
         cx = (box[0][0] + box[1][0])/2
         cy = (box[0][1] + box[1][1])/2
-        radius = CIRC_WIDTH
+        radius = CIRC_WIDTH/2
         circ = {"radius": radius, "x": int(cx), "y": int(cy), "colour": rgb2hex(cir[1][0], cir[1][1], cir[1][2]), "id": cir[3].secret_id}
         if cir[2] and logo is not None:
-            offset = (int((box[0][0] + box[1][0]) // 2 - CIRC_WIDTH // 2),
-                      int((box[0][1] + box[1][1]) // 2 - CIRC_WIDTH // 2))
-            svgimg = {"id": cir[3].id, "x": int(offset[0]), "y": int(offset[1]), "width": CIRC_WIDTH, "height": CIRC_WIDTH, "encoded": logo_dat}
+            offset = (int((box[0][0] + box[1][0]) // 2 - IMG_WIDTH // 2),
+                      int((box[0][1] + box[1][1]) // 2 - IMG_WIDTH // 2))
+            svgimg = {"id": cir[3].secret_id, "x": int(offset[0]), "y": int(offset[1]), "width": IMG_WIDTH, "height": IMG_WIDTH, "encoded": logo_dat}
             # img.paste(logo, offset)
             images_svg += [svgimg]
         else:
