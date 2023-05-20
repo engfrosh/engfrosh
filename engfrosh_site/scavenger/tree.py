@@ -1,15 +1,17 @@
 from PIL import Image, ImageDraw
 from common_models.models import Puzzle, PuzzleStream, Team, TeamPuzzleActivity
 from random import randint
+from django.template.loader import render_to_string
+import base64
 
-HSPACING = 500
-VSPACING = 500
+HSPACING = 50
+VSPACING = 50
 
-XOFFSET = 750
-YOFFSET = 750
+XOFFSET = 50
+YOFFSET = 25
 
-CIRC_WIDTH = 200
-LINE_WIDTH = 20
+CIRC_WIDTH = 20
+LINE_WIDTH = 2
 
 BRANCH_COLOR = (0, 0, 255)
 DEFAULT_COLOR = (0, 255, 0)
@@ -44,8 +46,6 @@ def generate_tree(team: Team):
     width = HSPACING * h_count + 2 * XOFFSET
     height = VSPACING * v_count + 2 * YOFFSET
 
-    img = Image.new("RGB", (width, height))
-    d = ImageDraw.Draw(img)
     # Draw all streams first
     direction = 1
     index = v_count/2
@@ -56,10 +56,14 @@ def generate_tree(team: Team):
     circles = []
     heads = []
     logo = None
+    logo_dat = None
+    rectangles_svg = []
+    circles_svg = []
+    images_svg = []
     if team.logo is not None and team.logo:
         team.logo.open()
-        logo = Image.open(team.logo)
-        logo = logo.resize((CIRC_WIDTH, CIRC_WIDTH))
+        logo = open(team.logo.path, "rb")
+        logo_dat = base64.b64encode(logo.read()).decode('ASCII')
     for i in range(len(streams)):
         lowest = None
         for s in streams:
@@ -99,8 +103,10 @@ def generate_tree(team: Team):
             xy = [(x, y), (x+CIRC_WIDTH, y+CIRC_WIDTH)]
             if not first:
                 mid_y = (2*y+CIRC_WIDTH)/2
-                rxy = [(x, mid_y), (x-HSPACING, mid_y)]
-                d.line(rxy, color, LINE_WIDTH)
+                # rxy = [(x, mid_y), (x-HSPACING, mid_y)]
+                # d.line(rxy, color, LINE_WIDTH)
+                line = {"x1": int(x), "y1": int(mid_y), "x2": int(x-HSPACING), "y2": int(mid_y), "width": LINE_WIDTH, "colour": rgb2hex(color[0], color[1], color[2]), "id": 0}
+                rectangles_svg += [line]
             # d.ellipse(xy, color)
             activity = TeamPuzzleActivity.objects.filter(team=team, puzzle=puzzle).first()
             if first and activity is None:
@@ -110,13 +116,13 @@ def generate_tree(team: Team):
                 g = randint(0, 255)
                 b = randint(0, 255)
                 color = (r, g, b)
-                circles += [(xy, color, True)]
+                circles += [(xy, color, True, puzzle)]
                 heads += [(puzzle, color)]
                 if not (j + MAX_LOOKAHEAD) >= len(puzzles):
                     lastShown = puzzles[j + MAX_LOOKAHEAD]
                 firstEnabled = False
             else:
-                circles += [(xy, color, False)]
+                circles += [(xy, color, False, puzzle)]
             xindex += 1
             curr_count += 1
             first = False
@@ -130,14 +136,27 @@ def generate_tree(team: Team):
         stream_puzzle = stream.first_enabled_puzzle
         if starts.get(puzzle.id, None) is None or starts.get(stream_puzzle.id, None) is None:
             continue
-        d.line([starts[puzzle.id], starts[stream_puzzle.id]], (255, 0, 0), LINE_WIDTH)
+        line = {"x1": int(starts[puzzle.id][0]), "y1": int(starts[puzzle.id][1]), "x2": int(starts[stream_puzzle.id][0]), "y2": int(starts[stream_puzzle.id][1]), "width": LINE_WIDTH, "colour": rgb2hex(255, 0, 0), "id": 0}
+        rectangles_svg += [line]
+        # d.line([starts[puzzle.id], starts[stream_puzzle.id]], (255, 0, 0), LINE_WIDTH)
     for i in range(len(circles)):
         cir = circles[i]
+        box = cir[0]
+        cx = (box[0][0] + box[1][0])/2
+        cy = (box[0][1] + box[1][1])/2
+        radius = CIRC_WIDTH
+        circ = {"radius": radius, "x": int(cx), "y": int(cy), "colour": rgb2hex(cir[1][0], cir[1][1], cir[1][2]), "id": cir[3].secret_id}
         if cir[2] and logo is not None:
-            box = cir[0]
             offset = (int((box[0][0] + box[1][0]) // 2 - CIRC_WIDTH // 2),
                       int((box[0][1] + box[1][1]) // 2 - CIRC_WIDTH // 2))
-            img.paste(logo, offset)
+            svgimg = {"id": cir[3].id, "x": int(offset[0]), "y": int(offset[1]), "width": CIRC_WIDTH, "height": CIRC_WIDTH, "encoded": logo_dat}
+            # img.paste(logo, offset)
+            images_svg += [svgimg]
         else:
-            d.ellipse(cir[0], cir[1])
-    return img
+            circles_svg += [circ]
+    txt = render_to_string("tree.html", {"rectangles": rectangles_svg, "circles": circles_svg, "images": images_svg, "width": int(width), "height": int(height)})
+    return txt
+
+
+def rgb2hex(r,g,b):
+    return "#{:02x}{:02x}{:02x}".format(r,g,b)

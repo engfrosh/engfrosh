@@ -1,0 +1,19 @@
+<svg xmlns='http://www.w3.org/2000/svg' version='1.1' id="scavtree" width="{{ width }}" height="{{ height }}">
+    <script>
+        function onTreeElemClick(event){
+            var id = event.target.id;
+            var url = "../../../scavenger/puzzle/"+id;
+            console.log(url);
+            window.top.location.href = url;
+        }
+    </script>
+    {% for rect in rectangles %}
+        <line id="{{ rect.id }}" stroke-width="{{ rect.width }}" onclick="onTreeElemClick(event)" fill="{{ rect.colour }}" x1="{{ rect.x1 }}" y1="{{ rect.y1 }}" x2="{{ rect.x2 }}" y2="{{ rect.y2 }}"/>
+    {% endfor %}
+    {% for cir in circles %}
+        <circle id="{{ cir.id }}" onclick="onTreeElemClick(event)" fill="{{ cir.colour }}" cx="{{ cir.x }}" cy="{{ cir.y }}" r="{{ cir.radius }}"/>
+    {% endfor %}
+    {% for im in images %}
+        <image id="{{ im.id }}" onclick="onTreeElemClick(event)" x="{{ im.x }}" y="{{ im.y }}" width="{{ im.width }}" height="{{ im.height }}" src="data:image/jpeg;base64,{{ im.encoded }}"/>
+    {% endfor %}
+</svg>

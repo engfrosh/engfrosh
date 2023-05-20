@@ -1,8 +1,10 @@
 {% extends 'base_generic.html' %}
+{% load static %}
 {% block page_title %}
     Scav
 {% endblock page_title %}
 {% block body %}
+    <meta http-equiv="Content-Security-Policy" content="default-src: 'self'" />
     {% if not team %}
         You are not part of a team
     {% else %}
@@ -17,90 +19,9 @@
             {% if not scavenger_enabled_for_team %}
                 Scavenger is not currently enabled
             {% endif %}
-            {% if completed_puzzles_requiring_photo_upload %}
-                <h1>Puzzles Requiring Verification Photo</h1>
-                <div class="">
-                    <table>
-                        <tr>
-                            <th>Name</th>
-                            <th></th>
-                        </tr>
-                        {% for puz in completed_puzzles_requiring_photo_upload %}
-                            <tr>
-                                <td>{{ puz.name }}</td>
-                                <td>
-                                    <a class="bg-main dark:bg-main-night rounded text-white p-1"
-                                       href="puzzle/{{ puz.secret_id }}">Go To Puzzle</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-                <hr/>
-            {% endif %}
-            {% if active_puzzles %}
-                <h1>Active Puzzles</h1>
-                <div class="">
-                    <table>
-                        <tr>
-                            <th>Name</th>
-                            <th></th>
-                        </tr>
-                        {% for puz in active_puzzles %}
-                            <tr>
-                                <td>{{ puz.name }}</td>
-                                <td>
-                                    <a class="bg-main dark:bg-main-night rounded text-white p-1"
-                                       href="puzzle/{{ puz.secret_id }}">Go To Puzzle</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-                <hr/>
-            {% endif %}
-            {% if completed_puzzles_awaiting_verification %}
-                <h1>Puzzles Being Verified</h1>
-                <div class="">
-                    <table>
-                        <tr>
-                            <th>Name</th>
-                            <th></th>
-                        </tr>
-                        {% for puz in completed_puzzles_awaiting_verification %}
-                            <tr>
-                                <td>{{ puz.name }}</td>
-                                <td>
-                                    <a class="bg-main dark:bg-main-night rounded text-white p-1"
-                                       href="puzzle/{{ puz.secret_id }}">Go To Puzzle</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-                <hr/>
-            {% endif %}
-            <img src="{{ team.scav_tree.url }}?{% now "U" %}" width="500" height="500">
-            {% if verified_puzzles %}
-                <h1>Verified and Completed Puzzles</h1>
-                <div class="">
-                    <table>
-                        <tr>
-                            <th>Name</th>
-                            <th></th>
-                        </tr>
-                        {% for puz in verified_puzzles %}
-                            <tr>
-                                <td>{{ puz.name }}</td>
-                                <td>
-                                    <a class="bg-main dark:bg-main-night rounded text-white p-1"
-                                       href="puzzle/{{ puz.secret_id }}">Go To Puzzle</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-            {% endif %}
+            <iframe src="{{ team.scav_tree.url }}" style="width: 1000px; height: 1000px;" id="imgframe">
+                <p>Looks like your browser doesn't support scav ;-;</p>
+            </iframe>
         {% endif %}
     {% endif %}
 {% endblock body %}
