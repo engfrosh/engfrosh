@@ -379,7 +379,10 @@ def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
             discord_role_ids: Union[List[int], None] = []
             for g in groups:
                 try:
-                    discord_role_ids.append(DiscordRole.objects.get(group_id=g).role_id)
+                    query = DiscordRole.objects.filter(group_id=g)
+                    for role in query:
+                        if role.secondary_group is None or role.secondary_group in groups:
+                            discord_role_ids.append(role.role_id)
                 except ObjectDoesNotExist:
                     continue
 
