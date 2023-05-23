@@ -17,6 +17,7 @@
             <th>Discord ID</th>
             <th>Discord Username</th>
             <th>Username</th>
+            <th></th>
         </tr>
         {% for user in users %}
             <tr class="py-1">
@@ -25,6 +26,7 @@
                 </td>
                 <td class="px-2">{{ user.discord_username }}</td>
                 <td class="px-2">{{ user.user.username }}</td>
+                <td class="px-2"><button onclick="postToServer(csrf_token, {'command': 'delete', 'user': '{{ user.id }}'}).then(res => {res.text().then(data => {alert(data);window.location.href='';})});">Unlink</button></td>
             </tr>
         {% endfor %}
     </table>
