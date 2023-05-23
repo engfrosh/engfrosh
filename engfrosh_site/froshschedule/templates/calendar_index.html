@@ -7,13 +7,28 @@
     <script type='text/javascript' src="{% static 'moment.js' %}"></script>
     <script type='text/javascript' src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
     <script type='text/javascript' src="{% static 'fullcalendar.js' %}"></script>
+    <style>
+        :root {
+        	--fc-page-bg-color: #2E033B;
+        }
+    </style>
     <div id="calendar">
     </div>
     <script type='text/javascript'>
         $(document).ready(function() {
             var calendar = document.getElementById("calendar");
             var obj = new FullCalendar.Calendar(calendar, {
-                initialView: 'dayGridMonth'
+                height: "auto",
+                events: "/api/calendar",
+                initialView: 'timeGridWeek',
+                views: {
+                    timeGridWeek: {
+                        slotMinTime: "05:00:00",
+                        slotMaxTime: "23:00:00",
+                        slotDuration: "01:00:00",
+                        nowIndicator: true
+                    }
+                }
             });
             obj.render();
         });

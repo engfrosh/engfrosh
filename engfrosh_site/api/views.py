@@ -50,9 +50,11 @@ class CalendarAPI(APIView):
         end = request.GET.get("end")
         if start is None or end is None:
             return Response("Invalid request", status=status.HTTP_400_BAD_REQUEST)
+        start = datetime.strptime(start, "%Y-%m-%dT%H:%M:%S%z")
+        end = datetime.strptime(end, "%Y-%m-%dT%H:%M:%S%z")
         utc = pytz.utc
-        start_time = utc.localize(datetime.utcfromtimestamp(int(start)))
-        end_time = utc.localize(datetime.utcfromtimestamp(int(end)))
+        start_time = start
+        end_time = end
         calendars = set()
         for group in user.groups.all():
             try:
