@@ -1,6 +1,13 @@
 {% extends "base_user.html" %}
 {% load static %}
 {% block page_title %}EngFrosh Home{% endblock page_title %}
+{% block js_functions %}
+<link rel='stylesheet' type='text/css' href="{% static 'jquery-ui/jquery-ui.min.css' %}" />
+<script type='text/javascript' src="{% static 'jquery/dist/jquery.js' %}"></script>
+<script type='text/javascript' src="{% static 'moment.js' %}"></script>
+<script type='text/javascript' src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
+<script type='text/javascript' src="{% static 'fullcalendar.js' %}"></script>
+{% endblock js_functions %}
 {% block active %}
     <div class="text-white text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
         <div>
@@ -33,11 +40,6 @@
                class="bg-main dark:bg-main-night rounded-lg p-2">Unlink Discord Users</a>
             {% endif %}
         </div>
-        <link rel='stylesheet' type='text/css' href="{% static 'jquery-ui/jquery-ui.min.css' %}" />
-        <script type='text/javascript' src="{% static 'jquery/dist/jquery.js' %}"></script>
-        <script type='text/javascript' src="{% static 'moment.js' %}"></script>
-        <script type='text/javascript' src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
-        <script type='text/javascript' src="{% static 'fullcalendar.js' %}"></script>
         <style>
             :root {
                 --fc-page-bg-color: #2E033B;
