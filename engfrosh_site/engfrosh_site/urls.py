@@ -35,5 +35,4 @@ urlpatterns = [
     path("check-in/", include('check_in.urls')),
     path("tickets/", include('ticket.urls')),
     path("api/", include('api.urls')),
-    path("calendar/", include('froshschedule.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

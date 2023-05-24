@@ -121,7 +121,6 @@ INSTALLED_APPS = [
     'check_in.apps.CheckInConfig',
     'ticket.apps.TicketConfig',
     'api.apps.APIConfig',
-    'froshschedule.apps.CalendarConfig',
     'channels',
     'schedule'
 ]
@@ -133,7 +132,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'engfrosh_site.urls'

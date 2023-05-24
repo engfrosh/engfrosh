@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from common_models.models import VerificationPhoto, Team
 from datetime import datetime
 from schedule.models import Calendar, Occurrence
-import pytz
 
 
 class TreeAPI(APIView):
@@ -50,9 +49,10 @@ class CalendarAPI(APIView):
         end = request.GET.get("end")
         if start is None or end is None:
             return Response("Invalid request", status=status.HTTP_400_BAD_REQUEST)
-        utc = pytz.utc
-        start_time = utc.localize(datetime.utcfromtimestamp(int(start)))
-        end_time = utc.localize(datetime.utcfromtimestamp(int(end)))
+        start = datetime.strptime(start, "%Y-%m-%dT%H:%M:%S%z")
+        end = datetime.strptime(end, "%Y-%m-%dT%H:%M:%S%z")
+        start_time = start
+        end_time = end
         calendars = set()
         for group in user.groups.all():
             try:
