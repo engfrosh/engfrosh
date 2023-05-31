@@ -3,7 +3,7 @@ from django.shortcuts import render  # noqa F401
 from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required, permission_required
 
-from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto
+from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, UserDetails
 
 # Create your views here.
 
@@ -64,10 +64,12 @@ def user_home(request: HttpRequest) -> HttpResponse:
     """The home page for regular users."""
 
     team = Team.from_user(request.user)
+    details = UserDetails.objects.filter(user=request.user).first()
 
     context = {
         "scavenger_enabled": team.scavenger_enabled if team else False,
-        "trade_up_enabled": team.trade_up_enabled if team else False
+        "trade_up_enabled": team.trade_up_enabled if team else False,
+        "details": details
     }
 
     return render(request, "user_home.html", context)
