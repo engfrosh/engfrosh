@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-from PIL import Image, ImageDraw
-from common_models.models import Puzzle, PuzzleStream, Team, TeamPuzzleActivity
-from random import randint
-
-HSPACING = 500
-VSPACING = 500
-
-XOFFSET = 750
-YOFFSET = 750
-
-CIRC_WIDTH = 200
-LINE_WIDTH = 20
-=======
 from common_models.models import Puzzle, PuzzleStream, Team, TeamPuzzleActivity
 from random import randint
 from django.template.loader import render_to_string
@@ -26,7 +12,6 @@ YOFFSET = 25
 CIRC_WIDTH = 65
 IMG_WIDTH = CIRC_WIDTH * 1.5
 LINE_WIDTH = 2
->>>>>>> branching
 
 BRANCH_COLOR = (0, 0, 255)
 DEFAULT_COLOR = (0, 255, 0)
@@ -118,16 +103,11 @@ def generate_tree(team: Team):
             xy = [(x, y), (x+CIRC_WIDTH, y+CIRC_WIDTH)]
             if not first:
                 mid_y = (2*y+CIRC_WIDTH)/2
-<<<<<<< HEAD
-                rxy = [(x, mid_y), (x-HSPACING, mid_y)]
-                d.line(rxy, color, LINE_WIDTH)
-=======
                 # rxy = [(x, mid_y), (x-HSPACING, mid_y)]
                 # d.line(rxy, color, LINE_WIDTH)
                 line = {"x1": int(x), "y1": int(mid_y), "x2": int(x-HSPACING), "y2": int(mid_y),
                         "width": LINE_WIDTH, "colour": rgb2hex(color[0], color[1], color[2]), "id": 0}
                 rectangles_svg += [line]
->>>>>>> branching
             # d.ellipse(xy, color)
             activity = TeamPuzzleActivity.objects.filter(team=team, puzzle=puzzle).first()
             if first and activity is None:
@@ -137,21 +117,13 @@ def generate_tree(team: Team):
                 g = randint(0, 255)
                 b = randint(0, 255)
                 color = (r, g, b)
-<<<<<<< HEAD
-                circles += [(xy, color, True)]
-=======
                 circles += [(xy, color, True, puzzle)]
->>>>>>> branching
                 heads += [(puzzle, color)]
                 if not (j + MAX_LOOKAHEAD) >= len(puzzles):
                     lastShown = puzzles[j + MAX_LOOKAHEAD]
                 firstEnabled = False
             else:
-<<<<<<< HEAD
-                circles += [(xy, color, False)]
-=======
                 circles += [(xy, color, False, puzzle)]
->>>>>>> branching
             xindex += 1
             curr_count += 1
             first = False
@@ -165,19 +137,6 @@ def generate_tree(team: Team):
         stream_puzzle = stream.first_enabled_puzzle
         if starts.get(puzzle.id, None) is None or starts.get(stream_puzzle.id, None) is None:
             continue
-<<<<<<< HEAD
-        d.line([starts[puzzle.id], starts[stream_puzzle.id]], (255, 0, 0), LINE_WIDTH)
-    for i in range(len(circles)):
-        cir = circles[i]
-        if cir[2] and logo is not None:
-            box = cir[0]
-            offset = (int((box[0][0] + box[1][0]) // 2 - CIRC_WIDTH // 2),
-                      int((box[0][1] + box[1][1]) // 2 - CIRC_WIDTH // 2))
-            img.paste(logo, offset)
-        else:
-            d.ellipse(cir[0], cir[1])
-    return img
-=======
         line = {"x1": int(starts[puzzle.id][0]), "y1": int(starts[puzzle.id][1]),
                 "x2": int(starts[stream_puzzle.id][0]), "y2": int(starts[stream_puzzle.id][1]),
                 "width": LINE_WIDTH, "colour": rgb2hex(255, 0, 0), "id": 0}
@@ -207,4 +166,3 @@ def generate_tree(team: Team):
 
 def rgb2hex(r, g, b):
     return "#{:02x}{:02x}{:02x}".format(r, g, b)
->>>>>>> branching
