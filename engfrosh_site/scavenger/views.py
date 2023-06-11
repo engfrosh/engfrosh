@@ -48,12 +48,11 @@ def index(request: HttpRequest) -> HttpResponse:
 
 
 def update_tree(team):
-    img = generate_tree(team)
+    data = generate_tree(team)
     if team.scav_tree is None:
-        team.scav_tree = models.ImageField()
-    data = io.BytesIO()
-    img.save(data, format='JPEG')
-    team.scav_tree.save(str(team.id), data)
+        team.scav_tree = models.FileField()
+    raw = io.BytesIO(data.encode('utf8'))
+    team.scav_tree.save(str(team.id)+".svg", raw)
 
 
 @login_required(login_url='/accounts/login')

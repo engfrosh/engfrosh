@@ -1,10 +1,8 @@
 {% extends 'base_generic.html' %}
-{% load static %}
 {% block page_title %}
     Scav
 {% endblock page_title %}
 {% block body %}
-    <meta http-equiv="Content-Security-Policy" content="default-src: 'self'" />
     {% if not team %}
         You are not part of a team
     {% else %}
@@ -19,7 +17,6 @@
             {% if not scavenger_enabled_for_team %}
                 Scavenger is not currently enabled
             {% endif %}
-<<<<<<< HEAD
             {% if completed_puzzles_requiring_photo_upload %}
                 <h1>Puzzles Requiring Verification Photo</h1>
                 <div class="">
@@ -83,7 +80,7 @@
                 </div>
                 <hr/>
             {% endif %}
-            <img src="{{ team.scav_tree.url }}?{% now "U" %}" width="500" height="500">
+            {% static team.scav_tree.path %}
             {% if verified_puzzles %}
                 <h1>Verified and Completed Puzzles</h1>
                 <div class="">
@@ -104,11 +101,6 @@
                     </table>
                 </div>
             {% endif %}
-=======
-            <iframe src="{{ team.scav_tree.url }}" style="width: 1000px; height: 1000px;" id="imgframe">
-                <p>Looks like your browser doesn't support scav ;-;</p>
-            </iframe>
->>>>>>> branching
         {% endif %}
     {% endif %}
 {% endblock body %}
