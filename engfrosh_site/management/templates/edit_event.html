@@ -1,0 +1,21 @@
+{% extends 'base_manage_subpage.html' %}
+{% load static %}
+{% block page_title %}
+    Edit Event
+{% endblock page_title %}
+{% block top_title %}
+    Edit Event
+{% endblock top_title %}
+{% block active %}
+    <form class="my-5" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" value="modify" id="action" name="action">
+        <input type="submit" value="Change Event" class="text-blue-600">
+    </form>
+    <form class="my-5" method="POST">
+        {% csrf_token %}
+        <input type="hidden" value="delete" id="action" name="action">
+        <input type="submit" value="Delete Event" class="text-red-600">
+    </form>
+{% endblock active %}

@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from common_models.models import VerificationPhoto, Team
 from datetime import datetime
 from schedule.models import Calendar, Occurrence
+from django.urls import reverse
 
 
 class TreeAPI(APIView):
@@ -97,6 +98,9 @@ class CalendarAPI(APIView):
 
                 event_start = occurrence.start
                 event_end = occurrence.end
+                url = ""
+                if request.user.has_perm("auth.change_user"):
+                    url = reverse("edit_event", args=[event.id])
                 if occurrence.cancelled:
                     # fixes bug 508
                     continue
@@ -115,6 +119,7 @@ class CalendarAPI(APIView):
                         "creator": str(occurrence.event.creator),
                         "calendar": occurrence.event.calendar.slug,
                         "cancelled": occurrence.cancelled,
+                        "url": url
                     }
                 )
         return Response(response_data)

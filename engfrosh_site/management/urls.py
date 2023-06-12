@@ -22,4 +22,5 @@ urlpatterns = [
     path('discord/channel-groups', views.manage_discord_channel_groups, name="manage_discord_channel_groups"),
     path('discord/nicks', views.manage_discord_nicks, name="manage_discord_nicks"),
     path('discord/nicks/<int:id>', views.manage_discord_nick, name="manage_discord_nick"),
+    path('events/<int:id>', views.edit_event, name="edit_event"),
 ]

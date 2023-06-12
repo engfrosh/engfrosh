@@ -31,11 +31,33 @@ from django.http.response import HttpResponse, JsonResponse, \
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import user_passes_test
 
+from schedule.models import Event
+
 
 logger = logging.getLogger("management.views")
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
+
+
+@permission_required("auth.change_user")
+def edit_event(request: HttpRequest, id: int) -> HttpResponse:
+    if request.method == "GET":
+        context = {"form": forms.EventForm(instance=Event.objects.filter(id=id).first())}
+        return render(request, "edit_event.html", context)
+    elif request.method == "POST":
+        action = request.POST['action']
+        if action == "delete":
+            event = Event.objects.filter(id=id).first()
+            if event is not None:
+                event.delete()
+            return redirect("/")
+        elif action == "modify":
+            form = forms.EventForm(request.POST, instance=Event.objects.filter(id=id).first())
+            if not form.is_valid:
+                return render(request, "edit_event.html", {"form": form})
+            form.save()
+            return redirect("/")
 
 
 @permission_required("auth.add_user")

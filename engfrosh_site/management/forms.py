@@ -1,5 +1,6 @@
 from django import forms
 from common_models.models import Puzzle
+from schedule.models import Event
 
 
 class DiscordNickForm(forms.Form):
@@ -20,3 +21,13 @@ class PuzzleForm(forms.ModelForm):
     class Meta:
         model = Puzzle
         exclude = ['id', 'secret_id', 'created_at']
+
+
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ['start', 'end', 'title', 'description', 'calendar', 'color_event']
+        widgets = {
+            "start": forms.DateTimeInput(),
+            "end": forms.DateTimeInput(),
+        }
