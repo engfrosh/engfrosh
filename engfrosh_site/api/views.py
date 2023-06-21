@@ -2,10 +2,12 @@ from rest_framework import permissions, authentication, status
 from rest_framework.views import APIView
 from .serializers import VerificationPhotoSerializer
 from rest_framework.response import Response
-from common_models.models import VerificationPhoto, Team
+from common_models.models import VerificationPhoto, Team, UserDetails
 from datetime import datetime
 from schedule.models import Calendar, Occurrence
 from django.urls import reverse
+from django.contrib.auth.models import User
+from engfrosh_common.AWS_SES import send_SES
 
 
 class TreeAPI(APIView):
@@ -22,6 +24,23 @@ class TreeAPI(APIView):
         team = Team.objects.filter(group_id=id).first()
         update_tree(team)
         return Response({"success": True})
+
+
+class WaiverAPI(APIView):
+    def get(self, request):
+        email = request.GET.get("email")
+        user = User.objects.filter(email=email).first()
+        if user is None:
+            # Freak out
+            print("Uh oh spaghetti O's, failed to find user " + email)
+            body = "Hello,\nA user with email: " + email + " could not be found!"
+            send_SES("noreply@engfrosh.com", "technical@engfrosh.com", "Waiver User Not Found", body, body)
+            return Response({"success": False})
+        else:
+            details = UserDetails.objects.filter(user=user).first()
+            details.waiver_completed = True
+            details.save()
+            return Response({"success": True})
 
 
 class VerificationPhotoAPI(APIView):
