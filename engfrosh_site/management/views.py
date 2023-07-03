@@ -14,7 +14,7 @@ import pyaccord
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity
-from common_models.models import ChannelTag, DiscordGuild
+from common_models.models import ChannelTag, DiscordGuild, Announcement
 import common_models.models
 from common_models.models import DiscordRole
 from . import registration
@@ -30,6 +30,7 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse, JsonResponse, \
     HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError, HttpResponseForbidden
 from django.shortcuts import render, redirect
+from .forms import AnnouncementForm
 from django.contrib.auth.decorators import user_passes_test
 
 from schedule.models import Event
@@ -39,6 +40,25 @@ logger = logging.getLogger("management.views")
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
+
+
+@staff_member_required(login_url='/accounts/login')
+def announcements(request: HttpRequest) -> HttpResponse:
+    """View for creating announcements"""
+    if request.method == "POST":
+        form = AnnouncementForm(request.POST)
+        context = {"form": form}
+        if form.is_valid():
+            data = form.cleaned_data
+            announcement = Announcement(title=data['title'], body=data['body'])
+            announcement.save()
+            context['success'] = True
+        else:
+            context['error'] = True
+    else:
+        form = AnnouncementForm()
+        context = {"form": form}
+    return render(request, "announcements.html", context)
 
 
 @permission_required("common_models.manage_scav")

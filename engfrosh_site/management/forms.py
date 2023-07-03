@@ -3,6 +3,11 @@ from common_models.models import Puzzle
 from schedule.models import Event
 
 
+class AnnouncementForm(forms.Form):
+    title = forms.CharField(label='Title', max_length=200)
+    body = forms.CharField(label='Body', widget=forms.Textarea)
+
+
 class DiscordNickForm(forms.Form):
     nickname = forms.CharField(label="Nickname", max_length=60)
     # 979c9f is the default discord role color

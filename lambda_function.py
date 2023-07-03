@@ -9,9 +9,10 @@ from urllib.parse import quote
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+
 def lambda_handler(event, context):
     message = event["Records"][0]["Sns"]["Message"]
-    if type(message) == type(""):
+    if isinstance(message, str):
         logger.info(message)
         message = json.loads(message)
     logger.info(message)
@@ -30,4 +31,3 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps('Success')
     }
-

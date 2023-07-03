@@ -8,6 +8,7 @@ urlpatterns = [
     path('users/add', views.bulk_register_users),
     path('teams', views.manage_frosh_teams, name="manage_frosh_teams"),
     path('', views.manage_index, name="manage_index"),
+    path('announcements', views.announcements, name="announcements"),
     # path('roles', views.manage_roles, name="manage_roles"),
     path('scavenger/puzzles', views.manage_scavenger_puzzles, name="manage_scavenger_puzzles"),
     path('scavenger/puzzles/<int:id>', views.edit_scavenger_puzzle, name="edit_scavenger_puzzle"),
@@ -24,5 +25,5 @@ urlpatterns = [
     path('discord/nicks/<int:id>', views.manage_discord_nick, name="manage_discord_nick"),
     path('events/<int:id>', views.edit_event, name="edit_event"),
     path('lock_team/<int:id>', views.lock_team, name="lock_team"),
-    path('unlock_team/<int:id>', views.unlock_team, name="unlock_team")
+    path('unlock_team/<int:id>', views.unlock_team, name="unlock_team"),
 ]

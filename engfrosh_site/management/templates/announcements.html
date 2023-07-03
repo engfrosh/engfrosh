@@ -1,0 +1,26 @@
+{% extends 'base_manage_subpage.html' %}
+{% load static %}
+{% block page_title %}
+    Create Announcement
+{% endblock page_title %}
+{% block top_title %}
+    Create Announcement
+{% endblock top_title %}
+{% block active %}
+
+{% if error %}
+<p class="text-red-600">Invalid Data!</p>
+{% endif %}
+{% if success %}
+<p class="text-green-600">Posted Announcement!</p>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Create">
+</form>
+{% endblock active %}
+{% block js_functions %}
+    <script src="{% static 'manage_discord_server.js' %}"></script>
+{% endblock js_functions %}
