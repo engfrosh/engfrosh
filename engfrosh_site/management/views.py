@@ -59,6 +59,8 @@ def announcements(request: HttpRequest) -> HttpResponse:
         form = AnnouncementForm()
         context = {"form": form}
     return render(request, "announcements.html", context)
+
+
 @permission_required("common_models.manage_scav")
 def lock_team(request: HttpRequest, id: int) -> HttpResponse:
     if request.method == "GET":
