@@ -10,6 +10,7 @@
 [+] Rebuild Discord bot so that it is independant of the webserver and just interacts through the database or web API calls to the web server
 [+] Rebuild Discord bot using nextcord
 [+] Update Discord bot to use slash commands (reference the engfrosh/scavenger-discord bot)
+[ ] Make it so you can @ roles for /scav_lock and /scav_unlock
 
 ## Management
 [ ] Add _Manage Roles_ page and make it easy to create the default roles for planning, heads, frosh, facils.

@@ -5,6 +5,7 @@ from typing import List, Union
 import requests
 import json
 import os
+import datetime
 
 import credentials
 
@@ -12,12 +13,14 @@ from django.contrib import auth
 import pyaccord
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
-from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity, ChannelTag
-from common_models.models import Announcement
+from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity
+from common_models.models import ChannelTag, DiscordGuild, Announcement
 import common_models.models
 from common_models.models import DiscordRole
 from . import registration
+from . import forms
 
+from django.utils.html import escape
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import permission_required
@@ -28,6 +31,9 @@ from django.http.response import HttpResponse, JsonResponse, \
     HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError, HttpResponseForbidden
 from django.shortcuts import render, redirect
 from .forms import AnnouncementForm
+from django.contrib.auth.decorators import user_passes_test
+
+from schedule.models import Event
 
 
 logger = logging.getLogger("management.views")
@@ -53,6 +59,58 @@ def announcements(request: HttpRequest) -> HttpResponse:
         form = AnnouncementForm()
         context = {"form": form}
     return render(request, "announcements.html", context)
+@permission_required("common_models.manage_scav")
+def lock_team(request: HttpRequest, id: int) -> HttpResponse:
+    if request.method == "GET":
+        if id == 0:
+            return render(request, "lock_teams.html", {"teams": Team.objects.all()})
+        else:
+            form = forms.LockForm()
+            form.duration = 15
+
+            team = Team.objects.filter(group_id=id).first()
+            return render(request, "lock_team.html", {"team": team, "form": form})
+    elif request.method == "POST":
+        team = Team.objects.filter(group_id=id).first()
+        form = forms.LockForm(request.POST)
+        if not form.is_valid():
+            return render(request, "lock_team.html", {"team": team, "form": form, "error": True})
+        curr = datetime.datetime.now()
+        delta = datetime.timedelta(minutes=form.cleaned_data['duration'])
+        team.scavenger_locked_out_until = curr + delta
+        team.save()
+        return redirect("/manage/lock_team/0")
+
+
+@permission_required("common_models.manage_scav")
+def unlock_team(request: HttpRequest, id: int) -> HttpResponse:
+    if id == 0:
+        return render(request, "unlock_teams.html", {"teams": Team.objects.all()})
+    else:
+        team = Team.objects.filter(group_id=id).first()
+        team.scavenger_locked_out_until = None
+        team.save()
+        return redirect("/manage/unlock_team/0")
+
+
+@permission_required("auth.change_user")
+def edit_event(request: HttpRequest, id: int) -> HttpResponse:
+    if request.method == "GET":
+        context = {"form": forms.EventForm(instance=Event.objects.filter(id=id).first())}
+        return render(request, "edit_event.html", context)
+    elif request.method == "POST":
+        action = request.POST['action']
+        if action == "delete":
+            event = Event.objects.filter(id=id).first()
+            if event is not None:
+                event.delete()
+            return redirect("/")
+        elif action == "modify":
+            form = forms.EventForm(request.POST, instance=Event.objects.filter(id=id).first())
+            if not form.is_valid():
+                return render(request, "edit_event.html", {"form": form})
+            form.save()
+            return redirect("/")
 
 
 @permission_required("auth.add_user")
@@ -129,19 +187,36 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
 # region Link Discord
 
 
-@permission_required("auth.change_user", login_url='/accounts/login')
+@permission_required("common_models.manage_scav", login_url='/accounts/login')
+def scavenger_scoreboard(request: HttpRequest) -> HttpResponse:
+    status = list(TeamPuzzleActivity.objects.filter(puzzle_completed_at=None).order_by('-puzzle__order'))
+    return render(request, "scavenger_scoreboard.html", {"status": status})
+
+
+@permission_required("common_models.manage_scav", login_url='/accounts/login')
+def scavenger_monitor(request: HttpRequest) -> HttpResponse:
+    return render(request, "scavenger_monitor.html")
+
+
+@permission_required("common_models.view_links", login_url='/accounts/login')
 def get_discord_link(request: HttpRequest) -> HttpResponse:
     """View to get discord linking links for users or send link emails to users."""
 
-    # TODO add so heads can access for their teams
-
     if request.method == "GET":
+        if not request.user.is_staff:
+            team = Team.from_user(request.user)
+            all_users = User.objects.all().order_by("username")
+            users = []
+            for user in all_users:
+                if team.group in user.groups.all():
+                    users += [user]
+        else:
+            users = User.objects.all().order_by("username")
         # Handle Webpage requests
         # TODO add check that user doesn't yet have a discord account linked.
 
         context = {"users": []}
 
-        users = User.objects.all().order_by("username")
         for usr in users:
             try:
                 email_sent = UserDetails.objects.get(user=usr).invite_email_sent
@@ -152,7 +227,8 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
                 context["users"].append({
                     "username": usr.username,
                     "id": usr.id,
-                    "email_sent": bool(email_sent)
+                    "email_sent": bool(email_sent),
+                    "email": usr.email
                 })
 
         return render(request, "create_discord_magic_links.html", context)
@@ -171,7 +247,17 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
             return HttpResponseBadRequest("Missing user_id")
 
         user = User.objects.get(id=req_dict["user_id"])
-
+        if not request.user.is_staff:
+            team = Team.from_user(request.user)
+            all_users = User.objects.all().order_by("username")
+            users = []
+            for u in all_users:
+                if team.group in user.groups.all():
+                    users += [u]
+        else:
+            users = User.objects.all().order_by("username")
+        if user not in users:
+            return HttpResponseBadRequest("Invalid user")
         match req_dict["command"]:
 
             # TODO should first sync and eliminate expired links
@@ -203,6 +289,10 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
                         login_path="/accounts/login", redirect="/accounts/link/discord")})  # TODO fix to include https
 
             case "send_link_email":
+                if not request.user.is_superuser:
+                    return HttpResponseBadRequest("You can't send emails.")
+                if '@cmail.carleton.ca' in user.email:
+                    return JsonResponse({"user_id": user.id})
                 # TODO Update the email to be dynamic
                 SENDER_EMAIL = "noreply@engfrosh.com"
                 if registration.email_magic_link(
@@ -237,7 +327,8 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
                     {"user_id": user.id, "qr_code_link": mlink.qr_code.url})
 
             case _:
-                return HttpResponseBadRequest(f"Invalid command: {req_dict['command']}")
+                command = escape(req_dict['command'])
+                return HttpResponseBadRequest(f"Invalid command: {command}")
 
     else:
         return HttpResponseNotAllowed(['GET', 'POST'])
@@ -363,7 +454,10 @@ def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
             discord_role_ids: Union[List[int], None] = []
             for g in groups:
                 try:
-                    discord_role_ids.append(DiscordRole.objects.get(group_id=g).role_id)
+                    query = DiscordRole.objects.filter(group_id=g)
+                    for role in query:
+                        if role.secondary_group is None or role.secondary_group in groups:
+                            discord_role_ids.append(role.role_id)
                 except ObjectDoesNotExist:
                     continue
 
@@ -395,13 +489,13 @@ def manage_index(request: HttpRequest) -> HttpResponse:
     return render(request, "manage.html")
 
 
-@staff_member_required(login_url='/accounts/login')
+@user_passes_test(lambda u: u.is_superuser)
 def initialize_database(request: HttpRequest) -> HttpResponse:
     common_models.models.initialize_database()
     return redirect("manage_index")
 
 
-@staff_member_required(login_url='/accounts/login')
+@user_passes_test(lambda u: u.is_superuser)
 def initialize_scav(request: HttpRequest) -> HttpResponse:
     common_models.models.initialize_scav()
     return redirect("manage_index")
@@ -537,18 +631,65 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
 
     elif request.method == "POST":
 
-        return HttpResponse("Not Implemented")
-
         if request.content_type != "application/json":
             return HttpResponseBadRequest("Invalid / missing content type.")
 
         req_dict = json.loads(request.body)
         if "command" not in req_dict:
             return HttpResponseBadRequest("Bad request body, missing command.")
+        if req_dict['command'] == 'toggle':
+            if "puzzle" not in req_dict:
+                return HttpResponseBadRequest("Bad request body, missing puzzle.")
+            puzzle_id = req_dict['puzzle']
+            puzzle = Puzzle.objects.filter(id=puzzle_id).first()
+            if puzzle.enabled:
+                puzzle.enabled = False
+                puzzle.save()
+                next_puzzle = puzzle.stream.get_next_enabled_puzzle(puzzle)
+                for activity in TeamPuzzleActivity.objects.filter(puzzle=puzzle).all():
+                    if not activity.puzzle_completed_at:
+                        if next_puzzle is None:
+                            activity.delete()
+                        else:
+                            activity.puzzle = next_puzzle
+                            activity.save()
+            else:
+                puzzle.enabled = True
+                puzzle.save()
+            return HttpResponse("Successfully toggled puzzle")
+        else:
+            return HttpResponseBadRequest("Invalid command.")
 
-        # match req_dict["command"]:
-        #     case "get_qr_code"
+    else:
+        return HttpResponseNotAllowed(("GET", "POST"))
 
+
+@permission_required("common_models.manage_scav")
+def edit_scavenger_puzzle(request: HttpRequest, id: int) -> HttpResponse:
+    """Page for editing scavenger puzzles"""
+    puzzle = Puzzle.objects.filter(id=id).first()
+    if puzzle is None:
+        return HttpResponseBadRequest("Invalid puzzle id!")
+    if request.method == "GET":
+        context = {
+            "puzzle": puzzle,
+            "form": forms.PuzzleForm(instance=puzzle)
+        }
+        return render(request, "edit_scavenger_puzzle.html", context)
+    elif request.method == "POST":
+        form = forms.PuzzleForm(request.POST, instance=puzzle)
+        if not form.is_valid():
+            context = {
+                "error": True,
+                "puzzle": puzzle,
+                "form": form
+            }
+            return render(request, "edit_scavenger_puzzle.html", context)
+        form.save()
+        teams = Team.objects.all()
+        for team in teams:
+            team.refresh_scavenger_progress()
+        return redirect("manage_scavenger_puzzles")
     else:
         return HttpResponseNotAllowed(("GET", "POST"))
 
@@ -619,3 +760,65 @@ def trade_up_viewer(request: HttpRequest) -> HttpResponse:
         })
 
     return render(request, "trade_up_viewer.html", context)
+
+
+@permission_required("common_models.view_discord_nicks", login_url='/accounts/login')
+def manage_discord_nicks(request: HttpRequest) -> HttpResponse:
+    if request.method == "GET":
+        search = request.GET.get('filter', '')
+        if request.user.is_staff:
+            users = DiscordUser.objects.filter(user__username__icontains=search)
+            users |= DiscordUser.objects.filter(discord_username__icontains=search)
+        else:
+            team = Team.from_user(request.user)
+            group = team.group
+            users = DiscordUser.objects.filter(user__username__icontains=search, user__groups__id__in=[group.id])
+            users |= DiscordUser.objects.filter(discord_username__icontains=search, user__groups__id__in=[group.id])
+        return render(request, "manage_discord_nicks.html", {"users": users})
+    elif request.method == "POST":
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Not application/json content type")
+        req_dict = json.loads(request.body)
+        if "command" not in req_dict:
+            return HttpResponseBadRequest("No command in request")
+        if req_dict['command'] == 'delete':
+            if request.user.is_staff:
+                users = DiscordUser.objects.all()
+            else:
+                team = Team.from_user(request.user)
+                group = team.group
+                users = DiscordUser.objects.filter(user__groups__id__in=[group.id]).all()
+            if "user" not in req_dict:
+                return HttpResponseBadRequest("No user in request.")
+            user = DiscordUser.objects.filter(id=req_dict['user']).first()
+            if user not in users:
+                return HttpResponseBadRequest("Invalid user.")
+            user.delete()
+            return HttpResponse("Unlinked discord account.")
+        else:
+            return HttpResponseBadRequest("Invalid command.")
+
+
+@permission_required("common_models.manage_discord_nicks", login_url='/accounts/login')
+def manage_discord_nick(request: HttpRequest, id: int) -> HttpResponse:
+    if request.method == "GET":
+        user = DiscordUser.objects.filter(id=id).first()
+        form = forms.DiscordNickForm(nick=user.discord_username)
+        return render(request, "manage_discord_nick.html", {"user": user, "form": form})
+    elif request.method == "POST":
+        user = DiscordUser.objects.filter(id=id).first()
+        form = forms.DiscordNickForm(request.POST)
+        context = {"user": user, "form": form, "error": False}
+        if form.is_valid():
+            nick = form.cleaned_data['nickname']
+            color = form.cleaned_data['color'][1:]
+            guild = DiscordGuild.objects.all().first()
+            name = "color-"+str(color)
+            role = guild.get_role(name)
+            if role is None:
+                role = guild.create_role(name=name, position=settings.COLOR_POSITION, color=int(color, 16))
+            guild.add_role_to_member(user.id, role)
+            guild.change_nick(user.id, nick)
+        else:
+            context['error'] = True
+        return render(request, "manage_discord_nick.html", context)

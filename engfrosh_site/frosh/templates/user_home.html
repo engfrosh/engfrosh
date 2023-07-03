@@ -1,22 +1,77 @@
 {% extends "base_user.html" %}
+{% load static %}
 {% block page_title %}EngFrosh Home{% endblock page_title %}
+{% block js_functions %}
+<link rel='stylesheet' type='text/css' href="{% static 'jquery-ui/jquery-ui.min.css' %}" />
+<script type='text/javascript' src="{% static 'jquery/dist/jquery.js' %}"></script>
+<script type='text/javascript' src="{% static 'moment.js' %}"></script>
+<script type='text/javascript' src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
+<script type='text/javascript' src="{% static 'fullcalendar.js' %}"></script>
+{% endblock js_functions %}
 {% block active %}
-    <div class="text-white text-center flex flex-col space-y-3 mx-auto container max-w-sm">
-        {% if scavenger_enabled %}
-            <a href="{% url 'scavenger_index' %}"
-               class="bg-main dark:bg-main-night rounded-lg p-2">Scav</a>
-        {% else %}
-            <p class="rounded-lg p-2 border">Scav Disabled</p>
-        {% endif %}
-        {% if trade_up_enabled %}
-            <a href="{% url 'trade_up_home' %}"
-               class="bg-main dark:bg-main-night rounded-lg p-2">Trade Up</a>
-        {% else %}
-            <p class="rounded-lg p-2 border">Trade Up Disabled</p>
-        {% endif %}
-        <a href="{% url 'my_skash' %}"
-           class="bg-main dark:bg-main-night rounded-lg p-2">Team Skash</a>
-        <a href="{% url 'create_ticket' %}"
-           class="bg-main dark:bg-main-night rounded-lg p-2">Get Help</a>
+    <div class="text-white text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
+        <div>
+            {% if scavenger_enabled %}
+                <a href="{% url 'scavenger_index' %}"
+                   class="bg-main dark:bg-main-night rounded-lg p-2">Scav</a>
+            {% else %}
+                <p class="rounded-lg p-2 border">Scav Disabled</p>
+            {% endif %}
+            {% if trade_up_enabled %}
+                <a href="{% url 'trade_up_home' %}"
+                   class="bg-main dark:bg-main-night rounded-lg p-2">Trade Up</a>
+            {% else %}
+                <p class="rounded-lg p-2 border">Trade Up Disabled</p>
+            {% endif %}<br><br>
+            <a href="{% url 'my_skash' %}"
+               class="bg-main dark:bg-main-night rounded-lg p-2">Team Skash</a>
+            <a href="{% url 'create_ticket' %}"
+               class="bg-main dark:bg-main-night rounded-lg p-2">Get Help</a><br><br>
+            {% if request.user.is_staff %}
+            <a href="{% url 'manage_index' %}"
+               class="bg-main dark:bg-main-night rounded-lg p-2 my-10">Management</a>
+            {% endif %}<br><br>
+            {% if perms.common_models.view_links %}
+            <a href="{% url 'magic_links' %}"
+               class="bg-main dark:bg-main-night rounded-lg p-2">View Magic Links</a>
+            {% endif %}
+            {% if perms.common_models.view_discord_nicks %}
+            <a href="{% url 'manage_discord_nicks' %}"
+               class="bg-main dark:bg-main-night rounded-lg p-2">Unlink Discord Users</a>
+            {% endif %}
+            {% if details %}
+            <br><p class="float-right">Your frosh id is: {{ details.frosh_id }}</p>
+            {% endif %}
+        </div>
+        <style>
+            :root {
+                --fc-page-bg-color: #2E033B;
+            }
+        </style>
+        <div id="calendar">
+        </div>
+        <script type='text/javascript'>
+            $(document).ready(function() {
+                var calendar = document.getElementById("calendar");
+                var obj = new FullCalendar.Calendar(calendar, {
+                    height: "auto",
+                    events: "/api/calendar",
+                    initialView: 'timeGridWeek',
+                    titleFormat: {month: 'short', day: 'numeric'},
+                    headerToolbar: {left: 'title',
+                                    center: '',
+                                    right: 'prev,next'},
+                    views: {
+                        timeGridWeek: {
+                            slotMinTime: "05:00:00",
+                            slotMaxTime: "23:00:00",
+                            slotDuration: "01:00:00",
+                            nowIndicator: true
+                        }
+                    }
+                });
+                obj.render();
+            });
+        </script>
     </div>
 {% endblock active %}

@@ -10,8 +10,8 @@
     <p>Use this page to give users links to join the discord server</p>
     <button type="button"
             class="bg-main dark:bg-main-night rounded text-white p-1 m-2"
-            onclick="add10Button()">
-        Email 10
+            onclick="add50Button()">
+        Email 50
     </button>
     <hr/>
     <table>
@@ -40,7 +40,9 @@
                     </button>
                 </td>
                 <td class="user_{{ user.id }} email_link button_cell text-center px-2">
-                    {% if not user.email_sent %}
+                    {% if '@cmail.carleton.ca' in user.email %}
+                        <p class="p-0.5 rounded border px-1">Using CMail</p>
+                    {% elif not user.email_sent %}
                         <button class="p-0.5 bg-main dark:bg-main-night text-white rounded px-1"
                                 type="button"
                                 onclick="email_magic_link({{ user.id }})">

@@ -7,15 +7,18 @@ from channels.layers import get_channel_layer
 class CheckInConsumer(WebsocketConsumer):
 
     def connect(self):
+        self.user = self.scope["user"]
+        if not self.user.has_perm("common_models.check_in"):
+            self.close()
         async_to_sync(self.channel_layer.group_add)(
-            'default',
+            'checkin',
             self.channel_name
         )
         self.accept()
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
-            'default',
+            'checkin',
             self.channel_name
         )
 

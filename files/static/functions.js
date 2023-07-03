@@ -1,8 +1,8 @@
 
 HEX_COLOR_PATTERN = /^#?[0-9A-F]{6}$/i;
 
-function postToServer(CSRFToken, toJSONBody) {
-  return fetch("", {
+function postToServerURL(CSRFToken, toJSONBody, url) {
+  return fetch(url, {
     method: "POST",
     mode: "cors",
     credentials: "same-origin",
@@ -13,3 +13,7 @@ function postToServer(CSRFToken, toJSONBody) {
     body: JSON.stringify(toJSONBody)
   })
 }
+function postToServer(CSRFToken, toJSONBody) {
+    return postToServerURL(CSRFToken, toJSONBody, "");
+}
+

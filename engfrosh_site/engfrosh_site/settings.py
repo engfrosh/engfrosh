@@ -18,6 +18,7 @@ import logging
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+COLOR_POSITION = 3
 
 # Hack for development to get around import issues
 sys.path.append(str(BASE_DIR.parent))
@@ -51,6 +52,14 @@ DISCORD_BOT_TOKEN = os.environ.get("DISCORD_BOT_TOKEN")
 if not DISCORD_BOT_TOKEN:
     logging.warning("No discord bot token provided")
 
+MICROSOFT_TOKEN = os.environ.get("MICROSOFT_TOKEN")
+if not MICROSOFT_TOKEN:
+    logging.warning("No microsoft token has been provided")
+MICROSOFT_ID = os.environ.get("MICROSOFT_ID")
+if not MICROSOFT_ID:
+    logging.warning("No microsoft client id has been provided")
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
 # Production sets the settings values, but doesn't affect debug parts
 if development:
@@ -63,13 +72,26 @@ else:
 if development:
     ALLOWED_HOSTS = [
         "127.0.0.1",
-        "localhost"
+        "localhost",
+        "server.engfrosh.com",
+        "engfrosh.com"
     ]
 else:
     ALLOWED_HOSTS = [
-        "mars.engfrosh.com"
+        "server.engfrosh.com",
+        "engfrosh.com"
     ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.engfrosh.com",
+    "https://engfrosh.com",
+    "http://*.engfrosh.com",
+    "http://engfrosh.com"
+]
+
+# This fixes oauth uri's going to http:// by default
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Discord API Settings
 DEFAULT_DISCORD_API_VERSION = 10
@@ -84,6 +106,7 @@ DEFAULT_SCAVENGER_PUZZLE_REQUIRE_PHOTO_UPLOAD = True
 
 INSTALLED_APPS = [
     'daphne',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -97,7 +120,9 @@ INSTALLED_APPS = [
     'common_models.apps.CommonModelsConfig',
     'check_in.apps.CheckInConfig',
     'ticket.apps.TicketConfig',
+    'api.apps.APIConfig',
     'channels',
+    'schedule'
 ]
 
 MIDDLEWARE = [
@@ -107,7 +132,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'engfrosh_site.urls'
@@ -139,12 +163,12 @@ ASGI_APPLICATION = 'engfrosh_site.asgi.application'
 
 DATABASES = {
     'default': {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "engfrosh_dev_2022_07_05",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "engfrosh",
         "USER": "engfrosh_site",
         "PASSWORD": "there-exercise-fenegle",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "HOST": "127.0.0.1",
+        "PORT": "3306",
     }}
 
 
@@ -244,6 +268,6 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console', 'file_debug', 'file_warn'],
-        'level': 'DEBUG',
+        'level': 'INFO',
     },
 }

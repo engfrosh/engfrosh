@@ -1,0 +1,17 @@
+{% extends 'base_manage_subpage.html' %}
+{% load static %}
+{% block page_title %}
+    Unlock Team
+{% endblock page_title %}
+{% block top_title %}
+    Unlock Team
+{% endblock top_title %}
+{% block active %}
+<div class="flex flex-col mx-auto container text-white text-center m-3">
+    <ul>
+        {% for team in teams %}
+            <li><a href="{% url 'unlock_team' id=team.group_id %}">{{ team.display_name }}</a> - {{ team.scavenger_locked_out_until }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock active %}

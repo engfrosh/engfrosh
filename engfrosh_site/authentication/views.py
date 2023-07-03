@@ -9,8 +9,9 @@ Includes views for:
 import logging
 import os
 from typing import List, Union
-
+from urllib.parse import urlparse
 import credentials
+import uuid
 
 from common_models.models import DiscordUser
 from common_models.models import DiscordRole
@@ -20,10 +21,14 @@ from pyaccord.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  #
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpRequest
+from django.http import HttpResponseBadRequest
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.encoding import uri_to_iri
 from django.conf import settings
+from django.contrib.auth.models import User
+
+import msal
 
 logger = logging.getLogger("Authentication.Views")
 
@@ -34,6 +39,45 @@ PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 def index(request: HttpRequest):
     """Generic accounts home."""
     return render(request, "index.html")
+
+
+def msLogin(request: HttpRequest):
+    AUTHORITY = "https://login.microsoftonline.com/common"
+    app = msal.ConfidentialClientApplication(settings.MICROSOFT_ID, authority=AUTHORITY,
+                                             client_credential=settings.MICROSOFT_TOKEN)
+    callback_url = request.build_absolute_uri("msTokenCallback")
+    SCOPE = []
+    url = app.get_authorization_request_url(SCOPE, state=str(uuid.uuid4()), redirect_uri=callback_url)
+    return redirect(url)
+
+
+def msTokenCallback(request: HttpRequest):
+    if request.user.is_authenticated:
+        logout(request)
+    params = request.GET
+    if 'code' not in params or 'state' not in params or 'session_state' not in params:
+        return HttpResponseBadRequest("Missing code and session state!")
+    code = params['code']
+    # state = params['state']
+    # session_state = params['session_state']
+    AUTHORITY = "https://login.microsoftonline.com/common"
+    app = msal.ConfidentialClientApplication(settings.MICROSOFT_ID, authority=AUTHORITY,
+                                             client_credential=settings.MICROSOFT_TOKEN)
+    SCOPE = []
+    callback_url = request.build_absolute_uri("msTokenCallback")
+    token = app.acquire_token_by_authorization_code(code, SCOPE, redirect_uri=callback_url)
+    if 'id_token_claims' not in token:
+        return HttpResponseBadRequest("Invalid or expired code!")
+    email = token['id_token_claims']['preferred_username'].lower()
+    user = User.objects.filter(email=email).first()
+    if user is None:
+        return HttpResponseBadRequest("Email is not registered!")
+    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+
+    discord = DiscordUser.objects.filter(user=user).first()
+    if discord is None:
+        return redirect("link_discord")
+    return redirect("user_home")
 
 
 @login_required()
@@ -71,6 +115,9 @@ def login_page(request: HttpRequest):
     if not request.user.is_anonymous:
         # Todo add way to log out
         if redirect_location:
+            is_absolute = bool(urlparse(redirect_location).netloc)
+            if is_absolute:
+                return HttpResponse("Warning: Absolute redirect url detected!")
             return redirect(redirect_location)
         else:
             return HttpResponse("You are already logged in.")
@@ -196,7 +243,10 @@ def discord_register_callback(request: HttpRequest):
             discord_role_ids: Union[List[int], None] = []
             for g in groups:
                 try:
-                    discord_role_ids.append(DiscordRole.objects.get(group_id=g).role_id)
+                    query = DiscordRole.objects.filter(group_id=g)
+                    for role in query:
+                        if role.secondary_group is None or role.secondary_group in groups:
+                            discord_role_ids.append(role.role_id)
                 except ObjectDoesNotExist:
                     continue
 
