@@ -25,5 +25,5 @@ urlpatterns = [
     path('discord/nicks/<int:id>', views.manage_discord_nick, name="manage_discord_nick"),
     path('events/<int:id>', views.edit_event, name="edit_event"),
     path('lock_team/<int:id>', views.lock_team, name="lock_team"),
-    path('unlock_team/<int:id>', views.unlock_team, name="unlock_team")
+    path('unlock_team/<int:id>', views.unlock_team, name="unlock_team"),
 ]

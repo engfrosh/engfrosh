@@ -11,4 +11,5 @@ urlpatterns = [
     path('puzzle/<slug:slug>/', views.puzzle_view),
     path("puzzle/<slug:slug>/verification_photo/", views.puzzle_photo_verification_view),
     path("stream_completed", views.stream_view),
+    path("regen_trees", views.regen_trees, name="regen_trees")
 ]

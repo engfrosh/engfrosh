@@ -1,10 +1,10 @@
 from typing import Union
 from django.http import HttpRequest, HttpResponse
 from django.http.response import HttpResponseNotAllowed, HttpResponseBadRequest, JsonResponse, HttpResponseForbidden
-from django.shortcuts import render  # noqa F401
+from django.shortcuts import render, redirect
 from scavenger.consumers import ScavConsumer
 from common_models.models import DiscordChannel, Puzzle, Team, VerificationPhoto
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 
 import logging
 import json
@@ -15,6 +15,14 @@ from django.db import models
 from scavenger.tree import generate_tree
 
 logger = logging.getLogger("engfrosh_site.scavenger.views")
+
+
+@permission_required("common_models.manage_scav", login_url='/accounts/login')
+def regen_trees(request: HttpRequest) -> HttpResponse:
+    teams = Team.objects.all()
+    for team in teams:
+        update_tree(team)
+    return redirect("/manage/")
 
 
 @login_required(login_url='/accounts/login')
