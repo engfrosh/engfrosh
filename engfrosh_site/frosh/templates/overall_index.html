@@ -8,12 +8,14 @@
     <div class="h-full text-center">
         <a href="{% url 'user_home' %}"
            class="bg-main dark:bg-main-night rounded-lg text-4xl p-4 mx-auto text-white">Blast Off!</a>
+        <div class="flex flex-col space-y-3 mx-auto container text-white text-center max-w-sm">
         {% for a in announcements %}
-            <div class="text-fuchsia-600 m-8">
+            <div class="m-8 bg-accent text-white width-50">
                 <h2>{{ a.title }}</h2>
                 <br>
                 <p>{{ a.body}}</p>
             </div>
         {% endfor %}
+        </div>
     </div>
 {% endblock body %}
