@@ -595,6 +595,10 @@ video {
   margin: 2.5rem;
 }
 
+.m-3 {
+  margin: 0.75rem;
+}
+
 .my-16 {
   margin-top: 4rem;
   margin-bottom: 4rem;
@@ -648,6 +652,10 @@ video {
 
 .mr-2 {
   margin-right: 0.5rem;
+}
+
+.mt-10 {
+  margin-top: 2.5rem;
 }
 
 .block {
@@ -776,6 +784,12 @@ video {
   --tw-space-y-reverse: 0;
   margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
+}
+
+.space-y-5 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1.25rem * var(--tw-space-y-reverse));
 }
 
 .truncate {
@@ -945,14 +959,14 @@ video {
   color: rgb(241 90 36 / var(--tw-text-opacity));
 }
 
-.text-red-600 {
-  --tw-text-opacity: 1;
-  color: rgb(220 38 38 / var(--tw-text-opacity));
-}
-
 .text-blue-600 {
   --tw-text-opacity: 1;
   color: rgb(37 99 235 / var(--tw-text-opacity));
+}
+
+.text-red-600 {
+  --tw-text-opacity: 1;
+  color: rgb(220 38 38 / var(--tw-text-opacity));
 }
 
 .text-green-600 {

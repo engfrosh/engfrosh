@@ -5,6 +5,7 @@ from typing import List, Union
 import requests
 import json
 import os
+import datetime
 
 import credentials
 
@@ -40,6 +41,40 @@ CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 
+@permission_required("common_models.manage_scav")
+def lock_team(request: HttpRequest, id: int) -> HttpResponse:
+    if request.method == "GET":
+        if id == 0:
+            return render(request, "lock_teams.html", {"teams": Team.objects.all()})
+        else:
+            form = forms.LockForm()
+            form.duration = 15
+
+            team = Team.objects.filter(group_id=id).first()
+            return render(request, "lock_team.html", {"team": team, "form": form})
+    elif request.method == "POST":
+        team = Team.objects.filter(group_id=id).first()
+        form = forms.LockForm(request.POST)
+        if not form.is_valid():
+            return render(request, "lock_team.html", {"team": team, "form": form, "error": True})
+        curr = datetime.datetime.now()
+        delta = datetime.timedelta(minutes=form.cleaned_data['duration'])
+        team.scavenger_locked_out_until = curr + delta
+        team.save()
+        return redirect("/manage/lock_team/0")
+
+
+@permission_required("common_models.manage_scav")
+def unlock_team(request: HttpRequest, id: int) -> HttpResponse:
+    if id == 0:
+        return render(request, "unlock_teams.html", {"teams": Team.objects.all()})
+    else:
+        team = Team.objects.filter(group_id=id).first()
+        team.scavenger_locked_out_until = None
+        team.save()
+        return redirect("/manage/unlock_team/0")
+
+
 @permission_required("auth.change_user")
 def edit_event(request: HttpRequest, id: int) -> HttpResponse:
     if request.method == "GET":
@@ -54,7 +89,7 @@ def edit_event(request: HttpRequest, id: int) -> HttpResponse:
             return redirect("/")
         elif action == "modify":
             form = forms.EventForm(request.POST, instance=Event.objects.filter(id=id).first())
-            if not form.is_valid:
+            if not form.is_valid():
                 return render(request, "edit_event.html", {"form": form})
             form.save()
             return redirect("/")
@@ -625,7 +660,7 @@ def edit_scavenger_puzzle(request: HttpRequest, id: int) -> HttpResponse:
         return render(request, "edit_scavenger_puzzle.html", context)
     elif request.method == "POST":
         form = forms.PuzzleForm(request.POST, instance=puzzle)
-        if not form.is_valid:
+        if not form.is_valid():
             context = {
                 "error": True,
                 "puzzle": puzzle,

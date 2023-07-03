@@ -1,0 +1,16 @@
+{% extends 'base_manage_subpage.html' %}
+{% load static %}
+{% block page_title %}
+    Lock Team
+{% endblock page_title %}
+{% block top_title %}
+    Lock Team
+{% endblock top_title %}
+{% block active %}
+    <h1>Lock {{ team.display_name }}</h1>
+    <form class="my-5" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Lock Team" class="text-blue-600">
+    </form>
+{% endblock active %}

@@ -17,6 +17,10 @@ class DiscordNickForm(forms.Form):
             self.fields['color'].value = col
 
 
+class LockForm(forms.Form):
+    duration = forms.IntegerField(label="Durations (mins)")
+
+
 class PuzzleForm(forms.ModelForm):
     class Meta:
         model = Puzzle
