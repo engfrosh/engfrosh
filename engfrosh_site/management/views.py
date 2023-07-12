@@ -200,6 +200,18 @@ def scavenger_monitor(request: HttpRequest) -> HttpResponse:
     return render(request, "scavenger_monitor.html")
 
 
+@user_passes_test(lambda u: u.is_superuser)
+def unregistered(request: HttpRequest) -> HttpResponse:
+    users = User.objects.all().order_by("username")
+    data = "Group Email [Required],Member Email,Member Type,Member Role"
+    for usr in users:
+        if not usr.is_superuser and not DiscordUser.objects.filter(user=usr).exists():
+            data += '\n' + "unregisteredfacils@engfrosh.com," + usr.email + ",,"
+    response = HttpResponse(data, 'text/csv')
+    response['Content-Disposition'] = 'attachment; filename="unregistered.csv"'
+    return response
+
+
 @permission_required("common_models.view_links", login_url='/accounts/login')
 def get_discord_link(request: HttpRequest) -> HttpResponse:
     """View to get discord linking links for users or send link emails to users."""
