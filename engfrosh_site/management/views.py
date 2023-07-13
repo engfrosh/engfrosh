@@ -230,6 +230,7 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
         # TODO add check that user doesn't yet have a discord account linked.
 
         context = {"users": []}
+        count = 0
 
         for usr in users:
             try:
@@ -238,13 +239,14 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
                 email_sent = False
 
             if not usr.is_superuser and not DiscordUser.objects.filter(user=usr).exists():
+                count += 1
                 context["users"].append({
                     "username": usr.username,
                     "id": usr.id,
                     "email_sent": bool(email_sent),
                     "email": usr.email
                 })
-
+        context["count"] = count
         return render(request, "create_discord_magic_links.html", context)
 
     elif request.method == "POST":
