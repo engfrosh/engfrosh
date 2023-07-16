@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from common_models.models import VerificationPhoto, Team, UserDetails
 from datetime import datetime
 from schedule.models import Calendar, Occurrence
-import schedule.models
+# import schedule.models
 from django.urls import reverse
 from django.contrib.auth.models import User
 from engfrosh_common.AWS_SES import send_SES
@@ -36,9 +36,9 @@ class ICSAPI(APIView):
         # This is ripped right from the django-scheduler code
         # https://github.com/llazzaro/django-scheduler/blob/8aa6f877f17e5b05f17d7c39e93d8e73625b0a65/schedule/views.py#L357
         event_list = []
-        relations = schedule.models.EventRelation.objects.get_events_for_object(user)
-        for e in relations:
-            event_list += [e.event]
+        # relations = schedule.models.EventRelation.objects.get_events_for_object(user)
+        # for e in relations:
+        #     event_list += [e.event]
         for calendar in calendars:
             # create flat list of events from each calendar
             for event in calendar.events.all():
@@ -138,9 +138,9 @@ class CalendarAPI(APIView):
         if Occurrence.objects.all().exists():
             i = Occurrence.objects.latest("id").id + 1
         event_list = []
-        relations = schedule.models.EventRelation.objects.get_events_for_object(user)
-        for e in relations:
-            event_list += [e.event]
+        # relations = schedule.models.EventRelation.objects.get_events_for_object(user)
+        # for e in relations:
+        #     event_list += [e.event]
         for calendar in calendars:
             # create flat list of events from each calendar
             for event in calendar.events.all():
