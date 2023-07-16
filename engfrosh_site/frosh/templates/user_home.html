@@ -26,7 +26,9 @@
             <a href="{% url 'my_skash' %}"
                class="bg-main dark:bg-main-night rounded-lg p-2">Team Skash</a>
             <a href="{% url 'create_ticket' %}"
-               class="bg-main dark:bg-main-night rounded-lg p-2">Get Help</a><br><br>
+               class="bg-main dark:bg-main-night rounded-lg p-2">Get Help</a>
+            <a href="{% url 'inclusivity_private' %}"
+               class="bg-main dark:bg-main-night rounded-lg p-2">Inclusivity and Wellness</a><br><br>
             {% if request.user.is_staff %}
             <a href="{% url 'manage_index' %}"
                class="bg-main dark:bg-main-night rounded-lg p-2 my-10">Management</a>

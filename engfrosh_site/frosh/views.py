@@ -4,8 +4,36 @@ from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required, permission_required
 
 from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, Announcement, UserDetails
+from common_models.models import InclusivityPage, FroshRole
+import datetime
 
-# Create your views here.
+
+def inclusivity_public(request: HttpRequest):
+    return render(request, "inclusivity_public.html", {})
+
+
+@login_required(login_url='/accounts/login')
+def inclusivity_private(request: HttpRequest):
+    groups = request.user.groups
+    frosh_groups = FroshRole.objects.all()
+    names = []
+    for g in frosh_groups:
+        names += [g.name]
+    role = groups.filter(name__in=names).first()
+    access = -1
+    if role is None:
+        access = 0
+    elif role.name == "Planning":
+        access = 4
+    elif role.name == "Head":
+        access = 3
+    elif role.name == "Facil":
+        access = 2
+    elif role.name == "Frosh":
+        access = 1
+    pages = InclusivityPage.objects.filter(permissions__lte=access, open_time__lte=datetime.datetime.now())
+    pages = list(pages)
+    return render(request, "inclusivity_private.html", {"pages": pages})
 
 
 @permission_required('frosh.view_team_coin_standings', "/accounts/permission-denied/")
