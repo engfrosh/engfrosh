@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from .serializers import VerificationPhotoSerializer
 from rest_framework.response import Response
 from common_models.models import VerificationPhoto, Team, UserDetails
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from schedule.models import Calendar, Occurrence
 # import schedule.models
 from django.urls import reverse
@@ -11,6 +11,8 @@ from django.contrib.auth.models import User
 from engfrosh_common.AWS_SES import send_SES
 from ics import Event
 import ics
+from django.utils.timezone import localtime
+import pytz
 
 
 class ICSAPI(APIView):
@@ -44,8 +46,10 @@ class ICSAPI(APIView):
             for event in calendar.events.all():
                 event_list += [event]
         for event in event_list:
-            now = datetime.now()
-            occurrences = event.get_occurrences(now - timedelta(days=365), now + timedelta(days=365))
+            now = datetime.now(pytz.timezone("America/Toronto"))
+            start = now - timedelta(days=365)
+            end = now + timedelta(days=365)
+            occurrences = event.get_occurrences(start, end)
             for o in occurrences:
                 e = Event()
                 e.name = o.title
