@@ -89,6 +89,12 @@ CSRF_TRUSTED_ORIGINS = [
     "http://engfrosh.com"
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
+}
+
 # This fixes oauth uri's going to http:// by default
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
