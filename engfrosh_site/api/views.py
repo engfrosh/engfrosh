@@ -45,7 +45,7 @@ class ICSAPI(APIView):
                 event_list += [event]
         for event in event_list:
             now = datetime.now()
-            occurrences = event.get_occurrences(now - timedelta(months=6), now + timedelta(months=6))
+            occurrences = event.get_occurrences(now - timedelta(months=365), now + timedelta(days=365))
             for o in occurrences:
                 e = Event()
                 e.name = o.title
