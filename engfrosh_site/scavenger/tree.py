@@ -11,11 +11,11 @@ YOFFSET = 25
 
 CIRC_WIDTH = 65
 IMG_WIDTH = CIRC_WIDTH * 1.5
-LINE_WIDTH = 2
+LINE_WIDTH = 6
 
-BRANCH_COLOR = (0, 0, 255)
-DEFAULT_COLOR = (0, 255, 0)
-COMPLETED_COLOR = (0, 255, 255)
+BRANCH_COLOR = (19, 102, 105)
+DEFAULT_COLOR = (26, 163, 74)
+COMPLETED_COLOR = (13, 13, 13)
 
 MAX_LOOKAHEAD = 1
 
@@ -139,7 +139,7 @@ def generate_tree(team: Team):
             continue
         line = {"x1": int(starts[puzzle.id][0]), "y1": int(starts[puzzle.id][1]),
                 "x2": int(starts[stream_puzzle.id][0]), "y2": int(starts[stream_puzzle.id][1]),
-                "width": LINE_WIDTH, "colour": rgb2hex(255, 0, 0), "id": 0}
+                "width": LINE_WIDTH, "colour": rgb2hex(19, 102, 105), "id": 0}
         rectangles_svg += [line]
         # d.line([starts[puzzle.id], starts[stream_puzzle.id]], (255, 0, 0), LINE_WIDTH)
     for i in range(len(circles)):
