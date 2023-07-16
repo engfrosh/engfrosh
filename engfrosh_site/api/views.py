@@ -9,7 +9,8 @@ import schedule.models
 from django.urls import reverse
 from django.contrib.auth.models import User
 from engfrosh_common.AWS_SES import send_SES
-from ics import Calendar, Event
+from ics import Event
+import ics
 
 
 class ICSAPI(APIView):
@@ -18,7 +19,7 @@ class ICSAPI(APIView):
         details = UserDetails.objects.filter(int_frosh_id=uid).first()
         if details is None:
             return Response("Invalid request", status=status.HTTP_400_BAD_REQUEST)
-        cal = Calendar()
+        cal = ics.Calendar()
         calendars = set()
         user = details.user
         for group in user.groups.all():
@@ -34,10 +35,6 @@ class ICSAPI(APIView):
             pass
         # This is ripped right from the django-scheduler code
         # https://github.com/llazzaro/django-scheduler/blob/8aa6f877f17e5b05f17d7c39e93d8e73625b0a65/schedule/views.py#L357
-        response_data = []
-        i = 1
-        if Occurrence.objects.all().exists():
-            i = Occurrence.objects.latest("id").id + 1
         event_list = []
         relations = schedule.models.EventRelation.objects.get_events_for_object(user)
         for e in relations:
@@ -49,12 +46,12 @@ class ICSAPI(APIView):
         for event in event_list:
             now = datetime.datetime.now()
             occurrences = event.get_occurrences(now - datetime.timedelta(months=6), now + datetime.timedelta(months=6))
-            for o in occurences:
+            for o in occurrences:
                 e = Event()
-                e.name = occurrence.title
-                e.begin = occurrence.start
-                e.end = occurrence.end
-                e.description = occurrence.description
+                e.name = o.title
+                e.begin = o.start
+                e.end = o.end
+                e.description = o.description
                 cal.events.add(e)
         data = " ".join(list(cal.serialize_iter()))
         return Response(data, content_type="text/calendar")
