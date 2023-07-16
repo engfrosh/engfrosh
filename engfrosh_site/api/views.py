@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from .serializers import VerificationPhotoSerializer
 from rest_framework.response import Response
 from common_models.models import VerificationPhoto, Team, UserDetails
-from datetime import datetime
+from datetime import datetime, timedelta
 from schedule.models import Calendar, Occurrence
 # import schedule.models
 from django.urls import reverse
@@ -45,7 +45,7 @@ class ICSAPI(APIView):
                 event_list += [event]
         for event in event_list:
             now = datetime.now()
-            occurrences = event.get_occurrences(now - datetime.timedelta(months=6), now + datetime.timedelta(months=6))
+            occurrences = event.get_occurrences(now - timedelta(months=6), now + timedelta(months=6))
             for o in occurrences:
                 e = Event()
                 e.name = o.title
