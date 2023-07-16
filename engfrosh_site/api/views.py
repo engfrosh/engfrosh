@@ -5,9 +5,56 @@ from rest_framework.response import Response
 from common_models.models import VerificationPhoto, Team, UserDetails
 from datetime import datetime
 from schedule.models import Calendar, Occurrence
+import schedule.models
 from django.urls import reverse
 from django.contrib.auth.models import User
 from engfrosh_common.AWS_SES import send_SES
+from ics import Event
+import ics
+
+
+class ICSAPI(APIView):
+    def get(self, request, **kwargs):
+        uid = kwargs.get("uid")
+        details = UserDetails.objects.filter(int_frosh_id=uid).first()
+        if details is None:
+            return Response("Invalid request", status=status.HTTP_400_BAD_REQUEST)
+        cal = ics.Calendar()
+        calendars = set()
+        user = details.user
+        for group in user.groups.all():
+            try:
+                calendar = Calendar.objects.get_calendar_for_object(group)
+                calendars.update({calendar})
+            except Exception:
+                continue
+        try:
+            calendar = Calendar.objects.get_calendar_for_object(user)
+            calendars.update({calendar})
+        except Exception:
+            pass
+        # This is ripped right from the django-scheduler code
+        # https://github.com/llazzaro/django-scheduler/blob/8aa6f877f17e5b05f17d7c39e93d8e73625b0a65/schedule/views.py#L357
+        event_list = []
+        relations = schedule.models.EventRelation.objects.get_events_for_object(user)
+        for e in relations:
+            event_list += [e.event]
+        for calendar in calendars:
+            # create flat list of events from each calendar
+            for event in calendar.events.all():
+                event_list += [event]
+        for event in event_list:
+            now = datetime.datetime.now()
+            occurrences = event.get_occurrences(now - datetime.timedelta(months=6), now + datetime.timedelta(months=6))
+            for o in occurrences:
+                e = Event()
+                e.name = o.title
+                e.begin = o.start
+                e.end = o.end
+                e.description = o.description
+                cal.events.add(e)
+        data = " ".join(list(cal.serialize_iter()))
+        return Response(data, content_type="text/calendar")
 
 
 class TreeAPI(APIView):
@@ -64,7 +111,6 @@ class CalendarAPI(APIView):
 
     def get(self, request, format=None):
         user = request.user
-        print(user.groups)
         start = request.GET.get("start")
         end = request.GET.get("end")
         if start is None or end is None:
@@ -92,6 +138,9 @@ class CalendarAPI(APIView):
         if Occurrence.objects.all().exists():
             i = Occurrence.objects.latest("id").id + 1
         event_list = []
+        relations = schedule.models.EventRelation.objects.get_events_for_object(user)
+        for e in relations:
+            event_list += [e.event]
         for calendar in calendars:
             # create flat list of events from each calendar
             for event in calendar.events.all():

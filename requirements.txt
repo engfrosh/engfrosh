@@ -58,3 +58,4 @@ djangorestframework==3.14.0
 django-unixdatetimefield==1.2.0
 mysqlclient==2.1.1
 msal==1.20.0
+ics==0.7.2
