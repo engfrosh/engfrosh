@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from .serializers import VerificationPhotoSerializer
 from rest_framework.response import Response
 from common_models.models import VerificationPhoto, Team, UserDetails
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from schedule.models import Calendar, Occurrence
 # import schedule.models
 from django.urls import reverse
@@ -11,11 +11,13 @@ from django.contrib.auth.models import User
 from engfrosh_common.AWS_SES import send_SES
 from ics import Event
 import ics
-from django.utils.timezone import localtime
 import pytz
+from api import renderer
 
 
 class ICSAPI(APIView):
+    renderer_classes = [renderer.PassthroughRenderer]
+
     def get(self, request, **kwargs):
         uid = kwargs.get("uid")
         details = UserDetails.objects.filter(int_frosh_id=uid).first()
@@ -57,7 +59,7 @@ class ICSAPI(APIView):
                 e.end = o.end
                 e.description = o.description
                 cal.events.add(e)
-        data = " ".join(list(cal.serialize_iter()))
+        data = cal.serialize()
         return Response(data, content_type="text/calendar")
 
 
