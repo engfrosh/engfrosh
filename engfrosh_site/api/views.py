@@ -58,6 +58,7 @@ class ICSAPI(APIView):
                 e.begin = o.start
                 e.end = o.end
                 e.description = o.description
+                e.created = o.created_on
                 cal.events.add(e)
         data = cal.serialize()
         return Response(data, content_type="text/calendar")
