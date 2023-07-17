@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from engfrosh_common.AWS_SES import send_SES
 from ics import Event
 import ics
+from ics.grammar.parse import ContentLine
 import pytz
 from api import renderer
 
@@ -58,7 +59,8 @@ class ICSAPI(APIView):
                 e.begin = o.start
                 e.end = o.end
                 e.description = o.description
-                e.created = o.created_on
+                e.created = event.created_on
+                e.last_modified = event.updated_on
                 cal.events.add(e)
         data = cal.serialize()
         return Response(data, content_type="text/calendar")
