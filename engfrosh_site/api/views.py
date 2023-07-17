@@ -11,7 +11,6 @@ from django.contrib.auth.models import User
 from engfrosh_common.AWS_SES import send_SES
 from ics import Event
 import ics
-from ics.grammar.parse import ContentLine
 import pytz
 from api import renderer
 
