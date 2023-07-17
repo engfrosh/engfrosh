@@ -9,7 +9,9 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import django
+from django.utils.encoding import smart_str
+django.utils.encoding.smart_text = smart_str
 from pathlib import Path
 import sys
 import os

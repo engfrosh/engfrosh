@@ -13,10 +13,11 @@ from ics import Event
 import ics
 import pytz
 from api import renderer
+import rest_framework
 
 
 class ICSAPI(APIView):
-    renderer_classes = [renderer.PassthroughRenderer]
+    renderer_classes = [renderer.PassthroughRenderer, rest_framework.renderers.JSONRenderer]
 
     def get(self, request, **kwargs):
         uid = kwargs.get("uid")
@@ -62,7 +63,9 @@ class ICSAPI(APIView):
                 e.last_modified = event.updated_on
                 cal.events.add(e)
         data = cal.serialize()
-        return Response(data, content_type="text/calendar")
+        resp = Response(data, content_type="text/calendar")
+        resp.accepted_media_type = "text/calendar"
+        return resp
 
 
 class TreeAPI(APIView):
