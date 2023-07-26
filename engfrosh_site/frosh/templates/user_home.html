@@ -37,6 +37,10 @@
             <a href="{% url 'magic_links' %}"
                class="bg-main dark:bg-main-night rounded-lg p-2">View Magic Links</a>
             {% endif %}
+            {% if perms.common_models.facil_signup %}
+            <a href="{% url 'facil_shifts' %}"
+               class="bg-main dark:bg-main-night rounded-lg p-2">Signup For Facil Shifts</a>
+            {% endif %}
             {% if perms.common_models.view_discord_nicks %}
             <a href="{% url 'manage_discord_nicks' %}"
                class="bg-main dark:bg-main-night rounded-lg p-2">Unlink Discord Users</a>
