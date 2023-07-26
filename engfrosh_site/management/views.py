@@ -34,7 +34,7 @@ from .forms import AnnouncementForm
 from django.contrib.auth.decorators import user_passes_test
 from management.email import send_email
 
-from schedule.models import Event
+from schedule.models import Event, Calendar
 
 
 logger = logging.getLogger("management.views")
@@ -48,7 +48,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         shifts = list(FacilShift.objects.all())
         for shift in shifts:
-            signups = len(FacilShiftSignup.objects.filter(shift=shift))
+            signups = shift.facil_count
             if signups >= shift.max_facils:
                 shifts.remove(shift)
             if len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
@@ -59,7 +59,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
         shift = FacilShift.objects.filter(id=shift_id).first()
         shifts = list(FacilShift.objects.all())
         for shift in shifts:
-            signups = len(FacilShiftSignup.objects.filter(shift=shift))
+            signups = shift.facil_count
             if signups >= shift.max_facils:
                 shifts.remove(shift)
             if len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
@@ -78,6 +78,13 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
         send_email(user=request.user, sender_email="noreply@engfrosh.com", subject="Facil Shift Signup",
                    body_text=body_text.format(start=str(shift.start), end=str(shift.end)),
                    body_html=body_text.format(start=str(shift.start), end=str(shift.end)))
+        calendar = Calendar.objects.filter(name=request.user.username)
+        if calendar is None:
+            calendar = Calendar(name=request.user.username)
+            calendar.save()
+            calendar.create_relation(request.user)
+        event = Event(start=shift.start, end=shift.end, title=shift.name, description=shift.desc, calendar=calendar)
+        event.save()
         shifts = list(FacilShift.objects.all())
         for shift in shifts:
             signups = len(FacilShiftSignup.objects.filter(shift=shift))
