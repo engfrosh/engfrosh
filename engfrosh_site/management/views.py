@@ -78,6 +78,13 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
         send_email(user=request.user, sender_email="noreply@engfrosh.com", subject="Facil Shift Signup",
                    body_text=body_text.format(start=str(shift.start), end=str(shift.end)),
                    body_html=body_text.format(start=str(shift.start), end=str(shift.end)))
+        shifts = list(FacilShift.objects.all())
+        for shift in shifts:
+            signups = len(FacilShiftSignup.objects.filter(shift=shift))
+            if signups >= shift.max_facils:
+                shifts.remove(shift)
+            if len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
+                shifts.remove(shift)
         return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": True})
 
 

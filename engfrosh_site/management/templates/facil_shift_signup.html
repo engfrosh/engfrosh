@@ -20,6 +20,7 @@
             <th class="px-2">Start</th>
             <th class="px-2">End</th>
             <th class="px-2">Max Facils</th>
+            <th class="px-2">Notes</th>
             <th class="px-2">Sign Up</th>
         </tr>
         {% for shift in shifts %}
@@ -29,6 +30,7 @@
                 <td class="px-2">{{ shift.start }}</td>
                 <td class="px-2">{{ shift.end }}</td>
                 <td class="px-2">{{ shift.max_facils }}</td>
+                <td class="px-2">{{ shift.flags }}</td>
                 <td class="px-2">
                     <form method="POST">
                         {% csrf_token %}
