@@ -14,7 +14,7 @@ import pyaccord
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity
-from common_models.models import ChannelTag, DiscordGuild, Announcement
+from common_models.models import ChannelTag, DiscordGuild, Announcement, FacilShift, FacilShiftSignup
 import common_models.models
 from common_models.models import DiscordRole
 from . import registration
@@ -32,6 +32,7 @@ from django.http.response import HttpResponse, JsonResponse, \
 from django.shortcuts import render, redirect
 from .forms import AnnouncementForm
 from django.contrib.auth.decorators import user_passes_test
+from management.email import send_email
 
 from schedule.models import Event
 
@@ -41,6 +42,43 @@ logger = logging.getLogger("management.views")
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
+
+@permission_required("common_models.facil_signup")
+def facil_shifts(request: HttpRequest) -> HttpResponse:
+    if request.method == "GET":
+        shifts = list(FacilShift.objects.all())
+        for shift in shifts:
+            signups = len(FacilShiftSignup.objects.filter(shift=shift))
+            if signups >= shift.max_facils:
+                shifts.remove(shift)
+            if len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
+                shifts.remove(shift)
+        return render(request, "facil_shift_signup.html", {"shifts": shifts})
+    elif request.method == "POST":
+        shift_id = int(request.POST["shift_id"])
+        shift = FacilShift.objects.filter(id=shift_id).first()
+        shifts = list(FacilShift.objects.all())
+        for shift in shifts:
+            signups = len(FacilShiftSignup.objects.filter(shift=shift))
+            if signups >= shift.max_facils:
+                shifts.remove(shift)
+            if len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
+                shifts.remove(shift)
+        if shift is None:
+            return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
+        count = len(FacilShiftSignup.objects.filter(shift=shift))
+        if count >= shift.max_facils:
+            return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
+        signup = FacilShiftSignup(user=request.user, shift=shift)
+        signup.save()
+        body_text = """Hello there,
+        You have successfully signed up for a facil shift from {start} to {end}.
+        If this is incorrect or you encounter any issues you can send an email to questions@engfrosh.com.
+        """
+        send_email(user=request.user, sender_email="noreply@engfrosh.com", subject="Facil Shift Signup",
+                   body_text=body_text.format(start=str(shift.start), end=str(shift.end)),
+                   body_html=body_text.format(start=str(shift.start), end=str(shift.end)))
+        return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": True})
 
 @staff_member_required(login_url='/accounts/login')
 def announcements(request: HttpRequest) -> HttpResponse:
