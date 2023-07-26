@@ -80,6 +80,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                    body_html=body_text.format(start=str(shift.start), end=str(shift.end)))
         return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": True})
 
+
 @staff_member_required(login_url='/accounts/login')
 def announcements(request: HttpRequest) -> HttpResponse:
     """View for creating announcements"""
