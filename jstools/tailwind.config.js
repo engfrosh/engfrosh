@@ -3,10 +3,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "main": "#693763",
-        "main-night": "#4F226E",
-        "accent": "#1AA34A",
-        // "background": "#E6E6E6",
+        "main": "#2BA8C4",
+        "main-night": "#2BA8C4",
+        "accent": "#4F226E",
+        "background": "#0F0E18",
         "background-night": "#0D0D0D",
       }
     },

@@ -21,6 +21,13 @@
         {% endblock js_functions %}
         {% block page_style %}
         {% endblock page_style %}
+        <style>
+            body{
+                background-image: url("{% static 'binary.png' %}");
+                background-repeat: no-repeat;
+                background-size: 100% 100%;
+            }
+        </style>
     </head>
     <body class="bg-white dark:bg-background-night dark:text-slate-400 dark:border-slate-400 dark:shadow-slate-400 shadow-black min-h-screen flex flex-col">
         <main class="flex-grow">
