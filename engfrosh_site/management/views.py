@@ -115,6 +115,27 @@ def announcements(request: HttpRequest) -> HttpResponse:
 
 
 @permission_required("common_models.manage_scav")
+def free_hints(request: HttpRequest, id: int) -> HttpResponse:
+    if request.method == "GET":
+        if id == 0:
+            return render(request, "free_hints.html", {"teams": Team.objects.all()})
+        else:
+            team = Team.objects.filter(group_id=id).first()
+            form = forms.HintForm()
+            form.free_hints = team.free_hints
+
+            return render(request, "free_hint.html", {"team": team, "form": form})
+    elif request.method == "POST":
+        team = Team.objects.filter(group_id=id).first()
+        form = forms.HintForm(request.POST)
+        if not form.is_valid():
+            return render(request, "free_hint.html", {"team": team, "form": form, "error": True})
+        team.free_hints = form.cleaned_data['free_hints']
+        team.save()
+        return redirect("/manage/free_hints/0")
+
+
+@permission_required("common_models.manage_scav")
 def lock_team(request: HttpRequest, id: int) -> HttpResponse:
     if request.method == "GET":
         if id == 0:

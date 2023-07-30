@@ -27,5 +27,6 @@ urlpatterns = [
     path('lock_team/<int:id>', views.lock_team, name="lock_team"),
     path('unlock_team/<int:id>', views.unlock_team, name="unlock_team"),
     path('unregistered', views.unregistered, name="emaillisti"),
-    path('facil_shifts', views.facil_shifts, name="facil_shifts")
+    path('facil_shifts', views.facil_shifts, name="facil_shifts"),
+    path('free_hints/<int:id>', views.free_hints, name="free_hints"),
 ]

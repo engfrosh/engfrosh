@@ -1,0 +1,16 @@
+{% extends 'base_manage_subpage.html' %}
+{% load static %}
+{% block page_title %}
+    Change Free Hints
+{% endblock page_title %}
+{% block top_title %}
+    Change Free Hints
+{% endblock top_title %}
+{% block active %}
+    <h1>Free Hints for {{ team.display_name }}</h1>
+    <form class="my-5" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Change" class="text-blue-600">
+    </form>
+{% endblock active %}

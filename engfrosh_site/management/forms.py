@@ -26,6 +26,10 @@ class LockForm(forms.Form):
     duration = forms.IntegerField(label="Durations (mins)")
 
 
+class HintForm(forms.Form):
+    free_hints = forms.IntegerField(label="Free Hints")
+
+
 class PuzzleForm(forms.ModelForm):
     class Meta:
         model = Puzzle
