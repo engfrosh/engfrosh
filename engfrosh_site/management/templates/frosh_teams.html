@@ -45,6 +45,7 @@
             <th>Team</th>
             <th>Discord Role?</th>
             <th>Scav Channel?</th>
+            <th>Free Hints</th>
             <th></th>
         </tr>
         {% for team in teams %}
@@ -69,6 +70,9 @@
             {% else %}
             <td class="scav_channel">❌</td>
             {% endif %}
+            <td>
+                <p>{{ team.free_hints }}</p>
+            </td>
         </tr>
         {% endfor %}
     </table>

@@ -596,7 +596,8 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
                 "name": team.display_name,
                 "discord_role": role_exists,
                 "color": team_color if team_color else None,
-                "scav_channel": scav_channel
+                "scav_channel": scav_channel,
+                "free_hints": team.free_hints
             }
             context["teams"].append(t)
         return render(request, "frosh_teams.html", context)
