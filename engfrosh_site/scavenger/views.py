@@ -1,20 +1,56 @@
 from typing import Union
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, FileResponse
 from django.http.response import HttpResponseNotAllowed, HttpResponseBadRequest, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect
 from scavenger.consumers import ScavConsumer
-from common_models.models import DiscordChannel, Puzzle, Team, VerificationPhoto
+from common_models.models import DiscordChannel, Puzzle, Team, VerificationPhoto, TeamPuzzleActivity
 from django.contrib.auth.decorators import login_required, permission_required
-
+from django.conf import settings
 import logging
 import json
 import io
 from django.urls import reverse
 from django.db import models
+import os
+import random
+import traceback
+import datetime
 
 from scavenger.tree import generate_tree
 
 logger = logging.getLogger("engfrosh_site.scavenger.views")
+
+
+@login_required(login_url='/accounts/login')
+def audio(request: HttpRequest, slug: str) -> HttpResponse:
+    try:
+        loc = settings.STATIC_ROOT + "/audio"
+        team = Team.from_user(request.user)
+        if not team:
+            return HttpResponseForbidden()
+        activities = TeamPuzzleActivity.objects.filter(team=team, puzzle_completed_at=None)
+        if len(activities) == 1:
+            # we are the last puzzle, finished scav
+            return FileResponse(open(loc + "/finished.mp3", "rb"))
+        try:
+            puz: Union[Puzzle, None] = Puzzle.objects.get(secret_id=slug)
+        except Puzzle.DoesNotExist:
+            return HttpResponseForbidden()
+        if puz is None:
+            return HttpResponseForbidden()
+        pa = puz.puzzle_activity_from_team(team)
+        if not pa:
+            return HttpResponseForbidden()
+        duration = pa.puzzle_completed_at - pa.puzzle_start_at  # seconds
+        if duration >= datetime.timedelta(hours=2):
+            return FileResponse(open(loc + "/longtime.mp3", "rb"))
+        else:
+            files = os.listdir(loc + "/random")
+            index = random.randrange(0, len(files))
+            return FileResponse(open(loc + "/random/" + files[index], "rb"))
+    except Exception:
+        traceback.print_exc()
+        return HttpResponseForbidden()
 
 
 @permission_required("common_models.manage_scav", login_url='/accounts/login')
@@ -153,7 +189,7 @@ def puzzle_photo_verification_view(request: HttpRequest, slug: str) -> HttpRespo
     match request.method:
         case "GET":
 
-            context = {}
+            context = {"slug": slug}
 
             return render(request, "scavenger_verification_photo_upload.html", context)
 

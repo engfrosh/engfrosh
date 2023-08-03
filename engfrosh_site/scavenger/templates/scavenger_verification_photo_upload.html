@@ -24,6 +24,8 @@
 {% endblock body %}
 {% block js_functions %}
     <script>
+        var audio = new Audio({% url audio_endpoint slug=slug %});
+        audio.play();
         function uploadPhoto() {
             {% comment %} alert("Uploading..."); {% endcomment %}
 

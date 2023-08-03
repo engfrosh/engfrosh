@@ -225,8 +225,9 @@ STATIC_URL = '/static/'
 # STATICFILES_DIRS with files/static shouldn't be used for production
 STATICFILES_DIRS = []
 if not PRODUCTION:
-    STATICFILES_DIRS.append('files/static')
+    #STATICFILES_DIRS.append('files/static')
     MEDIA_ROOT = './files/media'
+    STATIC_ROOT = './files/static'
 
 # STATIC_ROOT should not be present, at least for development as far as I know.
 if PRODUCTION:
