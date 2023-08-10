@@ -1,0 +1,40 @@
+{% extends "base_manage_subpage.html" %}
+{% load static %}
+{% block page_title %}
+    View Facil Shifts
+{% endblock page_title %}
+{% block top_title %}
+    View Facil Shifts
+{% endblock top_title %}
+{% block active %}
+    <table>
+        <tr>
+            <th class="px-2">Name</th>
+            <th class="px-2">Description</th>
+            <th class="px-2">Start</th>
+            <th class="px-2">End</th>
+            <th class="px-2">Max Facils</th>
+            <th class="px-2">Notes</th>
+            <th class="px-2">Facil Count</th>
+            <th class="px-2">Send Email</th>
+        </tr>
+        {% for shift in shifts %}
+            <tr>
+                <td class="px-2">{{ shift.name }}</td>
+                <td class="px-2">{{ shift.desc }}</td>
+                <td class="px-2">{{ shift.start }}</td>
+                <td class="px-2">{{ shift.end }}</td>
+                <td class="px-2">{{ shift.max_facils }}</td>
+                <td class="px-2">{{ shift.flags }}</td>
+                <td class="px-2">{{ shift.facil_count }}</td>
+                <td class="px-2">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="shift_id" value="{{ shift.id }}">
+                        <input type="submit" value="Email Shift">
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock active %}

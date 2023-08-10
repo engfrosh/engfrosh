@@ -29,4 +29,5 @@ urlpatterns = [
     path('unregistered', views.unregistered, name="emaillisti"),
     path('facil_shifts', views.facil_shifts, name="facil_shifts"),
     path('free_hints/<int:id>', views.free_hints, name="free_hints"),
+    path('mailing_list', views.mailing_list, name="mailing_list")
 ]

@@ -96,6 +96,22 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
 
 
 @staff_member_required(login_url='/accounts/login')
+def mailing_list(request: HttpRequest) -> HttpResponse:
+    if request.method == "GET":
+        shifts = list(FacilShift.objects.all())
+        return render(request, "create_mailing_list.html", {"shifts": shifts})
+    elif request.method == "POST":
+        shift_id = int(request.POST["shift_id"])
+        shift = FacilShift.objects.filter(id=shift_id).first()
+        signups = list(FacilShiftSignup.objects.filter(shift=shift))
+        redir = ""
+        for signup in signups:
+            redir += "," + signup.user.email
+        redir = "mailto:" + redir[1:]
+        return HttpResponse('<meta http-equiv="refresh" content="0;url=' + redir + '" />')
+
+
+@staff_member_required(login_url='/accounts/login')
 def announcements(request: HttpRequest) -> HttpResponse:
     """View for creating announcements"""
     if request.method == "POST":
