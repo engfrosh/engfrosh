@@ -56,7 +56,9 @@ def msTokenCallback(request: HttpRequest):
         logout(request)
     params = request.GET
     if 'code' not in params or 'state' not in params or 'session_state' not in params:
-        return HttpResponseBadRequest("Missing code and session state!")
+        return HttpResponseBadRequest("Missing code and session state! " +
+                                      "You probably are signed in using your personal Microsoft account. "
+                                      "Clear your cookies and if the issue persists contact technical@engfrosh.com")
     code = params['code']
     # state = params['state']
     # session_state = params['session_state']
