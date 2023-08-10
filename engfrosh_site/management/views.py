@@ -69,7 +69,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
         signup = FacilShiftSignup(user=request.user, shift=shift)
         signup.save()
-        calendar = Calendar.objects.filter(name=request.user.username)
+        calendar = Calendar.objects.filter(name=request.user.username).first()
         if calendar is None:
             calendar = Calendar(name=request.user.username)
             calendar.save()
@@ -100,6 +100,30 @@ def mailing_list(request: HttpRequest) -> HttpResponse:
             redir += "," + signup.user.email
         redir = "mailto:" + redir[1:]
         return HttpResponse('<meta http-equiv="refresh" content="0;url=' + redir + '" />')
+
+
+@staff_member_required(login_url='/accounts/login')
+def shift_export(request: HttpRequest) -> HttpResponse:
+    shifts = list(FacilShift.objects.all())
+    signups = list()
+    longest = 0
+    line = ""
+    for shift in shifts:
+        if shift.facil_count > longest:
+            longest = shift.facil_count
+        line += shift.name + ","
+        signups += [list(FacilShiftSignup.objects.filter(shift=shift))]
+    for i in range(longest):
+        line += "\n"
+        for signup in signups:
+            if len(signup) > i:
+                user = signup[i].user
+                line += user.first_name + " " + user.last_name + ","
+            else:
+                line += ","
+    response = HttpResponse(line, content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename="shifts.csv"'
+    return response
 
 
 @staff_member_required(login_url='/accounts/login')
@@ -452,6 +476,7 @@ def manage_discord_channels(request: HttpRequest) -> HttpResponse:
         return HttpResponseBadRequest("Bad http request method.")
 
 
+@user_passes_test(lambda u: u.is_superuser)
 def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
     """Page for managing discord channel groups by tags or categories."""
 
@@ -580,9 +605,12 @@ def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
     return HttpResponseServerError()
 
 
-@staff_member_required(login_url='/accounts/login')
 def manage_index(request: HttpRequest) -> HttpResponse:
     """Home page for management."""
+    if not request.user.is_authenticated:
+        return redirect('/accounts/login')
+    if not request.user.is_staff:
+        return redirect('/')
     return render(request, "manage.html")
 
 
