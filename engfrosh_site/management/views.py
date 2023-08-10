@@ -32,8 +32,6 @@ from django.http.response import HttpResponse, JsonResponse, \
 from django.shortcuts import render, redirect
 from .forms import AnnouncementForm
 from django.contrib.auth.decorators import user_passes_test
-from management.email import send_email
-
 from schedule.models import Event, Calendar
 
 
@@ -71,13 +69,6 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
         signup = FacilShiftSignup(user=request.user, shift=shift)
         signup.save()
-        body_text = """Hello there,
-        You have successfully signed up for a facil shift from {start} to {end}.
-        If this is incorrect or you encounter any issues you can send an email to questions@engfrosh.com.
-        """
-        send_email(user=request.user, sender_email="noreply@engfrosh.com", subject="Facil Shift Signup",
-                   body_text=body_text.format(start=str(shift.start), end=str(shift.end)),
-                   body_html=body_text.format(start=str(shift.start), end=str(shift.end)))
         calendar = Calendar.objects.filter(name=request.user.username)
         if calendar is None:
             calendar = Calendar(name=request.user.username)
