@@ -15,13 +15,13 @@
                 <a href="{% url 'scavenger_index' %}"
                    class="bg-main dark:bg-main-night rounded-lg p-2">Scav</a>
             {% else %}
-                <p class="rounded-lg p-2 border">Scav Disabled</p>
+                <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2">Scav Disabled</a>
             {% endif %}
             {% if trade_up_enabled %}
                 <a href="{% url 'trade_up_home' %}"
                    class="bg-main dark:bg-main-night rounded-lg p-2">Trade Up</a>
             {% else %}
-                <p class="rounded-lg p-2 border">Trade Up Disabled</p>
+                <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2">Trade Up Disabled</a>
             {% endif %}<br><br>
             <a href="{% url 'my_skash' %}"
                class="bg-main dark:bg-main-night rounded-lg p-2">Team Skash</a>
