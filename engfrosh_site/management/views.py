@@ -63,11 +63,14 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
         count = len(FacilShiftSignup.objects.filter(shift=shift))
         if count >= shift.max_facils:
             return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
+        signup = FacilShiftSignup.objects.filter(user=request.user, shift=shift).first()
+        if signup is not None:
+            return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
         signup = FacilShiftSignup(user=request.user, shift=shift)
         signup.save()
         calendar = Calendar.objects.filter(name=request.user.username).first()
         if calendar is None:
-            calendar = Calendar(name=request.user.username)
+            calendar = Calendar(name=request.user.username, slug=request.user.username)
             calendar.save()
             calendar.create_relation(request.user)
         event = Event(start=shift.start, end=shift.end, title=shift.name, description=shift.desc, calendar=calendar)
