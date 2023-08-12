@@ -140,6 +140,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'engfrosh_site.middleware.LoggingMiddleware'
 ]
 
 ROOT_URLCONF = 'engfrosh_site.urls'
