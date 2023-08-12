@@ -47,9 +47,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
         shifts = list(FacilShift.objects.all())
         for shift in shifts:
             signups = shift.facil_count
-            if signups >= shift.max_facils:
-                shifts.remove(shift)
-            if len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
+            if signups >= shift.max_facils or len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
                 shifts.remove(shift)
         return render(request, "facil_shift_signup.html", {"shifts": shifts})
     elif request.method == "POST":
@@ -58,9 +56,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
         shifts = list(FacilShift.objects.all())
         for shift in shifts:
             signups = shift.facil_count
-            if signups >= shift.max_facils:
-                shifts.remove(shift)
-            if len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
+            if signups >= shift.max_facils or len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
                 shifts.remove(shift)
         if shift is None:
             return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
@@ -79,9 +75,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
         shifts = list(FacilShift.objects.all())
         for shift in shifts:
             signups = len(FacilShiftSignup.objects.filter(shift=shift))
-            if signups >= shift.max_facils:
-                shifts.remove(shift)
-            if len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
+            if signups >= shift.max_facils or len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
                 shifts.remove(shift)
         return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": True})
 
