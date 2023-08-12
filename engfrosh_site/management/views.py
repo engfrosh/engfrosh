@@ -45,11 +45,12 @@ PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 def facil_shifts(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         shifts = list(FacilShift.objects.all())
+        rshifts = []
         for shift in shifts:
             signups = shift.facil_count
-            if signups >= shift.max_facils or len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
-                shifts.remove(shift)
-        return render(request, "facil_shift_signup.html", {"shifts": shifts})
+            if signups < shift.max_facils and len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) == 0:
+                rshifts += [shift]
+        return render(request, "facil_shift_signup.html", {"shifts": rshifts})
     elif request.method == "POST":
         logger.debug(request.user)
         logger.debug("Signing up for facil shift")
