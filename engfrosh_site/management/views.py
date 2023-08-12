@@ -51,6 +51,8 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                 shifts.remove(shift)
         return render(request, "facil_shift_signup.html", {"shifts": shifts})
     elif request.method == "POST":
+        logger.debug(request.user)
+        logger.debug("Signing up for facil shift")
         shift_id = int(request.POST["shift_id"])
         shift = FacilShift.objects.filter(id=shift_id).first()
         shifts = list(FacilShift.objects.all())
@@ -59,12 +61,15 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             if signups >= s.max_facils or len(FacilShiftSignup.objects.filter(shift=s, user=request.user)) > 0:
                 shifts.remove(s)
         if shift is None:
+            logger.debug("No eligible shifts")
             return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
         count = len(FacilShiftSignup.objects.filter(shift=shift))
         if count >= shift.max_facils:
+            logger.debug("Full shift")
             return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
         signup = FacilShiftSignup.objects.filter(user=request.user, shift=shift).first()
         if signup is not None:
+            logger.debug("Already signed up")
             return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
         signup = FacilShiftSignup(user=request.user, shift=shift)
         signup.save()
@@ -80,6 +85,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             signups = len(FacilShiftSignup.objects.filter(shift=shift))
             if signups >= shift.max_facils or len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
                 shifts.remove(shift)
+        logger.debug("")
         return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": True})
 
 
