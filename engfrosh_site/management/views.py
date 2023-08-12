@@ -52,8 +52,8 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                 rshifts += [shift]
         return render(request, "facil_shift_signup.html", {"shifts": rshifts})
     elif request.method == "POST":
-        logger.debug(request.user)
-        logger.debug("Signing up for facil shift")
+        logger.info(request.user)
+        logger.info("Signing up for facil shift")
         shift_id = int(request.POST["shift_id"])
         shift = FacilShift.objects.filter(id=shift_id).first()
         shifts = list(FacilShift.objects.all())
@@ -62,15 +62,15 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             if signups >= s.max_facils or len(FacilShiftSignup.objects.filter(shift=s, user=request.user)) > 0:
                 shifts.remove(s)
         if shift is None:
-            logger.debug("No eligible shifts")
+            logger.info("No eligible shifts")
             return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
         count = len(FacilShiftSignup.objects.filter(shift=shift))
         if count >= shift.max_facils:
-            logger.debug("Full shift")
+            logger.info("Full shift")
             return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
         signup = FacilShiftSignup.objects.filter(user=request.user, shift=shift).first()
         if signup is not None:
-            logger.debug("Already signed up")
+            logger.info("Already signed up")
             return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
         signup = FacilShiftSignup(user=request.user, shift=shift)
         signup.save()
@@ -86,7 +86,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             signups = len(FacilShiftSignup.objects.filter(shift=shift))
             if signups >= shift.max_facils or len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
                 shifts.remove(shift)
-        logger.debug("")
+        logger.info("Signed up for shift")
         return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": True})
 
 
@@ -489,7 +489,7 @@ def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
         for backend in auth.get_backends():
             if hasattr(backend, "get_all_permissions"):
                 permissions.update(backend.get_all_permissions(request.user))
-        logger.debug(f"User permissions: {permissions}")
+        logger.info(f"User permissions: {permissions}")
         return HttpResponseForbidden("Permission Denied")
 
     if request.method == "GET":
@@ -566,7 +566,7 @@ def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
 
         if req_dict["command"] == "add_user":
             # Get user information
-            logger.debug(f"Trying to add website user with id {req_dict['user_id']}")
+            logger.info(f"Trying to add website user with id {req_dict['user_id']}")
             discord_user = DiscordUser.objects.get(user=req_dict["user_id"])
             user = User.objects.get(id=req_dict["user_id"])
             if not discord_user:
@@ -728,10 +728,10 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
             except ObjectDoesNotExist:
                 return HttpResponseBadRequest("Invalid team id")
 
-            logger.debug(f"Request: {req_dict}")
+            logger.info(f"Request: {req_dict}")
 
             if "team_color" in req_dict and isinstance(req_dict["team_color"], int):
-                logger.debug(f"Setting team color to : {req_dict['team_color']}")
+                logger.info(f"Setting team color to : {req_dict['team_color']}")
                 team.color = req_dict["team_color"]
                 team.save()
 

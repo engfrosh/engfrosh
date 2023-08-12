@@ -65,8 +65,6 @@ def update_tree(team):
 
 @login_required(login_url='/accounts/login')
 def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
-    # TODO add support for lockouts
-    # TODO add permission verification
 
     team = Team.from_user(request.user)
     if not team:
@@ -105,7 +103,7 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
             return HttpResponseBadRequest("No answer provided in json body")
         if not team.scavenger_enabled:
             return HttpResponseForbidden("Scavenger not currently enabled.")
-        logger.debug(f"Answer submitted by team {team} with answer: {req_dict['answer']} through the website")
+        logger.info(f"Answer submitted by team {team} with answer: {req_dict['answer']} through the website")
         if not bypass:
             correct, stream_completed, next_puzzle, require_verification_photo = puz.check_team_guess(
                 team, req_dict["answer"])

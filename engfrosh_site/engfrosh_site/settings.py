@@ -276,6 +276,6 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console', 'file_debug', 'file_warn'],
-        'level': 'DEBUG',
+        'level': 'INFO',
     },
 }

@@ -78,15 +78,15 @@ class DiscordAuthBackend(BaseBackend):
             callback_url=None, magic_link_token=None) -> Union[User, None]:
         """Authenticates users with discord or magic link."""
 
-        logger.debug("Trying to authenticate with DiscordAuthBackend.authenticate")
+        logger.info("Trying to authenticate with DiscordAuthBackend.authenticate")
 
         if request.user.is_authenticated:
-            logger.debug("User is already logged in!")
+            logger.info("User is already logged in!")
             logout(request)
-            logger.debug("Logged out user!")
+            logger.info("Logged out user!")
 
         if magic_link_token:
-            logger.debug("Trying to authenticate with magic link token")
+            logger.info("Trying to authenticate with magic link token")
             try:
                 if magic_link := MagicLink.objects.get(token=magic_link_token):
                     # if magic_link.expiry > timezone.now():
@@ -104,7 +104,7 @@ class DiscordAuthBackend(BaseBackend):
 
         # If discord id is passed
         if discord_user_id:
-            logger.debug(f"Trying to authenticate with discord_user_id: {discord_user_id}")
+            logger.info(f"Trying to authenticate with discord_user_id: {discord_user_id}")
             try:
                 return DiscordUser.objects.get(id=discord_user_id).user
             except DiscordUser.DoesNotExist:
@@ -121,7 +121,7 @@ class DiscordAuthBackend(BaseBackend):
 
         try:
             discord_user = DiscordUser.objects.get(id=client.get_user_id())
-            logger.debug("Found discord user in system")
+            logger.info("Found discord user in system")
         except DiscordUser.DoesNotExist:
             logger.info("User does not exist in system")
             return None
