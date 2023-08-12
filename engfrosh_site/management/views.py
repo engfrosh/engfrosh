@@ -57,7 +57,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
         for s in shifts:
             signups = shift.facil_count
             if signups >= s.max_facils or len(FacilShiftSignup.objects.filter(shift=s, user=request.user)) > 0:
-                shifts.remove(shift)
+                shifts.remove(s)
         if shift is None:
             return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
         count = len(FacilShiftSignup.objects.filter(shift=shift))
