@@ -19,7 +19,7 @@
             {% if not scavenger_enabled_for_team %}
                 Scavenger is not currently enabled
             {% endif %}
-            <iframe src="{{ team.scav_tree.url }}" style="width: 1000px; height: 1000px;" id="imgframe">
+            <iframe src="{{ team.scav_tree.url }}" onload='javascript:(function(o){o.style.height=o.contentWindow.document.body.scrollHeight+"px";}(this));' style="height:1000px;width:800px;border:none;overflow:hidden; rotate: 90deg;" id="imgframe">
                 <p>Looks like your browser doesn't support scav ;-;</p>
             </iframe>
         {% endif %}
