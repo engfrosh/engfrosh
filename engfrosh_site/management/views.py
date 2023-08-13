@@ -120,7 +120,7 @@ def shift_export(request: HttpRequest) -> HttpResponse:
     for shift in shifts:
         if shift.facil_count > longest:
             longest = shift.facil_count
-        line += shift.name + ","
+        line += shift.name.replace(',', '') + ","
         signups += [list(FacilShiftSignup.objects.filter(shift=shift))]
     for i in range(longest):
         line += "\n"
