@@ -53,25 +53,28 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
         return render(request, "facil_shift_signup.html", {"shifts": rshifts})
     elif request.method == "POST":
         logger.info(request.user)
-        logger.info("Signing up for facil shift")
+        logger.info("Signing up for facil shift. Shift id: ")
         shift_id = int(request.POST["shift_id"])
+        logger.info(shift_id)
         shift = FacilShift.objects.filter(id=shift_id).first()
         shifts = list(FacilShift.objects.all())
+        shifts = list(FacilShift.objects.all())
+        rshifts = []
         for s in shifts:
-            signups = shift.facil_count
-            if signups >= s.max_facils or len(FacilShiftSignup.objects.filter(shift=s, user=request.user)) > 0:
-                shifts.remove(s)
+            signups = s.facil_count
+            if signups < s.max_facils and len(FacilShiftSignup.objects.filter(shift=s, user=request.user)) == 0:
+                rshifts += [s]
         if shift is None:
             logger.info("No eligible shifts")
-            return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
+            return render(request, "facil_shift_signup.html", {"shifts": rshifts, "success": False})
         count = len(FacilShiftSignup.objects.filter(shift=shift))
         if count >= shift.max_facils:
             logger.info("Full shift")
-            return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
+            return render(request, "facil_shift_signup.html", {"shifts": rshifts, "success": False})
         signup = FacilShiftSignup.objects.filter(user=request.user, shift=shift).first()
         if signup is not None:
             logger.info("Already signed up")
-            return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": False})
+            return render(request, "facil_shift_signup.html", {"shifts": rshifts, "success": False})
         signup = FacilShiftSignup(user=request.user, shift=shift)
         signup.save()
         calendar = Calendar.objects.filter(name=request.user.username).first()
@@ -82,12 +85,14 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
         event = Event(start=shift.start, end=shift.end, title=shift.name, description=shift.desc, calendar=calendar)
         event.save()
         shifts = list(FacilShift.objects.all())
+        shifts = list(FacilShift.objects.all())
+        rshifts = []
         for shift in shifts:
-            signups = len(FacilShiftSignup.objects.filter(shift=shift))
-            if signups >= shift.max_facils or len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) > 0:
-                shifts.remove(shift)
+            signups = shift.facil_count
+            if signups < shift.max_facils and len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) == 0:
+                rshifts += [shift]
         logger.info("Signed up for shift")
-        return render(request, "facil_shift_signup.html", {"shifts": shifts, "success": True})
+        return render(request, "facil_shift_signup.html", {"shifts": rshifts, "success": True})
 
 
 @staff_member_required(login_url='/accounts/login')
