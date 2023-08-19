@@ -8,6 +8,7 @@
 {% endblock top_title %}
 {% block active %}
     <form method="POST">
+        {% csrf_token %}
         <input type="submit" value="Regen All Calendars">
     </form>
     {% for user in users %}
