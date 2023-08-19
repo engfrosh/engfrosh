@@ -110,6 +110,7 @@ def mailing_list(request: HttpRequest) -> HttpResponse:
         redir = "mailto:" + redir[1:]
         return HttpResponse('<meta http-equiv="refresh" content="0;url=' + redir + '" />')
 
+
 @staff_member_required(login_url='/accounts/login')
 def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
     if request.method == "GET":
@@ -125,9 +126,20 @@ def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
         shift = signup.shift
         signup.delete()
 
-        cal = Calendar.objects.filter(name=request.user.username).first()
-        event = Event.objects.filter(calendar=cal, title=shift.name).first()
-        event.delete()
+        calendar = Calendar.objects.filter(name=request.user.username).first()
+        if calendar is not None:
+            calendar.delete()
+
+        calendar = Calendar(name=request.user.username, slug=request.user.username)
+        calendar.save()
+        calendar.create_relation(request.user)
+
+        signups = list(FacilShiftSignup.objects.filter(user__pk=id))
+        for signup in signups:
+            shift = signup.shift
+            event = Event(start=shift.start, end=shift.end, title=shift.name, description=shift.desc, calendar=calendar)
+            event.save()
+
         shifts = list(FacilShiftSignup.objects.filter(user__pk=id))
         return render(request, "shift_manage.html", {"shifts": shifts})
 
