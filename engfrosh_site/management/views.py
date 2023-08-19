@@ -122,9 +122,10 @@ def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
             return render(request, "shift_manage.html", {"shifts": shifts})
     else:
         shift_id = int(request.POST["shift"])
-        signup = FacilShiftSignup.objects.filter(shift__pk=shift_id, user__pk=id).first()
-        shift = signup.shift
-        signup.delete()
+        if shift_id != -1:
+            signup = FacilShiftSignup.objects.filter(shift__pk=shift_id, user__pk=id).first()
+            shift = signup.shift
+            signup.delete()
 
         calendar = Calendar.objects.filter(name=request.user.username).first()
         if calendar is not None:

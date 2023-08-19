@@ -7,6 +7,12 @@
     Shift Management
 {% endblock top_title %}
 {% block active %}
+    <form class="my-5 inline m-0 p-0" method="POST">
+        {% csrf_token %}
+        <input type="submit" value="Regen Calendar" class="text-blue-600">
+        <input class="inline" type="hidden" value="-1" id="shift" name="shift">
+    </form>
+    <br>
     {% for shift in shifts %}
     <form class="my-5 inline m-0 p-0" method="POST">
         {% csrf_token %}
