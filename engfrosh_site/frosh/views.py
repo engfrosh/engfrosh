@@ -2,7 +2,7 @@ from django.http.response import HttpResponse, HttpResponseNotAllowed, HttpRespo
 from django.shortcuts import render  # noqa F401
 from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required, permission_required
-
+import random
 from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, Announcement, UserDetails
 from common_models.models import InclusivityPage, FroshRole
 import datetime
@@ -92,13 +92,17 @@ def overall_index(request: HttpRequest):
 def user_home(request: HttpRequest) -> HttpResponse:
     """The home page for regular users."""
 
+    rand = random.randint(0, 3)
+    if request.user.username != "Darwin_J-gwktdVor":
+        rand = 0
     team = Team.from_user(request.user)
     details = UserDetails.objects.filter(user=request.user).first()
 
     context = {
         "scavenger_enabled": team.scavenger_enabled if team else False,
         "trade_up_enabled": team.trade_up_enabled if team else False,
-        "details": details
+        "details": details,
+        "rand": rand
     }
 
     return render(request, "user_home.html", context)
