@@ -121,28 +121,47 @@ def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
             shifts = list(FacilShiftSignup.objects.filter(user__pk=id))
             return render(request, "shift_manage.html", {"shifts": shifts})
     else:
-        shift_id = int(request.POST["shift"])
-        if shift_id != -1:
-            signup = FacilShiftSignup.objects.filter(shift__pk=shift_id, user__pk=id).first()
-            shift = signup.shift
-            signup.delete()
+        if id != 0:
+            shift_id = int(request.POST["shift"])
+            if shift_id != -1:
+                signup = FacilShiftSignup.objects.filter(shift__pk=shift_id, user__pk=id).first()
+                shift = signup.shift
+                signup.delete()
 
-        user = User.objects.filter(id=id).first()
-        calendar = Calendar.objects.filter(name=user.username).first()
-        if calendar is not None:
-            calendar.delete()
-        calendar = Calendar(name=user.username, slug=user.username)
-        calendar.save()
-        calendar.create_relation(user)
+            user = User.objects.filter(id=id).first()
+            calendar = Calendar.objects.filter(name=user.username).first()
+            if calendar is not None:
+                calendar.delete()
+            calendar = Calendar(name=user.username, slug=user.username)
+            calendar.save()
+            calendar.create_relation(user)
 
-        signups = list(FacilShiftSignup.objects.filter(user__pk=id))
-        for signup in signups:
-            shift = signup.shift
-            event = Event(start=shift.start, end=shift.end, title=shift.name, description=shift.desc, calendar=calendar)
-            event.save()
+            signups = list(FacilShiftSignup.objects.filter(user__pk=id))
+            for signup in signups:
+                shift = signup.shift
+                event = Event(start=shift.start, end=shift.end, title=shift.name,
+                              description=shift.desc, calendar=calendar)
+                event.save()
 
-        shifts = list(FacilShiftSignup.objects.filter(user__pk=id))
-        return render(request, "shift_manage.html", {"shifts": shifts})
+            shifts = list(FacilShiftSignup.objects.filter(user__pk=id))
+            return render(request, "shift_manage.html", {"shifts": shifts})
+        else:
+            for user in User.objects.all():
+                calendar = Calendar.objects.filter(name=user.username).first()
+                if calendar is not None:
+                    calendar.delete()
+                calendar = Calendar(name=user.username, slug=user.username)
+                calendar.save()
+                calendar.create_relation(user)
+
+                signups = list(FacilShiftSignup.objects.filter(user__pk=id))
+                for signup in signups:
+                    shift = signup.shift
+                    event = Event(start=shift.start, end=shift.end, title=shift.name,
+                                  description=shift.desc, calendar=calendar)
+                    event.save()
+            users = list(User.objects.all())
+            return render(request, "shift_manage_lookup.html", {"users": users})
 
 
 @staff_member_required(login_url='/accounts/login')

@@ -7,6 +7,9 @@
     Shift Management Lookup
 {% endblock top_title %}
 {% block active %}
+    <form method="POST">
+        <button id="submit" type="submit" value="Regen All Calendars">
+    </form>
     {% for user in users %}
         <div>
             <a href='{{ user.id }}'>{{ user.username }}</a>
