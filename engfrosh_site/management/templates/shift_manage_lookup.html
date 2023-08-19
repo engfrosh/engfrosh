@@ -1,0 +1,15 @@
+{% extends 'base_manage_subpage.html' %}
+{% load static %}
+{% block page_title %}
+    Shift Management Lookup
+{% endblock page_title %}
+{% block top_title %}
+    Shift Management Lookup
+{% endblock top_title %}
+{% block active %}
+    {% for user in users %}
+        <div>
+            <a href='{{ user.id }}'>{{ user.username }}</a>
+        </div>
+    {% endfor %}
+{% endblock active %}
