@@ -154,7 +154,7 @@ def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
                 calendar.save()
                 calendar.create_relation(user)
 
-                signups = list(FacilShiftSignup.objects.filter(user__pk=id))
+                signups = list(FacilShiftSignup.objects.filter(user=user))
                 for signup in signups:
                     shift = signup.shift
                     event = Event(start=shift.start, end=shift.end, title=shift.name,
