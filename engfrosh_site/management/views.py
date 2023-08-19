@@ -126,14 +126,14 @@ def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
             signup = FacilShiftSignup.objects.filter(shift__pk=shift_id, user__pk=id).first()
             shift = signup.shift
             signup.delete()
-
-        calendar = Calendar.objects.filter(name=request.user.username).first()
+        
+        user = User.objects.filter(id=id).first()
+        calendar = Calendar.objects.filter(name=user.username).first()
         if calendar is not None:
             calendar.delete()
-
-        calendar = Calendar(name=request.user.username, slug=request.user.username)
+        calendar = Calendar(name=user.username, slug=user.username)
         calendar.save()
-        calendar.create_relation(request.user)
+        calendar.create_relation(user)
 
         signups = list(FacilShiftSignup.objects.filter(user__pk=id))
         for signup in signups:
