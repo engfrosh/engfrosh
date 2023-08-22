@@ -592,6 +592,10 @@ video {
   float: right;
 }
 
+.m-0 {
+  margin: 0px;
+}
+
 .m-10 {
   margin: 2.5rem;
 }
@@ -622,10 +626,6 @@ video {
 
 .m-auto {
   margin: auto;
-}
-
-.m-0 {
-  margin: 0px;
 }
 
 .mx-1 {
@@ -1087,11 +1087,6 @@ video {
   .dark\:bg-red-600 {
     --tw-bg-opacity: 1;
     background-color: rgb(220 38 38 / var(--tw-bg-opacity));
-  }
-
-  .dark\:text-slate-400 {
-    --tw-text-opacity: 1;
-    color: rgb(148 163 184 / var(--tw-text-opacity));
   }
 
   .dark\:shadow-slate-400 {
