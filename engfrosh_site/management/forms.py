@@ -1,6 +1,7 @@
 from django import forms
 from common_models.models import Puzzle
-from schedule.models import Event
+from schedule.models import Event, Calendar
+from django.contrib.auth.models import User
 
 
 class AnnouncementForm(forms.Form):
@@ -37,6 +38,11 @@ class PuzzleForm(forms.ModelForm):
 
 
 class EventForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(EventForm, self).__init__(*args, **kwargs)
+        self.fields['calendar'].queryset = Calendar.objects.exclude(name__in=User.objects.all().values('username'))
+
     class Meta:
         model = Event
         fields = ['start', 'end', 'title', 'description', 'calendar', 'color_event']
