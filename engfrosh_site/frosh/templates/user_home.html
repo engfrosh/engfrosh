@@ -48,6 +48,10 @@
             <a href="{% url 'manage_discord_nicks' %}"
                class="bg-main dark:bg-main-night rounded-lg p-2">Unlink Discord Users</a>
             {% endif %}
+            {% if perms.common_models.check_in %}
+            <a href="{% url 'check-in-index' %}"
+               class="bg-main dark:bg-main-night rounded-lg p-2">Check In</a>
+            {% endif %}
             {% if details %}
             <br><p class="float-right">Your frosh id is: {{ details.frosh_id }}</p>
             <br><p>To link your frosh calendar with a calendar app import the calendar from the following URL: <a href={% url "ics_api" uid=details.int_frosh_id %}>https://server.engfrosh.com{% url "ics_api" uid=details.int_frosh_id %}</a></p>
