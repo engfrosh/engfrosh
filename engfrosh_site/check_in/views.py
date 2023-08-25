@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import permission_required
 from common_models.models import UserDetails, FroshRole
 from .forms import CheckInForm
 from .consumers import CheckInConsumer
