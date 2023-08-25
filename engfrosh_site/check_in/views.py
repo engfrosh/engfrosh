@@ -1,14 +1,14 @@
 from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required, permission_required
 from common_models.models import UserDetails, FroshRole
 from .forms import CheckInForm
 from .consumers import CheckInConsumer
 
 
-@staff_member_required(login_url='/accounts/login/')
+@permission_required("common_models.check_in")
 def check_in_view(request: HttpRequest, id: int) -> HttpResponse:
-    user = UserDetails.objects.filter(user=id).first()  # This is safe as user is a pk
+    user = UserDetails.objects.filter(user__id=id).first()  # This is safe as user is a pk
     if user is None:
         return HttpResponse('Failed to find user!')
     if user.checked_in:
@@ -34,7 +34,7 @@ def check_in_view(request: HttpRequest, id: int) -> HttpResponse:
     return redirect('/check-in/')
 
 
-@staff_member_required(login_url='/accounts/login/')
+@permission_required("common_models.check_in")
 def check_in_index(request: HttpRequest) -> HttpResponse:
     if request.GET.get('name', None) is not None:
         form = CheckInForm(request.GET)
@@ -44,15 +44,14 @@ def check_in_index(request: HttpRequest) -> HttpResponse:
                 results = UserDetails.objects.filter(user=int(name))
             else:
                 results = UserDetails.objects.filter(name__icontains=name)
-            data = results.values('name', 'user', 'shirt_size', 'checked_in')
 
-            return render(request, "check_in.html", {'form': form, 'data': data})
+            return render(request, "check_in.html", {'form': form, 'data': results})
         else:
             return render(request, "check_in.html", {'form': CheckInForm(), 'error': 'Invalid Name!'})
     else:
         return render(request, "check_in.html", {'form': CheckInForm()})
 
 
-@staff_member_required(login_url='/accounts/login/')
+@permission_required("common_models.check_in")
 def check_in_monitor(request: HttpRequest) -> HttpResponse:
     return render(request, "monitor.html")

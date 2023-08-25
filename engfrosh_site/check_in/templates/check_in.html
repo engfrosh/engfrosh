@@ -17,15 +17,29 @@
                     <tr>
                         <th>Name</th>
                         <th>Shirt Size</th>
+                        <th>Hardhat</th>
+                        <th>Breakfast</th>
+                        <th>Rafting</th>
                         <th>Checked In</th>
+                        <th>Can Check In</th>
                         <th>Check In</th>
+                        <th>Reason</th>
                     </tr>
                 {% for user in data %}
                     <tr>
                         <td>{{user.name}}</td>
                         <td>{{user.shirt_size}}</td>
+                        <td>{{user.hardhat}}</td>
+                        <td>{{user.breakfast}}</td>
+                        <td>{{user.rafting}}</td>
                         <td>{{user.checked_in}}</td>
-                        <td><a href="/check-in/check-in/{{user.user}}">Check In</a></td>
+                        <td>{{user.can_check_in}}</th>
+                        {% if user.can_check_in %}
+                            <td><a href="/check-in/check-in/{{user.user.id}}">Check In</a></td>
+                        {% else %}
+                            <td>Requirements Not Met</td>
+                            <td>{{user.check_in_reason}}</td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
                 </ul>
