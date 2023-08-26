@@ -592,6 +592,10 @@ video {
   float: right;
 }
 
+.float-left {
+  float: left;
+}
+
 .m-0 {
   margin: 0px;
 }
@@ -795,6 +799,10 @@ video {
   flex-direction: column;
 }
 
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
 .flex-wrap-reverse {
   flex-wrap: wrap-reverse;
 }
@@ -819,9 +827,17 @@ video {
   margin-bottom: calc(1rem * var(--tw-space-y-reverse));
 }
 
+.overflow-hidden {
+  overflow: hidden;
+}
+
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.whitespace-nowrap {
   white-space: nowrap;
 }
 
