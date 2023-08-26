@@ -6,10 +6,18 @@ import random
 from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, Announcement, UserDetails
 from common_models.models import InclusivityPage, FroshRole
 import datetime
+from management import forms
+from schedule.models import Event
 
 
 def inclusivity_public(request: HttpRequest):
     return render(request, "inclusivity_public.html", {})
+
+
+@login_required(login_url='/accounts/login')
+def view_event(request: HttpRequest, id: int):
+    context = {"form": forms.EventForm(instance=Event.objects.filter(id=id).first())}
+    return render(request, "view_event.html", context)
 
 
 @login_required(login_url='/accounts/login')

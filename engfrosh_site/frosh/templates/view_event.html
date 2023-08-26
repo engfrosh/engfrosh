@@ -1,0 +1,20 @@
+{% extends 'base_manage_subpage.html' %}
+{% load static %}
+{% block page_title %}
+    View Event
+{% endblock page_title %}
+{% block top_title %}
+    View Event
+{% endblock top_title %}
+{% block active %}
+    <style>
+        fieldset input, textarea{
+            background: white;
+        }
+    </style>
+    <form class="my-5" method="POST">
+        <fieldset disabled="disabled">
+            {{ form.as_p }}
+        </fieldset>
+    </form>
+{% endblock active %}

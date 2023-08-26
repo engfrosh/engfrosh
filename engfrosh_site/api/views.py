@@ -187,6 +187,8 @@ class CalendarAPI(APIView):
                 url = ""
                 if request.user.has_perm("auth.change_user"):
                     url = reverse("edit_event", args=[event.id])
+                else:
+                    url = reverse("view_event", args=[event.id])
                 if occurrence.cancelled:
                     # fixes bug 508
                     continue
