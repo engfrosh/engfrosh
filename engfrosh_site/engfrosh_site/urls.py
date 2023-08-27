@@ -24,6 +24,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 
 urlpatterns = [
     path('', frosh.views.overall_index),
+    path('fish', frosh.views.fish),
     path('admin/', admin.site.urls),
     path('accounts/', include('authentication.urls')),
     path('teams/', include('frosh.team_urls')),

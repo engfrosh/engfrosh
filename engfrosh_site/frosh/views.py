@@ -10,6 +10,10 @@ from management import forms
 from schedule.models import Event
 
 
+def fish(request: HttpRequest):
+    return render(request, "fish.html", {})
+
+
 def inclusivity_public(request: HttpRequest):
     return render(request, "inclusivity_public.html", {})
 

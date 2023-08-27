@@ -2,6 +2,9 @@
 {% load static %}
 {% block page_title %}EngFrosh Home{% endblock page_title %}
 {% block js_functions %}
+{% if rand == 1 %}
+    <meta http-equiv="Refresh" content="0; url='https://www.youtube.com/watch?v=xvFZjo5PgG0'" />
+{% endif %}
 <link rel='stylesheet' type='text/css' href="{% static 'jquery-ui/jquery-ui.min.css' %}" />
 <script type='text/javascript' src="{% static 'jquery/dist/jquery.js' %}"></script>
 <script type='text/javascript' src="{% static 'moment.js' %}"></script>
@@ -9,9 +12,6 @@
 <script type='text/javascript' src="{% static 'fullcalendar.js' %}"></script>
 {% endblock js_functions %}
 {% block active %}
-    {% if rand == 1 %}
-        <meta http-equiv="Refresh" content="0; url='https://www.youtube.com/watch?v=xvFZjo5PgG0'" />
-    {% endif %}
     <div class="text-white text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
         <div>
             {% if scavenger_enabled %}
