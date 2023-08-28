@@ -3,15 +3,13 @@ from rest_framework.views import APIView
 from .serializers import VerificationPhotoSerializer
 from rest_framework.response import Response
 from common_models.models import VerificationPhoto, Team, UserDetails
-from datetime import datetime, timedelta
-from schedule.models import Calendar, Occurrence, CalendarRelation
-# import schedule.models
+from datetime import datetime
+from schedule.models import Calendar, CalendarRelation
 from django.urls import reverse
 from django.contrib.auth.models import User
 from engfrosh_common.AWS_SES import send_SES
 from ics import Event
 import ics
-import pytz
 from api import renderer
 import rest_framework
 from django.contrib.contenttypes.models import ContentType
