@@ -33,9 +33,12 @@ class ICSAPI(APIView):
         user = details.user
         for group in user.groups.all():
             try:
-                calendar = Calendar.objects.get_calendar_for_object(group)
-                calendars.update({calendar})
-            except Exception:
+                ct = ContentType.objects.get_for_model(group)
+                relations = CalendarRelation.objects.filter(content_type=ct, object_id=group.id)
+                for relation in relations:
+                    calendars.update({relation.calendar})
+            except Exception as e:
+                logger.error(e)
                 continue
         try:
             calendar = Calendar.objects.get_calendar_for_object(user)
