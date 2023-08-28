@@ -52,6 +52,9 @@
                 </td>
             </tr>
         {% endfor %}
+        {% if shifts|length == 0 %}
+            <h1>There are no shifts currently available!</h1>
+        {% endif %}
     </table>
     </div>
 {% endblock active %}
