@@ -56,19 +56,14 @@ class ICSAPI(APIView):
             for event in calendar.events.all():
                 event_list += [event]
         for event in event_list:
-            now = datetime.now(pytz.timezone("America/Toronto"))
-            start = now - timedelta(days=365)
-            end = now + timedelta(days=365)
-            occurrences = event.get_occurrences(start, end)
-            for o in occurrences:
-                e = Event()
-                e.name = o.title
-                e.begin = o.start
-                e.end = o.end
-                e.description = o.description
-                e.created = event.created_on
-                e.last_modified = event.updated_on
-                cal.events.add(e)
+            e = Event()
+            e.name = event.title
+            e.begin = event.start
+            e.end = event.end
+            e.description = event.description
+            e.created = event.created_on
+            e.last_modified = event.updated_on
+            cal.events.add(e)
         data = cal.serialize()
         resp = Response(data, content_type="text/calendar")
         resp.accepted_media_type = "text/calendar"
@@ -155,9 +150,6 @@ class CalendarAPI(APIView):
         # This is ripped right from the django-scheduler code
         # https://github.com/llazzaro/django-scheduler/blob/8aa6f877f17e5b05f17d7c39e93d8e73625b0a65/schedule/views.py#L357
         response_data = []
-        i = 1
-        if Occurrence.objects.all().exists():
-            i = Occurrence.objects.latest("id").id + 1
         event_list = []
         # relations = schedule.models.EventRelation.objects.get_events_for_object(user)
         # for e in relations:
@@ -168,49 +160,23 @@ class CalendarAPI(APIView):
                 if event.start <= end_time and (event.end_recurring_period is None or event.end_recurring_period > start_time):  # noqa: E501
                     event_list += [event]
         for event in event_list:
-            occurrences = event.get_occurrences(start_time, end_time)
-            for occurrence in occurrences:
-                occurrence_id = i + occurrence.event.id
-                existed = False
-
-                if occurrence.id:
-                    occurrence_id = occurrence.id
-                    existed = True
-
-                recur_rule = occurrence.event.rule.name if occurrence.event.rule else None
-
-                if occurrence.event.end_recurring_period:
-                    recur_period_end = occurrence.event.end_recurring_period
-                    recur_period_end = recur_period_end
-                else:
-                    recur_period_end = None
-
-                event_start = occurrence.start
-                event_end = occurrence.end
-                url = ""
-                if request.user.has_perm("auth.change_user"):
-                    url = reverse("edit_event", args=[event.id])
-                else:
-                    url = reverse("view_event", args=[event.id])
-                if occurrence.cancelled:
-                    # fixes bug 508
-                    continue
-                response_data.append(
-                    {
-                        "id": occurrence_id,
-                        "title": occurrence.title,
-                        "start": event_start,
-                        "end": event_end,
-                        "existed": existed,
-                        "event_id": occurrence.event.id,
-                        "color": occurrence.event.color_event,
-                        "description": occurrence.description,
-                        "rule": recur_rule,
-                        "end_recurring_period": recur_period_end,
-                        "creator": str(occurrence.event.creator),
-                        "calendar": occurrence.event.calendar.slug,
-                        "cancelled": occurrence.cancelled,
-                        "url": url
-                    }
-                )
+            url = ""
+            if request.user.has_perm("auth.change_user"):
+                url = reverse("edit_event", args=[event.id])
+            else:
+                url = reverse("view_event", args=[event.id])
+            response_data.append(
+                {
+                    "id": event.id,
+                    "title": event.title,
+                    "start": event.start,
+                    "end": event.end,
+                    "existed": True,
+                    "event_id": event.id,
+                    "color": event.color_event,
+                    "description": event.description,
+                    "creator": str(event.creator),
+                    "calendar": event.calendar.slug,
+                    "url": url
+                })
         return Response(response_data)
