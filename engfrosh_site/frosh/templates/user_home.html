@@ -94,7 +94,7 @@
                     eventDidMount: function(arg) {
                         let val = filter.value;
                         if(!(val == arg.event.extendedProps.calendar || val == "all")){
-                            arg.el.style.display = "none";
+                            arg.event.remove();
                         }
                     },
                 });
