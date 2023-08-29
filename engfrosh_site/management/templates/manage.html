@@ -3,12 +3,13 @@
    EngFrosh Management
 {% endblock page_title %}
 {% block top_title %}
-   EngFrosh Management
+   <a href="{% url 'user_home' %}" class="bg-main dark:bg-main-night rounded-lg p-2"
+   >Back</a> EngFrosh Management
 {% endblock top_title %}
 {% block active %}
 <div class="flex flex-row">
    <div class="flex flex-col space-y-3 mx-auto container text-white text-center max-w-sm">
-      <h1>Spirit Stuff</h1>
+      <h1>Planning Stuff</h1>
       <a href="discord/magic-link"
          class="bg-main dark:bg-main-night rounded-lg p-2">Magic Links</a>
       <a href="{% url 'manage_scavenger_puzzles' %}"
