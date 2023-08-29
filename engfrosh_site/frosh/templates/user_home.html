@@ -56,6 +56,13 @@
             <br><p class="float-right">Your frosh id is: {{ details.frosh_id }}</p>
             <br><p>To link your frosh calendar with a calendar app import the calendar from the following URL: <a href={% url "ics_api" uid=details.int_frosh_id %}>https://server.engfrosh.com{% url "ics_api" uid=details.int_frosh_id %}</a></p>
             {% endif %}
+            <br>
+            <select id="filter">
+                <option value="all">All</option>
+                {% for calendar in calendars %}
+                <option value={{calendar.slug}}>{{calendar.name}}</option>
+                {% endfor %}
+            </select>
         </div>
         <style>
             :root {
@@ -67,6 +74,7 @@
         <script type='text/javascript'>
             $(document).ready(function() {
                 var calendar = document.getElementById("calendar");
+                var filter = document.getElementById("filter");
                 var obj = new FullCalendar.Calendar(calendar, {
                     height: "auto",
                     events: "/api/calendar",
@@ -82,9 +90,18 @@
                             slotDuration: "01:00:00",
                             nowIndicator: true
                         }
-                    }
+                    },
+                    eventDidMount: function(arg) {
+                        let val = filter.value;
+                        if(!(val == arg.event.extendedProps.calendar || val == "all")){
+                            arg.el.style.display = "none";
+                        }
+                    },
                 });
                 obj.render();
+                filter.addEventListener('change', function() {
+                    obj.refetchEvents();
+                });
             });
         </script>
     </div>

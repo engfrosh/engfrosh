@@ -7,7 +7,11 @@ from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, A
 from common_models.models import InclusivityPage, FroshRole
 import datetime
 from management import forms
-from schedule.models import Event
+from schedule.models import Event, CalendarRelation
+from django.contrib.contenttypes.models import ContentType
+import logging
+
+logger = logging.getLogger("frosh.views")
 
 
 def fish(request: HttpRequest):
@@ -110,11 +114,31 @@ def user_home(request: HttpRequest) -> HttpResponse:
     team = Team.from_user(request.user)
     details = UserDetails.objects.filter(user=request.user).first()
 
+    calendars = set()
+    user = request.user
+    for group in user.groups.all():
+        try:
+            ct = ContentType.objects.get_for_model(group)
+            relations = CalendarRelation.objects.filter(content_type=ct, object_id=group.id)
+            for relation in relations:
+                calendars.update({relation.calendar})
+        except Exception as e:
+            logger.error(e)
+            continue
+    try:
+        ct = ContentType.objects.get_for_model(user)
+        relations = CalendarRelation.objects.filter(content_type=ct, object_id=user.id)
+        for relation in relations:
+            calendars.update({relation.calendar})
+    except Exception:
+        pass
+
     context = {
         "scavenger_enabled": team.scavenger_enabled if team else False,
         "trade_up_enabled": team.trade_up_enabled if team else False,
         "details": details,
-        "rand": rand
+        "rand": rand,
+        "calendars": calendars,
     }
 
     return render(request, "user_home.html", context)

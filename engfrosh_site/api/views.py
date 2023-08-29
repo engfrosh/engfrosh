@@ -4,7 +4,7 @@ from .serializers import VerificationPhotoSerializer
 from rest_framework.response import Response
 from common_models.models import VerificationPhoto, Team, UserDetails
 from datetime import datetime
-from schedule.models import Calendar, CalendarRelation
+from schedule.models import CalendarRelation
 from django.urls import reverse
 from django.contrib.auth.models import User
 from engfrosh_common.AWS_SES import send_SES
@@ -39,8 +39,10 @@ class ICSAPI(APIView):
                 logger.error(e)
                 continue
         try:
-            calendar = Calendar.objects.get_calendar_for_object(user)
-            calendars.update({calendar})
+            ct = ContentType.objects.get_for_model(user)
+            relations = CalendarRelation.objects.filter(content_type=ct, object_id=user.id)
+            for relation in relations:
+                calendars.update({relation.calendar})
         except Exception:
             pass
         # This is ripped right from the django-scheduler code
@@ -141,8 +143,10 @@ class CalendarAPI(APIView):
                 logger.error(e)
                 continue
         try:
-            calendar = Calendar.objects.get_calendar_for_object(user)
-            calendars.update({calendar})
+            ct = ContentType.objects.get_for_model(user)
+            relations = CalendarRelation.objects.filter(content_type=ct, object_id=user.id)
+            for relation in relations:
+                calendars.update({relation.calendar})
         except Exception:
             pass
         # This is ripped right from the django-scheduler code
