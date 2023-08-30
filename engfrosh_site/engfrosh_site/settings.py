@@ -219,7 +219,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'authentication.discord_auth.DiscordAuthBackend'
+    'authentication.discord_auth.DiscordAuthBackend',
+    'authentication.loginbackend.EmailOrUsernameAuthenticationBackend'
 ]
 
 

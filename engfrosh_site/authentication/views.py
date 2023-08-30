@@ -150,6 +150,22 @@ def discord_login(request: HttpRequest):
             credentials.DISCORD_CLIENT_ID, callback_url, settings.DEFAULT_DISCORD_SCOPE, prompt="none"))
 
 
+def username_login(request: HttpRequest):
+    if request.method == "POST":
+        if 'username' not in request.POST or 'password' not in request.POST:
+            return redirect("login_failed")
+            pass
+        user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
+        if user is not None:
+            login(request, user,
+                  backend="authentication.loginbackend.EmailOrUsernameAuthenticationBackend")
+            return redirect("user_home")
+        else:
+            return redirect("login_failed")
+    else:
+        return render(request, "username_login.html", {})
+
+
 def discord_login_callback(request: HttpRequest):
     """Callback view that handles post discord login authentication.
 

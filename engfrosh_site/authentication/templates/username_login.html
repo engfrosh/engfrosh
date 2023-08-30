@@ -17,17 +17,6 @@
             display: block;
         }
 
-        .discord.login_button {
-            background-color: #5865F2;
-            font-size: large;
-        }
-
-        .admin.login_button {
-            background-color: slategray;
-            font-size: small;
-            
-        }
-
         .login_box {
             margin: auto;
             margin-top: 20%;
@@ -40,10 +29,14 @@
 
 <body>
     <div class="login_box">
-        <a href="{% url 'discord_login' %}" type="button" class="login_button discord">Login with Discord</a>
-        <a href="{% url 'msLogin' %}" type="button" class="login_button discord">Login with CMail</a>
-        <br/>
-        <a href="{% url 'username_login' %}" type="button" class="login_button admin">Login as Staff</a> 
+        <form method="POST">
+            {% csrf_token %}
+            <label for="username">Username:</label>
+            <input id="username" name="username" type="text"><br>
+            <label for="password">Password:</label>
+            <input id="password" name="password" type="password"><br>
+            <input type="submit" value="Submit">
+        </form>    
     </div>
 </body>
 
