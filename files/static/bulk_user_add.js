@@ -43,6 +43,9 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
   let selectRole = document.querySelector("." + row_id + ".role_selection");
   let selectProgram = document.querySelector("." + row_id + ".program_selection");
   let sizeInput = document.querySelector("." + row_id + ".size_input")
+  let allergiesInput = document.querySelector("." + row_id + ".allergies")
+  let raftingInput = document.querySelector("." + row_id + ".rafting")
+  let hardhatInput = document.querySelector("." + row_id + ".hardhat")
   let button = document.querySelector("button." + row_id);
 
   const name = nameInput.value;
@@ -51,6 +54,9 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
   const role = selectRole.value;
   let program = selectProgram.value;
   const size = sizeInput.value
+  const rafting = raftingInput.value;
+  const hardhat = hardhatInput.value;
+  const allergies = allergiesInput.value;
 
   vName = validateName(name);
   vEmail = validateEmail(email);
@@ -117,7 +123,10 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
         "team": team,
         "role": role,
         "program": program,
-        "size": size
+        "size": size,
+        "allergies": allergies,
+        "hardhat": hardhat,
+        "rafting": rafting
       })
     })
       .then(res => {
@@ -148,7 +157,7 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
 }
 
 
-function addUserRow(name, email, team, role, program, size) {
+function addUserRow(name, email, team, role, program, size, allergies, rafting, hardhat) {
 
   const table = document.getElementById("new-user-table");
 
@@ -234,11 +243,38 @@ function addUserRow(name, email, team, role, program, size) {
   }
   sizeCell.appendChild(sizeInput);
 
+  let allCell = row.insertCell(6);
+  let allInput = document.createElement("input");
+  allInput.setAttribute("type", "text");
+  allInput.setAttribute("class", row_id + " allergies")
+  if (allergies) {
+    allInput.value = allergies;
+  }
+  allCell.appendChild(allInput);
+
+  let raftCell = row.insertCell(7);
+  let raftInput = document.createElement("input");
+  raftInput.setAttribute("type", "text");
+  raftInput.setAttribute("class", row_id + " rafting")
+  if (rafting) {
+    raftInput.value = rafting;
+  }
+  raftCell.appendChild(raftInput);
+
+  let hardCell = row.insertCell(8);
+  let hardInput = document.createElement("input");
+  hardInput.setAttribute("type", "text");
+  hardInput.setAttribute("class", row_id + " hardhat")
+  if (hardhat) {
+    hardInput.value = hardhat;
+  }
+  hardCell.appendChild(hardInput);
+
   let submitButton = document.createElement("button");
   submitButton.innerText = "ADD";
   submitButton.setAttribute("onclick", "addUserRowButtonPress('" + row_id + "')")
   submitButton.setAttribute("class", row_id + " submit_button")
-  let submitCell = row.insertCell(6);
+  let submitCell = row.insertCell(9);
   submitCell.appendChild(submitButton);
 };
 
@@ -272,8 +308,11 @@ function handleCSVFile(file) {
     const role = values[3];
     const program = values[4];
     const size = values[5];
+    const allergies = values[6];
+    const rafting = values[7];
+    const hardhat = values[8];
 
-    addUserRow(name, email, team, role, program, size);
+    addUserRow(name, email, team, role, program, size, allergies, rafting, hardhat);
 
   }
 
