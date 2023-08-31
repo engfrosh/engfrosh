@@ -7,6 +7,28 @@ from .consumers import CheckInConsumer
 
 
 @permission_required("common_models.check_in")
+def hardhat(request: HttpRequest, id: int) -> HttpResponse:
+    user = UserDetails.objects.filter(user__id=id).first()  # This is safe as user is a pk
+    if user is None:
+        return HttpResponse('Failed to find user!')
+    user.hardhat = True
+    user.hardhat_paid = True
+    user.save()
+    return HttpResponse("User modified! You can close this window!")
+
+
+@permission_required("common_models.check_in")
+def rafting(request: HttpRequest, id: int) -> HttpResponse:
+    user = UserDetails.objects.filter(user__id=id).first()  # This is safe as user is a pk
+    if user is None:
+        return HttpResponse('Failed to find user!')
+    user.rafting = True
+    user.rafting_paid = True
+    user.save()
+    return HttpResponse("User modified! You can close this window!")
+
+
+@permission_required("common_models.check_in")
 def check_in_view(request: HttpRequest, id: int) -> HttpResponse:
     user = UserDetails.objects.filter(user__id=id).first()  # This is safe as user is a pk
     if user is None:
@@ -31,7 +53,7 @@ def check_in_view(request: HttpRequest, id: int) -> HttpResponse:
     CheckInConsumer.notify_trigger(location, size, team)
 
     user.save()
-    return redirect('/check-in/')
+    return render(request, "check_in.html", {'form': CheckInForm(), 'data': [user]})
 
 
 @permission_required("common_models.check_in")
@@ -44,7 +66,6 @@ def check_in_index(request: HttpRequest) -> HttpResponse:
                 results = UserDetails.objects.filter(user=int(name))
             else:
                 results = UserDetails.objects.filter(name__icontains=name)
-
             return render(request, "check_in.html", {'form': form, 'data': results})
         else:
             return render(request, "check_in.html", {'form': CheckInForm(), 'error': 'Invalid Name!'})
