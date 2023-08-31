@@ -6,7 +6,7 @@
     <div class="p-6">
         <div class="space-y-4 mt-4 text-center">
             <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto m-4">
-                <a href="/check-in/monitor" style="float: left;" target="_blank">Monitor</a>
+                <a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/monitor" style="float: left;" target="_blank">Monitor</a>
                 <form>
                     {% csrf_token %}
                     {{ form }}
@@ -18,10 +18,8 @@
                         <th>Name</th>
                         <th>Shirt Size</th>
                         <th>Hardhat</th>
-                        <th>Breakfast</th>
                         <th>Rafting</th>
-                        <th>Checked In</th>
-                        <th>Can Check In</th>
+                        <th>Team</th>
                         <th>Check In</th>
                         <th>Reason</th>
                     </tr>
@@ -30,16 +28,17 @@
                         <td>{{user.name}}</td>
                         <td>{{user.shirt_size}}</td>
                         <td>{{user.hardhat}}</td>
-                        <td>{{user.breakfast}}</td>
                         <td>{{user.rafting}}</td>
-                        <td>{{user.checked_in}}</td>
-                        <td>{{user.can_check_in}}</th>
+                        <td>{{user.team}}</td>
                         {% if user.can_check_in %}
-                            <td><a href="/check-in/check-in/{{user.user.id}}">Check In</a></td>
+                            <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/check-in/{{user.user.id}}">Check In</a></td>
+                            <td></td>
                         {% else %}
                             <td>Requirements Not Met</td>
                             <td>{{user.check_in_reason}}</td>
                         {% endif %}
+                        <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/rafting/{{user.user.id}}" target="_blank">Rafting</a></td>
+                        <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/hardhat/{{user.user.id}}" target="_blank">Hardhat</a></td>
                     </tr>
                 {% endfor %}
                 </ul>
