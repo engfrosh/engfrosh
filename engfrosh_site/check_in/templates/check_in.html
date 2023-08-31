@@ -3,6 +3,12 @@
     Check In
 {% endblock page_title %}
 {% block body %}
+    <style>
+        td, th{
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+    </style>
     <div class="p-6">
         <div class="space-y-4 mt-4 text-center">
             <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto m-4">
@@ -17,6 +23,7 @@
                     <tr>
                         <th>Name</th>
                         <th>Shirt Size</th>
+                        <th>Sweater Size</th>
                         <th>Hardhat</th>
                         <th>Rafting</th>
                         <th>Team</th>
@@ -27,6 +34,7 @@
                     <tr>
                         <td>{{user.name}}</td>
                         <td>{{user.shirt_size}}</td>
+                        <td>{{user.sweater_size}}</td>
                         <td>{{user.hardhat}}</td>
                         <td>{{user.rafting}}</td>
                         <td>{{user.team}}</td>
