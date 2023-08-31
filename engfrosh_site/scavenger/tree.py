@@ -74,7 +74,7 @@ def generate_tree(team: Team):
                     lowest = s
         stream = lowest
         if lowest is None:
-            return
+            continue
         if not enabled_streams.get(stream.id, False):
             continue
         completed[stream.id] = True
