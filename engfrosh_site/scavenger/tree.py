@@ -73,6 +73,8 @@ def generate_tree(team: Team):
                 if lowest is None or unlocks[s.id] < unlocks[lowest.id]:
                     lowest = s
         stream = lowest
+        if lowest in None:
+            return
         if not enabled_streams.get(stream.id, False):
             continue
         completed[stream.id] = True
