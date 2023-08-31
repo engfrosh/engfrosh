@@ -8,5 +8,7 @@ urlpatterns = [
     path('', views.check_in_index, name="check-in-index"),
     path('monitor', views.check_in_monitor),
     path('rafting/<int:id>', views.rafting),
-    path('hardhat/<int:id>', views.hardhat)
+    path('hardhat/<int:id>', views.hardhat),
+    path('brightspace/<int:id>', views.brightspace),
+    path('prc/<int:id>', views.prc)
 ]
