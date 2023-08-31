@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class EmailOrUsernameAuthenticationBackend(BaseBackend):
 
     def authenticate(self, request, **kwargs):
-        if not 'username' in kwargs or not 'password' in kwargs:
+        if 'username' not in kwargs or 'password' not in kwargs:
             return None
         username = kwargs['username']
         password = kwargs['password']
