@@ -45,10 +45,12 @@
                             <td>Requirements Not Met</td>
                             <td>{{user.check_in_reason}}</td>
                         {% endif %}
-                        <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/rafting/{{user.user.id}}" target="_blank">Rafting</a></td>
+                        <!-- <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/rafting/{{user.user.id}}" target="_blank">Rafting</a></td>
                         <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/hardhat/{{user.user.id}}" target="_blank">Hardhat</a></td>
                         <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/brightspace/{{user.user.id}}" target="_blank">Brightspace</a></td>
                         <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/prc/{{user.user.id}}" target="_blank">PRC</a></td>
+                        --!>
+                        <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/waiver/{{user.user.id}}" target="_blank">Waiver</a></td>
                     </tr>
                 {% endfor %}
                 </ul>
