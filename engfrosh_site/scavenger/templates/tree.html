@@ -1,3 +1,4 @@
+<body id="body">
 <svg xmlns='http://www.w3.org/2000/svg' version='1.1' id="scavtree" width="{{ width }}" height="{{ height }}">
     <script>
         function onTreeElemClick(event){
@@ -6,6 +7,7 @@
             console.log(url);
             window.top.location.href = url;
         }
+        document.getElementById("body").scrollTop(100);
     </script>
     {% for rect in rectangles %}
         <line style="stroke:{{ rect.colour }};stroke-width:{{ rect.width }};" x1="{{ rect.x1 }}" y1="{{ rect.y1 }}" x2="{{ rect.x2 }}" y2="{{ rect.y2 }}"/>
@@ -17,3 +19,4 @@
         <image id="{{ im.id }}" onclick="onTreeElemClick(event)" x="{{ im.x }}" y="{{ im.y }}" width="{{ im.width }}" height="{{ im.height }}" href="data:image/jpeg;base64,{{ im.encoded }}"/>
     {% endfor %}
 </svg>
+</body>
