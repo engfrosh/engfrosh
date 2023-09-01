@@ -40,10 +40,11 @@ def generate_tree(team: Team):
                     if act is not None and act.is_completed:
                         enabled_streams[puzzle.stream_branch.id] = True
     h_count = 0
-    for key, value in unlocks.items():
-        if value > h_count:
-            h_count = value
-    width = HSPACING * h_count + 2 * XOFFSET + 400
+    for stream in streams:
+        cnt = Puzzle.objects.filter(stream=stream, enabled=True)
+        if cnt > h_count:
+            h_count = cnt
+    width = HSPACING * h_count + 2 * XOFFSET + 200
     height = VSPACING * v_count + 2 * YOFFSET
 
     # Draw all streams first
