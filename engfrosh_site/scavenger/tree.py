@@ -41,7 +41,7 @@ def generate_tree(team: Team):
                         enabled_streams[puzzle.stream_branch.id] = True
     h_count = 0
     for stream in streams:
-        cnt = len(Puzzle.objects.filter(stream=stream, enabled=True))
+        cnt = len(TeamPuzzleActivity.objects.filter(team=team, completed=True)) + 1
         if cnt > h_count:
             h_count = cnt
     width = HSPACING * h_count + 2 * XOFFSET + 200
