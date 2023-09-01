@@ -43,7 +43,7 @@ def generate_tree(team: Team):
     for key, value in unlocks.items():
         if value > h_count:
             h_count = value
-    width = HSPACING * h_count + 2 * XOFFSET
+    width = HSPACING * h_count + 2 * XOFFSET + 400
     height = VSPACING * v_count + 2 * YOFFSET
 
     # Draw all streams first
