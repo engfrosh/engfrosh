@@ -8,7 +8,7 @@
             window.top.location.href = url;
         }
         window.onload = function() {
-            window.scrollTo(0, document.body.scrollHeight);
+            window.scrollTo(document.getElementById("body").scrollWidth, 0);
         }
     </script>
     {% for rect in rectangles %}
