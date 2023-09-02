@@ -339,6 +339,7 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
             program = req_dict["program"]
             size = req_dict["size"]
             rafting = req_dict["rafting"]
+            sweater = req_dict["sweater"]
             if rafting.lower() == "true":
                 rafting = True
             else:
@@ -364,7 +365,7 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
         try:
             user = registration.create_user_initialize(name, email, role, team, program, size,
                                                        rafting=rafting, hardhat=hardhat,
-                                                       allergies=allergies)
+                                                       allergies=allergies, sweater_size=sweater)
         except registration.UserAlreadyExistsError:
             return HttpResponseBadRequest("User already exists.")
 

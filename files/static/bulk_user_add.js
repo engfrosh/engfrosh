@@ -46,6 +46,7 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
   let allergiesInput = document.querySelector("." + row_id + ".allergies")
   let raftingInput = document.querySelector("." + row_id + ".rafting")
   let hardhatInput = document.querySelector("." + row_id + ".hardhat")
+  let sweaterInput = document.querySelector("." + row_id + ".sweater")
   let button = document.querySelector("button." + row_id);
 
   const name = nameInput.value;
@@ -57,6 +58,7 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
   const rafting = raftingInput.value;
   const hardhat = hardhatInput.value;
   const allergies = allergiesInput.value;
+  const sweater = sweaterInput.value;
 
   vName = validateName(name);
   vEmail = validateEmail(email);
@@ -126,7 +128,8 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
         "size": size,
         "allergies": allergies,
         "hardhat": hardhat,
-        "rafting": rafting
+        "rafting": rafting,
+        "sweater": sweater,
       })
     })
       .then(res => {
@@ -157,7 +160,7 @@ function addUserRowButtonPress(row_id, disable_invalid_alert) {
 }
 
 
-function addUserRow(name, email, team, role, program, size, allergies, rafting, hardhat) {
+function addUserRow(name, email, team, role, program, size, allergies, rafting, hardhat, sweater) {
 
   const table = document.getElementById("new-user-table");
 
@@ -270,11 +273,20 @@ function addUserRow(name, email, team, role, program, size, allergies, rafting, 
   }
   hardCell.appendChild(hardInput);
 
+  let sweatCell = row.insertCell(9);
+  let sweatInput = document.createElement("input");
+  sweatInput.setAttribute("type", "text");
+  sweatInput.setAttribute("class", row_id + " sweater")
+  if (sweater) {
+    sweatInput.value = sweater;
+  }
+  sweatCell.appendChild(sweatInput);
+
   let submitButton = document.createElement("button");
   submitButton.innerText = "ADD";
   submitButton.setAttribute("onclick", "addUserRowButtonPress('" + row_id + "')")
   submitButton.setAttribute("class", row_id + " submit_button")
-  let submitCell = row.insertCell(9);
+  let submitCell = row.insertCell(10);
   submitCell.appendChild(submitButton);
 };
 
@@ -311,8 +323,9 @@ function handleCSVFile(file) {
     const allergies = values[6];
     const rafting = values[7];
     const hardhat = values[8];
+    const sweater = values[9];
 
-    addUserRow(name, email, team, role, program, size, allergies, rafting, hardhat);
+    addUserRow(name, email, team, role, program, size, allergies, rafting, hardhat, sweater);
 
   }
 
