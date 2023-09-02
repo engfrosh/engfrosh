@@ -416,14 +416,27 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
 
         context = {"users": []}
         count = 0
+        details = UserDetails.objects.all()
+        discords = DiscordUser.objects.all()
 
         for usr in users:
-            try:
-                email_sent = UserDetails.objects.get(user=usr).invite_email_sent
-            except ObjectDoesNotExist:
+            d = None
+            for d2 in details:
+                if d2.user == user:
+                    d = d2
+                    break
+            if d is None or not d.invite_email_sent:
                 email_sent = False
+            else:
+                email_sent = True
 
-            if not usr.is_superuser and not DiscordUser.objects.filter(user=usr).exists():
+            disc = None
+            for d2 in discords:
+                if d2.user == user:
+                    disc = d2
+                    break
+
+            if not usr.is_superuser and disc is None:
                 count += 1
                 context["users"].append({
                     "username": usr.username,
