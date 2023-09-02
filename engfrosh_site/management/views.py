@@ -424,7 +424,7 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
         for usr in users:
             d = None
             for d2 in details:
-                if d2.user == user:
+                if d2.user == usr:
                     d = d2
                     break
             if d is None or not d.invite_email_sent:
@@ -434,7 +434,7 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
 
             disc = None
             for d2 in discords:
-                if d2.user == user:
+                if d2.user == usr:
                     disc = d2
                     break
 
