@@ -408,7 +408,7 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
         if not request.user.is_staff:
             team = Team.from_user(request.user)
             group = team.group
-            users = User.objects.filter(groups__in=group).order_by("username")
+            users = User.objects.filter(groups__in=[group]).order_by("username")
         else:
             users = User.objects.all().order_by("username")
         # Handle Webpage requests
@@ -464,7 +464,7 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
         if not request.user.is_staff:
             team = Team.from_user(request.user)
             group = team.group
-            users = User.objects.filter(groups__in=group).order_by("username")
+            users = User.objects.filter(groups__in=[group]).order_by("username")
         else:
             users = User.objects.all().order_by("username")
         if user not in users:
