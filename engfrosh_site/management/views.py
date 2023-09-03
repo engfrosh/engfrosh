@@ -407,11 +407,8 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         if not request.user.is_staff:
             team = Team.from_user(request.user)
-            all_users = User.objects.all().order_by("username")
-            users = []
-            for user in all_users:
-                if team.group in user.groups.all():
-                    users += [user]
+            group = team.group
+            users = User.objects.filter(groups__in=group).order_by("username")
         else:
             users = User.objects.all().order_by("username")
         # Handle Webpage requests
@@ -419,8 +416,8 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
 
         context = {"users": []}
         count = 0
-        details = UserDetails.objects.all()
-        discords = DiscordUser.objects.all()
+        details = UserDetails.objects.filter(user__in=users)
+        discords = DiscordUser.objects.filter(user__in=users)
 
         for usr in users:
             d = None
@@ -466,14 +463,13 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
         user = User.objects.get(id=req_dict["user_id"])
         if not request.user.is_staff:
             team = Team.from_user(request.user)
-            all_users = User.objects.all().order_by("username")
-            users = []
-            for u in all_users:
-                if team.group in user.groups.all():
-                    users += [u]
+            group = team.group
+            users = User.objects.filter(groups__in=group).order_by("username")
         else:
             users = User.objects.all().order_by("username")
         if user not in users:
+            return HttpResponseBadRequest("Invalid user")
+        if DiscordUser.objects.filter(user=user).first() is not None:
             return HttpResponseBadRequest("Invalid user")
         match req_dict["command"]:
 
