@@ -119,7 +119,7 @@ def email_magic_link(user: User, hostname: str, login_path: str, sender_email: s
 
 def create_user_initialize(name: str, email: str, role: FroshRole, team: Optional[Team] = None,
                            program: Optional[UniversityProgram] = None, size: Optional[str] = None,
-                           rafting=False, hardhat=False, allergies="") -> User:
+                           rafting=False, hardhat=False, allergies="", sweater_size=None) -> User:
     """Creates a new user with the specified details, initializes their account with other passed details."""
 
     # Check that the email has not already been added
@@ -144,7 +144,8 @@ def create_user_initialize(name: str, email: str, role: FroshRole, team: Optiona
     user.save()
 
     user_details = UserDetails(user=user, name=name, shirt_size=size,
-                               allergies=allergies, rafting=rafting, hardhat=hardhat)
+                               allergies=allergies, rafting=rafting, hardhat=hardhat,
+                               sweater_size=sweater_size)
     user_details.save()
 
     role.group.user_set.add(user)
