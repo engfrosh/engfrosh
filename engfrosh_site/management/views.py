@@ -420,21 +420,13 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
         discords = DiscordUser.objects.filter(user__in=users)
 
         for usr in users:
-            d = None
-            for d2 in details:
-                if d2.user == usr:
-                    d = d2
-                    break
+            d = details.filter(user=usr)
             if d is None or not d.invite_email_sent:
                 email_sent = False
             else:
                 email_sent = True
 
-            disc = None
-            for d2 in discords:
-                if d2.user == usr:
-                    disc = d2
-                    break
+            disc = discords.filter(user=usr)
 
             if not usr.is_superuser and disc is None:
                 count += 1
