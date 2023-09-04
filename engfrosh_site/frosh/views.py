@@ -52,7 +52,7 @@ def inclusivity_private(request: HttpRequest):
     return render(request, "inclusivity_private.html", {"pages": pages})
 
 
-@permission_required('frosh.view_team_coin_standings', "/accounts/permission-denied/")
+@permission_required('common_models.view_team_coin_standings', "/accounts/permission-denied/")
 def coin_standings(request: HttpRequest):
     context = {
         "teams": []
