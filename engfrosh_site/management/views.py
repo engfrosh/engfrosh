@@ -13,7 +13,7 @@ from django.contrib import auth
 import pyaccord
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
-from common_models.models import FroshRole, Team, UniversityProgram, UserDetails, TeamTradeUpActivity
+from common_models.models import FroshRole, Team, UniversityProgram, TeamTradeUpActivity
 from common_models.models import ChannelTag, DiscordGuild, Announcement, FacilShift, FacilShiftSignup
 import common_models.models
 from common_models.models import DiscordRole
@@ -408,33 +408,34 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
         if not request.user.is_staff:
             team = Team.from_user(request.user)
             group = team.group
-            users = User.objects.filter(groups__in=[group]).order_by("username")
+            users = User.objects.select_related("discorduser").select_related("userdetails").filter(groups__in=[group]).order_by("username")  # noqa: E501
         else:
-            users = User.objects.all().order_by("username")
+            users = User.objects.select_related("discorduser").select_related("userdetails").order_by("username")
         # Handle Webpage requests
         # TODO add check that user doesn't yet have a discord account linked.
 
         context = {"users": []}
         count = 0
-        details = {i.user.id: i for i in UserDetails.objects.filter(user__in=users)}
-        discords = {i.user.id: i for i in DiscordUser.objects.filter(user__in=users)}
         for usr in users:
-            d = details.get(usr.id, None)
-            if d is None or not d.invite_email_sent:
-                email_sent = False
-            else:
-                email_sent = True
-
-            disc = discords.get(usr.id, None)
-
-            if not usr.is_superuser and disc is None:
-                count += 1
-                context["users"].append({
-                    "username": usr.username,
-                    "id": usr.id,
-                    "email_sent": bool(email_sent),
-                    "email": usr.email
-                })
+            try:
+                d = usr.userdetails
+                if d is None or not d.invite_email_sent:
+                    email_sent = False
+                else:
+                    email_sent = True
+                try:
+                    discord = usr.discorduser  # noqa: F841
+                except Exception:
+                    if not usr.is_superuser:
+                        count += 1
+                        context["users"].append({
+                            "username": usr.username,
+                            "id": usr.id,
+                            "email_sent": bool(email_sent),
+                            "email": usr.email
+                        })
+            except Exception:
+                pass
         context["count"] = count
         return render(request, "create_discord_magic_links.html", context)
 
