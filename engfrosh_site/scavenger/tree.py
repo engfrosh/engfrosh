@@ -22,7 +22,7 @@ MAX_LOOKAHEAD = 1
 
 def generate_tree(team: Team):
     streams = PuzzleStream.objects.filter(enabled=True)
-    v_count = len(streams)
+    # v_count = len(streams)
     unlocks = {}
     enabled_streams = {}
     for j in range(1):  # This is really hacky
@@ -44,8 +44,8 @@ def generate_tree(team: Team):
         cnt = len(TeamPuzzleActivity.objects.filter(team=team).exclude(puzzle_completed_at=None)) + 1
         if cnt > h_count:
             h_count = cnt
-    width = HSPACING * 3 + XOFFSET
-    height = VSPACING * v_count + YOFFSET
+    width = HSPACING * h_count + XOFFSET
+    height = VSPACING * 3 + YOFFSET
 
     # Draw all streams first
     index = 1
