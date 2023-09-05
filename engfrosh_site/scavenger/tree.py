@@ -7,7 +7,7 @@ HSPACING = 100
 VSPACING = 150
 
 XOFFSET = 75
-YOFFSET = 250
+YOFFSET = 350
 
 CIRC_WIDTH = 65
 IMG_WIDTH = CIRC_WIDTH * 1.5
@@ -30,15 +30,16 @@ def generate_tree(team: Team):
             if stream.default:
                 unlocks[stream.id] = 0
                 enabled_streams[stream.id] = True
-            puzzles = Puzzle.objects.filter(stream=stream, enabled=True)
+            puzzles = Puzzle.objects.filter(stream=stream, enabled=True).order_by('order')
             index = unlocks.get(stream.id, 0)
             for puzzle in puzzles:
                 index += 1
                 if puzzle.stream_branch is not None and unlocks.get(puzzle.stream_branch, 0) < index:
-                    unlocks[puzzle.stream_branch.id] = index
-                    act = TeamPuzzleActivity.objects.filter(team=team, puzzle=puzzle).first()
-                    if act is not None and act.is_completed:
-                        enabled_streams[puzzle.stream_branch.id] = True
+                    if unlocks[puzzle.stream_branch.id] == 0:
+                        unlocks[puzzle.stream_branch.id] = index
+                        act = TeamPuzzleActivity.objects.filter(team=team, puzzle=puzzle).first()
+                        if act is not None and act.is_completed:
+                            enabled_streams[puzzle.stream_branch.id] = True
     h_count = 0
     for stream in streams:
         cnt = len(TeamPuzzleActivity.objects.filter(team=team).exclude(puzzle_completed_at=None)) + 1
