@@ -8,6 +8,11 @@
 {% endblock top_title %}
 {% block active %}
     <h1>Lock {{ team.display_name }}</h1>
+    <style>
+        input {
+            color: black;
+        }
+    </style>
     <form class="my-5" method="POST">
         {% csrf_token %}
         {{ form.as_p }}
