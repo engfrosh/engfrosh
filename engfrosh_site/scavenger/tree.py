@@ -35,11 +35,10 @@ def generate_tree(team: Team):
             for puzzle in puzzles:
                 index += 1
                 if puzzle.stream_branch is not None and unlocks.get(puzzle.stream_branch, 0) < index:
-                    if unlocks[puzzle.stream_branch.id] == 0:
-                        unlocks[puzzle.stream_branch.id] = index
-                        act = TeamPuzzleActivity.objects.filter(team=team, puzzle=puzzle).first()
-                        if act is not None and act.is_completed:
-                            enabled_streams[puzzle.stream_branch.id] = True
+                    unlocks[puzzle.stream_branch.id] = index
+                    act = TeamPuzzleActivity.objects.filter(team=team, puzzle=puzzle).first()
+                    if act is not None and act.is_completed:
+                        enabled_streams[puzzle.stream_branch.id] = True
     h_count = 0
     for stream in streams:
         cnt = len(TeamPuzzleActivity.objects.filter(team=team).exclude(puzzle_completed_at=None)) + 1
