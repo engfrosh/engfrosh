@@ -4,10 +4,10 @@ from django.template.loader import render_to_string
 import base64
 
 HSPACING = 100
-VSPACING = 100
+VSPACING = 150
 
-XOFFSET = 25
-YOFFSET = 200
+XOFFSET = 75
+YOFFSET = 250
 
 CIRC_WIDTH = 65
 IMG_WIDTH = CIRC_WIDTH * 1.5
