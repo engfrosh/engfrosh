@@ -45,7 +45,7 @@ def generate_tree(team: Team):
         if cnt > h_count:
             h_count = cnt
     width = HSPACING * h_count + XOFFSET
-    height = VSPACING * v_count + YOFFSET - VSPACING
+    height = VSPACING * v_count + YOFFSET
 
     # Draw all streams first
     direction = 1
