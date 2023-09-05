@@ -109,7 +109,7 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
                 team, req_dict["answer"])
             if correct:
                 DiscordChannel.send_to_updates_channels(
-                    f"""{team.display_name} has submitted an answer for puzzle {puz.name} (order {puz.order})!""")
+                    f"""@here {team.display_name} has submitted an answer for puzzle {puz.name} (order {puz.order})!""")
             if require_verification_photo:
                 next_page = "verification_photo/"
             elif next_puzzle:
@@ -171,7 +171,7 @@ def puzzle_photo_verification_view(request: HttpRequest, slug: str) -> HttpRespo
             pa.save()
 
             DiscordChannel.send_to_updates_channels(
-                f"""{team.display_name} has uploaded a photo for {puz.name} that needs verification.""" +
+                f"""@here {team.display_name} has uploaded a photo for {puz.name} that needs verification.""" +
                 f""""\n{request.build_absolute_uri(reverse("approve_scavenger_puzzles"))}""")
             ScavConsumer.notify_trigger(photo.photo.url, team.display_name, photo.id)
             return HttpResponse()
