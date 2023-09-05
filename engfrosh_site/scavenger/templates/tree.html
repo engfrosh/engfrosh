@@ -8,7 +8,8 @@
             window.top.location.href = url;
         }
         window.onload = function() {
-            window.scrollTo(document.getElementById("body").scrollWidth, 0);
+            var imgframe = document.getElementById("imgframe")
+            imgframe.scrollTo = imgframe.scrollHeight
         }
     </script>
     {% for rect in rectangles %}

@@ -42,6 +42,10 @@ def index(request: HttpRequest) -> HttpResponse:
 
     bypass = request.user.has_perm('common_models.bypass_scav_rules')
 
+    tree = open(team.scav_tree.path, "r")
+    content = tree.read()
+    tree.close()
+
     context = {
         "scavenger_enabled_for_team": team.scavenger_enabled,
         "team": team,
@@ -49,7 +53,8 @@ def index(request: HttpRequest) -> HttpResponse:
         "active_puzzles": team.active_puzzles,
         "verified_puzzles": team.verified_puzzles,
         "completed_puzzles_awaiting_verification": team.completed_puzzles_awaiting_verification,
-        "completed_puzzles_requiring_photo_upload": team.completed_puzzles_requiring_photo_upload
+        "completed_puzzles_requiring_photo_upload": team.completed_puzzles_requiring_photo_upload,
+        "tree": content,
     }
 
     return render(request, "scavenger_index.html", context=context)

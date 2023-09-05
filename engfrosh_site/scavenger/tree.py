@@ -6,7 +6,7 @@ import base64
 HSPACING = 100
 VSPACING = 150
 
-XOFFSET = 100
+XOFFSET = 200
 YOFFSET = 400
 
 CIRC_WIDTH = 65
@@ -44,7 +44,7 @@ def generate_tree(team: Team):
         cnt = len(TeamPuzzleActivity.objects.filter(team=team).exclude(puzzle_completed_at=None)) + 1
         if cnt > h_count:
             h_count = cnt
-    width = HSPACING * h_count + XOFFSET
+    width = HSPACING * h_count + XOFFSET + 150
     height = VSPACING * v_count + YOFFSET
 
     # Draw all streams first
