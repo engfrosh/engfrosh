@@ -21,7 +21,8 @@
             {% if not scavenger_enabled_for_team %}
                 Scavenger is not currently enabled
             {% endif %}
-            <div style="height:1000px;width:800px;border:none;overflow:scroll;transform:rotate(90deg);-webkit-transform:rotate(90deg);" id="imgframe">
+            <!-- <div style="height:1000px;width:800px;border:none;overflow:scroll;transform:rotate(90deg);-webkit-transform:rotate(90deg);" id="imgframe"> --!>
+            <div id="imgframe">
                 {{ tree|safe }}
             </div>
         {% endif %}
