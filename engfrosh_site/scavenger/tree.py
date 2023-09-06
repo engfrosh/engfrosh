@@ -44,8 +44,8 @@ def generate_tree(team: Team):
         cnt = len(TeamPuzzleActivity.objects.filter(team=team).exclude(puzzle_completed_at=None)) + 1
         if cnt > h_count:
             h_count = cnt
-    width = HSPACING * h_count + XOFFSET + 150
-    height = VSPACING * 3 + YOFFSET
+    height = HSPACING * h_count + XOFFSET + 150
+    width = VSPACING * 3 + YOFFSET
 
     # Draw all streams first
     index = 1
@@ -109,7 +109,7 @@ def generate_tree(team: Team):
                 mid_y = (2*y+CIRC_WIDTH)/2
                 # rxy = [(x, mid_y), (x-HSPACING, mid_y)]
                 # d.line(rxy, color, LINE_WIDTH)
-                line = {"x1": int(x), "y1": int(mid_y), "x2": int(x-HSPACING), "y2": int(mid_y),
+                line = {"x1": int(mid_y), "y1": int(x), "x2": int(mid_y), "y2": int(x-HSPACING),
                         "width": LINE_WIDTH, "colour": rgb2hex(color[0], color[1], color[2]), "id": 0}
                 rectangles_svg += [line]
             # d.ellipse(xy, color)
@@ -145,8 +145,8 @@ def generate_tree(team: Team):
         stream_puzzle = stream.first_enabled_puzzle
         if starts.get(puzzle.id, None) is None or starts.get(stream_puzzle.id, None) is None:
             continue
-        line = {"x1": int(starts[puzzle.id][0]), "y1": int(starts[puzzle.id][1]),
-                "x2": int(starts[stream_puzzle.id][0]), "y2": int(starts[stream_puzzle.id][1]),
+        line = {"x1": int(starts[puzzle.id][1]), "y1": int(starts[puzzle.id][0]),
+                "x2": int(starts[stream_puzzle.id][1]), "y2": int(starts[stream_puzzle.id][0]),
                 "width": LINE_WIDTH, "colour": rgb2hex(19, 102, 105), "id": 0}
         rectangles_svg += [line]
         # d.line([starts[puzzle.id], starts[stream_puzzle.id]], (255, 0, 0), LINE_WIDTH)
@@ -156,12 +156,12 @@ def generate_tree(team: Team):
         cx = (box[0][0] + box[1][0])/2
         cy = (box[0][1] + box[1][1])/2
         radius = CIRC_WIDTH/2
-        circ = {"radius": radius, "x": int(cx), "y": int(cy), "colour": rgb2hex(cir[1][0], cir[1][1], cir[1][2]),
+        circ = {"radius": radius, "x": int(cy), "y": int(cx), "colour": rgb2hex(cir[1][0], cir[1][1], cir[1][2]),
                 "id": cir[3].secret_id}
         if cir[2] and logo is not None:
             offset = (int((box[0][0] + box[1][0]) // 2 - IMG_WIDTH // 2),
                       int((box[0][1] + box[1][1]) // 2 - IMG_WIDTH // 2))
-            svgimg = {"id": cir[3].secret_id, "x": int(offset[0]), "y": int(offset[1]), "width": IMG_WIDTH,
+            svgimg = {"id": cir[3].secret_id, "x": int(offset[1]), "y": int(offset[0]), "width": IMG_WIDTH,
                       "height": IMG_WIDTH, "encoded": logo_dat}
             # img.paste(logo, offset)
             images_svg += [svgimg]
