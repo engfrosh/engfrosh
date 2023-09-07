@@ -98,7 +98,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
 @staff_member_required(login_url='/accounts/login')
 def mailing_list(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
-        shifts = list(FacilShift.objects.all())
+        shifts = list(FacilShift.objects.order_by('start'))
         return render(request, "create_mailing_list.html", {"shifts": shifts})
     elif request.method == "POST":
         shift_id = int(request.POST["shift_id"])
