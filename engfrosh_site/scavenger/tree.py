@@ -143,6 +143,8 @@ def generate_tree(team: Team):
         if not enabled_streams.get(stream.id, False) and not enabled_streams.get(puzzle.stream.id, False):
             continue
         stream_puzzle = stream.first_enabled_puzzle
+        if stream_puzzle is None:
+            continue
         if starts.get(puzzle.id, None) is None or starts.get(stream_puzzle.id, None) is None:
             continue
         line = {"x1": int(starts[puzzle.id][1]), "y1": int(starts[puzzle.id][0]),
