@@ -911,7 +911,8 @@ def approve_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
 
         context = {"puzzle_activities_awaiting_verification": list(
-            filter(TeamPuzzleActivity._is_awaiting_verification, TeamPuzzleActivity.objects.all()))}
+            filter(TeamPuzzleActivity._is_awaiting_verification,
+                   TeamPuzzleActivity.objects.exclude(puzzle_completed_at=None)))}
 
         return render(request, "approve_scavenger_puzzles.html", context)
 
