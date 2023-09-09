@@ -10,18 +10,18 @@
 [+] Rebuild Discord bot so that it is independant of the webserver and just interacts through the database or web API calls to the web server
 [+] Rebuild Discord bot using nextcord
 [+] Update Discord bot to use slash commands (reference the engfrosh/scavenger-discord bot)
-[ ] Make it so you can @ roles for /scav_lock and /scav_unlock
+[+] Make it so you can @ roles for /scav_lock and /scav_unlock
 
 ## Management
 [ ] Add _Manage Roles_ page and make it easy to create the default roles for planning, heads, frosh, facils.
 [+] Add way to create default roles for Directors, Spirit, etc
 [ ] Add email delay to not hit AWS limits
-[ ] Add invite/email all button to the magic links invite page
-[ ] Add tracking and limit the send link page to users who have not linked a discord account
+[+] Add invite/email all button to the magic links invite page
+[+] Add tracking and limit the send link page to users who have not linked a discord account
 [ ] Add easy way to change the discord invite email
 [ ] Change discord magic links to not immediately get invalidated
 [ ] Change name of the _magic links_ page to _send invite links_
-[ ] When adding users via magic link check that they don't have a discord account linked first, and don't have an outstanding magic link, don't allow the email button. 
+[+] When adding users via magic link check that they don't have a discord account linked first, and don't have an outstanding magic link, don't allow the email button. 
 [ ] Add management of programs to make it easy to generate the programs
 
 ## Authentication
@@ -35,23 +35,23 @@
 
 ## Scav
 [ ] How do we want to do scav
-[ ] Add handling question response times
-[ ] Add check if questions are actually enabled before sending them
-[ ] Add enable and disable scav commands 
+[+] Add handling question response times
+[+] Add check if questions are actually enabled before sending them
+[+] Add enable and disable scav commands 
 [+] Add QR answer support
 [ ] Have scav be available after the week to let people see the whole thing 
 
 ## Scoin
-[ ] Do we want Scoin still
+[+] Do we want Scoin still
 [ ] Add setting to edit whether scoin exists or not
 <!-- [ ] Add more robust permissions -->
 
 ## Moderation
 [+] Make it so edited messages also get checked for moderation
-[ ] Fix word list so names and common words are not captured or limited
+[+] Fix word list so names and common words are not captured or limited
 
 ## Logging
-[ ] Change logging format so it is actually useful
+[+] Change logging format so it is actually useful
 
 ## Trade Up
 [ ] Add trade up log
