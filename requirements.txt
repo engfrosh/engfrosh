@@ -47,7 +47,7 @@ tomli==2.0.1
 tqdm==4.64.0
 typing_extensions==4.3.0
 tzdata==2022.2
-urllib3==1.26.11
+urllib3==1.26.17
 yarl==1.8.1
 zipp==3.8.1
 credentials==1.1
