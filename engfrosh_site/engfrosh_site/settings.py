@@ -195,6 +195,7 @@ DATABASES = {
         "USER": "engfrosh_site",
         "PASSWORD": "there-exercise-fenegle",
         "HOST": "127.0.0.1",
+        'CONN_MAX_AGE': 3600,
         "PORT": "3306",
     }}
 
