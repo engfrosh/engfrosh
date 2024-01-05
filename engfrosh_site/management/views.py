@@ -13,7 +13,7 @@ from django.contrib import auth
 import pyaccord
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
-from common_models.models import FroshRole, Team, UniversityProgram, TeamTradeUpActivity
+from common_models.models import FroshRole, Team, UniversityProgram, TeamTradeUpActivity, UserDetails
 from common_models.models import ChannelTag, DiscordGuild, Announcement, FacilShift, FacilShiftSignup
 import common_models.models
 from common_models.models import DiscordRole
@@ -192,6 +192,35 @@ def shift_export(request: HttpRequest) -> HttpResponse:
                 line += ","
     response = HttpResponse(line, content_type="text/csv")
     response['Content-Disposition'] = 'attachment; filename="shifts.csv"'
+    return response
+
+
+@staff_member_required(login_url='/accounts/login')
+def export_teams(request: HttpRequest) -> HttpResponse:
+    data = {}
+    max_len = 0
+    for team in Team.objects.all():
+        users = UserDetails.objects.filter(user__groups__in=[team.group])
+        data[team] = users
+        if len(users) > max_len:
+            max_len = len(users)
+    line = ""
+    for i in range(-2, max_len):
+        for key, value in data.items():
+            if i == -2:
+                line += key.display_name + ",,"
+            elif i == -1:
+                line += "Name,Role,"
+            else:
+                if len(value) > i:
+                    line += value[i].name + "," + value[i].role + ","
+                else:
+                    line += ",,"
+                
+        line += "\n"
+    
+    response = HttpResponse(line, content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename="teams.csv"'
     return response
 
 
