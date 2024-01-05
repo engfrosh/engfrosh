@@ -216,9 +216,9 @@ def export_teams(request: HttpRequest) -> HttpResponse:
                     line += value[i].name + "," + value[i].role + ","
                 else:
                     line += ",,"
-                
+
         line += "\n"
-    
+
     response = HttpResponse(line, content_type="text/csv")
     response['Content-Disposition'] = 'attachment; filename="teams.csv"'
     return response
