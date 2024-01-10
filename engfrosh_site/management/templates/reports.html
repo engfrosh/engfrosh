@@ -1,0 +1,91 @@
+{% extends "base_manage_subpage.html" %}
+{% load static %}
+{% block page_title %}
+    Programmable Reports
+{% endblock page_title %}
+{% block top_title %}
+    Programmable Reports
+{% endblock top_title %}
+{% block active %}
+    <div class="text-white">
+    <table id="table">
+        {% if data is None %}
+            <tr>
+                <td class="px-2">Target</td>
+                <td class="px-2">Value</td>
+                <td class="px-2">Operator</td>
+                <td class="px-2"><button onclick="add()">Add</button></td>
+                <td class="px-2"><button onclick="send()">View HTML</button></td>
+            </tr>
+            <tr id="input">
+                <td class="px-2">
+                    <select id="target">
+                        {% for param in params %}
+                            <option value="{{ param }}">{{ param }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td class="px-2">
+                    <input type="text" id="value">
+                </td>
+                <td class="px-2">
+                    <select id="operator">
+                        <option value="=">Equals</option>
+                        <option value="!=">Does Not Equal</option>
+                    </select>
+                </td>
+            </tr>
+            <form id="hiddenform" method="POST">
+                {% csrf_token %}
+                <input type="hidden" id="query" name="query">
+            </form>
+        {% else %}
+        <tr>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="query" value="{{ query }}"></input>
+                <input type="submit" value="Download CSV"></input>
+            </form>
+            <td>
+                <p>Results found: {{ length }}</p>
+            </td>
+        </tr>
+        {% for d1 in data %}
+            <tr>
+                {% for d2 in d1 %}
+                    <td class="px-2">{{ d2 }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        {% endif %}
+    </table>
+    </div>
+    <script>
+        var query = {"format": "html", "query": new Array()};
+        function add(){
+            var target = document.getElementById("target").value;
+            var value = document.getElementById("value").value;
+            var operator = document.getElementById("operator").value;
+            var elem = {"target": target, "value": value, "operator": operator};
+            query.query.push(elem);
+            var table = document.getElementById("table");
+            var tr = document.createElement("tr");
+            var td1 = document.createElement("td");
+            td1.innerHTML = target;
+            tr.appendChild(td1);
+            var td2 = document.createElement("td");
+            td2.innerHTML = value;
+            tr.appendChild(td2);
+            var td3 = document.createElement("td");
+            td3.innerHTML = operator;
+            tr.appendChild(td3);
+            table.appendChild(tr);
+        }
+        function send(){
+            var form = document.getElementById("hiddenform");
+            var input = document.getElementById("query");
+            input.value = JSON.stringify(query);
+            form.submit();
+        }
+    </script>
+{% endblock active %}

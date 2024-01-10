@@ -13,7 +13,7 @@ from django.contrib import auth
 import pyaccord
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
-from common_models.models import FroshRole, Team, UniversityProgram, TeamTradeUpActivity
+from common_models.models import FroshRole, Team, UniversityProgram, TeamTradeUpActivity, UserDetails
 from common_models.models import ChannelTag, DiscordGuild, Announcement, FacilShift, FacilShiftSignup
 import common_models.models
 from common_models.models import DiscordRole
@@ -109,6 +109,95 @@ def mailing_list(request: HttpRequest) -> HttpResponse:
             redir += "," + signup.user.email
         redir = "mailto:" + redir[1:]
         return HttpResponse('<meta http-equiv="refresh" content="0;url=' + redir + '" />')
+
+
+@staff_member_required(login_url='/accounts/login')
+def reports(request: HttpRequest) -> HttpResponse:
+    if request.method == "GET":
+        details = UserDetails.objects.all().first()
+        params = []
+        for key in dir(details):
+            if key.startswith("_"):
+                continue
+            params += ["details." + key]
+        for key in dir(details.user):
+            if key.startswith("_"):
+                continue
+            params += ["user." + key]
+        return render(request, "reports.html", {"params": params})
+    elif request.method == "POST":
+        req_dict = json.loads(request.POST.get("query"))
+        requirements = []
+        try:
+            dataformat = req_dict['format']
+            for query in req_dict['query']:
+                target = query['target']
+                value = query['value']
+                operator = query['operator']
+                requirements += [(target, value, operator)]
+        except KeyError:
+            return HttpResponseBadRequest("Key Error in Body")
+        users = UserDetails.objects.all()
+        data = []
+        for user in users:
+            met = True
+            for r in requirements:
+                d = r[0].split(".")
+                obj = d[0]
+                name = d[1]
+                if obj == "details":
+                    value = str(getattr(user, name))
+                    if callable(value):
+                        value = value()
+                elif obj == "user":
+                    value = str(getattr(user.user, name))
+                    if callable(value):
+                        value = value()
+                if r[2] == "=" and value.lower() != str(r[1]).lower():
+                    met = False
+                    break
+                elif r[2] == "!=" and value.lower() == str(r[1]).lower():
+                    met = False
+                    break
+            if met:
+                data += [user]
+        output = []
+        first = True
+        for user in data:
+            cur = []
+            if first:
+                for key in user.__dict__.keys():
+                    if key.startswith("_"):
+                        continue
+                    cur += ["details." + key]
+                for key in user.user.__dict__.keys():
+                    if key.startswith("_"):
+                        continue
+                    cur += ["user." + key]
+                output += [cur]
+            cur = []
+            first = False
+            for key, value in user.__dict__.items():
+                if key.startswith("_"):
+                    continue
+                cur += [str(value)]
+            for key, value in user.user.__dict__.items():
+                if key.startswith("_"):
+                    continue
+                cur += [str(value)]
+            output += [cur]
+        if dataformat == "csv":
+            line = ""
+            for o1 in output:
+                for o2 in o1:
+                    line += o2 + ","
+                line += "\n"
+            response = HttpResponse(line, content_type="text/csv")
+            response['Content-Disposition'] = 'attachment; filename="report.csv"'
+            return response
+        elif dataformat == "html":
+            req_dict["format"] = "csv"
+            return render(request, "reports.html", {"data": output, "length": len(output)-1, "query": json.dumps(req_dict)})
 
 
 @staff_member_required(login_url='/accounts/login')
