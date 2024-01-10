@@ -170,6 +170,7 @@ def reports(request: HttpRequest) -> HttpResponse:
                     if key.startswith("_"):
                         continue
                     cur += ["details." + key]
+                cur += ["details.role"]
                 for key in user.user.__dict__.keys():
                     if key.startswith("_"):
                         continue
@@ -181,6 +182,7 @@ def reports(request: HttpRequest) -> HttpResponse:
                 if key.startswith("_"):
                     continue
                 cur += [str(value)]
+            cur += [user.role]
             for key, value in user.user.__dict__.items():
                 if key.startswith("_"):
                     continue
@@ -197,7 +199,8 @@ def reports(request: HttpRequest) -> HttpResponse:
             return response
         elif dataformat == "html":
             req_dict["format"] = "csv"
-            return render(request, "reports.html", {"data": output, "length": len(output)-1, "query": json.dumps(req_dict)})
+            return render(request, "reports.html", {"data": output, "length": len(output)-1,
+                                                    "query": json.dumps(req_dict)})
 
 
 @staff_member_required(login_url='/accounts/login')
