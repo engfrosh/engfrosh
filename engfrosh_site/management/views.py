@@ -857,7 +857,7 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
                 puzzle.save()
                 next_puzzle = puzzle.stream.get_next_enabled_puzzle(puzzle)
                 for activity in TeamPuzzleActivity.objects.filter(puzzle=puzzle).all():
-                    if not activity.puzzle_completed_at:
+                    if not activity.is_completed:
                         if next_puzzle is None:
                             activity.delete()
                         else:
