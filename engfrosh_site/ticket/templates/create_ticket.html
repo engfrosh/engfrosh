@@ -4,11 +4,14 @@
 {% endblock page_title %}
 {% block body %}
 
-<form action="create" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Create">
-</form>
-<a class="text-blue-600" href="{% url 'view_tickets' %}">View My Tickets</a>
+<div style="margin:25px;">
+    <form action="create" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <br>
+        <input type="submit" value="Create" style="cursor:pointer; border-width:1px; padding:5px; border-radius:5px;">
+    </form><br><br>
+    <a class="text-blue-600" href="{% url 'view_tickets' %}">View My Tickets</a>
+</div>
 
 {% endblock %}

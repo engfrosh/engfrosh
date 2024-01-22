@@ -73,6 +73,7 @@ def msTokenCallback(request: HttpRequest):
     email = token['id_token_claims']['preferred_username'].lower()
     user = User.objects.filter(email=email).first()
     if user is None:
+        logger.error("Email is not registered: " + email)
         return HttpResponseBadRequest("Email is not registered!")
     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
