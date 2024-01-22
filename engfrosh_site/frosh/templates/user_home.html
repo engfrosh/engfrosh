@@ -17,14 +17,18 @@
             {% if scavenger_enabled %}
                 <a href="{% url 'scavenger_index' %}"
                    class="bg-main dark:bg-main-night rounded-lg p-2">Scav</a>
-            {% else %}
+            {% elif scavenger_disabled %}
                 <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2">Scav Disabled</a>
+            {% else %}
+                <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2">No Scav Team</a>
             {% endif %}
             {% if trade_up_enabled %}
                 <a href="{% url 'trade_up_home' %}"
                    class="bg-main dark:bg-main-night rounded-lg p-2">Trade Up</a>
-            {% else %}
+            {% elif trade_up_disabled %}
                 <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2">Trade Up Disabled</a>
+            {% else %}
+                <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2">No Trade Up Team</a>
             {% endif %}<br><br>
             <a href="{% url 'my_skash' %}"
                class="bg-main dark:bg-main-night rounded-lg p-2">Team Skash</a>
