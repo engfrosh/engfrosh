@@ -187,18 +187,28 @@ ASGI_APPLICATION = 'engfrosh_site.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "engfrosh",
-        "USER": "engfrosh_site",
-        "PASSWORD": "there-exercise-fenegle",
-        "HOST": "127.0.0.1",
-        'CONN_MAX_AGE': 3600,
-        "PORT": "3306",
-    }}
-
+if development:
+    DATABASES = {
+        'default': {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": "engfrosh",
+            "USER": "engfrosh_site",
+            "PASSWORD": "there-exercise-fenegle",
+            "HOST": "127.0.0.1",
+            'CONN_MAX_AGE': 3600,
+            "PORT": "3306",
+        }}
+else:
+    DATABASES = {
+        'default': {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": "engfrosh",
+            "USER": "engfrosh_site",
+            "PASSWORD": "there-exercise-fenegle",
+            "HOST": "10.0.0.1",
+            'CONN_MAX_AGE': 3600,
+            "PORT": "3306",
+        }}
 
 # Password validation & Authentication
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
