@@ -93,20 +93,16 @@ if development:
     ALLOWED_HOSTS = [
         "127.0.0.1",
         "localhost",
-        "server.engfrosh.com",
-        "engfrosh.com"
+        "nem-scav.mycses.ca"
     ]
 else:
     ALLOWED_HOSTS = [
-        "server.engfrosh.com",
-        "engfrosh.com"
+        "nem-scav.mycses.ca"
     ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://*.engfrosh.com",
-    "https://engfrosh.com",
-    "http://*.engfrosh.com",
-    "http://engfrosh.com"
+    "https://nem-scav.mycses.ca",
+    "http://nem-scav.mycses.ca"
 ]
 
 REST_FRAMEWORK = {
