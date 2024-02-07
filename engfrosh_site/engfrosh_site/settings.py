@@ -205,7 +205,7 @@ else:
             "NAME": "engfrosh",
             "USER": "engfrosh_site",
             "PASSWORD": "there-exercise-fenegle",
-            "HOST": "10.0.0.1",
+            "HOST": "10.10.10.1",
             'CONN_MAX_AGE': 3600,
             "PORT": "3306",
         }}
