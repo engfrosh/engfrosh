@@ -7,12 +7,12 @@ import os
 from typing import Union
 
 import credentials
-from common_models.models import DiscordUser, MagicLink
+from common_models.models import DiscordUser, MagicLink, Team
 
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
 from django.contrib.auth import logout
-
+from django.contrib.auth.models import Group
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
@@ -55,10 +55,21 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
     # If no given User account to associate with, create a new one
     if not user:
         if not username:
-            s = f"{discord_username}+{discord_discriminator}-"
+            decode = discord_username.decode('utf-8')
+            s = f"{decode}+{discord_discriminator}-"
             username = s + "".join(random.choice(string.ascii_letters + string.digits) for i in range(8))
         user = User.objects.create_user(username, email, password)  # type: ignore
         user.save()
+        head = Group.objects.get(name='Head')
+        head.user_set.add(user)
+        group = Group(name=username)
+        group.save()
+        group.user_set.add(user)
+        team = Team(display_name=username, group=group, color=None)
+        team.save()
+        team.reset_scavenger_progress()
+        team.save()
+
 
     # Create new DiscordUser
     discord_user = DiscordUser(

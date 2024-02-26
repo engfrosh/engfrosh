@@ -187,8 +187,8 @@ if development:
     DATABASES = {
         'default': {
             "ENGINE": "django.db.backends.mysql",
-            "NAME": "engfrosh",
-            "USER": "engfrosh_site",
+            "NAME": "nemscav",
+            "USER": "nemscav_site",
             "PASSWORD": "there-exercise-fenegle",
             "HOST": "127.0.0.1",
             'CONN_MAX_AGE': 3600,
@@ -198,8 +198,8 @@ else:
     DATABASES = {
         'default': {
             "ENGINE": "django.db.backends.mysql",
-            "NAME": "engfrosh",
-            "USER": "engfrosh_site",
+            "NAME": "nemscav",
+            "USER": "nemscav_site",
             "PASSWORD": "there-exercise-fenegle",
             "HOST": "10.10.10.1",
             'CONN_MAX_AGE': 3600,
