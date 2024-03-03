@@ -612,14 +612,14 @@ def discord_create(request: HttpRequest) -> HttpResponse:
             overwrites += [o]
         if len(DiscordChannel.objects.filter(name=team.display_name, type=4)) == 0:
             category = guild.create_channel(team.display_name, None, True)
-            DiscordChannel(name=team.display_name, type=4, id=category.id).save()
+            DiscordChannel(name=team.display_name, type=4, id=category.id, team=team).save()
         cat = DiscordChannel.objects.filter(name=team.display_name, type=4).first()
         for i in range(len(types)):
             t = types[i]
             if len(DiscordChannel.objects.filter(name=team.discord_name + "-" + t[0])) > 0:
                 continue
             chan = guild.create_channel(team.discord_name + "-" + t[0], cat.id, False)
-            dchan = DiscordChannel(name=team.discord_name + "-" + t[0], type=0, id=chan.id)
+            dchan = DiscordChannel(name=team.discord_name + "-" + t[0], type=0, id=chan.id, basename=t[0], team=team)
             dchan.save()
             dchan.tags.add(t[1])
             dchan.unlocked_overwrites.add(disallow)
