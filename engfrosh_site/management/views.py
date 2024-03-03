@@ -590,6 +590,7 @@ def discord_create(request: HttpRequest) -> HttpResponse:
     poverwrite.save()
     disallow = DiscordOverwrite(descriptive_name="Deny All", user_id=guild.id, type=0, allow=0, deny=3072)
     disallow.save()
+    admin = DiscordOverwrite.objects.get(descriptive_name="Technical")
     for team in Team.objects.all():
         if team.discord_name is None:
             continue
@@ -622,6 +623,7 @@ def discord_create(request: HttpRequest) -> HttpResponse:
             dchan.save()
             dchan.tags.add(t[1])
             dchan.unlocked_overwrites.add(disallow)
+            dchan.unlocked_overwrites.add(admin)
             if i == 0:
                 dchan.unlocked_overwrites.add(poverwrite)
             for i2 in range(i, len(types)):
