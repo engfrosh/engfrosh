@@ -55,6 +55,10 @@
          class="bg-main dark:bg-main-night rounded-lg p-2">Create Announcement</a>
       <a href="{% url 'edit_event' id=0 %}"
          class="bg-main dark:bg-main-night rounded-lg p-2">Create Calendar Event</a>
+      <a href="{% url 'discord_rename' %}"
+         class="bg-main dark:bg-main-night rounded-lg p-2">Rename Discord Channels</a>
+      <a href="{% url 'discord_create' %}"
+         class="bg-main dark:bg-main-night rounded-lg p-2">Create Discord Channels</a>
    </div>
 </div>
 {% endblock active %}
