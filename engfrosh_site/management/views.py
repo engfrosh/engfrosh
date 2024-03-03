@@ -629,6 +629,7 @@ def discord_create(request: HttpRequest) -> HttpResponse:
 
             dchan.save()
             dchan.unlock()
+    return redirect('/manage/')
 
 
 @user_passes_test(lambda u: u.is_superuser)
