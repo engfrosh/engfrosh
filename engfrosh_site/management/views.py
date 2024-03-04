@@ -615,7 +615,7 @@ def discord_create(request: HttpRequest) -> HttpResponse:
             category = guild.create_channel(team.display_name, None, True)
             DiscordChannel(name=team.display_name, type=4, id=category.id, team=team).save()
         cat = DiscordChannel.objects.filter(name=team.display_name, type=4).first()
-        for i in range(len(types)):
+        for i in range(len(types) - 1):
             t = types[i]
             if len(DiscordChannel.objects.filter(name=team.discord_name + "-" + t[0])) > 0:
                 continue
