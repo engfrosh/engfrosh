@@ -21,9 +21,22 @@
             {% if not scavenger_enabled_for_team %}
                 Scavenger is not currently enabled
             {% endif %}
-            <!-- <div style="height:1000px;width:800px;border:none;overflow:scroll;transform:rotate(90deg);-webkit-transform:rotate(90deg);" id="imgframe"> --!>
             <div id="imgframe">
                 {{ tree|safe }}
+            </div>
+            <div id="scavtext">
+                <h2>Active Scavenger Puzzles</h2>
+                <ul>
+                    {% for puzzle in active_puzzles %}
+                        <a href="{% url 'view_puzzle' slug=puzzle.secret_id%}">{{puzzle.name}}</a>
+                    {% endfor %}
+                </ul>
+                <h2>Completed Scavenger Puzzles</h2>
+                <ul>
+                    {% for puzzle in completed_puzzles %}
+                        <a href="{% url 'view_puzzle' slug=puzzle.secret_id%}">{{puzzle.name}}</a>
+                    {% endfor %}
+                </ul>
             </div>
         {% endif %}
     {% endif %}
