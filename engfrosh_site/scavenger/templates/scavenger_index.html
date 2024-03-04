@@ -26,7 +26,7 @@
                 {{ tree|safe }}
             </div> --!>
             {% for puzzle in active_puzzles %}
-                <a href="{% url 'puzzle_view' slug=puzzle.puzzle.secret_id %}">{{ puzzle.puzzle.name}}</a>
+                <a href="{% url 'puzzle_view' slug=puzzle.secret_id %}">{{ puzzle.puzzle.name}}</a>
             {% endfor %}
         {% endif %}
     {% endif %}
