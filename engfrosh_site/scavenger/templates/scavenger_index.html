@@ -25,9 +25,12 @@
             <!-- <div id="imgframe">
                 {{ tree|safe }}
             </div> --!>
+            <h2>Active Puzzles</h2>
+            <ul>
             {% for puzzle in active_puzzles %}
-                <a href="{% url 'puzzle_view' slug=puzzle.secret_id %}">{{ puzzle.puzzle.name}}</a>
+                <li><a href="{% url 'puzzle_view' slug=puzzle.secret_id %}">{{ puzzle.name}}</a></li>
             {% endfor %}
+            </ul>
         {% endif %}
     {% endif %}
 {% endblock body %}
