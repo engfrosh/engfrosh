@@ -564,6 +564,8 @@ def manage_discord_channels(request: HttpRequest) -> HttpResponse:
 def discord_rename(request: HttpRequest) -> HttpResponse:
     for channel in DiscordChannel.objects.all():
         channel.rename()
+    for role in DiscordRole.objects.all():
+        role.rename()
     return redirect('/manage/')
 
 
@@ -576,7 +578,8 @@ def discord_create(request: HttpRequest) -> HttpResponse:
         ("Frosh", ChannelTag.objects.get_or_create(name="FROSH")[0], Group.objects.get_or_create(name="Frosh")[0]),
         ("Facil", ChannelTag.objects.get_or_create(name="FACIL")[0], Group.objects.get_or_create(name="Facil")[0]),
         ("Head", ChannelTag.objects.get_or_create(name="HEAD")[0], Group.objects.get_or_create(name="Head")[0]),
-        ("Groupco", ChannelTag.objects.get_or_create(name="GROUP-CO")[0], None),
+        ("Groupco", ChannelTag.objects.get_or_create(name="GROUP-CO")[0],
+         Group.objects.get_or_create(name="GroupCo")[0]),
     ]
     if guild.get_role("Planning") is None:
         r = guild.create_role("Planning")
@@ -598,8 +601,6 @@ def discord_create(request: HttpRequest) -> HttpResponse:
         for t in types:
             name = team.display_name + " " + t[0]
             sg = t[2]
-            if sg is None:
-                sg = Group.objects.get_or_create(name=team.display_name + " GroupCo")[0]
 
             if guild.get_role(name) is None:
                 r = guild.create_role(name)
