@@ -22,9 +22,12 @@
                 Scavenger is not currently enabled
             {% endif %}
             <!-- <div style="height:1000px;width:800px;border:none;overflow:scroll;transform:rotate(90deg);-webkit-transform:rotate(90deg);" id="imgframe"> --!>
-            <div id="imgframe">
+            <!-- <div id="imgframe">
                 {{ tree|safe }}
-            </div>
+            </div> --!>
+            {% for puzzle in active_puzzles %}
+                <a href="{% url 'puzzle_view' slug=puzzle.puzzle.secret_id %}">{{ puzzle.puzzle.name}}</a>
+            {% endfor %}
         {% endif %}
     {% endif %}
 {% endblock body %}
