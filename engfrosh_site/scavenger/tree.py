@@ -27,6 +27,8 @@ def generate_tree(team: Team):
     enabled_streams = {}
     for j in range(1):  # This is really hacky
         for stream in streams:
+            if unlocks.get(stream.id, None) is not None:
+                continue
             if stream.default:
                 unlocks[stream.id] = 0
                 enabled_streams[stream.id] = True
