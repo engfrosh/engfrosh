@@ -4,7 +4,7 @@ from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required, permission_required
 import random
 from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, Announcement, UserDetails
-from common_models.models import InclusivityPage, FroshRole
+from common_models.models import InclusivityPage, FroshRole, DiscordUser
 import datetime
 from management import forms
 from schedule.models import Event, CalendarRelation
@@ -133,12 +133,15 @@ def user_home(request: HttpRequest) -> HttpResponse:
     except Exception:
         pass
 
+    discord = DiscordUser.objects.filter(user=request.user).first()
+
     context = {
         "scavenger_enabled": team.scavenger_enabled if team else False,
         "trade_up_enabled": team.trade_up_enabled if team else False,
         "scavenger_disabled": not team.scavenger_enabled if team else False,
         "trade_up_disabled": not team.trade_up_enabled if team else False,
         "details": details,
+        "link_discord": True if discord is None else False,
         "rand": rand,
         "calendars": calendars,
     }

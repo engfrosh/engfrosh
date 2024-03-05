@@ -33,4 +33,8 @@ urlpatterns = [
     path('shift_export', views.shift_export, name="shift_export"),
     path('shift_manage/<int:id>', views.shift_manage, name="shift_manage"),
     path('reports', views.reports, name="reports")
+    path('export_teams', views.export_teams, name="export_teams"),
+    path('prc', views.bulk_add_prc, name="bulk_add_prc")
+    path('discord_rename', views.discord_rename, name="discord_rename"),
+    path('discord_create', views.discord_create, name="discord_create")
 ]

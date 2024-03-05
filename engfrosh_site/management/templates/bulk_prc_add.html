@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}">
+        {% csrf_token %}
+        <script>
+        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        // Load the constants that are modifiable at runtime
+        var teams = [{% for t in team_options %}"{{t}}",{% endfor %}];
+        var roles = [{% for r in role_options %}"{{r}}",{% endfor %}];
+        var programs = [{% for p in program_options %}"{{p}}",{% endfor %}];
+        </script>
+        <style>
+        th {
+            width: 100px;
+        }
+
+        th.email, th.name {
+            width: 300px;
+        }
+
+        input.name_input, input.email_input {
+            width: 300px;
+        }
+
+        input.size_input {
+            width: 50px;
+            text-align: center;
+        }
+
+        td {
+            text-align: center;
+        }
+        </style>
+        <script src="{% static 'bulk_prc_add.js' %}"></script>
+        <title></title>
+    </head>
+    <body>
+        <a href="/manage">Back to Manage</a>
+        <br />
+        <hr/>
+        <p>
+            Upload CSV:
+            <input type="file" id="file_selector" accept=".csv">
+        </input>
+    </p>
+    <a href="{% static 'example_prc_csv.csv' %}">Example CSV</a>
+    <br/>
+    <script>
+        const fileSelector = document.getElementById("file_selector")
+        fileSelector.addEventListener('change', (event) => {
+            const file = event.target.files[event.target.files.length - 1];
+            console.log(file);
+            handleCSVFile(file);
+        })
+    </script>
+    <hr/>
+    <button onclick="addPRCRow()">Add PRC</button>
+    <table id="new-user-table">
+        <tr>
+            <th class="first_name">First Name</th>
+            <th class="last_name">Last Name</th>
+            <th class="email">Email</th>
+            <th class="issued">Issued</th>
+            <th class="add_all">
+                <button type="button" onclick="addAllPRCButtonPress()">ADD ALL</button>
+            </th>
+        </tr>
+    </table>
+</body>
+</html>
