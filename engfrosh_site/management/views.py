@@ -16,7 +16,7 @@ from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle,
 from common_models.models import FroshRole, Team, UniversityProgram, TeamTradeUpActivity, UserDetails
 from common_models.models import ChannelTag, DiscordGuild, Announcement, FacilShift, FacilShiftSignup
 import common_models.models
-from common_models.models import DiscordRole
+from common_models.models import DiscordRole, DiscordOverwrite
 from . import registration
 from . import forms
 
@@ -403,6 +403,48 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
     return HttpResponseBadRequest()
 
 
+@permission_required("auth.add_user")
+def bulk_add_prc(request: HttpRequest) -> HttpResponse:
+    """View for bulk prc adding."""
+
+    if request.method == "GET":
+        context = {}
+        return render(request, "bulk_prc_add.html", context)
+
+    elif request.method == "POST":
+
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Not application/json content type")
+
+        req_dict = json.loads(request.body)
+        try:
+            if req_dict["command"] != "add_prc":
+                return HttpResponseBadRequest()
+
+            first_name = req_dict["first_name"]
+            last_name = req_dict["last_name"]
+            email = req_dict["email"]
+            issued = req_dict["issued"]
+        except KeyError:
+            return HttpResponseBadRequest("Key Error in Body")
+        if issued is None or issued == "":
+            return HttpResponseBadRequest("Invalid PRC.")
+        user = User.objects.filter(email=email).first()
+        if user is None:
+            users = User.objects.filter(first_name__iexact=first_name, last_name__iexact=last_name)
+            if len(users) == 1:
+                user = users.first()
+        if user is None:
+            return HttpResponseBadRequest("User not found.")
+        details = UserDetails.objects.filter(user=user).first()
+        details.prc_completed = True
+        details.save
+
+        return JsonResponse({"user_id": user.id, "username": user.username})  # type: ignore
+
+    return HttpResponseBadRequest()
+
+
 # region Link Discord
 
 
@@ -587,6 +629,81 @@ def manage_discord_channels(request: HttpRequest) -> HttpResponse:
     else:
 
         return HttpResponseBadRequest("Bad http request method.")
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def discord_rename(request: HttpRequest) -> HttpResponse:
+    for channel in DiscordChannel.objects.all():
+        channel.rename()
+    for role in DiscordRole.objects.all():
+        role.rename()
+    return redirect('/manage/')
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def discord_create(request: HttpRequest) -> HttpResponse:
+    guild = DiscordGuild.objects.first()
+    if guild is None:
+        return redirect('/manage/')
+    types = [
+        ("Frosh", ChannelTag.objects.get_or_create(name="FROSH")[0], Group.objects.get_or_create(name="Frosh")[0]),
+        ("Facil", ChannelTag.objects.get_or_create(name="FACIL")[0], Group.objects.get_or_create(name="Facil")[0]),
+        ("Head", ChannelTag.objects.get_or_create(name="HEAD")[0], Group.objects.get_or_create(name="Head")[0]),
+        ("Groupco", ChannelTag.objects.get_or_create(name="GROUP-CO")[0],
+         Group.objects.get_or_create(name="GroupCo")[0]),
+    ]
+    if guild.get_role("Planning") is None:
+        r = guild.create_role("Planning")
+    else:
+        r = guild.get_role("Planning")
+    g = Group.objects.get_or_create(name="Planning")[0]
+    dr = DiscordRole.objects.get_or_create(role_id=r.id, group_id=g)[0]
+    dr.save()
+    prole = DiscordRole.objects.get(group_id=Group.objects.filter(name="Planning").first())
+    poverwrite = DiscordOverwrite(descriptive_name="Planning", user_id=prole.role_id, type=0, allow=3072, deny=0)
+    poverwrite.save()
+    disallow = DiscordOverwrite(descriptive_name="Deny All", user_id=guild.id, type=0, allow=0, deny=3072)
+    disallow.save()
+    admin = DiscordOverwrite.objects.get(descriptive_name="Technical")
+    for team in Team.objects.all():
+        if team.discord_name is None:
+            continue
+        overwrites = []
+        for t in types:
+            name = team.display_name + " " + t[0]
+            sg = t[2]
+
+            if guild.get_role(name) is None:
+                r = guild.create_role(name)
+                dr = DiscordRole(role_id=r.id, group_id=team.group, secondary_group_id=sg)
+                dr.save()
+            dr = DiscordRole.objects.get(group_id=team.group, secondary_group_id=sg)
+            o = DiscordOverwrite(descriptive_name=team.display_name + " " + t[0],
+                                 user_id=dr.role_id, type=0, allow=3072, deny=0)
+            o.save()
+            overwrites += [o]
+        if len(DiscordChannel.objects.filter(name=team.display_name, type=4)) == 0:
+            category = guild.create_channel(team.display_name, None, True)
+            DiscordChannel(name=team.display_name, type=4, id=category.id, team=team).save()
+        cat = DiscordChannel.objects.filter(name=team.display_name, type=4).first()
+        for i in range(len(types) - 1):
+            t = types[i]
+            if len(DiscordChannel.objects.filter(name=team.discord_name + "-" + t[0])) > 0:
+                continue
+            chan = guild.create_channel(team.discord_name + "-" + t[0], cat.id, False)
+            dchan = DiscordChannel(name=team.discord_name + "-" + t[0], type=0, id=chan.id, basename=t[0], team=team)
+            dchan.save()
+            dchan.tags.add(t[1])
+            dchan.unlocked_overwrites.add(disallow)
+            dchan.unlocked_overwrites.add(admin)
+            if i == 0:
+                dchan.unlocked_overwrites.add(poverwrite)
+            for i2 in range(i, len(types)):
+                dchan.unlocked_overwrites.add(overwrites[i2])
+
+            dchan.save()
+            dchan.unlock()
+    return redirect('/manage/')
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -882,7 +999,11 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
             puzzle_id = req_dict['puzzle']
             puzzle = Puzzle.objects.filter(id=puzzle_id).first()
             if puzzle.enabled:
+                puzzle.enabled = False
+                puzzle.save()
                 next_puzzle = puzzle.stream.get_next_enabled_puzzle(puzzle)
+                puzzle.enabled = True
+                puzzle.save()
                 for activity in TeamPuzzleActivity.objects.filter(puzzle=puzzle).all():
                     if not activity.is_completed:
                         if next_puzzle is None:
