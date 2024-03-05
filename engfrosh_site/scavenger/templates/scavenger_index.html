@@ -7,11 +7,27 @@
 <meta http-equiv="Content-Security-Policy" content="default-src: 'self'" />
 {% endblock js_functions %}
 {% block body %}
+<script>
+var old = false;
+function viewSwitch(){
+    old = !old;
+    var imgframe = document.getElementById("imgframe");
+    var scavtext = document.getElementById("scavtext");
+    if(old){
+        imgframe.style.display = "none";
+        scavtext.style.display = "block";
+    }else{
+        imgframe.style.display = "block";
+        scavtext.style.display = "none";
+    }
+}
+</script>
     {% if not team %}
         You are not part of a team
     {% else %}
+        <button onclick="viewSwitch();">Change View</button><br>
         Here is your team:
-        {{ team.display_name }}
+        {{ team.display_name }}<br>
         {% if bypass %}
             <h1 class="text-red-600 text-xl">Warning: Scav rule bypass is enabled, puzzle progress will not be saved!</h1>
         {% endif %}
@@ -24,17 +40,29 @@
             <div id="imgframe">
                 {{ tree|safe }}
             </div>
-            <div id="scavtext">
-                <h2>Active Scavenger Puzzles</h2>
+            <div id="scavtext" style="display: none;">
+                <h2 style="text-size: 20px;">Active Scavenger Puzzles</h2>
                 <ul>
                     {% for puzzle in active_puzzles %}
-                        <a href="{% url 'view_puzzle' slug=puzzle.secret_id%}">{{puzzle.name}}</a>
+                        <a href="{% url 'view_puzzle' slug=puzzle.secret_id%}">{{puzzle.name}}</a><br>
                     {% endfor %}
-                </ul>
-                <h2>Completed Scavenger Puzzles</h2>
+                </ul><br>
+                <h2 style="text-size: 20px;">Puzzles Missing Image</h2>
                 <ul>
-                    {% for puzzle in completed_puzzles %}
-                        <a href="{% url 'view_puzzle' slug=puzzle.secret_id%}">{{puzzle.name}}</a>
+                    {% for puzzle in completed_puzzles_requiring_photo_upload %}
+                        <a href="{% url 'verify_puzzle' slug=puzzle.secret_id%}">{{puzzle.name}}</a><br>
+                    {% endfor %}
+                </ul><br>
+                <h2 style="text-size: 20px;">Puzzles Awaiting Verification</h2>
+                <ul>
+                    {% for puzzle in completed_puzzles_awaiting_verification %}
+                        <a href="{% url 'view_puzzle' slug=puzzle.secret_id%}">{{puzzle.name}}</a><br>
+                    {% endfor %}
+                </ul><br>
+                <h2 style="text-size: 20px;">Verified Scavenger Puzzles</h2>
+                <ul>
+                    {% for puzzle in verified_puzzles %}
+                        <a href="{% url 'view_puzzle' slug=puzzle.secret_id%}">{{puzzle.name}}</a><br>
                     {% endfor %}
                 </ul>
             </div>
