@@ -14,7 +14,7 @@ import pyaccord
 from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, TeamTradeUpActivity
-from common_models.models import ChannelTag, DiscordGuild, Announcement, FacilShift, FacilShiftSignup
+from common_models.models import ChannelTag, DiscordGuild, Announcement, FacilShift, FacilShiftSignup, UserDetails
 import common_models.models
 from common_models.models import DiscordRole, DiscordOverwrite
 from . import registration
@@ -368,6 +368,48 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
                                                        allergies=allergies, sweater_size=sweater)
         except registration.UserAlreadyExistsError:
             return HttpResponseBadRequest("User already exists.")
+
+        return JsonResponse({"user_id": user.id, "username": user.username})  # type: ignore
+
+    return HttpResponseBadRequest()
+
+
+@permission_required("auth.add_user")
+def bulk_add_prc(request: HttpRequest) -> HttpResponse:
+    """View for bulk prc adding."""
+
+    if request.method == "GET":
+        context = {}
+        return render(request, "bulk_prc_add.html", context)
+
+    elif request.method == "POST":
+
+        if request.content_type != "application/json":
+            return HttpResponseBadRequest("Not application/json content type")
+
+        req_dict = json.loads(request.body)
+        try:
+            if req_dict["command"] != "add_prc":
+                return HttpResponseBadRequest()
+
+            first_name = req_dict["first_name"]
+            last_name = req_dict["last_name"]
+            email = req_dict["email"]
+            issued = req_dict["issued"]
+        except KeyError:
+            return HttpResponseBadRequest("Key Error in Body")
+        if issued is None or issued == "":
+            return HttpResponseBadRequest("Invalid PRC.")
+        user = User.objects.filter(email=email).first()
+        if user is None:
+            users = User.objects.filter(first_name__iexact=first_name, last_name__iexact=last_name)
+            if len(users) == 1:
+                user = users.first()
+        if user is None:
+            return HttpResponseBadRequest("User not found.")
+        details = UserDetails.objects.filter(user=user).first()
+        details.prc_completed = True
+        details.save
 
         return JsonResponse({"user_id": user.id, "username": user.username})  # type: ignore
 
