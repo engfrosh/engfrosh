@@ -9,7 +9,7 @@
 {% block active %}
     <form method="POST">
         {% csrf_token %}
-        <input type="submit" value="Regen All Calendars">
+        <input type="submit" value="Regen All Calendars" class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2">
     </form>
     {% for user in users %}
         <div>

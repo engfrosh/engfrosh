@@ -11,6 +11,6 @@
     <form class="my-5" method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Change" class="text-blue-600">
+        <input type="submit" value="Change" class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2">
     </form>
 {% endblock active %}

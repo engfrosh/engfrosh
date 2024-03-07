@@ -25,7 +25,9 @@
             <li><p>U: Up and moving!</p></li>
             <li><p>E: ENERGY/HYPE TIME/LOUD</p></li>
         </ul>
-        <br>
+        <br> 
+        {% if maxed is False %}
+        You have {{remaining}} shifts to sign up for!<br>
         <tr>
             <th class="px-2">Name</th>
             <th class="px-2">Description</th>
@@ -35,6 +37,16 @@
             <th class="px-2">Notes</th>
             <th class="px-2">Sign Up</th>
         </tr>
+        
+        <script>
+        function btncallback(shift_id, shift_name){
+            var result = confirm("Are you sure you want to sign up for " + shift_name);
+            if(result === true){
+                document.getElementById("shift-" + shift_id).submit();
+            }
+        }
+        </script>
+
         {% for shift in shifts %}
             <tr>
                 <td class="px-2">{{ shift.name }}</td>
@@ -44,14 +56,19 @@
                 <td class="px-2">{{ shift.max_facils }}</td>
                 <td class="px-2">{{ shift.flags }}</td>
                 <td class="px-2">
-                    <form method="POST">
+                    <form method="POST" id="shift-{{ shift.id }}">
                         {% csrf_token %}
                         <input type="hidden" name="shift_id" value="{{ shift.id }}">
-                        <input type="submit" value="Sign Up">
+                        
+                        <button class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2" type="button" onclick='btncallback({{ shift.id }}, "{{ shift.name }}")'>Sign Up</button>
                     </form>
                 </td>
             </tr>
         {% endfor %}
+        {% endif %}
+        {% if maxed is True %}
+            <h1>You are at the limit for shifts!</h1>
+        {% endif %}
         {% if shifts|length == 0 %}
             <h1>There are no shifts currently available!</h1>
         {% endif %}
