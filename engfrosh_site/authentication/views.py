@@ -74,7 +74,7 @@ def msTokenCallback(request: HttpRequest):
     user = User.objects.filter(email=email).first()
     if user is None:
         logger.error("Email is not registered: " + email)
-        return HttpResponseBadRequest("Email is not registered!")
+        return HttpResponse("Email is not registered! You must sign in with the email you supplied on your application!")
     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
     discord = DiscordUser.objects.filter(user=user).first()
