@@ -159,6 +159,12 @@ def reports(request: HttpRequest) -> HttpResponse:
                 elif r[2] == "!=" and value.lower() == str(r[1]).lower():
                     met = False
                     break
+                elif r[2] == "ew" and not value.lower().endswith(str(r[1]).lower()):
+                    met = False
+                    break
+                elif r[2] == "new" and value.lower().endswith(str(r[1]).lower()):
+                    met = False
+                    break
             if met:
                 data += [user]
         output = []
