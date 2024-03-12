@@ -33,7 +33,11 @@
             {% if link_discord %}
                 <a href="{% url 'discord_register' %}"
                    class="bg-main dark:bg-main-night rounded-lg p-2">Link Discord</a><br><br>
-            {% endif%}
+            {% endif %}
+            {% if upload_charter %}
+                <a href="{% url 'upload_charter' %}"
+                   class="bg-main dark:bg-main-night rounded-lg p-2">Upload Charter</a><br><br>
+            {% endif %}
             <a href="{% url 'my_skash' %}"
                class="bg-main dark:bg-main-night rounded-lg p-2">Team Skash</a>
             <a href="{% url 'create_ticket' %}"

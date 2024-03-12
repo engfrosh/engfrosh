@@ -1,0 +1,20 @@
+{% extends "base_user.html" %}
+{% load static %}
+{% block page_title %}Upload Charter{% endblock page_title %}
+{% block js_functions %}
+<link rel='stylesheet' type='text/css' href="{% static 'jquery-ui/jquery-ui.min.css' %}" />
+{% endblock js_functions %}
+{% block active %}
+    <div class="text-white text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
+        <div>
+            <h1>Upload your charter!</h1>
+            <h2 style="color: red;">{{ error }}</h2>
+            <a href="{{ charter_loc }}">Blank Charter</a>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form }}
+                <br><input type="submit" value="Submit" class="bg-main dark:bg-main-night rounded-lg p-2">
+            </form>
+        </div>
+    </div>
+{% endblock active %}

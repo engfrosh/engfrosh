@@ -4,12 +4,14 @@ from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required, permission_required
 import random
 from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, Announcement, UserDetails
-from common_models.models import InclusivityPage, FroshRole, DiscordUser
+from common_models.models import InclusivityPage, FroshRole, DiscordUser, Setting
 import datetime
 from management import forms
 from schedule.models import Event, CalendarRelation
 from django.contrib.contenttypes.models import ContentType
 import logging
+from .forms import CharterForm
+from django.http import HttpResponseRedirect
 
 logger = logging.getLogger("frosh.views")
 
@@ -105,11 +107,29 @@ def overall_index(request: HttpRequest):
 
 
 @login_required(login_url='/accounts/login')
+def upload_charter(request: HttpRequest) -> HttpResponse:
+    loc = Setting.objects.get_or_create(id="Blank Charter URL", defaults={"value": "http://localhost/charter.pdf"})[0]
+    if request.method == "POST":
+        form = CharterForm(request.POST, request.FILES)
+        if not form.is_valid() or not request.FILES['file'].name.lower().endswith(".pdf"):
+            return render(request, "upload_charter.html",
+                          {"form": form, "charter_loc": loc.value, "error": "Invalid file!"})
+        details = UserDetails.objects.get(user=request.user)
+        details.charter = request.FILES['file']
+        details.save()
+        return HttpResponseRedirect("/user/")
+    else:
+        form = CharterForm()
+    return render(request, "upload_charter.html", {"form": form, "charter_loc": loc.value})
+
+
+@login_required(login_url='/accounts/login')
 def user_home(request: HttpRequest) -> HttpResponse:
     """The home page for regular users."""
 
     rand = random.randint(0, 3)
-    if request.user.username != "Darwin_J-gwktdVor":
+    roll = Setting.objects.get_or_create(id="Rick Roll", defaults={"value": "Darwin_J-gwktdVor"})[0]
+    if request.user.username != roll.value:
         rand = 0
     team = Team.from_user(request.user)
     details = UserDetails.objects.filter(user=request.user).first()
@@ -134,6 +154,13 @@ def user_home(request: HttpRequest) -> HttpResponse:
         pass
 
     discord = DiscordUser.objects.filter(user=request.user).first()
+    upload_charter = False
+    charter = Setting.objects.get_or_create(id="Charter Upload", defaults={"value": "False"})[0]
+    if details is not None and charter.value == "True" and details.role != "Frosh":
+        try:
+            details.charter.path
+        except:  # noqa: E722
+            upload_charter = True
 
     context = {
         "scavenger_enabled": team.scavenger_enabled if team else False,
@@ -144,6 +171,7 @@ def user_home(request: HttpRequest) -> HttpResponse:
         "link_discord": True if discord is None else False,
         "rand": rand,
         "calendars": calendars,
+        "upload_charter": upload_charter,
     }
 
     return render(request, "user_home.html", context)
