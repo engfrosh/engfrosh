@@ -364,6 +364,10 @@ def free_hints(request: HttpRequest, id: int) -> HttpResponse:
 
 @permission_required("common_models.manage_scav")
 def lock_team(request: HttpRequest, id: int) -> HttpResponse:
+    for team in Team.objects.exclude(scavenger_locked_out_until=None):
+        if not team.scavenger_lock:
+            team.scavenger_locked_out_until = None
+            team.save()
     if request.method == "GET":
         if id == 0:
             return render(request, "lock_teams.html", {"teams": Team.objects.all()})
@@ -387,6 +391,10 @@ def lock_team(request: HttpRequest, id: int) -> HttpResponse:
 
 @permission_required("common_models.manage_scav")
 def unlock_team(request: HttpRequest, id: int) -> HttpResponse:
+    for team in Team.objects.exclude(scavenger_locked_out_until=None):
+        if not team.scavenger_lock:
+            team.scavenger_locked_out_until = None
+            team.save()
     if id == 0:
         return render(request, "unlock_teams.html", {"teams": Team.objects.all()})
     else:
