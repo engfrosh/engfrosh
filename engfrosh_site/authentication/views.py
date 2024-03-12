@@ -45,7 +45,7 @@ def msLogin(request: HttpRequest):
     AUTHORITY = "https://login.microsoftonline.com/common"
     app = msal.ConfidentialClientApplication(settings.MICROSOFT_ID, authority=AUTHORITY,
                                              client_credential=settings.MICROSOFT_TOKEN)
-    callback_url = request.build_absolute_uri("msTokenCallback")
+    callback_url = "https://server.engfrosh.com/accounts/msTokenCallback"
     SCOPE = []
     url = app.get_authorization_request_url(SCOPE, state=str(uuid.uuid4()), redirect_uri=callback_url)
     return redirect(url)
@@ -66,7 +66,7 @@ def msTokenCallback(request: HttpRequest):
     app = msal.ConfidentialClientApplication(settings.MICROSOFT_ID, authority=AUTHORITY,
                                              client_credential=settings.MICROSOFT_TOKEN)
     SCOPE = []
-    callback_url = request.build_absolute_uri("msTokenCallback")
+    callback_url = "https://server.engfrosh.com/accounts/msTokenCallback"
     token = app.acquire_token_by_authorization_code(code, SCOPE, redirect_uri=callback_url)
     if 'id_token_claims' not in token:
         return HttpResponseBadRequest("Invalid or expired code!")

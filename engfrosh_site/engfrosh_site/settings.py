@@ -99,14 +99,14 @@ if development:
 else:
     ALLOWED_HOSTS = [
         "server.engfrosh.com",
-        "engfrosh.com"
+        "time.engfrosh.com"
     ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.engfrosh.com",
-    "https://engfrosh.com",
+    "https://time.engfrosh.com",
     "http://*.engfrosh.com",
-    "http://engfrosh.com"
+    "http://time.engfrosh.com"
 ]
 
 REST_FRAMEWORK = {
