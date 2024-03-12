@@ -4,7 +4,7 @@ from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required, permission_required
 import random
 from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, Announcement, UserDetails
-from common_models.models import InclusivityPage, FroshRole, DiscordUser, Setting
+from common_models.models import InclusivityPage, FroshRole, DiscordUser, Setting, FAQPage
 import datetime
 from management import forms
 from schedule.models import Event, CalendarRelation
@@ -14,6 +14,15 @@ from .forms import CharterForm
 from django.http import HttpResponseRedirect
 
 logger = logging.getLogger("frosh.views")
+
+
+def faq_page(request: HttpRequest, id: int):
+    if id == 0:
+        pages = FAQPage.objects.all()
+        return render(request, "faq_pages.html", {"pages": pages})
+    else:
+        page = FAQPage.objects.filter(id=id).first()
+        return render(request, "faq_page.html", {"page": page})
 
 
 def fish(request: HttpRequest):

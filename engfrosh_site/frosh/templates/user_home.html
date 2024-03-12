@@ -24,12 +24,14 @@
             {% endif %}
             {% if trade_up_enabled %}
                 <a href="{% url 'trade_up_home' %}"
-                   class="bg-main dark:bg-main-night rounded-lg p-2">Trade Up</a>
+                    class="bg-main dark:bg-main-night rounded-lg p-2">Trade Up</a>
             {% elif trade_up_disabled %}
                 <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2">Trade Up Disabled</a>
             {% else %}
                 <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2">No Trade Up Team</a>
             {% endif %}<br><br>
+            <a href="{% url 'view_faq' id=0 %}"
+                class="bg-main dark:bg-main-night rounded-lg p-2">View FAQs</a>
             {% if link_discord %}
                 <a href="{% url 'discord_register' %}"
                    class="bg-main dark:bg-main-night rounded-lg p-2">Link Discord</a><br><br>

@@ -8,4 +8,5 @@ urlpatterns = [
     path('inclusivity_private', views.inclusivity_private, name="inclusivity_private"),
     path('view_event/<int:id>', views.view_event, name="view_event"),
     path('upload_charter', views.upload_charter, name="upload_charter"),
+    path('faq/<int:id>', views.faq_page, name="view_faq")
 ]
