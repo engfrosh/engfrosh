@@ -8,12 +8,12 @@
 {% endblock top_title %}
 {% block active %}
     <div class="text-white">
-    <table>
+    
         {% if success is None %}
         {% elif not success %}
-            <p>Failed to add shift!</p>
+            <p>Failed to modify shift!</p>
         {% elif success %}
-            <p>Successfully added shift!</p>
+            <p>Successfully modify shift!</p>
         {% endif %}
         <h2>Reserve Facil Shifts Here!</h2><br>
         <p>All shifts are subject to change and you'll get your final schedule in the coming weeks. Facils must sign up for at least 3 shifts</p>
@@ -26,6 +26,42 @@
             <li><p>E: ENERGY/HYPE TIME/LOUD</p></li>
         </ul>
         <br>
+        <tr>
+            <th class="px-2">Name</th>
+            <th class="px-2">Description</th>
+            <th class="px-2">Start</th>
+            <th class="px-2">End</th>
+            <th class="px-2">Max Facils</th>
+            <th class="px-2">Notes</th>
+            {% if can_remove %}
+            <th class="px-2">Remove</th>
+            {% endif %}
+        </tr>
+        <h2>My Shifts</h2><br>
+        <table>
+        {% for shift in my_shifts %}
+        <tr>
+            <td class="px-2">{{ shift.name }}</td>
+            <td class="px-2">{{ shift.desc }}</td>
+            <td class="px-2">{{ shift.start }}</td>
+            <td class="px-2">{{ shift.end }}</td>
+            <td class="px-2">{{ shift.max_facils }}</td>
+            <td class="px-2">{{ shift.flags }}</td>
+            <td class="px-2">
+                {% if can_remove %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="shift_id" value="{{ shift.id }}">
+                    <input type="hidden" name="action" value="remove">
+                    <input type="submit" value="Remove">
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </table>
+        <h2>Available Shifts</h2><br>
+        <table>
         <tr>
             <th class="px-2">Name</th>
             <th class="px-2">Description</th>
@@ -47,14 +83,15 @@
                     <form method="POST">
                         {% csrf_token %}
                         <input type="hidden" name="shift_id" value="{{ shift.id }}">
+                        <input type="hidden" name="action" value="add">
                         <input type="submit" value="Sign Up">
                     </form>
                 </td>
             </tr>
         {% endfor %}
+        </table>
         {% if shifts|length == 0 %}
             <h1>There are no shifts currently available!</h1>
         {% endif %}
-    </table>
     </div>
 {% endblock active %}

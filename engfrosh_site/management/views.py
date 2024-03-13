@@ -15,6 +15,7 @@ from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, TeamTradeUpActivity, UserDetails
 from common_models.models import ChannelTag, DiscordGuild, Announcement, FacilShift, FacilShiftSignup
+from common_models.models import Setting
 import common_models.models
 from common_models.models import DiscordRole, DiscordOverwrite
 from . import registration
@@ -43,6 +44,11 @@ PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 @permission_required("common_models.facil_signup")
 def facil_shifts(request: HttpRequest) -> HttpResponse:
+    lockout_time = int(Setting.objects.get_or_create(id="Facil Shift Drop Deadline",
+                                                     defaults={"value": "0"})[0].value)
+    can_remove = True
+    if datetime.datetime.utcfromtimestamp(lockout_time) <= datetime.datetime.now():
+        can_remove = False
     if request.method == "GET":
         shifts = list(FacilShift.objects.all())
         rshifts = []
@@ -50,49 +56,110 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             signups = shift.facil_count
             if signups < shift.max_facils and len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) == 0:
                 rshifts += [shift]
-        return render(request, "facil_shift_signup.html", {"shifts": rshifts})
+        my_shifts = []
+        for shift in FacilShiftSignup.objects.filter(user=request.user):
+            my_shifts += [shift.shift]
+        return render(request, "facil_shift_signup.html",
+                      {"shifts": rshifts, "my_shifts": my_shifts, "can_remove": can_remove})
     elif request.method == "POST":
-        logger.info(request.user)
-        logger.info("Signing up for facil shift. Shift id: ")
-        shift_id = int(request.POST["shift_id"])
-        logger.info(shift_id)
-        shift = FacilShift.objects.filter(id=shift_id).first()
-        shifts = list(FacilShift.objects.all())
-        shifts = list(FacilShift.objects.all())
-        rshifts = []
-        for s in shifts:
-            signups = s.facil_count
-            if signups < s.max_facils and len(FacilShiftSignup.objects.filter(shift=s, user=request.user)) == 0:
-                rshifts += [s]
-        if shift is None:
-            logger.info("No eligible shifts")
-            return render(request, "facil_shift_signup.html", {"shifts": rshifts, "success": False})
-        count = len(FacilShiftSignup.objects.filter(shift=shift))
-        if count >= shift.max_facils:
-            logger.info("Full shift")
-            return render(request, "facil_shift_signup.html", {"shifts": rshifts, "success": False})
-        signup = FacilShiftSignup.objects.filter(user=request.user, shift=shift).first()
-        if signup is not None:
-            logger.info("Already signed up")
-            return render(request, "facil_shift_signup.html", {"shifts": rshifts, "success": False})
-        signup = FacilShiftSignup(user=request.user, shift=shift)
-        signup.save()
-        calendar = Calendar.objects.filter(name=request.user.username).first()
-        if calendar is None:
-            calendar = Calendar(name=request.user.username, slug=request.user.username)
+        action = request.POST.get("action", "")
+        if action == "add":
+            logger.info(request.user)
+            logger.info("Signing up for facil shift. Shift id: ")
+            shift_id = int(request.POST["shift_id"])
+            logger.info(shift_id)
+            shift = FacilShift.objects.filter(id=shift_id).first()
+            shifts = list(FacilShift.objects.all())
+            shifts = list(FacilShift.objects.all())
+            rshifts = []
+            my_shifts = []
+            for shift2 in FacilShiftSignup.objects.filter(user=request.user):
+                my_shifts += [shift2.shift]
+            for s in shifts:
+                signups = s.facil_count
+                if signups < s.max_facils and len(FacilShiftSignup.objects.filter(shift=s, user=request.user)) == 0:
+                    rshifts += [s]
+            if shift is None:
+                logger.info("No eligible shifts")
+                return render(request, "facil_shift_signup.html",
+                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
+            count = len(FacilShiftSignup.objects.filter(shift=shift))
+            if count >= shift.max_facils:
+                logger.info("Full shift")
+                return render(request, "facil_shift_signup.html",
+                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
+            signup = FacilShiftSignup.objects.filter(user=request.user, shift=shift).first()
+            if signup is not None:
+                logger.info("Already signed up")
+                return render(request, "facil_shift_signup.html",
+                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
+            signup = FacilShiftSignup(user=request.user, shift=shift)
+            signup.save()
+            calendar = Calendar.objects.filter(name=request.user.username).first()
+            if calendar is None:
+                calendar = Calendar(name=request.user.username, slug=request.user.username)
+                calendar.save()
+                calendar.create_relation(request.user)
+            event = Event(start=shift.start, end=shift.end, title=shift.name, description=shift.desc, calendar=calendar)
+            event.save()
+            shifts = list(FacilShift.objects.all())
+            shifts = list(FacilShift.objects.all())
+            rshifts = []
+            for shift in shifts:
+                signups = shift.facil_count
+                count = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
+                if signups < shift.max_facils and count == 0:
+                    rshifts += [shift]
+            logger.info("Signed up for shift")
+            my_shifts = []
+            for shift in FacilShiftSignup.objects.filter(user=request.user):
+                my_shifts += [shift.shift]
+            return render(request, "facil_shift_signup.html",
+                          {"shifts": rshifts, "success": True, "my_shifts": my_shifts, "can_remove": can_remove})
+        elif action == "remove":
+            my_shifts = []
+            for shift in FacilShiftSignup.objects.filter(user=request.user):
+                my_shifts += [shift.shift]
+            logger.info(request.user)
+            logger.info("Removing from facil shift. Shift id: ")
+            if not can_remove:
+                logger.info("Removing is disabled")
+                return render(request, "facil_shift_signup.html",
+                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
+            shift_id = int(request.POST["shift_id"])
+            logger.info(shift_id)
+            shift = FacilShift.objects.filter(id=shift_id).first()
+            if shift is None:
+                logger.info("Shift not found")
+                return render(request, "facil_shift_signup.html",
+                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
+            signup = FacilShiftSignup.objects.filter(shift=shift, user=request.user).first()
+            if signup is None:
+                logger.info("Shift not found")
+                return render(request, "facil_shift_signup.html",
+                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
+            signup.delete()
+            user = request.user
+            calendar = Calendar.objects.filter(name=user.username).first()
+            if calendar is not None:
+                calendar.delete()
+            calendar = Calendar(name=user.username, slug=user.username)
             calendar.save()
-            calendar.create_relation(request.user)
-        event = Event(start=shift.start, end=shift.end, title=shift.name, description=shift.desc, calendar=calendar)
-        event.save()
-        shifts = list(FacilShift.objects.all())
-        shifts = list(FacilShift.objects.all())
-        rshifts = []
-        for shift in shifts:
-            signups = shift.facil_count
-            if signups < shift.max_facils and len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) == 0:
-                rshifts += [shift]
-        logger.info("Signed up for shift")
-        return render(request, "facil_shift_signup.html", {"shifts": rshifts, "success": True})
+            calendar.create_relation(user)
+
+            signups = list(FacilShiftSignup.objects.filter(user=user))
+            for signup in signups:
+                shift = signup.shift
+                event = Event(start=shift.start, end=shift.end, title=shift.name,
+                              description=shift.desc, calendar=calendar)
+                event.save()
+            my_shifts = []
+            for shift in FacilShiftSignup.objects.filter(user=request.user):
+                my_shifts += [shift.shift]
+            rshifts = []
+
+            return render(request, "facil_shift_signup.html",
+                          {"shifts": rshifts, "success": True, "my_shifts": my_shifts, "can_remove": can_remove})
 
 
 @staff_member_required(login_url='/accounts/login')
