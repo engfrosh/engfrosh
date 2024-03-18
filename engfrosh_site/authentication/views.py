@@ -176,6 +176,9 @@ def discord_login_callback(request: HttpRequest):
     """
 
     oauth_code = request.GET.get("code")
+
+    if request.GET.get("error", "") == "access_denied":
+        return redirect("login_failed")
     # oauth_state = request.GET.get("state")
 
     callback_url = request.build_absolute_uri(request.path)
