@@ -195,7 +195,7 @@ def discord_login_callback(request: HttpRequest):
 
 def login_failed(request):
     """View for login failed."""
-    return render(request, "login_failed.html")
+    return render(request, "login_failed.html", status=400)
 # endregion
 
 
