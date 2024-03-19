@@ -644,7 +644,7 @@ def scavenger_monitor(request: HttpRequest) -> HttpResponse:
 
 @user_passes_test(lambda u: u.is_superuser)
 def unregistered(request: HttpRequest) -> HttpResponse:
-    users = User.objects.select_related("discorduser").iall().order_by("username")
+    users = User.objects.select_related("discorduser").all().order_by("username")
     data = "Group Email [Required],Member Email,Member Type,Member Role"
     for usr in users:
         if not usr.is_superuser:
