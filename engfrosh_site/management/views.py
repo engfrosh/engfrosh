@@ -644,11 +644,14 @@ def scavenger_monitor(request: HttpRequest) -> HttpResponse:
 
 @user_passes_test(lambda u: u.is_superuser)
 def unregistered(request: HttpRequest) -> HttpResponse:
-    users = User.objects.all().order_by("username")
+    users = User.objects.select_related("discorduser").iall().order_by("username")
     data = "Group Email [Required],Member Email,Member Type,Member Role"
     for usr in users:
-        if not usr.is_superuser and not DiscordUser.objects.filter(user=usr).exists():
-            data += '\n' + "unregisteredfacils@engfrosh.com," + usr.email + ",,"
+        if not usr.is_superuser:
+            try:
+                d = usr.discorduser  # noqa: F841
+            except Exception:
+                data += '\n' + "unregisteredfacils@engfrosh.com," + usr.email + ",,"
     response = HttpResponse(data, 'text/csv')
     response['Content-Disposition'] = 'attachment; filename="unregistered.csv"'
     return response
