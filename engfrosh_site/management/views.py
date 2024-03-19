@@ -47,14 +47,15 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
     lockout_time = int(Setting.objects.get_or_create(id="Facil Shift Drop Deadline",
                                                      defaults={"value": "0"})[0].value)
     can_remove = True
-    if datetime.datetime.utcfromtimestamp(lockout_time) <= datetime.datetime.now():
+    if datetime.datetime.utcfromtimestamp(lockout_time) <= datetime.datetime.now() and lockout_time != 0:
         can_remove = False
     if request.method == "GET":
         shifts = list(FacilShift.objects.all())
         rshifts = []
         for shift in shifts:
             signups = shift.facil_count
-            if signups < shift.max_facils and len(FacilShiftSignup.objects.filter(shift=shift, user=request.user)) == 0:
+            u_signups = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
+            if signups < shift.max_facils and u_signups == 0 and not shift.is_passed:
                 rshifts += [shift]
         my_shifts = []
         for shift in FacilShiftSignup.objects.filter(user=request.user):
@@ -77,10 +78,15 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                 my_shifts += [shift2.shift]
             for s in shifts:
                 signups = s.facil_count
-                if signups < s.max_facils and len(FacilShiftSignup.objects.filter(shift=s, user=request.user)) == 0:
+                u_signups = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
+                if signups < s.max_facils and u_signups == 0 and not shift.is_passed:
                     rshifts += [s]
             if shift is None:
-                logger.info("No eligible shifts")
+                logger.info("Shift not found")
+                return render(request, "facil_shift_signup.html",
+                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
+            if shift.is_passed:
+                logger.info("Shift is passed")
                 return render(request, "facil_shift_signup.html",
                               {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
             count = len(FacilShiftSignup.objects.filter(shift=shift))
@@ -108,7 +114,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             for shift in shifts:
                 signups = shift.facil_count
                 count = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
-                if signups < shift.max_facils and count == 0:
+                if signups < shift.max_facils and count == 0 and not shift.is_passed:
                     rshifts += [shift]
             logger.info("Signed up for shift")
             my_shifts = []
@@ -131,6 +137,10 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             shift = FacilShift.objects.filter(id=shift_id).first()
             if shift is None:
                 logger.info("Shift not found")
+                return render(request, "facil_shift_signup.html",
+                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
+            if shift.is_cutoff:
+                logger.info("Shift is cutoff")
                 return render(request, "facil_shift_signup.html",
                               {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
             signup = FacilShiftSignup.objects.filter(shift=shift, user=request.user).first()
