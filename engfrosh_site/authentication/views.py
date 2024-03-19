@@ -14,7 +14,7 @@ import credentials
 import uuid
 
 from common_models.models import DiscordUser
-from common_models.models import DiscordRole
+from common_models.models import DiscordRole, Setting
 from .discord_auth import DiscordUserAlreadyExistsError, register
 from pyaccord.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  # noqa E402
 
@@ -45,7 +45,9 @@ def msLogin(request: HttpRequest):
     AUTHORITY = "https://login.microsoftonline.com/common"
     app = msal.ConfidentialClientApplication(settings.MICROSOFT_ID, authority=AUTHORITY,
                                              client_credential=settings.MICROSOFT_TOKEN)
-    callback_url = "https://server.engfrosh.com/accounts/msTokenCallback"
+    base_url = Setting.objects.get_or_create(id="callback_base",
+                                             defaults={"value": "https://server.engfrosh.com"})[0].value
+    callback_url = base_url + "/accounts/msTokenCallback"
     SCOPE = []
     url = app.get_authorization_request_url(SCOPE, state=str(uuid.uuid4()), redirect_uri=callback_url)
     return redirect(url)
@@ -66,7 +68,9 @@ def msTokenCallback(request: HttpRequest):
     app = msal.ConfidentialClientApplication(settings.MICROSOFT_ID, authority=AUTHORITY,
                                              client_credential=settings.MICROSOFT_TOKEN)
     SCOPE = []
-    callback_url = "https://server.engfrosh.com/accounts/msTokenCallback"
+    base_url = Setting.objects.get_or_create(id="callback_base",
+                                             defaults={"value": "https://server.engfrosh.com"})[0].value
+    callback_url = base_url + "/accounts/msTokenCallback"
     token = app.acquire_token_by_authorization_code(code, SCOPE, redirect_uri=callback_url)
     if 'id_token_claims' not in token:
         return HttpResponseBadRequest("Invalid or expired code!")
@@ -144,7 +148,9 @@ def login_page(request: HttpRequest):
 
 def discord_login(request: HttpRequest):
     """Redirects user to discord authentication to log in."""
-    callback_url = "https://server.engfrosh.com/accounts/login/discord/callback/"
+    base_url = Setting.objects.get_or_create(id="callback_base",
+                                             defaults={"value": "https://server.engfrosh.com"})[0].value
+    callback_url = base_url + "/accounts/login/discord/callback/"
     # TODO add redirect for the next page here
 
     return redirect(
@@ -180,8 +186,9 @@ def discord_login_callback(request: HttpRequest):
     if request.GET.get("error", "") == "access_denied":
         return redirect("login_failed")
     # oauth_state = request.GET.get("state")
-
-    callback_url = request.build_absolute_uri(request.path)
+    base_url = Setting.objects.get_or_create(id="callback_base",
+                                             defaults={"value": "https://server.engfrosh.com"})[0].value
+    callback_url = base_url + "/accounts/login/discord/callback/"
 
     user = authenticate(request, discord_oauth_code=oauth_code, callback_url=callback_url)
     if user is not None:
@@ -213,7 +220,9 @@ def register_page(request: HttpRequest):
 
 def discord_register(request):
     """Redirects to discord authentication to register."""
-    callback_url = "https://server.engfrosh.com/accounts/register/discord/callback/"
+    base_url = Setting.objects.get_or_create(id="callback_base",
+                                             defaults={"value": "https://server.engfrosh.com"})[0].value
+    callback_url = base_url + "/accounts/register/discord/callback/"
 
     return redirect(
         build_oauth_authorize_url(
@@ -237,7 +246,9 @@ def discord_register_callback(request: HttpRequest):
         # If disallowing registration to pre registered people.
         return HttpResponse("Registration failed, please contact questions@engfrosh.com")
 
-    callback_url = request.build_absolute_uri(request.path)
+    base_url = Setting.objects.get_or_create(id="callback_base",
+                                             defaults={"value": "https://server.engfrosh.com"})[0].value
+    callback_url = base_url + "/accounts/register/discord/callback/"
 
     try:
         user = register(discord_oauth_code=oauth_code, callback_url=callback_url, user=user)
