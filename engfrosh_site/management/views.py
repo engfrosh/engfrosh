@@ -42,7 +42,7 @@ CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 
-@permission_required("auth.change_user")
+@permission_required("common_models.calendar_manage")
 def shift_edit(request: HttpRequest, id: int) -> HttpResponse:
     if id == 0:
         form = forms.ShiftForm()
@@ -182,7 +182,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                           {"shifts": rshifts, "success": True, "my_shifts": my_shifts, "can_remove": can_remove})
 
 
-@permission_required("auth.change_user")
+@permission_required("common_models.calendar_manage")
 def mailing_list(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         shifts = list(FacilShift.objects.order_by('start'))
@@ -198,7 +198,7 @@ def mailing_list(request: HttpRequest) -> HttpResponse:
         return HttpResponse('<meta http-equiv="refresh" content="0;url=' + redir + '" />')
 
 
-@permission_required("auth.change_user")
+@permission_required("common_models.calendar_manage")
 def reports(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         details = UserDetails.objects.all().first()
@@ -296,7 +296,7 @@ def reports(request: HttpRequest) -> HttpResponse:
                                                     "query": json.dumps(req_dict)})
 
 
-@permission_required("auth.change_user")
+@permission_required("common_models.calendar_manage")
 def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
     if request.method == "GET":
         if id == 0:
@@ -349,7 +349,7 @@ def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
             return render(request, "shift_manage_lookup.html", {"users": users})
 
 
-@permission_required("auth.change_user")
+@permission_required("common_models.calendar_manage")
 def shift_export(request: HttpRequest) -> HttpResponse:
     shifts = list(FacilShift.objects.all())
     signups = list()
@@ -380,7 +380,7 @@ def shift_export(request: HttpRequest) -> HttpResponse:
     return response
 
 
-@permission_required("auth.change_user")
+@permission_required("common_models.calendar_manage")
 def export_teams(request: HttpRequest) -> HttpResponse:
     data = {}
     max_len = 0
@@ -409,7 +409,7 @@ def export_teams(request: HttpRequest) -> HttpResponse:
     return response
 
 
-@staff_member_required(login_url='/accounts/login')
+@permission_required("common_models.announcement_manage")
 def announcements(request: HttpRequest) -> HttpResponse:
     """View for creating announcements"""
     if request.method == "POST":
@@ -491,7 +491,7 @@ def unlock_team(request: HttpRequest, id: int) -> HttpResponse:
         return redirect("/manage/unlock_team/0")
 
 
-@permission_required("auth.change_user")
+@permission_required("common_models.calendar_manage")
 def edit_event(request: HttpRequest, id: int) -> HttpResponse:
     if request.method == "GET":
         event = Event.objects.filter(id=id).first()
