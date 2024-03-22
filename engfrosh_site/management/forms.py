@@ -1,6 +1,6 @@
 from django import forms
 from common_models.models import Puzzle, FacilShift
-from schedule.models import Event, Calendar
+from schedule.models import Calendar
 from django.contrib.auth.models import User
 
 
@@ -48,7 +48,7 @@ class EventForm(forms.Form):
     end = forms.DateTimeField(label="End")
     title = forms.CharField(label="Title", max_length=400)
     description = forms.CharField(label="Description", max_length=4000)
-    calendar = forms.MultipleChoiceField(label="Calendar", choices=[("Default","Default")])
+    calendar = forms.MultipleChoiceField(label="Calendar", choices=[("Default", "Default")])
     color_event = forms.CharField(label="Colour", max_length=50)
 
     def __init__(self, *args):

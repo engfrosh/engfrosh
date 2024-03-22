@@ -1,0 +1,33 @@
+{% extends 'base_manage_subpage.html' %}
+{% load static %}
+{% block page_title %}
+    Lock Scav
+{% endblock page_title %}
+{% block top_title %}
+    Lock Scav
+{% endblock top_title %}
+{% block active %}
+    <h1>Lock Scav and Trade Up</h1>
+    <style>
+        input {
+            color: black;
+        }
+    </style>
+    <br>
+    {% if scav %}
+        <h2>Scav is enabled</h2>
+    {% else %}
+        <h2>Scav is disabled</h2>
+    {% endif %}
+    <br>
+    {% if tradeup %}
+        <h2>Trade Up is enabled</h2>
+    {% else %}
+        <h2>Trade Up is disabled</h2>
+    {% endif %}
+    <br>
+    <form class="my-5" method="POST">
+        {% csrf_token %}
+        <input type="submit" value="Toggle Scav and Trade Up" class="text-blue-600">
+    </form>
+{% endblock active %}

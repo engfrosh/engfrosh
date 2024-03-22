@@ -17,7 +17,7 @@ from common_models.models import FroshRole, Team, UniversityProgram, TeamTradeUp
 from common_models.models import ChannelTag, DiscordGuild, Announcement, FacilShift, FacilShiftSignup
 from common_models.models import Setting
 import common_models.models
-from common_models.models import DiscordRole, DiscordOverwrite
+from common_models.models import DiscordRole, DiscordOverwrite, BooleanSetting
 from . import registration
 from . import forms
 
@@ -25,7 +25,6 @@ from django.utils.html import escape
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import permission_required
-from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse, JsonResponse, \
@@ -40,6 +39,25 @@ logger = logging.getLogger("management.views")
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
+
+
+@permission_required("common_models.manage_scav")
+def lock_scav(request: HttpRequest) -> HttpResponse:
+    scav = BooleanSetting.objects.get(id="SCAVENGER_ENABLED")
+    tradeup = BooleanSetting.objects.get(id="TRADE_UP_ENABLED")
+    if request.method == "POST":
+        scav.value = not scav.value
+        tradeup.value = not tradeup.value
+        scav.save()
+        tradeup.save()
+        scav_txt = "locked"
+        if scav.value:
+            scav_txt = "unlocked"
+        tradeup_txt = "locked"
+        if tradeup.value:
+            tradeup.txt = "unlocked"
+        DiscordChannel.send_to_updates_channels("Scav is now " + scav_txt + ". Trade Up is now " + tradeup_txt)
+    return render(request, "lock_scav.html", {"scav": scav.value, "tradeup": tradeup.value})
 
 
 @permission_required("common_models.calendar_manage")
