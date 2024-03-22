@@ -41,6 +41,7 @@
             <th>Team</th>
             <th>Puzzle Name</th>
             <th>Current Puzzle (Order)</th>
+            <th>Current Puzzle Started</th>
         </tr>
         {% for act in status %}
         <tr>
@@ -50,6 +51,7 @@
             {% else %}
             <td class="color_box">{{ act.puzzle.name }}</td>
             <td class="color_box">#{{ act.puzzle.order }}</td>
+            <td class="color_box">{{ act.puzzle_start_at }}</td>
             {% endif %}
         </tr>
         {% endfor %}
