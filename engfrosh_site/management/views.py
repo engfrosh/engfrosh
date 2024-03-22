@@ -55,7 +55,7 @@ def lock_scav(request: HttpRequest) -> HttpResponse:
             scav_txt = "unlocked"
         tradeup_txt = "locked"
         if tradeup.value:
-            tradeup.txt = "unlocked"
+            tradeup_txt = "unlocked"
         DiscordChannel.send_to_updates_channels("Scav is now " + scav_txt + ". Trade Up is now " + tradeup_txt)
     return render(request, "lock_scav.html", {"scav": scav.value, "tradeup": tradeup.value})
 
