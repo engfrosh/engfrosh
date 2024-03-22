@@ -11,6 +11,9 @@
         <a href="{% url 'shift_export' %}"
              class="bg-main dark:bg-main-night rounded-lg p-2">Export Shifts</a>
         <br>
+        <a href="{% url 'shift_edit' id=0 %}"
+             class="bg-main dark:bg-main-night rounded-lg p-2">Create Shift</a>
+        <br>
         <br>
     </div>
     <table>
@@ -26,7 +29,9 @@
         </tr>
         {% for shift in shifts %}
             <tr>
-                <td class="px-2">{{ shift.name }}</td>
+                <td class="px-2">
+                <a href="{% url 'shift_edit' id=shift.id %}">
+                {{ shift.name }}</a></td>
                 <td class="px-2">{{ shift.desc }}</td>
                 <td class="px-2">{{ shift.start }}</td>
                 <td class="px-2">{{ shift.end }}</td>

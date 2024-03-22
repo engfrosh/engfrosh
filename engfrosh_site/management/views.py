@@ -42,6 +42,16 @@ CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 
+@permission_required("auth.change_user")
+def shift_edit(request: HttpRequest, id: int) -> HttpResponse:
+    if id == 0:
+        form = forms.ShiftForm()
+    else:
+        shift = FacilShift.objects.filter(id=id).first()
+        form = forms.ShiftForm(instance=shift)
+    return render(request, "edit_shift.html", {"form": form})
+
+
 @permission_required("common_models.facil_signup")
 def facil_shifts(request: HttpRequest) -> HttpResponse:
     lockout_time = int(Setting.objects.get_or_create(id="Facil Shift Drop Deadline",
@@ -172,7 +182,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                           {"shifts": rshifts, "success": True, "my_shifts": my_shifts, "can_remove": can_remove})
 
 
-@staff_member_required(login_url='/accounts/login')
+@permission_required("auth.change_user")
 def mailing_list(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         shifts = list(FacilShift.objects.order_by('start'))
@@ -188,7 +198,7 @@ def mailing_list(request: HttpRequest) -> HttpResponse:
         return HttpResponse('<meta http-equiv="refresh" content="0;url=' + redir + '" />')
 
 
-@staff_member_required(login_url='/accounts/login')
+@permission_required("auth.change_user")
 def reports(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         details = UserDetails.objects.all().first()
@@ -286,7 +296,7 @@ def reports(request: HttpRequest) -> HttpResponse:
                                                     "query": json.dumps(req_dict)})
 
 
-@staff_member_required(login_url='/accounts/login')
+@permission_required("auth.change_user")
 def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
     if request.method == "GET":
         if id == 0:
@@ -339,7 +349,7 @@ def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
             return render(request, "shift_manage_lookup.html", {"users": users})
 
 
-@staff_member_required(login_url='/accounts/login')
+@permission_required("auth.change_user")
 def shift_export(request: HttpRequest) -> HttpResponse:
     shifts = list(FacilShift.objects.all())
     signups = list()
@@ -370,7 +380,7 @@ def shift_export(request: HttpRequest) -> HttpResponse:
     return response
 
 
-@staff_member_required(login_url='/accounts/login')
+@permission_required("auth.change_user")
 def export_teams(request: HttpRequest) -> HttpResponse:
     data = {}
     max_len = 0
@@ -498,7 +508,7 @@ def edit_event(request: HttpRequest, id: int) -> HttpResponse:
             if not form.is_valid():
                 return render(request, "edit_event.html", {"form": form})
             form.save()
-            return redirect("/")
+            return redirect("/manage/")
 
 
 @permission_required("auth.add_user")

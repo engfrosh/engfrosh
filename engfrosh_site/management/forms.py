@@ -1,7 +1,13 @@
 from django import forms
-from common_models.models import Puzzle
+from common_models.models import Puzzle, FacilShift
 from schedule.models import Event, Calendar
 from django.contrib.auth.models import User
+
+
+class ShiftForm(forms.ModelForm):
+    class Meta:
+        model = FacilShift
+        exclude = ['id']
 
 
 class AnnouncementForm(forms.Form):

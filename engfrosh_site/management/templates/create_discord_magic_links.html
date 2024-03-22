@@ -1,4 +1,11 @@
-{% extends "base_manage_subpage.html" %}
+{% extends "base_manage.html" %}
+{% block nav_bar %}
+    <div class="flex flex-row flex-wrap-reverse items-center justify-start mb-4">
+        <a class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
+           href="{% url 'user_home' %}">Back to Home Page</a>
+    </div>
+{% endblock nav_bar %}
+
 {% load static %}
 {% block page_title %}
     Manage Discord Magic Links
