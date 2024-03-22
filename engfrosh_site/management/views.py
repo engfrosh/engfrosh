@@ -494,7 +494,23 @@ def unlock_team(request: HttpRequest, id: int) -> HttpResponse:
 @permission_required("auth.change_user")
 def edit_event(request: HttpRequest, id: int) -> HttpResponse:
     if request.method == "GET":
-        context = {"form": forms.EventForm(instance=Event.objects.filter(id=id).first())}
+        event = Event.objects.filter(id=id).first()
+        form = forms.EventForm()
+        if id != 0:
+            form.start = event.start
+            form.end = event.end
+            form.title = event.title
+            form.description = event.description
+            form.calendar = event.calendar.name
+            form.color_event = event.color_event
+        else:
+            form.start = datetime.datetime.now()
+            form.end = datetime.datetime.now()
+            form.title = ""
+            form.description = ""
+            form.calendar = ""
+            form.color_event = ""
+        context = {"form": form}
         return render(request, "edit_event.html", context)
     elif request.method == "POST":
         action = request.POST['action']
@@ -504,10 +520,20 @@ def edit_event(request: HttpRequest, id: int) -> HttpResponse:
                 event.delete()
             return redirect("/")
         elif action == "modify":
-            form = forms.EventForm(request.POST, instance=Event.objects.filter(id=id).first())
+            form = forms.EventForm(request.POST)
             if not form.is_valid():
                 return render(request, "edit_event.html", {"form": form})
-            form.save()
+            data = form.cleaned_data
+            start = data['start']
+            end = data['end']
+            title = data['title']
+            desc = data['description']
+            calendar = data['calendar']
+            color = data['color_event']
+            for c in calendar:
+                cal = Calendar.objects.get(name=c)
+                event = Event(start=start, end=end, title=title, description=desc, calendar=cal, color_event=color)
+                event.save()
             return redirect("/manage/")
 
 

@@ -43,15 +43,24 @@ class PuzzleForm(forms.ModelForm):
         exclude = ['id', 'secret_id', 'created_at']
 
 
-class EventForm(forms.ModelForm):
+class EventForm(forms.Form):
+    start = forms.DateTimeField(label="Start")
+    end = forms.DateTimeField(label="End")
+    title = forms.CharField(label="Title", max_length=400)
+    description = forms.CharField(label="Description", max_length=4000)
+    calendar = forms.MultipleChoiceField(label="Calendar", choices=[("Default","Default")])
+    color_event = forms.CharField(label="Colour", max_length=50)
 
-    def __init__(self, *args, **kwargs):
-        super(EventForm, self).__init__(*args, **kwargs)
-        self.fields['calendar'].queryset = Calendar.objects.exclude(name__in=User.objects.all().values('username'))
+    def __init__(self, *args):
+        super().__init__(*args)
+        calendar_choices = Calendar.objects.exclude(name__in=User.objects.all().values('username')).values("name")
+        choices = []
+        for c in calendar_choices:
+            name = c['name']
+            choices += [(name, name)]
+        self.fields['calendar'].choices = choices
 
     class Meta:
-        model = Event
-        fields = ['start', 'end', 'title', 'description', 'calendar', 'color_event']
         widgets = {
             "start": forms.DateTimeInput(),
             "end": forms.DateTimeInput(),
