@@ -41,7 +41,7 @@ CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 
-@permission_required("common_models.manage_scav")
+@permission_required("common_models.lock_scav")
 def lock_scav(request: HttpRequest) -> HttpResponse:
     scav = BooleanSetting.objects.get(id="SCAVENGER_ENABLED")
     tradeup = BooleanSetting.objects.get(id="TRADE_UP_ENABLED")
@@ -60,7 +60,7 @@ def lock_scav(request: HttpRequest) -> HttpResponse:
     return render(request, "lock_scav.html", {"scav": scav.value, "tradeup": tradeup.value})
 
 
-@permission_required("common_models.calendar_manage")
+@permission_required("common_models.shift_manage")
 def shift_edit(request: HttpRequest, id: int) -> HttpResponse:
     if id == 0:
         form = forms.ShiftForm()
@@ -200,7 +200,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                           {"shifts": rshifts, "success": True, "my_shifts": my_shifts, "can_remove": can_remove})
 
 
-@permission_required("common_models.calendar_manage")
+@permission_required("common_models.shift_manage")
 def mailing_list(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         shifts = list(FacilShift.objects.order_by('start'))
@@ -216,7 +216,7 @@ def mailing_list(request: HttpRequest) -> HttpResponse:
         return HttpResponse('<meta http-equiv="refresh" content="0;url=' + redir + '" />')
 
 
-@permission_required("common_models.calendar_manage")
+@permission_required("common_models.report_manage")
 def reports(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         details = UserDetails.objects.all().first()
@@ -367,7 +367,7 @@ def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
             return render(request, "shift_manage_lookup.html", {"users": users})
 
 
-@permission_required("common_models.calendar_manage")
+@permission_required("common_models.shift_manage")
 def shift_export(request: HttpRequest) -> HttpResponse:
     shifts = list(FacilShift.objects.all())
     signups = list()
@@ -398,7 +398,7 @@ def shift_export(request: HttpRequest) -> HttpResponse:
     return response
 
 
-@permission_required("common_models.calendar_manage")
+@permission_required("common_models.report_manage")
 def export_teams(request: HttpRequest) -> HttpResponse:
     data = {}
     max_len = 0
@@ -640,7 +640,7 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
     return HttpResponseBadRequest()
 
 
-@permission_required("auth.add_user")
+@permission_required("auth.change_user")
 def bulk_add_prc(request: HttpRequest) -> HttpResponse:
     """View for bulk prc adding."""
 
