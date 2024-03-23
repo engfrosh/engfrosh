@@ -1,0 +1,22 @@
+{% extends 'base_manage_subpage.html' %}
+
+{% load static %}
+{% block page_title %}
+    Edit Calendar
+{% endblock page_title %}
+{% block top_title %}
+    Edit Calendar
+{% endblock top_title %}
+{% block active %}
+    <h1>Edit Calendar</h1>
+    <style>
+        input {
+            color: black;
+        }
+    </style>
+    <form class="my-5" method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Apply" class="text-blue-600">
+    </form>
+{% endblock active %}

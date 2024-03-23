@@ -41,6 +41,22 @@ CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 
+@permission_required("common_models.calendar_manage")
+def show_calendars(request: HttpRequest) -> HttpResponse:
+    calendars = Calendar.objects.exclude(name__in=User.objects.all().values('username'))
+    return render(request, "show_calendars.html", {"calendars": calendars})
+
+
+@permission_required("common_models.calendar_manage")
+def edit_calendar(request: HttpRequest, id: int) -> HttpResponse:
+    if id == 0:
+        form = forms.CalendarForm()
+    else:
+        cal = Calendar.objects.filter(id=id).first()
+        form = forms.CalendarForm(instance=cal)
+    return render(request, "edit_calendar.html", {"form": form})
+
+
 @permission_required("common_models.lock_scav")
 def lock_scav(request: HttpRequest) -> HttpResponse:
     scav = BooleanSetting.objects.get(id="SCAVENGER_ENABLED")
