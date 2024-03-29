@@ -928,6 +928,8 @@ def discord_create(request: HttpRequest) -> HttpResponse:
         overwrites = []
         for t in types:
             name = team.display_name + " " + t[0]
+            if t[0] == "Design":
+                name = "Design"
             sg = t[2]
 
             if guild.get_role(name) is None:
