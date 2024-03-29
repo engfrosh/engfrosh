@@ -904,6 +904,7 @@ def discord_create(request: HttpRequest) -> HttpResponse:
     types = [
         ("Frosh", ChannelTag.objects.get_or_create(name="FROSH")[0], Group.objects.get_or_create(name="Frosh")[0]),
         ("Facil", ChannelTag.objects.get_or_create(name="FACIL")[0], Group.objects.get_or_create(name="Facil")[0]),
+        ("Design", ChannelTag.objects.get_or_create(name="DESIGN")[0], Group.objects.get_or_create(name="Design")[0]),
         ("Head", ChannelTag.objects.get_or_create(name="HEAD")[0], Group.objects.get_or_create(name="Head")[0]),
         ("Groupco", ChannelTag.objects.get_or_create(name="GROUP-CO")[0],
          Group.objects.get_or_create(name="GroupCo")[0]),
@@ -955,7 +956,8 @@ def discord_create(request: HttpRequest) -> HttpResponse:
             if i == 0:
                 dchan.unlocked_overwrites.add(poverwrite)
             for i2 in range(i, len(types)):
-                dchan.unlocked_overwrites.add(overwrites[i2])
+                if not (i2 == 2) or i == 2:
+                    dchan.unlocked_overwrites.add(overwrites[i2])
 
             dchan.save()
             dchan.unlock()
