@@ -939,7 +939,7 @@ def discord_create(request: HttpRequest) -> HttpResponse:
             if not t[0] == "Design":
                 dr = DiscordRole.objects.get(group_id=team.group, secondary_group_id=sg)
             else:
-                dr = DiscordRole.objects.get(group_id=Group.get(name=t[0]).id)
+                dr = DiscordRole.objects.get(group_id=Group.objects.filter(name=t[0]).first().id)
             o = DiscordOverwrite(descriptive_name=team.display_name + " " + t[0],
                                  user_id=dr.role_id, type=0, allow=3072, deny=0)
             o.save()
