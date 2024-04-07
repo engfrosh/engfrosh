@@ -13,59 +13,62 @@
 {% endblock js_functions %}
 {% block active %}
     <div class="text-white text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
+        <img src="/static/engfroshLost.png" alt="Engfrosh Lost in Time">
         <div>
-            {% if scavenger_enabled %}
-                <a href="{% url 'scavenger_index' %}"
-                   class="bg-main dark:bg-main-night rounded-lg p-2">Scav</a>
-            {% elif scavenger_disabled %}
-                <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2">Scav Disabled</a>
-            {% else %}
-                <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2">No Scav Team</a>
-            {% endif %}
-            {% if trade_up_enabled %}
-                <a href="{% url 'trade_up_home' %}"
-                    class="bg-main dark:bg-main-night rounded-lg p-2">Trade Up</a>
-            {% elif trade_up_disabled %}
-                <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2">Trade Up Disabled</a>
-            {% else %}
-                <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2">No Trade Up Team</a>
-            {% endif %}<br><br>
-            <a href="{% url 'view_faq' id=0 %}"
-                class="bg-main dark:bg-main-night rounded-lg p-2">View FAQs</a>
-            {% if link_discord %}
-                <a href="{% url 'discord_register' %}"
-                   class="bg-main dark:bg-main-night rounded-lg p-2">Link Discord</a><br><br>
-            {% endif %}
-            {% if upload_charter %}
-                <a href="{% url 'upload_charter' %}"
-                   class="bg-main dark:bg-main-night rounded-lg p-2">Upload Charter</a><br><br>
-            {% endif %}
-            <a href="{% url 'my_skash' %}"
-               class="bg-main dark:bg-main-night rounded-lg p-2">Team Skash</a>
-            <a href="{% url 'create_ticket' %}"
-               class="bg-main dark:bg-main-night rounded-lg p-2">Get Help</a>
-            <a href="{% url 'inclusivity_private' %}"
-               class="bg-main dark:bg-main-night rounded-lg p-2">Inclusivity and Wellness</a><br><br>
-            {% if request.user.is_staff %}
-            <a href="{% url 'manage_index' %}"
-               class="bg-main dark:bg-main-night rounded-lg p-2 my-10">Management</a>
-            {% endif %}<br><br>
-            {% if perms.common_models.view_links %}
-            <a href="{% url 'magic_links' %}"
-               class="bg-main dark:bg-main-night rounded-lg p-2">View Magic Links</a>
-            {% endif %}
-            {% if perms.common_models.facil_signup %}
-            <a href="{% url 'facil_shifts' %}"
-               class="bg-main dark:bg-main-night rounded-lg p-2">Signup For Facil Shifts</a>
-            {% endif %}
-            {% if perms.common_models.view_discord_nicks %}
-            <a href="{% url 'manage_discord_nicks' %}"
-               class="bg-main dark:bg-main-night rounded-lg p-2">Unlink Discord Users</a>
-            {% endif %}
-            {% if perms.common_models.check_in %}
-            <a href="{% url 'check-in-index' %}"
-               class="bg-main dark:bg-main-night rounded-lg p-2">Check In</a>
-            {% endif %}
+            <div class="mx-auto max-w-4xl">
+                {% if scavenger_enabled %}
+                    <a href="{% url 'scavenger_index' %}"
+                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Scav</a>
+                {% elif scavenger_disabled %}
+                    <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2 inline-block m-2">Scav Disabled</a>
+                {% else %}
+                    <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2 inline-block m-2">No Scav Team</a>
+                {% endif %}
+                {% if trade_up_enabled %}
+                    <a href="{% url 'trade_up_home' %}"
+                        class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Trade Up</a>
+                {% elif trade_up_disabled %}
+                    <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2 inline-block m-2">Trade Up Disabled</a>
+                {% else %}
+                    <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2 inline-block m-2">No Trade Up Team</a>
+                {% endif %}
+                <a href="{% url 'view_faq' id=0 %}"
+                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">View FAQs</a>
+                {% if link_discord %}
+                    <a href="{% url 'discord_register' %}"
+                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Link Discord</a>
+                {% endif %}
+                {% if upload_charter %}
+                    <a href="{% url 'upload_charter' %}"
+                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Upload Charter</a>
+                {% endif %}
+                <a href="{% url 'my_skash' %}"
+                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Team Skash</a>
+                <a href="{% url 'create_ticket' %}"
+                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Get Help</a>
+                <a href="{% url 'inclusivity_private' %}"
+                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Inclusivity and Wellness</a>
+                {% if request.user.is_staff %}
+                <a href="{% url 'manage_index' %}"
+                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Management</a>
+                {% endif %}
+                {% if perms.common_models.view_links %}
+                <a href="{% url 'magic_links' %}"
+                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">View Magic Links</a>
+                {% endif %}
+                {% if perms.common_models.facil_signup %}
+                <a href="{% url 'facil_shifts' %}"
+                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Signup For Facil Shifts</a>
+                {% endif %}
+                {% if perms.common_models.view_discord_nicks %}
+                <a href="{% url 'manage_discord_nicks' %}"
+                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Unlink Discord Users</a>
+                {% endif %}
+                {% if perms.common_models.check_in %}
+                <a href="{% url 'check-in-index' %}"
+                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Check In</a>
+                {% endif %}
+            </div>
             {% if details %}
             <br><p class="float-right">Your frosh id is: {{ details.frosh_id }}</p>
             <br><p>To link your frosh calendar with a calendar app import the calendar from the following URL: <a href={% url "ics_api" uid=details.int_frosh_id %}>https://server.engfrosh.com{% url "ics_api" uid=details.int_frosh_id %}</a></p>
@@ -80,10 +83,10 @@
         </div>
         <style>
             :root {
-                --fc-page-bg-color: #4F226E;
+                --fc-page-bg-color: #8305c8;
             }
         </style>
-        <div id="calendar" class="bg-background">
+        <div id="calendar" class="bg-background p-2">
         </div>
         <script type='text/javascript'>
             $(document).ready(function() {
