@@ -33,6 +33,9 @@
             select {
                 color: black;
             }
+            .bg-main, .bg-main-night{
+                background-color: #8305c8;
+            }
         </style>
     </head>
     <body class="bg-white dark:bg-background-night text-white dark:border-slate-400 dark:shadow-slate-400 shadow-black min-h-screen flex flex-col">
@@ -41,7 +44,7 @@
                 DEFAULT body
             {% endblock body %}
         </main>
-        <footer class="h-fit bg-main dark:bg-main-night text-center w-full text-white" style="background-color:#8305c8;">
+        <footer class="h-fit bg-main dark:bg-main-night text-center w-full text-white">
             {% block footer %}
             {% endblock footer %}
             <p class="my-3">

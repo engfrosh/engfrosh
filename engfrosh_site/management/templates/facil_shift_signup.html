@@ -7,7 +7,7 @@
     Sign Up For Facil Shifts
 {% endblock top_title %}
 {% block active %}
-    <div class="text-white">
+    <div class="text-white text-[2vmin] p-6 bg-[#a85800] shadow-[0_0_50px_8px_rgba(0,0,0,0.7)]">
     
         {% if success is None %}
         {% elif not success %}
@@ -26,19 +26,21 @@
             <li><p>E: ENERGY/HYPE TIME/LOUD</p></li>
         </ul>
         <br>
-        <tr>
-            <th class="px-2">Name</th>
-            <th class="px-2">Description</th>
-            <th class="px-2">Start</th>
-            <th class="px-2">End</th>
-            <th class="px-2">Max Facils</th>
-            <th class="px-2">Notes</th>
-            {% if can_remove %}
-            <th class="px-2">Remove</th>
-            {% endif %}
-        </tr>
-        <h2>My Shifts</h2><br>
-        <table>
+        <table class="w-full">
+            <tr>
+                <th class="px-2">Name</th>
+                <th class="px-2">Description</th>
+                <th class="px-2">Start</th>
+                <th class="px-2">End</th>
+                <th class="px-2">Max Facils</th>
+                <th class="px-2">Notes</th>
+                {% if can_remove %}
+                <th class="px-2">Remove</th>
+                {% endif %}
+            </tr>
+        </table>
+        <h2>My Shifts:</h2>
+        <table class="w-full">
         {% for shift in my_shifts %}
         <tr>
             <td class="px-2">{{ shift.name }}</td>
@@ -60,7 +62,7 @@
         </tr>
         {% endfor %}
         </table>
-        <h2>Available Shifts</h2><br>
+        <h2>Available Shifts:</h2>
         <table>
         <tr>
             <th class="px-2">Name</th>
