@@ -39,4 +39,6 @@ urlpatterns = [
     path('discord_create', views.discord_create, name="discord_create"),
     path('shift_edit/<int:id>', views.shift_edit, name="shift_edit"),
     path('lock_scav', views.lock_scav, name="lock_scav"),
+    path('edit_calendar/<int:id>', views.edit_calendar, name="edit_calendar"),
+    path('show_calendars', views.show_calendars, name="show_calendars"),
 ]

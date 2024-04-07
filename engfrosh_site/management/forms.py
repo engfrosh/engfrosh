@@ -10,6 +10,12 @@ class ShiftForm(forms.ModelForm):
         exclude = ['id']
 
 
+class CalendarForm(forms.ModelForm):
+    class Meta:
+        model = Calendar
+        exclude = ['id']
+
+
 class AnnouncementForm(forms.Form):
     title = forms.CharField(label='Title', max_length=200)
     body = forms.CharField(label='Body', widget=forms.Textarea)

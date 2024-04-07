@@ -41,6 +41,22 @@ CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 
+@permission_required("common_models.calendar_manage")
+def show_calendars(request: HttpRequest) -> HttpResponse:
+    calendars = Calendar.objects.exclude(name__in=User.objects.all().values('username'))
+    return render(request, "show_calendars.html", {"calendars": calendars})
+
+
+@permission_required("common_models.calendar_manage")
+def edit_calendar(request: HttpRequest, id: int) -> HttpResponse:
+    if id == 0:
+        form = forms.CalendarForm()
+    else:
+        cal = Calendar.objects.filter(id=id).first()
+        form = forms.CalendarForm(instance=cal)
+    return render(request, "edit_calendar.html", {"form": form})
+
+
 @permission_required("common_models.lock_scav")
 def lock_scav(request: HttpRequest) -> HttpResponse:
     scav = BooleanSetting.objects.get(id="SCAVENGER_ENABLED")
@@ -888,6 +904,7 @@ def discord_create(request: HttpRequest) -> HttpResponse:
     types = [
         ("Frosh", ChannelTag.objects.get_or_create(name="FROSH")[0], Group.objects.get_or_create(name="Frosh")[0]),
         ("Facil", ChannelTag.objects.get_or_create(name="FACIL")[0], Group.objects.get_or_create(name="Facil")[0]),
+        ("Design", ChannelTag.objects.get_or_create(name="DESIGN")[0], Group.objects.get_or_create(name="Design")[0]),
         ("Head", ChannelTag.objects.get_or_create(name="HEAD")[0], Group.objects.get_or_create(name="Head")[0]),
         ("Groupco", ChannelTag.objects.get_or_create(name="GROUP-CO")[0],
          Group.objects.get_or_create(name="GroupCo")[0]),
@@ -911,13 +928,19 @@ def discord_create(request: HttpRequest) -> HttpResponse:
         overwrites = []
         for t in types:
             name = team.display_name + " " + t[0]
+            if t[0] == "Design":
+                name = "Design"
             sg = t[2]
 
-            if guild.get_role(name) is None:
+            if guild.get_role(name) is None and len(DiscordRole.objects
+                                                    .filter(group_id=team.group, secondary_group_id=sg) == 0):
                 r = guild.create_role(name)
                 dr = DiscordRole(role_id=r.id, group_id=team.group, secondary_group_id=sg)
                 dr.save()
-            dr = DiscordRole.objects.get(group_id=team.group, secondary_group_id=sg)
+            if not t[0] == "Design":
+                dr = DiscordRole.objects.filter(group_id=team.group, secondary_group_id=sg).first()
+            else:
+                dr = DiscordRole.objects.filter(group_id=Group.objects.filter(name=t[0]).first().id).first()
             o = DiscordOverwrite(descriptive_name=team.display_name + " " + t[0],
                                  user_id=dr.role_id, type=0, allow=3072, deny=0)
             o.save()
@@ -931,7 +954,7 @@ def discord_create(request: HttpRequest) -> HttpResponse:
             if len(DiscordChannel.objects.filter(name=team.discord_name + "-" + t[0])) > 0:
                 continue
             chan = guild.create_channel(team.discord_name + "-" + t[0], cat.id, False)
-            dchan = DiscordChannel(name=team.discord_name + "-" + t[0], type=0, id=chan.id, basename=t[0], team=team)
+            dchan = DiscordChannel(name=team.discord_name + "-" + t[0], type=0, id=chan.id, team=team)
             dchan.save()
             dchan.tags.add(t[1])
             dchan.unlocked_overwrites.add(disallow)
@@ -939,7 +962,8 @@ def discord_create(request: HttpRequest) -> HttpResponse:
             if i == 0:
                 dchan.unlocked_overwrites.add(poverwrite)
             for i2 in range(i, len(types)):
-                dchan.unlocked_overwrites.add(overwrites[i2])
+                if not (i2 == 2) or i == 2:
+                    dchan.unlocked_overwrites.add(overwrites[i2])
 
             dchan.save()
             dchan.unlock()
