@@ -26,19 +26,36 @@
                 {% endif %}
             </div>
             {% if not view_only %}
+                <ul>
+                {% for a in comp_answers %}
+                <li>
+                    <input type="text"
+                           id="answerText-{{ i }}"
+                           value="{{ a }}"
+                           disabled="disabled"
+                           class="border-2 rounded border-slate-900 dark:border-slate-400 text-black"/>
+                </li>
+                {% endfor %}
+                {% for i in remaining_answers %}
+                <li>
                 <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto m-4">
                     <p>Text Answer</p>
                     <input type="text"
-                           id="answerText"
+                           id="answerText-{{ i }}"
+                           {% if i == 0 %}
                            value="{{ guess }}"
+                           {% endif %}
                            class="border-2 rounded border-slate-900 dark:border-slate-400 text-black"/>
                     <button type="button"
                             id="answerSubmitButton"
-                            onclick="submitAnswerButtonPress()"
+                            onclick="submitAnswerButtonPress({{ i }})"
                             class="bg-main dark:bg-main-night rounded text-white p-1">
                         Submit
                     </button>
                 </div>
+                </li>
+                {% endfor %}
+                </ul>
             {% elif requires_photo %}
             </div>
             <div class="m-10 text-center">
@@ -52,8 +69,8 @@
 {% endblock body %}
 {% block js_functions %}
     <script>
-    function submitAnswerButtonPress() {
-        let answerInput = document.getElementById("answerText");
+    function submitAnswerButtonPress(id) {
+        let answerInput = document.getElementById("answerText-" + id);
         const answer = answerInput.value;
         // alert("Trying to submit: " + answer);
         if (!answer) {
