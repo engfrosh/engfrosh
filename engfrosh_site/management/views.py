@@ -15,7 +15,7 @@ from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, TeamTradeUpActivity, UserDetails
 from common_models.models import ChannelTag, DiscordGuild, Announcement, FacilShift, FacilShiftSignup
-from common_models.models import Setting
+from common_models.models import Setting, QRCode
 import common_models.models
 from common_models.models import DiscordRole, DiscordOverwrite, BooleanSetting
 from . import registration
@@ -1240,7 +1240,7 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
 
         for puz in Puzzle.objects.all():
-            if not puz.qr_code:
+            if len(QRCode.objects.filter(puzzle=puz)) == 0:
                 puz._generate_qr_code()
 
         context = {

@@ -27,9 +27,6 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if puzzle.qr_code %}<a class="rounded border" href="{{ puzzle.qr_code.url }}">QR Code</a>{% endif %}
-                </td>
-                <td>
                     <button onclick="postToServer(csrf_token, {'command': 'toggle', 'puzzle': '{{ puzzle.id }}'}).then(res => {res.text().then(data => {alert(data);window.location.href='';})});">Toggle</button>
                 </td>
             </tr>

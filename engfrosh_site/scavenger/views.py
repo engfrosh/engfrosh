@@ -3,7 +3,7 @@ from django.http import HttpRequest, HttpResponse
 from django.http.response import HttpResponseNotAllowed, HttpResponseBadRequest, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect
 from scavenger.consumers import ScavConsumer
-from common_models.models import DiscordChannel, Puzzle, Team, VerificationPhoto
+from common_models.models import DiscordChannel, Puzzle, Team, VerificationPhoto, QRCode
 from django.contrib.auth.decorators import login_required, permission_required
 
 import logging
@@ -19,8 +19,11 @@ logger = logging.getLogger("engfrosh_site.scavenger.views")
 
 @permission_required("common_models.manage_scav", login_url='/accounts/login')
 def print_qr(request: HttpRequest) -> HttpResponse:
-    puzzles = Puzzle.objects.all()
-    return render(request, "print_qr.html", {"puzzles": puzzles})
+    for puz in Puzzle.objects.all():
+        if len(QRCode.objects.filter(puzzle=puz)) == 0:
+            puz._generate_qr_code()
+    codes = QRCode.objects.all()
+    return render(request, "print_qr.html", {"codes": codes})
 
 
 @permission_required("common_models.manage_scav", login_url='/accounts/login')
