@@ -89,6 +89,8 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
     if not (puz and puz.is_viewable_for_team(team)) and not bypass:
         return HttpResponse("You do not have access to this puzzle.")
 
+    activity = puz.puzzle_activity_from_team(team)
+
     if request.method == "GET":
 
         context = {
@@ -97,7 +99,10 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
             "scavenger_enabled_for_team": team.scavenger_enabled,
             "guess": request.GET.get("answer", ""),
             "bypass": bypass,
-            "requires_photo": puz.requires_verification_photo_by_team(team)
+            "requires_photo": puz.requires_verification_photo_by_team(team),
+            "answers": len(puz.answers),
+            "comp_answers": activity.completed_answers,
+            "remaining_answers": range(len(puz.answers)-len(activity.completed_answers)),
         }
 
         return render(request, "scavenger_question.html", context)
