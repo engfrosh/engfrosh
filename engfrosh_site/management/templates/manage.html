@@ -3,101 +3,107 @@
    EngFrosh Management
 {% endblock page_title %}
 {% block top_title %}
-   <a href="{% url 'user_home' %}" class="bg-main dark:bg-main-night rounded-lg p-2"
-   >Back</a> EngFrosh Management
+   <a href="{% url 'user_home' %}" class="bg-main dark:bg-main-night rounded-lg p-2">Back</a> 
+   <div class="text-white p-6 bg-background shadow m-6 inline-block">
+      EngFrosh Management
+   </div>
 {% endblock top_title %}
 {% block active %}
 <div class="flex flex-row">
    <div class="flex flex-col space-y-3 mx-auto container text-white text-center max-w-sm">
-      <h1>Planning Stuff</h1>
+      <div class="text-white p-1 bg-background shadow m-1 inline-block">
+         <h1>Planning Stuff</h1>
+      </div>
       {% if perms.common_models.view_links %}
       <a href="discord/magic-link"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Magic Links</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Magic Links</a>
       {% endif %}
       {% if perms.common_models.manage_scav %}
       <a href="{% url 'manage_scavenger_puzzles' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Manage Scavenger Puzzles 🧩</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Manage Scavenger Puzzles 🧩</a>
       <a href="{% url 'scavenger_scoreboard' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">View Scavenger Scoreboard</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">View Scavenger Scoreboard</a>
       <a href="{% url 'approve_scavenger_puzzles' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Approve Scavenger Photos</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Approve Scavenger Photos</a>
       <a href="{% url 'scavenger_monitor' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Scavenger Monitor</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Scavenger Monitor</a>
       <a href="{% url 'lock_team' id=0 %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Lock Team</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Lock Team</a>
       <a href="{% url 'unlock_team' id=0 %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Unlock Team</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Unlock Team</a>
       <a href="{% url 'free_hints' id=0 %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Free Hints</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Free Hints</a>
       {% endif %}
       {% if perms.common_models.view_team %}
       <a href="{% url 'trade_up_viewer' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">View Trade Up</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">View Trade Up</a>
       {% endif %}
       {% if perms.common_models.view_discord_nicks %}
       <a href="{% url 'manage_discord_nicks' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Manage Discord Nicks</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Manage Discord Nicks</a>
       {% endif %}
       {% if perms.common_models.shift_manage %}
       <a href="{% url 'mailing_list' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">View Shift Signups</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">View Shift Signups</a>
       <a href="{% url 'shift_manage' id=0 %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Manage Facil Shift Signups</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Manage Facil Shift Signups</a>
       {% endif %}
       {% if perms.common_models.view_team_coin_standings %}
       <a href="{% url 'skash_standings' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">View Skash</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">View Skash</a>
       {% endif %}
       {% if perms.common_models.lock_scav %}
       <a href="{% url 'lock_scav' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Lock Scav</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Lock Scav</a>
       {% endif %}
    </div>
    <div class="flex flex-col space-y-3 mx-auto container text-white text-center max-w-sm">
-      <h1>Technical Stuff</h1>
-      <a href="/admin" class="bg-main dark:bg-main-night rounded-lg p-2">Server Admin</a>
+      <div class="text-white p-1 bg-background shadow m-1 inline-block">
+         <h1>Technical Stuff</h1>
+      </div>
+      <a href="/admin" class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Server Admin</a>
       {% if perms.auth.add_user %}
-      <a href="users/add" class="bg-main dark:bg-main-night rounded-lg p-2">Add Users</a>
+      <a href="users/add" class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Add Users</a>
       {% endif %}
       {% if perms.auth.change_user %}
       <a href="{% url 'add_users_to_discord_guild' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Add Users To Guild</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Add Users To Guild</a>
       {% endif %}
       {% if perms.frosh_team.change_team %}
       <a href="{% url 'manage_frosh_teams' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Manage Teams</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Manage Teams</a>
       {% endif %}
       {% if request.user.is_superuser %}
       <a href="{% url 'initialize_database' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Initialize Database</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Initialize Database</a>
       <a href="{% url 'initialize_scav' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Initialize Scavenger</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Initialize Scavenger</a>
       <a href="{% url 'discord_rename' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Rename Discord Channels</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Rename Discord Channels</a>
       <a href="{% url 'discord_create' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Create Discord Channels</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Create Discord Channels</a>
       {% endif %}
       {% if perms.common_models.manage_scav %}
       <a href="{% url 'regen_trees' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Regen Scav Trees</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Regen Scav Trees</a>
       {% endif %}
       {% if perms.common_models.announcement_manage %}
       <a href="{% url 'announcements' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Create Announcement</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Create Announcement</a>
       {% endif %}
       {% if perms.common_models.calendar_manage %}
       <a href="{% url 'edit_event' id=0 %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Create Calendar Event</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Create Calendar Event</a>
       {% endif %}
       {% if perms.common_models.report_manage %}
       <a href="{% url 'reports' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Reports</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Reports</a>
       <a href="{% url 'export_teams' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Export Teams</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Export Teams</a>
       {% endif %}
       {% if perms.auth.change_user %}
       <a href="{% url 'bulk_add_prc' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">PRC Import</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">PRC Import</a>
       {% endif %}
    </div>
 </div>

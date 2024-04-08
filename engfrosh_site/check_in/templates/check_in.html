@@ -2,7 +2,7 @@
 {% block page_title %}
     Check In
 {% endblock page_title %}
-{% block body %}
+{% block active %}
     <style>
         td, th{
             padding-left: 5px;
@@ -11,7 +11,7 @@
     </style>
     <div class="p-6">
         <div class="space-y-4 mt-4 text-center">
-            <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto m-4">
+            <div class="bg-background shadow rounded-lg px-6 py-8 shadow-xl max-w-5xl mx-auto m-4">
                 <a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/monitor" style="float: left;" target="_blank">Monitor</a>
                 <form action="/check-in/">
                     {% csrf_token %}
@@ -56,4 +56,4 @@
             </div>
         </div>
     </div>
-{% endblock body %}
+{% endblock active %}

@@ -7,31 +7,33 @@
     Approve Scavenger Puzzles
 {% endblock top_title %}
 {% block active %}
-    <table>
-        <tr>
-            <th>Puzzle</th>
-            <th>Team</th>
-            <th>Photo</th>
-            <th>Approve</th>
-            <th></th>
-        </tr>
-        {% for puzzle_activity in puzzle_activities_awaiting_verification %}
+    <div class="text-white p-6 bg-background rounded-lg shadow m-5 inline-block">
+        <table>
             <tr>
-                <td class="px-3 text-center">{{ puzzle_activity.puzzle.name }}</td>
-                <td class="px-3 text-center">{{ puzzle_activity.team.display_name }}</td>
-                <td class="px-3 text-center">
-                    <a href="{{ puzzle_activity.verification_photo.photo.url }}"
-                       class="rounded border">Photo</a>
-                </td>
-                <td class="px-3 text-center">
-                    <button class="rounded border p-1"
-                            onclick="approvePhotoButtonPress('{{ puzzle_activity.verification_photo.id }}')">
-                        Approve
-                    </button>
-                </td>
+                <th>Puzzle</th>
+                <th>Team</th>
+                <th>Photo</th>
+                <th>Approve</th>
+                <th></th>
             </tr>
-        {% endfor %}
-    </table>
+            {% for puzzle_activity in puzzle_activities_awaiting_verification %}
+                <tr>
+                    <td class="px-3 text-center">{{ puzzle_activity.puzzle.name }}</td>
+                    <td class="px-3 text-center">{{ puzzle_activity.team.display_name }}</td>
+                    <td class="px-3 text-center">
+                        <a href="{{ puzzle_activity.verification_photo.photo.url }}"
+                        class="rounded border">Photo</a>
+                    </td>
+                    <td class="px-3 text-center">
+                        <button class="rounded border p-1"
+                                onclick="approvePhotoButtonPress('{{ puzzle_activity.verification_photo.id }}')">
+                            Approve
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endblock active %}
 {% block js_functions %}
     <script>

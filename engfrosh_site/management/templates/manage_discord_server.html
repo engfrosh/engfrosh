@@ -17,6 +17,7 @@
             onclick="scanForServersButtonPress()">
         Scan for Servers
     </button>
+    <div class="text-white p-6 bg-background rounded-lg shadow m-5 inline-block">
     <table>
         <tr>
             <th>Name</th>
@@ -39,6 +40,7 @@
             </tr>
         {% endfor %}
     </table>
+    </div>
 {% endblock active %}
 {% block js_functions %}
     <script src="{% static 'manage_discord_server.js' %}"></script>
