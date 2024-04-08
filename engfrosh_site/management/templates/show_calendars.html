@@ -1,0 +1,24 @@
+{% extends 'base_manage_subpage.html' %}
+
+{% load static %}
+{% block page_title %}
+    View Calendar
+{% endblock page_title %}
+{% block top_title %}
+    View Calendar
+{% endblock top_title %}
+{% block active %}
+    <h1>View Calendars</h1><br>
+    <a href="{% url 'edit_calendar' id=0 %}"
+         class="bg-main dark:bg-main-night rounded-lg p-2">Create Calendar</a><br>
+    <style>
+        input {
+            color: black;
+        }
+    </style>
+    <h2>Calendars:</h2><br>
+    {% for cal in calendars %}
+        <a href="{% url 'edit_calendar' id=cal.id %}"
+            class="bg-main dark:bg-main-night rounded-lg p-2">{{ cal.name }}</a><br><br>
+    {% endfor %}
+{% endblock active %}

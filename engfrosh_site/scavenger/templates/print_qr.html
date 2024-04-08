@@ -1,0 +1,7 @@
+<html>
+<body>
+{% for puzzle in puzzles %}
+<img src="{{ puzzle.qr_code.url }}" style="width: 45%;"/>
+{% endfor %}
+</body>
+</html>

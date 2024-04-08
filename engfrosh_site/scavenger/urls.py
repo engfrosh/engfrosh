@@ -11,5 +11,6 @@ urlpatterns = [
     path('puzzle/<slug:slug>/', views.puzzle_view, name="view_puzzle"),
     path("puzzle/<slug:slug>/verification_photo/", views.puzzle_photo_verification_view, name="verify_puzzle"),
     path("stream_completed", views.stream_view),
-    path("regen_trees", views.regen_trees, name="regen_trees")
+    path("regen_trees", views.regen_trees, name="regen_trees"),
+    path("print_qr", views.print_qr, name="print_qr"),
 ]

@@ -18,6 +18,12 @@ logger = logging.getLogger("engfrosh_site.scavenger.views")
 
 
 @permission_required("common_models.manage_scav", login_url='/accounts/login')
+def print_qr(request: HttpRequest) -> HttpResponse:
+    puzzles = Puzzle.objects.all()
+    return render(request, "print_qr.html", {"puzzles": puzzles})
+
+
+@permission_required("common_models.manage_scav", login_url='/accounts/login')
 def regen_trees(request: HttpRequest) -> HttpResponse:
     teams = Team.objects.all()
     for team in teams:

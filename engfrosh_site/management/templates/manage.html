@@ -20,7 +20,7 @@
       {% endif %}
       {% if perms.common_models.manage_scav %}
       <a href="{% url 'manage_scavenger_puzzles' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Manage Scavenger Puzzles 🧩</a>
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Manage Scavenger Puzzles</a>
       <a href="{% url 'scavenger_scoreboard' %}"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">View Scavenger Scoreboard</a>
       <a href="{% url 'approve_scavenger_puzzles' %}"
@@ -33,6 +33,8 @@
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Unlock Team</a>
       <a href="{% url 'free_hints' id=0 %}"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Free Hints</a>
+      <a href="{% url 'print_qr' %}"
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Print QR Codes</a>
       {% endif %}
       {% if perms.common_models.view_team %}
       <a href="{% url 'trade_up_viewer' %}"
@@ -94,6 +96,8 @@
       {% if perms.common_models.calendar_manage %}
       <a href="{% url 'edit_event' id=0 %}"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Create Calendar Event</a>
+      <a href="{% url 'show_calendars' %}"
+         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">View Calendars</a>
       {% endif %}
       {% if perms.common_models.report_manage %}
       <a href="{% url 'reports' %}"

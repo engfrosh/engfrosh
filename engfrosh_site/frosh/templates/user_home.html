@@ -96,6 +96,7 @@
             <div id="calendar" class="p-2">
             </div>
         </div>
+      
         <script type='text/javascript'>
             $(document).ready(function() {
                 var calendar = document.getElementById("calendar");
@@ -106,7 +107,7 @@
                     initialView: 'timeGridWeek',
                     titleFormat: {month: 'short', day: 'numeric'},
                     headerToolbar: {left: 'title',
-                                    center: '',
+                                    center: 'timeGridWeek,timeGridDay',
                                     right: 'prev,next'},
                     views: {
                         timeGridWeek: {
