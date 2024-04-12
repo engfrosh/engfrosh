@@ -190,6 +190,12 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             signup = FacilShiftSignup.objects.filter(shift=shift, user=request.user).first()
             if signup is None:
                 logger.info("Shift not found")
+                rshifts = []
+                for shift in shifts:
+                    signups = shift.facil_count
+                    count = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
+                    if signups < shift.max_facils and count == 0 and not shift.is_passed:
+                        rshifts += [shift]
                 return render(request, "facil_shift_signup.html",
                               {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
             signup.delete()
@@ -211,7 +217,11 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             for shift in FacilShiftSignup.objects.filter(user=request.user):
                 my_shifts += [shift.shift]
             rshifts = []
-
+            for shift in shifts:
+                signups = shift.facil_count
+                count = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
+                if signups < shift.max_facils and count == 0 and not shift.is_passed:
+                    rshifts += [shift]
             return render(request, "facil_shift_signup.html",
                           {"shifts": rshifts, "success": True, "my_shifts": my_shifts, "can_remove": can_remove})
 
