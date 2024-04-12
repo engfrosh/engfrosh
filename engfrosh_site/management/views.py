@@ -1402,15 +1402,15 @@ def manage_discord_nicks(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         search = request.GET.get('filter', '')
         if request.user.is_staff:
-            users = DiscordUser.objects.filter(user__username__icontains=search).select_related('user')
-            users |= DiscordUser.objects.filter(discord_username__icontains=search).select_related('user')
+            users = DiscordUser.objects.select_related('user').filter(user__username__icontains=search)
+            users |= DiscordUser.objects.select_related('user').filter(discord_username__icontains=search)
         else:
             team = Team.from_user(request.user)
             group = team.group
-            users = DiscordUser.objects.filter(user__username__icontains=search,
-                                               user__groups__id__in=[group.id]).select_related('user')
-            users |= DiscordUser.objects.filter(discord_username__icontains=search,
-                                                user__groups__id__in=[group.id]).select_related('user')
+            users = DiscordUser.objects.select_related('user').filter(user__username__icontains=search,
+                                                                      user__groups__id__in=[group.id])
+            users |= DiscordUser.objects.select_related('user').filter(discord_username__icontains=search,
+                                                                       user__groups__id__in=[group.id])
         return render(request, "manage_discord_nicks.html", {"users": users})
     elif request.method == "POST":
         if request.content_type != "application/json":
