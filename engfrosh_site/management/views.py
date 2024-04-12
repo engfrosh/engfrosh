@@ -1430,6 +1430,7 @@ def manage_discord_nicks(request: HttpRequest) -> HttpResponse:
             user = DiscordUser.objects.filter(id=req_dict['user']).first()
             if user not in users:
                 return HttpResponseBadRequest("Invalid user.")
+            user.kick_user()
             user.delete()
             return HttpResponse("Unlinked discord account.")
         else:
