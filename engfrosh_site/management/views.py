@@ -153,7 +153,6 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             event = Event(start=shift.start, end=shift.end, title=shift.name, description=shift.desc, calendar=calendar)
             event.save()
             shifts = list(FacilShift.objects.all())
-            shifts = list(FacilShift.objects.all())
             rshifts = []
             for shift in shifts:
                 signups = shift.facil_count
@@ -191,6 +190,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             if signup is None:
                 logger.info("Shift not found")
                 rshifts = []
+                shifts = list(FacilShift.objects.all())
                 for shift in shifts:
                     signups = shift.facil_count
                     count = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
@@ -217,6 +217,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             for shift in FacilShiftSignup.objects.filter(user=request.user):
                 my_shifts += [shift.shift]
             rshifts = []
+            shifts = list(FacilShift.objects.all())
             for shift in shifts:
                 signups = shift.facil_count
                 count = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
