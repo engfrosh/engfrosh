@@ -23,9 +23,9 @@
         {% endblock page_style %}
         <style>
             body {
-                background-image: url("{% static 'binary.png' %}");
-                background-repeat: no-repeat;
-                background-size: 100% 100%;
+                background-image: url("{% static 'background.png' %}");
+                background-repeat: repeat-y;
+                background-size: 100vmax 100vh;
             }
             input[type=text], textarea, input[type=number] {
                 color: black;
@@ -33,6 +33,22 @@
             select {
                 color: black;
             }
+            .bg-main, .bg-main-night{
+                background-color: #8305c8;
+            }
+            .bg-orange {
+                background-color: #a85800;
+            }
+            .bg-background {
+                background-color: #532552;
+            }
+            .shadow {
+                box-shadow: 0 0 10px 1px rgba(0,0,0,0.8);
+            }
+            #calender {
+                padding:8px;
+            }
+
         </style>
     </head>
     <body class="bg-white dark:bg-background-night text-white dark:border-slate-400 dark:shadow-slate-400 shadow-black min-h-screen flex flex-col">
@@ -46,6 +62,7 @@
             {% endblock footer %}
             <p class="my-3">
                 Get Help: <a href="mailto:questions@engfrosh.com">questions@engfrosh.com</a>
+                |
                 <a href="{% url 'inclusivity_public' %}">Inclusivity Pages</a>
             </p>
         </footer>

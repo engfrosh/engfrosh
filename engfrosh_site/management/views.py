@@ -15,7 +15,7 @@ from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, TeamTradeUpActivity, UserDetails
 from common_models.models import ChannelTag, DiscordGuild, Announcement, FacilShift, FacilShiftSignup
-from common_models.models import Setting
+from common_models.models import Setting, QRCode
 import common_models.models
 from common_models.models import DiscordRole, DiscordOverwrite, BooleanSetting
 from . import registration
@@ -914,6 +914,7 @@ def discord_create(request: HttpRequest) -> HttpResponse:
     types = [
         ("Frosh", ChannelTag.objects.get_or_create(name="FROSH")[0], Group.objects.get_or_create(name="Frosh")[0]),
         ("Facil", ChannelTag.objects.get_or_create(name="FACIL")[0], Group.objects.get_or_create(name="Facil")[0]),
+        ("Design", ChannelTag.objects.get_or_create(name="DESIGN")[0], Group.objects.get_or_create(name="Design")[0]),
         ("Head", ChannelTag.objects.get_or_create(name="HEAD")[0], Group.objects.get_or_create(name="Head")[0]),
         ("Groupco", ChannelTag.objects.get_or_create(name="GROUP-CO")[0],
          Group.objects.get_or_create(name="GroupCo")[0]),
@@ -937,13 +938,19 @@ def discord_create(request: HttpRequest) -> HttpResponse:
         overwrites = []
         for t in types:
             name = team.display_name + " " + t[0]
+            if t[0] == "Design":
+                name = "Design"
             sg = t[2]
 
-            if guild.get_role(name) is None:
+            if guild.get_role(name) is None and len(DiscordRole.objects
+                                                    .filter(group_id=team.group, secondary_group_id=sg) == 0):
                 r = guild.create_role(name)
                 dr = DiscordRole(role_id=r.id, group_id=team.group, secondary_group_id=sg)
                 dr.save()
-            dr = DiscordRole.objects.get(group_id=team.group, secondary_group_id=sg)
+            if not t[0] == "Design":
+                dr = DiscordRole.objects.filter(group_id=team.group, secondary_group_id=sg).first()
+            else:
+                dr = DiscordRole.objects.filter(group_id=Group.objects.filter(name=t[0]).first().id).first()
             o = DiscordOverwrite(descriptive_name=team.display_name + " " + t[0],
                                  user_id=dr.role_id, type=0, allow=3072, deny=0)
             o.save()
@@ -957,7 +964,7 @@ def discord_create(request: HttpRequest) -> HttpResponse:
             if len(DiscordChannel.objects.filter(name=team.discord_name + "-" + t[0])) > 0:
                 continue
             chan = guild.create_channel(team.discord_name + "-" + t[0], cat.id, False)
-            dchan = DiscordChannel(name=team.discord_name + "-" + t[0], type=0, id=chan.id, basename=t[0], team=team)
+            dchan = DiscordChannel(name=team.discord_name + "-" + t[0], type=0, id=chan.id, team=team)
             dchan.save()
             dchan.tags.add(t[1])
             dchan.unlocked_overwrites.add(disallow)
@@ -965,7 +972,8 @@ def discord_create(request: HttpRequest) -> HttpResponse:
             if i == 0:
                 dchan.unlocked_overwrites.add(poverwrite)
             for i2 in range(i, len(types)):
-                dchan.unlocked_overwrites.add(overwrites[i2])
+                if not (i2 == 2) or i == 2:
+                    dchan.unlocked_overwrites.add(overwrites[i2])
 
             dchan.save()
             dchan.unlock()
@@ -1242,7 +1250,7 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
 
         for puz in Puzzle.objects.all():
-            if not puz.qr_code:
+            if len(QRCode.objects.filter(puzzle=puz)) == 0:
                 puz._generate_qr_code()
 
         context = {
