@@ -95,7 +95,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
         can_remove = False
     if request.method == "GET":
         shifts = list(FacilShift.objects.all())
-        rshifts = []
+        rshifts = []  # Shifts remaining to be signed up for
         for shift in shifts:
             signups = shift.facil_count
             u_signups = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
@@ -1402,13 +1402,15 @@ def manage_discord_nicks(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         search = request.GET.get('filter', '')
         if request.user.is_staff:
-            users = DiscordUser.objects.filter(user__username__icontains=search)
-            users |= DiscordUser.objects.filter(discord_username__icontains=search)
+            users = DiscordUser.objects.filter(user__username__icontains=search).select_related('user')
+            users |= DiscordUser.objects.filter(discord_username__icontains=search).select_related('user')
         else:
             team = Team.from_user(request.user)
             group = team.group
-            users = DiscordUser.objects.filter(user__username__icontains=search, user__groups__id__in=[group.id])
-            users |= DiscordUser.objects.filter(discord_username__icontains=search, user__groups__id__in=[group.id])
+            users = DiscordUser.objects.filter(user__username__icontains=search,
+                                               user__groups__id__in=[group.id]).select_related('user')
+            users |= DiscordUser.objects.filter(discord_username__icontains=search,
+                                                user__groups__id__in=[group.id]).select_related('user')
         return render(request, "manage_discord_nicks.html", {"users": users})
     elif request.method == "POST":
         if request.content_type != "application/json":
