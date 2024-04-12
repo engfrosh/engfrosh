@@ -115,7 +115,6 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             logger.info(shift_id)
             shift = FacilShift.objects.filter(id=shift_id).first()
             shifts = list(FacilShift.objects.all())
-            shifts = list(FacilShift.objects.all())
             rshifts = []
             my_shifts = []
             for shift2 in FacilShiftSignup.objects.filter(user=request.user):
