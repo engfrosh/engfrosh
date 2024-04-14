@@ -268,7 +268,7 @@ def reports(request: HttpRequest) -> HttpResponse:
                 requirements += [(target, value, operator)]
         except KeyError:
             return HttpResponseBadRequest("Key Error in Body")
-        users = UserDetails.objects.all()
+        users = UserDetails.objects.select_related('user').all()
         data = []
         for user in users:
             met = True
