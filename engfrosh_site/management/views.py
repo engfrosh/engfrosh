@@ -335,8 +335,11 @@ def reports(request: HttpRequest) -> HttpResponse:
             response['Content-Disposition'] = 'attachment; filename="report.csv"'
             return response
         elif dataformat == "html":
+            length = len(output) - 1
+            if length == -1:
+                length = 0
             req_dict["format"] = "csv"
-            return render(request, "reports.html", {"data": output, "length": len(output)-1,
+            return render(request, "reports.html", {"data": output, "length": length,
                                                     "query": json.dumps(req_dict)})
 
 
