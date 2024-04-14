@@ -95,7 +95,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
         can_remove = False
     if request.method == "GET":
         shifts = list(FacilShift.objects.all())
-        rshifts = []
+        rshifts = []  # Shifts remaining to be signed up for
         for shift in shifts:
             signups = shift.facil_count
             u_signups = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
@@ -114,7 +114,6 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             shift_id = int(request.POST["shift_id"])
             logger.info(shift_id)
             shift = FacilShift.objects.filter(id=shift_id).first()
-            shifts = list(FacilShift.objects.all())
             shifts = list(FacilShift.objects.all())
             rshifts = []
             my_shifts = []
@@ -153,7 +152,6 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             event = Event(start=shift.start, end=shift.end, title=shift.name, description=shift.desc, calendar=calendar)
             event.save()
             shifts = list(FacilShift.objects.all())
-            shifts = list(FacilShift.objects.all())
             rshifts = []
             for shift in shifts:
                 signups = shift.facil_count
@@ -190,6 +188,13 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             signup = FacilShiftSignup.objects.filter(shift=shift, user=request.user).first()
             if signup is None:
                 logger.info("Shift not found")
+                rshifts = []
+                shifts = list(FacilShift.objects.all())
+                for shift in shifts:
+                    signups = shift.facil_count
+                    count = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
+                    if signups < shift.max_facils and count == 0 and not shift.is_passed:
+                        rshifts += [shift]
                 return render(request, "facil_shift_signup.html",
                               {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
             signup.delete()
@@ -211,7 +216,12 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             for shift in FacilShiftSignup.objects.filter(user=request.user):
                 my_shifts += [shift.shift]
             rshifts = []
-
+            shifts = list(FacilShift.objects.all())
+            for shift in shifts:
+                signups = shift.facil_count
+                count = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
+                if signups < shift.max_facils and count == 0 and not shift.is_passed:
+                    rshifts += [shift]
             return render(request, "facil_shift_signup.html",
                           {"shifts": rshifts, "success": True, "my_shifts": my_shifts, "can_remove": can_remove})
 
@@ -258,7 +268,7 @@ def reports(request: HttpRequest) -> HttpResponse:
                 requirements += [(target, value, operator)]
         except KeyError:
             return HttpResponseBadRequest("Key Error in Body")
-        users = UserDetails.objects.all()
+        users = UserDetails.objects.select_related('user').all()
         data = []
         for user in users:
             met = True
@@ -325,8 +335,11 @@ def reports(request: HttpRequest) -> HttpResponse:
             response['Content-Disposition'] = 'attachment; filename="report.csv"'
             return response
         elif dataformat == "html":
+            length = len(output) - 1
+            if length == -1:
+                length = 0
             req_dict["format"] = "csv"
-            return render(request, "reports.html", {"data": output, "length": len(output)-1,
+            return render(request, "reports.html", {"data": output, "length": length,
                                                     "query": json.dumps(req_dict)})
 
 
@@ -1392,13 +1405,15 @@ def manage_discord_nicks(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         search = request.GET.get('filter', '')
         if request.user.is_staff:
-            users = DiscordUser.objects.filter(user__username__icontains=search)
-            users |= DiscordUser.objects.filter(discord_username__icontains=search)
+            users = DiscordUser.objects.select_related('user').filter(user__username__icontains=search)
+            users |= DiscordUser.objects.select_related('user').filter(discord_username__icontains=search)
         else:
             team = Team.from_user(request.user)
             group = team.group
-            users = DiscordUser.objects.filter(user__username__icontains=search, user__groups__id__in=[group.id])
-            users |= DiscordUser.objects.filter(discord_username__icontains=search, user__groups__id__in=[group.id])
+            users = DiscordUser.objects.select_related('user').filter(user__username__icontains=search,
+                                                                      user__groups__id__in=[group.id])
+            users |= DiscordUser.objects.select_related('user').filter(discord_username__icontains=search,
+                                                                       user__groups__id__in=[group.id])
         return render(request, "manage_discord_nicks.html", {"users": users})
     elif request.method == "POST":
         if request.content_type != "application/json":
@@ -1418,6 +1433,7 @@ def manage_discord_nicks(request: HttpRequest) -> HttpResponse:
             user = DiscordUser.objects.filter(id=req_dict['user']).first()
             if user not in users:
                 return HttpResponseBadRequest("Invalid user.")
+            user.kick_user()
             user.delete()
             return HttpResponse("Unlinked discord account.")
         else:
