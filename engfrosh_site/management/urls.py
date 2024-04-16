@@ -41,4 +41,5 @@ urlpatterns = [
     path('lock_scav', views.lock_scav, name="lock_scav"),
     path('edit_calendar/<int:id>', views.edit_calendar, name="edit_calendar"),
     path('show_calendars', views.show_calendars, name="show_calendars"),
+    path('unregistered_email', views.unregistered_email, name="unregistered_email"),
 ]

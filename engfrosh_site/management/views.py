@@ -6,6 +6,7 @@ import requests
 import json
 import os
 import datetime
+import time
 
 import credentials
 
@@ -31,6 +32,7 @@ from django.http.response import HttpResponse, JsonResponse, \
     HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError, HttpResponseForbidden
 from django.shortcuts import render, redirect
 from .forms import AnnouncementForm
+from .email import send_email
 from django.contrib.auth.decorators import user_passes_test
 from schedule.models import Event, Calendar
 
@@ -738,6 +740,32 @@ def unregistered(request: HttpRequest) -> HttpResponse:
     response = HttpResponse(data, 'text/csv')
     response['Content-Disposition'] = 'attachment; filename="unregistered.csv"'
     return response
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def unregistered_email(request: HttpRequest) -> HttpResponse:
+    users = User.objects.select_related("discorduser").all().order_by("username")
+    body = """Welcome to EngFrosh,<br>
+
+You have been invited to join the EngFrosh Discord server!<br>
+You can join it by going to https://time.engfrosh.com and navigating to "Sign in with cmail".<br><br>
+
+Please do not reply to this email, it is automated, any questions or concerns can be sent to technical@engfrosh.com
+<br><br>
+
+Thanks,\n<br>
+EngFrosh Technicals
+    """
+    for usr in users:
+        if not usr.is_superuser:
+            try:
+                d = usr.discorduser  # noqa: F841
+            except Exception:
+                if usr.email.endswith("cmail.carleton.ca"):
+                    send_email(user=usr, sender_email="noreply@engfrosh.com",
+                               subject="EngFrosh Discord Reminder", body_text=body, body_html=body)
+                    time.sleep(1/15)  # AWS SES send limit is 14 per second
+    return HttpResponse("Sent emails!")
 
 
 @permission_required("common_models.view_links", login_url='/accounts/login')
