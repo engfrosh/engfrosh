@@ -35,7 +35,18 @@ def inclusivity_public(request: HttpRequest):
 
 @login_required(login_url='/accounts/login')
 def view_event(request: HttpRequest, id: int):
-    context = {"form": forms.EventForm(instance=Event.objects.filter(id=id).first())}
+    e = Event.objects.filter(id=id).first()
+    if e is None:
+        form = None
+    else:
+        form = forms.EventForm(calendar_choices=[{"name": e.calendar.name}])
+        form.initial['start'] = e.start
+        form.initial['end'] = e.end
+        form.initial['title'] = e.title
+        form.initial['description'] = e.description
+        form.initial['calendar'] = e.calendar
+        form.initial['color'] = e.color_event
+    context = {"form": form}
     return render(request, "view_event.html", context)
 
 
