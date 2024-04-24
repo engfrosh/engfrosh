@@ -85,7 +85,9 @@ def msTokenCallback(request: HttpRequest):
     discord = DiscordUser.objects.filter(user=user).first()
     if discord is None:
         return redirect("link_discord")
-    return redirect("user_home")
+    home_url = Setting.objects.get_or_create(id="home_url",
+                                             defaults={"value": "https://time.engfrosh.com/user/"})[0].value
+    return redirect(home_url)
 
 
 @login_required()
@@ -193,8 +195,9 @@ def discord_login_callback(request: HttpRequest):
     user = authenticate(request, discord_oauth_code=oauth_code, callback_url=callback_url)
     if user is not None:
         login(request, user, backend="authentication.discord_auth.DiscordAuthBackend")
-
-        return redirect("discord_welcome")
+        home_url = Setting.objects.get_or_create(id="home_url",
+                                                 defaults={"value": "https://time.engfrosh.com/user/"})[0].value
+        return redirect(home_url)
 
     else:
         return redirect("login_failed")
@@ -293,8 +296,9 @@ def discord_register_callback(request: HttpRequest):
 
             else:
                 logger.warning(f"Failed to add user {discord_user} to discord server.")
-
-    return redirect("discord_welcome")
+    home_url = Setting.objects.get_or_create(id="home_url",
+                                             defaults={"value": "https://time.engfrosh.com/user/"})[0].value
+    return redirect(home_url)
 
 
 @login_required()
