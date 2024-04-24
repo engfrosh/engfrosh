@@ -53,13 +53,14 @@ class EventForm(forms.Form):
     start = forms.DateTimeField(label="Start")
     end = forms.DateTimeField(label="End")
     title = forms.CharField(label="Title", max_length=400)
-    description = forms.CharField(label="Description", max_length=4000)
+    description = forms.CharField(label="Description", max_length=4000, widget=forms.Textarea)
     calendar = forms.MultipleChoiceField(label="Calendar", choices=[("Default", "Default")])
     color_event = forms.CharField(label="Colour", max_length=50)
 
-    def __init__(self, *args):
+    def __init__(self, *args, calendar_choices=None):
         super().__init__(*args)
-        calendar_choices = Calendar.objects.exclude(name__in=User.objects.all().values('username')).values("name")
+        if calendar_choices is None:
+            calendar_choices = Calendar.objects.exclude(name__in=User.objects.all().values('username')).values("name")
         choices = []
         for c in calendar_choices:
             name = c['name']
