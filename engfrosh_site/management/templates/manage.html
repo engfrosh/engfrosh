@@ -44,9 +44,11 @@
       <a href="{% url 'manage_discord_nicks' %}"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Manage Discord Nicks</a>
       {% endif %}
-      {% if perms.common_models.shift_manage %}
+      {% if perms.common_models.shift_manage or perms.common_models.attendance_manage %}
       <a href="{% url 'mailing_list' %}"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">View Shift Signups</a>
+      {% endif %}
+      {% if perms.common_models.shift_manage %}
       <a href="{% url 'shift_manage' id=0 %}"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Manage Facil Shift Signups</a>
       {% endif %}

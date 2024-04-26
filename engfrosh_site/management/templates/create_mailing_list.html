@@ -26,7 +26,12 @@
             <th class="px-2">Max Facils</th>
             <th class="px-2">Notes</th>
             <th class="px-2">Facil Count</th>
+            {% if perms.common_models.shift_manage %}
             <th class="px-2">Send Email</th>
+            {% endif %}
+            {% if perms.common_models.attendance_manage %}
+            <th class="px-2">Check In</th>
+            {% endif %}
         </tr>
         {% for shift in shifts %}
             <tr>
@@ -39,6 +44,7 @@
                 <td class="px-2">{{ shift.max_facils }}</td>
                 <td class="px-2">{{ shift.flags }}</td>
                 <td class="px-2">{{ shift.facil_count }}</td>
+                {% if perms.common_models.shift_manage %}
                 <td class="px-2">
                     <form method="POST">
                         {% csrf_token %}
@@ -46,6 +52,13 @@
                         <input type="submit" value="Email Shift">
                     </form>
                 </td>
+                {% endif %}
+                {% if perms.common_models.attendance_manage %}
+                <td class="px-2">
+                <a href="{% url 'shift_checkin' id=shift.id %}"
+                    class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Check In</a>
+                </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </table>

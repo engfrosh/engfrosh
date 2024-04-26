@@ -22,6 +22,7 @@ from common_models.models import DiscordRole, DiscordOverwrite, BooleanSetting
 from . import registration
 from . import forms
 
+from django.core.exceptions import PermissionDenied
 from django.utils.html import escape
 from django.conf import settings
 from django.contrib.auth.models import User, Group
@@ -41,6 +42,30 @@ logger = logging.getLogger("management.views")
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
+
+
+@permission_required("common_models.attendance_manage")
+def shift_checkin(request: HttpRequest, id: int) -> HttpResponse:
+    shift = FacilShift.objects.filter(id=id).first()
+    if shift is None:
+        return HttpResponse("Invalid shift!")
+
+    if request.method == "GET":
+        signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user")
+        return render(request, "shift_checkin.html", {"shift": shift, "signups": signups})
+    elif request.method == "POST":
+        signup_id = request.POST.get("signup", "")
+        signup = FacilShiftSignup.objects.filter(id=signup_id).first()
+        if signup is None:
+            return HttpResponse("Invalid signup!")
+        switch = request.POST.get("switch", "")
+        if switch == "True":
+            signup.attendance = False
+        else:
+            signup.attendance = True
+        signup.save()
+        signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user")
+        return render(request, "shift_checkin.html", {"shift": shift, "signups": signups})
 
 
 @permission_required("common_models.calendar_manage")
@@ -228,12 +253,18 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                           {"shifts": rshifts, "success": True, "my_shifts": my_shifts, "can_remove": can_remove})
 
 
-@permission_required("common_models.shift_manage")
 def mailing_list(request: HttpRequest) -> HttpResponse:
+    if request.user is None:
+        raise PermissionDenied()
+    if not request.user.has_perm('common_models.shift_manage') and \
+       not request.user.has_perm('common_models.attendance_manage'):
+        raise PermissionDenied()
     if request.method == "GET":
         shifts = list(FacilShift.objects.order_by('start'))
         return render(request, "create_mailing_list.html", {"shifts": shifts})
     elif request.method == "POST":
+        if not request.user.has_perm('common_models.shift_manage'):
+            raise PermissionDenied()
         shift_id = int(request.POST["shift_id"])
         shift = FacilShift.objects.filter(id=shift_id).first()
         signups = list(FacilShiftSignup.objects.filter(shift=shift))

@@ -26,6 +26,7 @@
             <li><p>E: ENERGY/HYPE TIME/LOUD</p></li>
         </ul>
         <br>
+        <h2>My Shifts:</h2>
         <table class="w-full">
             <tr>
                 <th class="px-2">Name</th>
@@ -38,9 +39,6 @@
                 <th class="px-2">Remove</th>
                 {% endif %}
             </tr>
-        </table>
-        <h2>My Shifts:</h2>
-        <table class="w-full">
         {% for shift in my_shifts %}
         <tr>
             <td class="px-2">{{ shift.name }}</td>

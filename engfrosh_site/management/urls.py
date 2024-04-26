@@ -42,4 +42,5 @@ urlpatterns = [
     path('edit_calendar/<int:id>', views.edit_calendar, name="edit_calendar"),
     path('show_calendars', views.show_calendars, name="show_calendars"),
     path('unregistered_email', views.unregistered_email, name="unregistered_email"),
+    path('shift_checkin/<int:id>', views.shift_checkin, name="shift_checkin"),
 ]
