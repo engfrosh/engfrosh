@@ -51,7 +51,7 @@ def shift_checkin(request: HttpRequest, id: int) -> HttpResponse:
         return HttpResponse("Invalid shift!")
 
     if request.method == "GET":
-        signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user")
+        signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__last_name')
         return render(request, "shift_checkin.html", {"shift": shift, "signups": signups})
     elif request.method == "POST":
         signup_id = request.POST.get("signup", "")
@@ -64,7 +64,7 @@ def shift_checkin(request: HttpRequest, id: int) -> HttpResponse:
         else:
             signup.attendance = True
         signup.save()
-        signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user")
+        signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__last_name')
         return render(request, "shift_checkin.html", {"shift": shift, "signups": signups})
 
 
@@ -121,7 +121,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
     if datetime.datetime.utcfromtimestamp(lockout_time) <= datetime.datetime.now() and lockout_time != 0:
         can_remove = False
     if request.method == "GET":
-        shifts = list(FacilShift.objects.all())
+        shifts = list(FacilShift.objects.order_by('start').all())
         rshifts = []  # Shifts remaining to be signed up for
         for shift in shifts:
             signups = shift.facil_count
@@ -129,7 +129,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             if signups < shift.max_facils and u_signups == 0 and not shift.is_passed:
                 rshifts += [shift]
         my_shifts = []
-        for shift in FacilShiftSignup.objects.filter(user=request.user):
+        for shift in FacilShiftSignup.objects.filter(user=request.user).order_by('shift__start'):
             my_shifts += [shift.shift]
         return render(request, "facil_shift_signup.html",
                       {"shifts": rshifts, "my_shifts": my_shifts, "can_remove": can_remove})
@@ -141,10 +141,10 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             shift_id = int(request.POST["shift_id"])
             logger.info(shift_id)
             shift = FacilShift.objects.filter(id=shift_id).first()
-            shifts = list(FacilShift.objects.all())
+            shifts = list(FacilShift.objects.order_by('start').all())
             rshifts = []
             my_shifts = []
-            for shift2 in FacilShiftSignup.objects.filter(user=request.user):
+            for shift2 in FacilShiftSignup.objects.filter(user=request.user).order_by('shift__start'):
                 my_shifts += [shift2.shift]
             for s in shifts:
                 signups = s.facil_count
@@ -178,7 +178,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                 calendar.create_relation(request.user)
             event = Event(start=shift.start, end=shift.end, title=shift.name, description=shift.desc, calendar=calendar)
             event.save()
-            shifts = list(FacilShift.objects.all())
+            shifts = list(FacilShift.objects.order_by('start').all())
             rshifts = []
             for shift in shifts:
                 signups = shift.facil_count
@@ -187,18 +187,18 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                     rshifts += [shift]
             logger.info("Signed up for shift")
             my_shifts = []
-            for shift in FacilShiftSignup.objects.filter(user=request.user):
+            for shift in FacilShiftSignup.objects.filter(user=request.user).order_by('shift__start'):
                 my_shifts += [shift.shift]
             return render(request, "facil_shift_signup.html",
                           {"shifts": rshifts, "success": True, "my_shifts": my_shifts, "can_remove": can_remove})
         elif action == "remove":
             my_shifts = []
-            for shift in FacilShiftSignup.objects.filter(user=request.user):
+            for shift in FacilShiftSignup.objects.filter(user=request.user).order_by('shift__start'):
                 my_shifts += [shift.shift]
             logger.info(request.user)
             logger.info("Removing from facil shift. Shift id: ")
             rshifts = []
-            shifts = list(FacilShift.objects.all())
+            shifts = list(FacilShift.objects.order_by('start').all())
             for shift in shifts:
                 signups = shift.facil_count
                 count = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
@@ -240,10 +240,10 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                               description=shift.desc, calendar=calendar)
                 event.save()
             my_shifts = []
-            for shift in FacilShiftSignup.objects.filter(user=request.user):
+            for shift in FacilShiftSignup.objects.filter(user=request.user).order_by('shift__start'):
                 my_shifts += [shift.shift]
             rshifts = []
-            shifts = list(FacilShift.objects.all())
+            shifts = list(FacilShift.objects.order_by('start').all())
             for shift in shifts:
                 signups = shift.facil_count
                 count = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))

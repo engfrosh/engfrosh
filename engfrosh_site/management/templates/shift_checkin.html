@@ -1,11 +1,23 @@
-{% extends "base_manage_subpage.html" %}
+{% extends 'base_generic.html' %}
 {% load static %}
 {% block page_title %}
     Facil Shift Attendance
 {% endblock page_title %}
-{% block top_title %}
-    Facil Shift Attendance
-{% endblock top_title %}
+
+{% block body %}
+    <div class="m-4">
+        {% block nav_bar %}
+            <div class="flex flex-row flex-wrap-reverse items-center justify-start mb-4">
+            <a class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
+                href="{% url 'mailing_list' %}">Back to Shifts</a>
+            <h1 class="text-center p-2 text-2xl grow max-w-fit">
+                {% block top_title %}
+                    Facil Shift Attendance
+                {% endblock top_title %}
+            </h1>
+            <br/>
+            </div>
+        {% endblock nav_bar %}
 {% block active %}
     <h1 style="color: black; font-size: 30px;">Shift: {{ shift.name }}</h1>
     <div class="text-white p-6 bg-background rounded-lg shadow m-5 inline-block">
@@ -38,3 +50,5 @@
     </table>
     </div>
 {% endblock active %}
+</div>
+{% endblock body %}
