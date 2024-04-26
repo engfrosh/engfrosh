@@ -440,21 +440,25 @@ def shift_export(request: HttpRequest) -> HttpResponse:
     for shift in shifts:
         if shift.facil_count > longest:
             longest = shift.facil_count
-        line += shift.name.replace(',', '') + ","
+        name = shift.name.replace(',', '') + ","
+        line += name + name + name
         s = []
         for signup in signups:
             if signup.shift == shift:
                 s += [signup]
         shift_signups += [s]
+    line += "\n"
+    for shift in shifts:
+        line += "Name,Email,Present,"
     for i in range(longest):
         line += "\n"
         for j in range(len(shift_signups)):
             signup = shift_signups[j]
             if len(signup) > i:
                 user = signup[i].user
-                line += user.first_name + " " + user.last_name + ","
+                line += user.first_name + " " + user.last_name + "," + user.email + "," + str(signup[i].attendance) + ","
             else:
-                line += ","
+                line += ",,,"
     response = HttpResponse(line, content_type="text/csv")
     response['Content-Disposition'] = 'attachment; filename="shifts.csv"'
     return response
