@@ -11,5 +11,6 @@ urlpatterns = [
     path('hardhat/<int:id>', views.hardhat),
     path('brightspace/<int:id>', views.brightspace),
     path('prc/<int:id>', views.prc),
-    path('waiver/<int:id>', views.waiver)
+    path('waiver/<int:id>', views.waiver),
+    path('contract/<int:id>', views.contract),
 ]

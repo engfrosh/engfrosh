@@ -17,6 +17,16 @@ def prc(request: HttpRequest, id: int) -> HttpResponse:
 
 
 @permission_required("common_models.check_in")
+def contract(request: HttpRequest, id: int) -> HttpResponse:
+    user = UserDetails.objects.filter(user__id=id).first()  # This is safe as user is a pk
+    if user is None:
+        return HttpResponse('Failed to find user!')
+    user.contract = True
+    user.save()
+    return HttpResponse("User modified! You can close this window!")
+
+
+@permission_required("common_models.check_in")
 def brightspace(request: HttpRequest, id: int) -> HttpResponse:
     user = UserDetails.objects.filter(user__id=id).first()  # This is safe as user is a pk
     if user is None:

@@ -45,12 +45,55 @@
                             <td>Requirements Not Met</td>
                             <td>{{user.check_in_reason}}</td>
                         {% endif %}
-                        <!-- <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/rafting/{{user.user.id}}" target="_blank">Rafting</a></td>
-                        <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/hardhat/{{user.user.id}}" target="_blank">Hardhat</a></td>
-                        <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/brightspace/{{user.user.id}}" target="_blank">Brightspace</a></td>
-                        <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/prc/{{user.user.id}}" target="_blank">PRC</a></td>
-                        -->
-                        <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/waiver/{{user.user.id}}" target="_blank">Waiver</a></td>
+                        <script>
+                        function send(endpoint){
+                            fetch(endpoint, {
+                                method: "POST",
+                                mode: "cors",
+                                credentials: "same-origin",
+                                headers: {
+                                    "X-CSRFToken": csrf_token,
+                                    "Content-Type": "application/json"
+                                },
+                            })
+                            .then(res => {
+                                if (res.ok) {
+                                    location.reload();
+                                } else {
+                                    res.text().then(data => {
+                                        console.log("Error: " + data);
+                                        alert("Failed to set!");
+                                    })
+                                }
+                            })
+                        }
+                        function rafting(id){
+                            send("/check-in/rafting/" + id);
+                        }
+                        function hardhat(id){
+                            send("/check-in/hardhat/" + id);
+                        }
+                        function brightspace(id){
+                            send("/check-in/brightspace/" + id);
+                        }
+                        function prc(id){
+                            send("/check-in/prc/" + id);
+                        }
+                        function contract(id){
+                            send("/check-in/contract/" + id);
+                        }
+                        function waiver(id){
+                            send("/check-in/waiver/" + id);
+                        }
+                        </script>
+                        {% if user.role != "Frosh" %}
+                        <td><button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="rafting({{user.user.id}})">Rafting</button></td>
+                        <td><button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="hardhat({{user.user.id}})">Hardhat</button></td>
+                        <td><button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="brightspace({{user.user.id}})">Brightspace</button></td>
+                        <td><button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="prc({{user.user.id}})">PRC</button></td>
+                        <td><button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="contract({{user.user.id}})">Contract</button></td>
+                        {% endif %}
+                        <td><button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="waiver({{user.user.id}})">Waiver</button></td>
                     </tr>
                 {% endfor %}
             </div>
