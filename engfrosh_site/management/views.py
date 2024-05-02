@@ -483,7 +483,7 @@ def export_teams(request: HttpRequest) -> HttpResponse:
                 line += "Name,Role,"
             else:
                 if len(value) > i:
-                    line += value[i].name + "," + value[i].role + ","
+                    line += str(value[i].name) + "," + str(value[i].role) + ","
                 else:
                     line += ",,"
 
