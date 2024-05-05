@@ -781,6 +781,10 @@ def bulk_add_prc(request: HttpRequest) -> HttpResponse:
             details.rafting = True
         if trueFalse(rafting_paid):
             details.rafting_paid = True
+        if trueFalse(contract):
+            details.contract = True
+        if trueFalse(waiver):
+            details.waiver = True
         if sweater_size is not None:
             details.sweater_size = sweater_size
         if shirt_size is not None:
