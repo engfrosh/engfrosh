@@ -10,6 +10,7 @@ bot_config.yaml
 offline-files/soopp-bingo/*.pdf
 jstools/node_modules/
 tree.png
+venv
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

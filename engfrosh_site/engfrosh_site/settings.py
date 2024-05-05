@@ -122,8 +122,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Discord API Settings
 DEFAULT_DISCORD_API_VERSION = 10
 DEFAULT_DISCORD_SCOPE = ["identify", "guilds.join"]
-
-SESSION_COOKIE_DOMAIN = ".engfrosh.com"
+if not development:
+    SESSION_COOKIE_DOMAIN = ".engfrosh.com"
 
 # Model Defaults
 DEFAULT_SCAVENGER_PUZZLE_REQUIRE_PHOTO_UPLOAD = True
