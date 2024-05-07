@@ -707,6 +707,13 @@ def bulk_register_users(request: HttpRequest) -> HttpResponse:
     return HttpResponseBadRequest()
 
 
+def trueFalse(data: str) -> bool:
+    data = data.lower()
+    if data == "true" or data == "yes":
+        return True
+    return False
+
+
 @permission_required("auth.change_user")
 def bulk_add_prc(request: HttpRequest) -> HttpResponse:
     """View for bulk prc adding."""
@@ -728,21 +735,63 @@ def bulk_add_prc(request: HttpRequest) -> HttpResponse:
             first_name = req_dict["first_name"]
             last_name = req_dict["last_name"]
             email = req_dict["email"]
-            issued = req_dict["issued"]
+            issued = req_dict["prc"]
+            grade = req_dict["grade"]
+            contract = req_dict["contract"]
+            waiver = req_dict["waiver"]
+            training = req_dict["training"]
+            hardhat = req_dict["hardhat"]
+            hardhat_paid = req_dict["hardhat_paid"]
+            breakfast = req_dict["breakfast"]
+            breakfast_paid = req_dict["breakfast_paid"]
+            rafting = req_dict["rafting"]
+            rafting_paid = req_dict["rafting_paid"]
+            sweater_size = req_dict["sweater_size"]
+            shirt_size = req_dict["shirt_size"]
+            allergies = req_dict["allergies"]
         except KeyError:
             return HttpResponseBadRequest("Key Error in Body")
-        if issued is None or issued == "":
-            return HttpResponseBadRequest("Invalid PRC.")
         user = User.objects.filter(email=email).first()
-        if user is None:
+        print(email)
+        if user is None or email is None or email == "":
             users = User.objects.filter(first_name__iexact=first_name, last_name__iexact=last_name)
             if len(users) == 1:
                 user = users.first()
         if user is None:
             return HttpResponseBadRequest("User not found.")
         details = UserDetails.objects.filter(user=user).first()
-        details.prc_completed = True
-        details.save
+        if issued is not None and issued != "":
+            details.prc_completed = True
+        if grade is not None:
+            expected_grade = Setting.objects.get_or_create(id="Bulk_Grade",
+                                                           defaults={"value": "12"})[0].value
+            if grade == expected_grade:
+                details.brightspace_completed = True
+        if trueFalse(training):
+            details.training_completed = True
+        if trueFalse(hardhat):
+            details.hardhat = True
+        if trueFalse(hardhat_paid):
+            details.hardhat_paid = True
+        if trueFalse(breakfast):
+            details.breakfast = True
+        if trueFalse(breakfast_paid):
+            details.breakfast_paid = True
+        if trueFalse(rafting):
+            details.rafting = True
+        if trueFalse(rafting_paid):
+            details.rafting_paid = True
+        if trueFalse(contract):
+            details.contract = True
+        if trueFalse(waiver):
+            details.waiver = True
+        if sweater_size is not None:
+            details.sweater_size = sweater_size
+        if shirt_size is not None:
+            details.shirt_size = shirt_size
+        if allergies is not None:
+            details.allergies = allergies
+        details.save()
 
         return JsonResponse({"user_id": user.id, "username": user.username})  # type: ignore
 
