@@ -19,3 +19,4 @@ msal==1.20.0
 ics==0.7.2
 pytz==2023.3
 sentry-sdk==1.29.2
+credentials==1.1
