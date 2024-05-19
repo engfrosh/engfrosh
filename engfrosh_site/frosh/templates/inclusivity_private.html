@@ -1,6 +1,6 @@
 {% extends "base_user.html" %}
 {% load static %}
-{% block page_title %}EngFrosh Inclusivity{% endblock page_title %}
+{% block page_title %}EngFrosh Resources{% endblock page_title %}
 {% block js_functions %}
 <link rel='stylesheet' type='text/css' href="{% static 'jquery-ui/jquery-ui.min.css' %}" />
 <script type='text/javascript' src="{% static 'jquery/dist/jquery.js' %}"></script>
@@ -11,7 +11,7 @@
 {% block active %}
     <div class="text-white text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
         <div>
-            <h1>Open Inclusivity and Wellness Topics</h1><br>
+            <h1>Open Resources</h1><br>
             {% for p in pages %}
                 <div>
                     <a href={{ p.file.url }}>{{ p.name }}</a>
