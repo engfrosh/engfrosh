@@ -1347,7 +1347,7 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
             logger.info(f"Request: {req_dict}")
 
             if "team_color" in req_dict and isinstance(req_dict["team_color"], int):
-                logger.info(f"Setting team color to : {req_dict['team_color']}")
+                logger.info(f"Setting team color to : {req_dict['team_color']}")  # noqa: E203
                 team.color = req_dict["team_color"]
                 team.save()
 

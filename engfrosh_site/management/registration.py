@@ -4,14 +4,14 @@ import logging
 import random
 import string
 from typing import Optional
-
+import credentials
 from django.core.exceptions import ObjectDoesNotExist
 from common_models.models import MagicLink
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from datetime import timedelta
 from django.utils.encoding import iri_to_uri
 from django.utils import timezone
-from common_models.models import FroshRole, Team, UserDetails, UniversityProgram
+from common_models.models import FroshRole, Team, UserDetails, UniversityProgram, DiscordUser, DiscordRole, get_client
 from management.email import send_email
 
 
@@ -124,20 +124,84 @@ def create_user_initialize(name: str, email: str, role: FroshRole, team: Optiona
 
     # Check that the email has not already been added
     if User.objects.filter(email=email).exists():
-        logger.error(f"User with email {email} already exists in database.")
-        raise UserAlreadyExistsError()
+        logger.error(f"User with email {email} already exists in database. Updating!")
+        user = User.objects.filter(email=email).first()
+        if user.is_staff:
+            raise UserAlreadyExistsError()
+        details = UserDetails.objects.filter(user=user).first()
+        if details is None:
+            details = UserDetails(user=user, name=name, shirt_size=size,
+                                  allergies=allergies, rafting=rafting, hardhat=hardhat,
+                                  sweater_size=sweater_size)
+        else:
+            details.name = name
+            details.shirt_size = size
+            details.allergies = allergies
+            details.rafting = rafting
+            details.hardhat = hardhat
+            details.sweater_size = sweater_size
+            old_role = details.role
+            if old_role is not None:
+                Group.objects.filter(name=old_role).first().user_set.remove(user)
+            old_team = details.team
+            if old_team is not None:
+                old_team.group.user_set.remove(user)
+            programs = UniversityProgram.objects.all().values("group")
+            for g in programs:
+                if user in g.user_set:
+                    g.user_set.remove(user)
+
+        role.group.user_set.add(user)
+        if team:
+            team.group.user_set.add(user)
+        if program:
+            program.group.user_set.add(user)
+        details.save()
+        discord = DiscordUser.objects.filter(user=user).first()
+        name_split = name.split()
+
+        if len(name_split) == 2:
+            first_name = name_split[0]
+            last_name = name_split[1]
+        else:
+            first_name = ""
+            last_name = name
+        if discord is not None:
+            # Change discord groups
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+            client = get_client()
+            groups = user.groups.all()
+            discord_role_ids = []
+            for g in groups:
+                try:
+                    query = DiscordRole.objects.filter(group_id=g)
+                    for role in query:
+                        if role.secondary_group is None or role.secondary_group in groups:
+                            discord_role_ids.append(role.role_id)
+                except ObjectDoesNotExist:
+                    continue
+
+            client.set_roles_for_member(credentials.GUILD_ID, discord.id, discord_role_ids)
+            if details.override_nick is not None:
+                name = details.override_nick
+            else:
+                pronouns = details.pronouns
+                name = user.first_name + " " + user.last_name
+                if len(pronouns) > 0:
+                    name += " ("
+                    for i in range(len(pronouns)-1):
+                        if len(name + pronouns[i].name + " ") > 31:
+                            break
+                        name += pronouns[i].name + " "
+                        name += pronouns[len(pronouns)-1].name + ")"
+            print("New nick: " + name)
+            client.change_user_nickname(credentials.GUILD_ID, discord.id, name)
+            return user
 
     username = name.replace(" ", "_") + "-" + "".join(random.choice(string.ascii_letters + string.digits)
                                                       for i in range(8))
-    name_split = name.split()
-
-    if len(name_split) == 2:
-        first_name = name_split[0]
-        last_name = name_split[1]
-    else:
-        first_name = ""
-        last_name = name
-
     user = User.objects.create_user(username, email)  # type: ignore
     user.first_name = first_name
     user.last_name = last_name
