@@ -122,6 +122,14 @@ def create_user_initialize(name: str, email: str, role: FroshRole, team: Optiona
                            rafting=False, hardhat=False, allergies="", sweater_size=None) -> User:
     """Creates a new user with the specified details, initializes their account with other passed details."""
 
+    name_split = name.split()
+
+    if len(name_split) == 2:
+        first_name = name_split[0]
+        last_name = name_split[1]
+    else:
+        first_name = ""
+        last_name = name
     # Check that the email has not already been added
     if User.objects.filter(email=email).exists():
         logger.error(f"User with email {email} already exists in database. Updating!")
@@ -158,14 +166,6 @@ def create_user_initialize(name: str, email: str, role: FroshRole, team: Optiona
             program.group.user_set.add(user)
         details.save()
         discord = DiscordUser.objects.filter(user=user).first()
-        name_split = name.split()
-
-        if len(name_split) == 2:
-            first_name = name_split[0]
-            last_name = name_split[1]
-        else:
-            first_name = ""
-            last_name = name
         if discord is not None:
             # Change discord groups
             user.first_name = first_name
