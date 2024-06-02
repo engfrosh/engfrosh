@@ -296,13 +296,17 @@ function handleCSVFile(file) {
     for (let i = 0; i < headings.length; i++) {
       headings[i] = headings[i].trim().toLowerCase();
     }
+    console.log(headings)
     if (headings[0] != "name" | headings[1] != "email" | headings[2] != "team" | headings[3] != "role" | headings[4] != "program" | headings[5] != "shirt size") {
-      return false;
+      if (headings[0] != "first name" | headings[1] != "last name" | headings[2] != "email" | headings[3] != "team" | headings[4] != "role" | headings[5] != "program" | headings[6] != "shirt size") {
+        return 0;
+      }
+      return 2;
     }
-    return true;
+    return 1;
   }
 
-  function handleCSVLine(line) {
+  function handleCSVLine(line, split_name) {
     if (!line) {
       // If line is blank, ignore and treat as properly handled
       return true;
@@ -313,17 +317,20 @@ function handleCSVFile(file) {
     for (let i = 0; i < values.length; i++) {
       values[i] = values[i].trim();
     }
-
-    const name = values[0];
-    const email = values[1];
-    const team = values[2];
-    const role = values[3];
-    const program = values[4];
-    const size = values[5];
-    const allergies = values[6];
-    const rafting = values[7];
-    const hardhat = values[8];
-    const sweater = values[9];
+    index = 0
+    var name = values[index++];
+    if (split_name){
+        name += " " + values[index++];
+    }
+    const email = values[index++];
+    const team = values[index++];
+    const role = values[index++];
+    const program = values[index++];
+    const size = values[index++];
+    const allergies = values[index++];
+    const rafting = values[index++];
+    const hardhat = values[index++];
+    const sweater = values[index++];
 
     addUserRow(name, email, team, role, program, size, allergies, rafting, hardhat, sweater);
 
@@ -334,13 +341,14 @@ function handleCSVFile(file) {
     let lines = event.target.result.split("\n");
 
     // Check if the file is valid
-    if (!checkFirstLine(lines[0])) {
-      alert("Bad CSV Headings. Should be name,email,team,role");
+    heading = checkFirstLine(lines[0])
+    if (heading == 0) {
+      alert("Bad CSV Headings. Should be name,email,team,role,program,shirt size");
     }
     else {
       // File headers are good
       for (line of lines.slice(1)) {
-        handleCSVLine(line);
+        handleCSVLine(line, heading == 2);
       }
     }
   }
