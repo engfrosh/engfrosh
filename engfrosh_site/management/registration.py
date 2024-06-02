@@ -132,7 +132,7 @@ def create_user_initialize(name: str, email: str, role: FroshRole, team: Optiona
         last_name = name
     # Check that the email has not already been added
     if User.objects.filter(email=email).exists():
-        logger.error(f"User with email {email} already exists in database. Updating!")
+        logger.info(f"User with email {email} already exists in database. Updating!")
         user = User.objects.filter(email=email).first()
         if user.is_staff:
             raise UserAlreadyExistsError()
