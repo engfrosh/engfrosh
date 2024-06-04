@@ -18,10 +18,15 @@ logger = logging.getLogger("frosh.views")
 
 def faq_page(request: HttpRequest, id: int):
     if id == 0:
-        pages = FAQPage.objects.all()
+        if request.user.is_staff:
+            pages = FAQPage.objects.all()
+        else:
+            pages = FAQPage.objects.filter(restricted=False)
         return render(request, "faq_pages.html", {"pages": pages})
     else:
         page = FAQPage.objects.filter(id=id).first()
+        if page is None or (page.restricted and not request.user.is_staff):
+            return HttpResponse("FAQ not found!", status=404)
         return render(request, "faq_page.html", {"page": page})
 
 
