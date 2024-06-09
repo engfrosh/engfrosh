@@ -18,7 +18,7 @@ logger = logging.getLogger("frosh.views")
 
 def faq_page(request: HttpRequest, id: int):
     if id == 0:
-        pages = FAQPage.objects.filter(restricted=None)
+        pages = FAQPage.objects.filter(restricted_group=None)
         pages |= FAQPage.objects.filter(restricted_group__in=request.user.groups.all())
         return render(request, "faq_pages.html", {"pages": pages})
     else:
