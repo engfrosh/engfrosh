@@ -23,7 +23,8 @@ def faq_page(request: HttpRequest, id: int):
         return render(request, "faq_pages.html", {"pages": pages})
     else:
         page = FAQPage.objects.filter(id=id).first()
-        if page is None or (page.restricted_group is not None and page.restricted_group not in request.user.groups.all()):
+        if page is None or (page.restricted_group is not None and
+           page.restricted_group not in request.user.groups.all()):
             return HttpResponse("FAQ not found!", status=404)
         return render(request, "faq_page.html", {"page": page})
 
