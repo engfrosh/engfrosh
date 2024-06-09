@@ -3,6 +3,9 @@
     Your Skash
 {% endblock page_title %}
 {% block body %}
+<a class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
+           href="{% url 'user_home' %}">Back</a>
+
     <div class="text-center">
         <h1 class="text-7xl mt-28 text-accent">{{ team.display_name }}</h1>
         <br/>

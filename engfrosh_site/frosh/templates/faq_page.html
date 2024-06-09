@@ -9,6 +9,8 @@
 <script type='text/javascript' src="{% static 'fullcalendar.js' %}"></script>
 {% endblock js_functions %}
 {% block active %}
+<a class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
+           href="{% url 'view_faq' id=0 %}">Back</a>
     <style>
         table, th, td {
             border: 1px solid black;
@@ -16,6 +18,9 @@
         }
         h1 {
             font-size: 32px;
+        }
+        a {
+            color: lightblue;
         }
     </style>
     <div class="text-white text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
