@@ -263,7 +263,7 @@ def discord_register_callback(request: HttpRequest):
 
     if not user:
         logger.error("Could not register user.")
-        raise Exception("Could not register user.")
+        return HttpResponse("Failed to register. If this issue persists contact technical@engfrosh.com", status=500)
     login(request, user, backend="authentication.discord_auth.DiscordAuthBackend")
 
     if credentials.GUILD_ID:

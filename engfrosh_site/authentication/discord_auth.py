@@ -32,41 +32,45 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
     """
 
     # Get User Info
-    discord_api = DiscordUserAPI(client_id=credentials.DISCORD_CLIENT_ID,
-                                 client_secret=credentials.DISCORD_CLIENT_SECRET,
-                                 access_token=access_token,
-                                 expires_in=expires_in, refresh_token=refresh_token,
-                                 oauth_code=discord_oauth_code,
-                                 callback_url=callback_url)
-    discord_user_info = discord_api.get_user_info()
-
-    discord_user_id = discord_user_info["id"]
-    discord_username = discord_user_info["username"].encode("utf-8").decode('utf-8', 'ignore').encode("utf-8")
-    discord_discriminator = discord_user_info["discriminator"]
-
-    # Check if user is already registered
     try:
-        discord_user = DiscordUser.objects.get(id=discord_user_id)
-        if discord_user:
-            raise DiscordUserAlreadyExistsError
-    except DiscordUser.DoesNotExist:
-        pass
+        discord_api = DiscordUserAPI(client_id=credentials.DISCORD_CLIENT_ID,
+                                     client_secret=credentials.DISCORD_CLIENT_SECRET,
+                                     access_token=access_token,
+                                     expires_in=expires_in, refresh_token=refresh_token,
+                                     oauth_code=discord_oauth_code,
+                                     callback_url=callback_url)
+        discord_user_info = discord_api.get_user_info()
 
-    # If no given User account to associate with, create a new one
-    if not user:
-        if not username:
-            s = f"{discord_username}+{discord_discriminator}-"
-            username = s + "".join(random.choice(string.ascii_letters + string.digits) for i in range(8))
-        user = User.objects.create_user(username, email, password)  # type: ignore
-        user.save()
+        discord_user_id = discord_user_info["id"]
+        discord_username = discord_user_info["username"].encode("utf-8").decode('utf-8', 'ignore').encode("utf-8")
+        discord_discriminator = discord_user_info["discriminator"]
 
-    # Create new DiscordUser
-    discord_user = DiscordUser(
-        id=discord_user_id, user=user, discord_username=discord_username, discriminator=discord_discriminator)
-    discord_user.set_tokens(*discord_api.get_tokens())
-    discord_user.save()
+        # Check if user is already registered
+        try:
+            discord_user = DiscordUser.objects.get(id=discord_user_id)
+            if discord_user:
+                raise DiscordUserAlreadyExistsError
+        except DiscordUser.DoesNotExist:
+            pass
 
-    return user
+        # If no given User account to associate with, create a new one
+        if not user:
+            if not username:
+                s = f"{discord_username}+{discord_discriminator}-"
+                username = s + "".join(random.choice(string.ascii_letters + string.digits) for i in range(8))
+            user = User.objects.create_user(username, email, password)  # type: ignore
+            user.save()
+
+        # Create new DiscordUser
+        discord_user = DiscordUser(
+            id=discord_user_id, user=user, discord_username=discord_username, discriminator=discord_discriminator)
+        discord_user.set_tokens(*discord_api.get_tokens())
+        discord_user.save()
+
+        return user
+    except:  # noqa: E722
+        logger.error("Failed to register user. Info: AT:", access_token, "OT:", discord_oauth_code, "CB:", callback_url)
+        return None
 
 
 class DiscordAuthBackend(BaseBackend):
