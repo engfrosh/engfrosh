@@ -10,7 +10,13 @@
             {% endif %}
             <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto text-center">
                 <h2>Puzzle: {{ puzzle.name }}</h2>
-                {% if puzzle.puzzle_text %}<p class="m-4">{{ puzzle.puzzle_text }}</p>{% endif %}
+                {% if puzzle.puzzle_text %}
+                {% if puzzle.puzzle_is_link %}
+                    <a class="m-4" href="{{ puzzle.puzzle_text }}">{{ puzzle.puzzle_text }}</a>
+                {% else %}
+                    <p class="m-4">{{ puzzle.puzzle_text }}</p>
+                {% endif %}
+                {% endif %}
                 {% if puzzle.puzzle_file %}
                     {% if puzzle.puzzle_file_download %}
                         <a class="bg-main dark:bg-main-night rounded-lg p-2 text-white m-2"
