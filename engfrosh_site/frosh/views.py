@@ -194,7 +194,7 @@ def user_home(request: HttpRequest) -> HttpResponse:
         "scavenger_disabled": not team.scavenger_enabled if team else False,
         "trade_up_disabled": not team.trade_up_enabled if team else False,
         "details": details,
-        "link_discord": True if discord is None else False,
+        "link_discord": True if discord is None and details.discord_allowed else False,
         "rand": rand,
         "calendars": calendars,
         "upload_charter": upload_charter,
