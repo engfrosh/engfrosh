@@ -104,7 +104,7 @@ def link_discord(request: HttpRequest):
     details = UserDetails.objects.filter(user=request.user).first()
     if details is None or not details.discord_allowed:
         home_url = Setting.objects.get_or_create(id="home_url",
-                                             defaults={"value": "https://time.engfrosh.com/user/"})[0].value
+                                                 defaults={"value": "https://time.engfrosh.com/user/"})[0].value
         return redirect(home_url)
     if skip_confirmation and skip_confirmation == "true":
         return redirect("discord_register")
