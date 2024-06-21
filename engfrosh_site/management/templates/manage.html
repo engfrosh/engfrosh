@@ -87,10 +87,6 @@
       <a href="{% url 'discord_create' %}"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Create Discord Channels</a>
       {% endif %}
-      {% if perms.common_models.manage_scav %}
-      <a href="{% url 'regen_trees' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Regen Scav Trees</a>
-      {% endif %}
       {% if perms.common_models.announcement_manage %}
       <a href="{% url 'announcements' %}"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Create Announcement</a>

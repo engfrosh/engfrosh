@@ -8,6 +8,7 @@
 {% endblock js_functions %}
 {% block body %}
 <script>
+const tree = JSON.parse(atob("{{tree|safe}}"));
 var old = false;
 function viewSwitch(){
     old = !old;
@@ -38,7 +39,7 @@ function viewSwitch(){
                 Scavenger is not currently enabled
             {% endif %}
             <div id="imgframe">
-                {{ tree|safe }}
+                
             </div>
             <div id="scavtext" style="display: none;">
                 <h2 style="text-size: 20px;">Active Scavenger Puzzles</h2>
