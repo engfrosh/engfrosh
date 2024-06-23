@@ -14,7 +14,7 @@ import credentials
 import uuid
 
 from common_models.models import DiscordUser
-from common_models.models import DiscordRole, Setting
+from common_models.models import DiscordRole, Setting, UserDetails
 from .discord_auth import DiscordUserAlreadyExistsError, register
 from pyaccord.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  # noqa E402
 
@@ -83,7 +83,8 @@ def msTokenCallback(request: HttpRequest):
     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
     discord = DiscordUser.objects.filter(user=user).first()
-    if discord is None:
+    details = UserDetails.objects.filter(user=user).first()
+    if discord is None and details is not None and details.discord_allowed:
         return redirect("link_discord")
     home_url = Setting.objects.get_or_create(id="home_url",
                                              defaults={"value": "https://time.engfrosh.com/user/"})[0].value
@@ -100,6 +101,11 @@ def home_page(request: HttpRequest):
 def link_discord(request: HttpRequest):
     """Page to prompt user to link their discord account to their user account."""
     skip_confirmation = request.GET.get("skip-confirm")
+    details = UserDetails.objects.filter(user=request.user).first()
+    if details is None or not details.discord_allowed:
+        home_url = Setting.objects.get_or_create(id="home_url",
+                                                 defaults={"value": "https://time.engfrosh.com/user/"})[0].value
+        return redirect(home_url)
     if skip_confirmation and skip_confirmation == "true":
         return redirect("discord_register")
 
@@ -252,6 +258,9 @@ def discord_register_callback(request: HttpRequest):
     base_url = Setting.objects.get_or_create(id="callback_base",
                                              defaults={"value": "https://server.engfrosh.com"})[0].value
     callback_url = base_url + "/accounts/register/discord/callback/"
+    details = UserDetails.objects.filter(user=user).first()
+    if details is None or not details.discord_allowed:
+        return HttpResponse("You are not allowed to join the Discord!")
 
     try:
         user = register(discord_oauth_code=oauth_code, callback_url=callback_url, user=user)
