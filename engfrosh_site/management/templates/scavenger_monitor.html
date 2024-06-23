@@ -8,7 +8,7 @@
         <h1>Approvals</h1>
     </div>
     <script>
-        let socket = new WebSocket('ws://'+window.location.host+"/ws/scav/approval");
+        let socket = new WebSocket('wss://'+window.location.host+"/ws/scav/approval");
         socket.onopen = function(e){
             document.getElementById("status").innerHTML = "Connected";
         }
