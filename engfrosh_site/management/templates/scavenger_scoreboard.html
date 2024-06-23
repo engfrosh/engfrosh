@@ -55,13 +55,14 @@
         <h1>Team Details: {{ team.display_name }}</h1><br>
         <a href="/scavenger/?team={{ team.id }}">View Team Tree</a><br>
         <h2>Overall Stats</h2>
-        <label for="prog-overall-{{ team.id }}">{{ team.display_name }} - Overall ({{ team.num_clues_finished }}/{{ puzzles_total }})</label>
+        <p>Last puzzle was completed at: {{ team.last_puzzle_timestamp }}</p>
+        <label for="prog-overall-{{ team.id }}">Overall ({{ team.num_clues_finished }}/{{ puzzles_total }})</label>
         <progress id="prog-overall-{{ team.id }}" max="{{ puzzles_total }}" value="{{ team.num_clues_finished }}"></progress><br>
-        <label for="prog-main-{{ team.id }}">{{ team.display_name }} - Main ({{ team.num_main_clues_finished }}/{{ main_puzzles_total }})</label>
+        <label for="prog-main-{{ team.id }}">Main ({{ team.num_main_clues_finished }}/{{ main_puzzles_total }})</label>
         <progress id="prog-main-{{ team.id }}" max="{{ main_puzzles_total }}" value="{{ team.num_main_clues_finished }}"></progress><br><br>
         <h2>By Branch (Unlocked)</h2>
         {% for branch in team.active_branches %}
-        <label for="prog-{{ branch.id }}-{{ team.id }}">{{ team.display_name }} - {{ branch.puzzle.stream.name }} ({{ branch.num_clues_finished }}/{{ branch.num_clues_total }})</label>
+        <label for="prog-{{ branch.id }}-{{ team.id }}">{{ branch.puzzle.stream.name }} ({{ branch.num_clues_finished }}/{{ branch.num_clues_total }})</label>
         <progress id="prog-{{ branch.id }}-{{ team.id }}" max="{{ branch.num_clues_total }}" value="{{ branch.num_clues_finished }}"></progress><br>
         {% endfor %}
     </div>
