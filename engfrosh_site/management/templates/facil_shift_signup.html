@@ -49,11 +49,11 @@
             <td class="px-2">{{ shift.flags }}</td>
             <td class="px-2">
                 {% if can_remove and not shift.is_cutoff %}
-                <form method="POST">
+                <form method="POST" id="shift-rem-{{ shift.id }}">
                     {% csrf_token %}
                     <input type="hidden" name="shift_id" value="{{ shift.id }}">
                     <input type="hidden" name="action" value="remove">
-                    <input type="submit" value="Remove">
+                    <button class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2" type="button" onclick='btnremcallback({{ shift.id }}, "{{ shift.name }}")'>Remove</button>
                 </form>
                 {% endif %}
             </td>
@@ -71,6 +71,20 @@
             <th class="px-2">Notes</th>
             <th class="px-2">Sign Up</th>
         </tr>
+        <script>
+        function btnaddcallback(shift_id, shift_name){
+            var result = confirm("Are you sure you want to sign up for " + shift_name);
+            if(result === true){
+                document.getElementById("shift-add-" + shift_id).submit();
+            }
+        }
+        function btnremcallback(shift_id, shift_name){
+            var result = confirm("Are you sure you want to remove " + shift_name);
+            if(result === true){
+                document.getElementById("shift-rem-" + shift_id).submit();
+            }
+        }
+        </script>
         {% for shift in shifts %}
             <tr>
                 <td class="px-2">{{ shift.name }}</td>
@@ -80,11 +94,11 @@
                 <td class="px-2">{{ shift.max_facils }}</td>
                 <td class="px-2">{{ shift.flags }}</td>
                 <td class="px-2">
-                    <form method="POST">
+                    <form method="POST" id="shift-add-{{ shift.id }}">
                         {% csrf_token %}
                         <input type="hidden" name="shift_id" value="{{ shift.id }}">
                         <input type="hidden" name="action" value="add">
-                        <input type="submit" value="Sign Up">
+                        <button class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2" type="button" onclick='btnaddcallback({{ shift.id }}, "{{ shift.name }}")'>Sign Up</button>
                     </form>
                 </td>
             </tr>
