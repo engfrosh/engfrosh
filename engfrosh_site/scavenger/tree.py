@@ -6,6 +6,8 @@ def generate_tree(team: Team):
     lookahead = int(lookahead.value)
     branch_lookahead = Setting.objects.get_or_create(id="Scav Branch Lookahead", defaults={"value": "1"})[0]
     branch_lookahead = int(branch_lookahead.value)
+    fow_on_branches = Setting.objects.get_or_create(id="Fog Of War On Branches", defaults={"value": "True"})[0]
+    fow_on_branches = bool(fow_on_branches.value)
     result = {}
     streams = PuzzleStream.objects.filter(enabled=True)
     activities = TeamPuzzleActivity.objects.select_related()
@@ -42,7 +44,7 @@ def generate_tree(team: Team):
             if branch.default:
                 if activity == branch_activities[0]:
                     puzzle_arr += ["start"]
-                elif activity == branch_activities[-1]:
+                elif activity == branch_activities[len(branch_activities)-1]:
                     puzzle_arr += ["end"]
             else:
                 if activity == branch_activities[0]:
@@ -64,7 +66,10 @@ def generate_tree(team: Team):
             last = branch_activities[len(branch_activities)-1]
             last_order = last.puzzle.order
         puzzles_ahead = Puzzle.objects.filter(enabled=True, stream=branch, order__gt=last_order)
-        puzzles_ahead = puzzles_ahead.order_by('order')[:lookahead]
+        if not fow_on_branches and not branch.default:
+            puzzles_ahead = puzzles_ahead.order_by('order')
+        else:
+            puzzles_ahead = puzzles_ahead.order_by('order')[:lookahead]
         for puzzle in puzzles_ahead:
             orders[puzzle.name] = puzzle.order
             puzzle_arr = ["hidden", "", ""]
