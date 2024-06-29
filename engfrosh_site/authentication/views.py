@@ -253,7 +253,7 @@ def discord_register_callback(request: HttpRequest):
     if user.is_anonymous:
         user = None
         # If disallowing registration to pre registered people.
-        return HttpResponse("Registration failed, please contact questions@engfrosh.com")
+        return HttpResponse("Registration failed, please contact websupport@engfrosh.com")
 
     base_url = Setting.objects.get_or_create(id="callback_base",
                                              defaults={"value": "https://server.engfrosh.com"})[0].value

@@ -32,6 +32,11 @@ def stream_view(request: HttpRequest) -> HttpResponse:
 @login_required(login_url='/accounts/login')
 def index(request: HttpRequest) -> HttpResponse:
     team = Team.from_user(request.user)
+    set_team = request.GET.get('team', None)
+    if set_team is not None and request.user.has_perm("common_models.manage_scav"):
+        team = Team.objects.filter(group__id=int(set_team)).first()
+    else:
+        set_team = None
 
     if not team:
         return render(request, "scavenger_index.html", context={"team": None})

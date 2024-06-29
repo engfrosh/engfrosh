@@ -4,7 +4,7 @@
     EngFrosh
 {% endblock page_title %}
 {% block body %}
-    <img src="{% static 'logo.png' %}" class="w-1/2 h-1/2 m-auto" style="margin-top:10px; height:76vmin; width:95vmin;" alt="EngFrosh Logo">
+    <img src="{% static 'logo.png' %}" class="m-auto" style="margin-top:10px; height:56vmin; width:75vmin;" alt="EngFrosh Logo">
     <div class="h-full text-center" style="margin:25px; font-size:3rem;">
         <div style="color:#a85800; text-shadow:0px 0px 5px #c290dd;"><b id="timer" >Countdown</b></div>
         <div style="margin-bottom:3rem;">
@@ -27,7 +27,7 @@
     </div>
     <script> <!-- Countdown timer until opening ceremonies -->
         var countDownDate = new Date("September 1, 2024 18:30:00").getTime();
-        var x = setInterval(function() {
+        function setCountdown(){
             var now = new Date().getTime();
             var distance = countDownDate - now;
             var days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -39,6 +39,8 @@
                 clearInterval(x);
                 document.getElementById("timer").innerHTML = "";
             }
-        }, 1000);
+        }
+        setCountdown();
+        var x = setInterval(setCountdown, 1000);
     </script>
 {% endblock body %}

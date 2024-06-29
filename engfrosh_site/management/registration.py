@@ -61,7 +61,7 @@ DEFAULT_MAGIC_LINK_EMAIL_TEXT = \
     """Welcome to EngFrosh!
 Here is your magic link to log into the EngFrosh site and Discord server: {link}
 
-If you need any help or any questions, please email questions@engfrosh.com"""
+If you need any help or any questions, please email websupport@engfrosh.com"""
 
 DEFAULT_MAGIC_LINK_EMAIL_HTML = \
     """<html lang='en'>
@@ -71,7 +71,7 @@ DEFAULT_MAGIC_LINK_EMAIL_HTML = \
             <p><a href='{link}' >Here</a> is your magic link to log into the EngFrosh site and Discord server.</p>
             <br/>
             <p>If you need any help or any questions,
-            please email <a href="mailto:questions@engfrosh.com">questions@engfrosh.com</a>
+            please email <a href="mailto:websupport@engfrosh.com">websupport@engfrosh.com</a>
             <br/>
             <br/>
             {link}
