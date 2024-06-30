@@ -16,7 +16,7 @@ from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, TeamTradeUpActivity, UserDetails
 from common_models.models import ChannelTag, DiscordGuild, Announcement, FacilShift, FacilShiftSignup
-from common_models.models import Setting, QRCode
+from common_models.models import Setting, QRCode, PuzzleStream
 import common_models.models
 from common_models.models import DiscordRole, DiscordOverwrite, BooleanSetting
 from . import registration
@@ -804,7 +804,14 @@ def bulk_add_prc(request: HttpRequest) -> HttpResponse:
 @permission_required("common_models.manage_scav", login_url='/accounts/login')
 def scavenger_scoreboard(request: HttpRequest) -> HttpResponse:
     status = list(TeamPuzzleActivity.objects.filter(puzzle_completed_at=None).order_by('-puzzle__order'))
-    return render(request, "scavenger_scoreboard.html", {"status": status})
+    teams = list(Team.objects.filter(scavenger_team=True).order_by("display_name"))
+    main_branches = list(PuzzleStream.objects.filter(enabled=True, default=True))
+    main_puzzles_total = Puzzle.objects.filter(enabled=True, stream__in=main_branches).count()
+    puzzles_total = Puzzle.objects.filter(enabled=True).count()
+    return render(request, "scavenger_scoreboard.html", {"status": status,
+                                                         "teams": teams,
+                                                         "puzzles_total": puzzles_total,
+                                                         "main_puzzles_total": main_puzzles_total})
 
 
 @permission_required("common_models.manage_scav", login_url='/accounts/login')

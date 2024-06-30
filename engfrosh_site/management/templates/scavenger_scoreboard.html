@@ -31,31 +31,58 @@
             text-align: center;
         }
     </style>
-    <script src="{% static 'functions.js' %}"></script>
 </head>
 
 <body>
     <a href="{% url 'manage_index' %}">Back to Manage</a><br />
-    <table>
-        <tr>
-            <th>Team</th>
-            <th>Puzzle Name</th>
-            <th>Current Puzzle (Order)</th>
-            <th>Current Puzzle Started</th>
-        </tr>
-        {% for act in status %}
-        <tr>
-            <td class="color_box">{{ act.team.display_name }}</td>
-            {% if act.team.scavenger_finished %}
-            <td class="color_box">Finished Scav</td>
-            {% else %}
-            <td class="color_box">{{ act.puzzle.name }}</td>
-            <td class="color_box">#{{ act.puzzle.order }}</td>
-            <td class="color_box">{{ act.puzzle_start_at }}</td>
-            {% endif %}
-        </tr>
+    <select id="teamchoice">
+        <option value="div-overview">Overview</option>
+        {% for team in teams %}
+        <option value="div-{{ team.id }}">{{ team.display_name }}</option>
         {% endfor %}
-    </table>
+    </select>
+    <div id="div-overview">
+        <h1>Scavenger Overview</h1><br>
+        {% for team in teams %}
+        <label for="prog-overall-{{ team.id }}">{{ team.display_name }} - Overall ({{ team.num_clues_finished }}/{{ puzzles_total }})</label>
+        <progress id="prog-overall-{{ team.id }}" max="{{ puzzles_total }}" value="{{ team.num_clues_finished }}"></progress><br>
+        <label for="prog-main-{{ team.id }}">{{ team.display_name }} - Main ({{ team.num_main_clues_finished }}/{{ main_puzzles_total }})</label>
+        <progress id="prog-main-{{ team.id }}" max="{{ main_puzzles_total }}" value="{{ team.num_main_clues_finished }}"></progress><br><br>
+        {% endfor %}
+    </div>
+    {% for team in teams %}
+    <div id="div-{{ team.id }}" style="display: none;">
+        <h1>Team Details: {{ team.display_name }}</h1><br>
+        <a href="/scavenger/?team={{ team.id }}">View Team Tree</a><br>
+        <h2>Overall Stats</h2>
+        <p>Last puzzle was completed at: {{ team.last_puzzle_timestamp }}</p>
+        <label for="prog-overall-{{ team.id }}">Overall ({{ team.num_clues_finished }}/{{ puzzles_total }})</label>
+        <progress id="prog-overall-{{ team.id }}" max="{{ puzzles_total }}" value="{{ team.num_clues_finished }}"></progress><br>
+        <label for="prog-main-{{ team.id }}">Main ({{ team.num_main_clues_finished }}/{{ main_puzzles_total }})</label>
+        <progress id="prog-main-{{ team.id }}" max="{{ main_puzzles_total }}" value="{{ team.num_main_clues_finished }}"></progress><br><br>
+        <h2>By Branch (Unlocked)</h2>
+        {% for branch in team.active_branches %}
+        <label for="prog-{{ branch.id }}-{{ team.id }}">{{ branch.puzzle.stream.name }} ({{ branch.num_clues_finished }}/{{ branch.num_clues_total }})</label>
+        <progress id="prog-{{ branch.id }}-{{ team.id }}" max="{{ branch.num_clues_total }}" value="{{ branch.num_clues_finished }}"></progress><br>
+        {% endfor %}
+    </div>
+    {% endfor %}
+    <script>
+        function hideAll(){
+            document.getElementById("div-overview").style = "display: none;";
+            {% for team in teams %}
+            document.getElementById("div-{{ team.id }}").style = "display: none;";
+            {% endfor %}
+        }
+        function showSelected(){
+            hideAll();
+            document.getElementById(document.getElementById("teamchoice").value).style = "display: block;";
+        }
+        document.getElementById("teamchoice").onchange = function(){
+            showSelected();
+        };
+        showSelected();
+    </script>
 </body>
 
 </html>
