@@ -29,7 +29,10 @@ function viewSwitch(){
         Here is your team:
         {{ team.display_name }}<br>
         {% if bypass %}
-            <h1 class="text-red-600 text-xl">Warning: Scav rule bypass is enabled, puzzle progress will not be saved!</h1>
+            <h1 class="text-red-600 text-xl">Warning: Scav rule bypass is enabled!</h1>
+        {% endif %}
+        {% if no_save %}
+            <h1 class="text-red-600 text-xl">Warning: Scav saving is disabled!</h1>
         {% endif %}
         {% if team.scavenger_finished %}
             <h1 class="text-5xl">Congratulation on Completing Scav!</h1>
