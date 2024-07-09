@@ -1,17 +1,15 @@
 from typing import Union
 from django.http import HttpRequest, HttpResponse
 from django.http.response import HttpResponseNotAllowed, HttpResponseBadRequest, JsonResponse, HttpResponseForbidden
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from scavenger.consumers import ScavConsumer
 from common_models.models import DiscordChannel, Puzzle, Team, VerificationPhoto, QRCode
 from django.contrib.auth.decorators import login_required, permission_required
 
 import logging
 import json
-import io
 from django.urls import reverse
-from django.db import models
-
+import base64
 from scavenger.tree import generate_tree
 
 logger = logging.getLogger("engfrosh_site.scavenger.views")
@@ -24,14 +22,6 @@ def print_qr(request: HttpRequest) -> HttpResponse:
             puz._generate_qr_code()
     codes = QRCode.objects.all()
     return render(request, "print_qr.html", {"codes": codes})
-
-
-@permission_required("common_models.manage_scav", login_url='/accounts/login')
-def regen_trees(request: HttpRequest) -> HttpResponse:
-    teams = Team.objects.all()
-    for team in teams:
-        update_tree(team)
-    return redirect("/manage/")
 
 
 @login_required(login_url='/accounts/login')
@@ -57,9 +47,7 @@ def index(request: HttpRequest) -> HttpResponse:
     bypass = request.user.has_perm('common_models.bypass_scav_rules')
     no_save = request.user.has_perm('common_models.disable_scav_save')
 
-    tree = open(team.scav_tree.path, "r")
-    content = tree.read()
-    tree.close()
+    tree = base64.b64encode(bytes(json.dumps(generate_tree(team)), 'utf-8')).decode('utf-8')
 
     context = {
         "scavenger_enabled_for_team": team.scavenger_enabled,
@@ -70,18 +58,10 @@ def index(request: HttpRequest) -> HttpResponse:
         "verified_puzzles": team.verified_puzzles,
         "completed_puzzles_awaiting_verification": team.completed_puzzles_awaiting_verification,
         "completed_puzzles_requiring_photo_upload": team.completed_puzzles_requiring_photo_upload,
-        "tree": content,
+        "tree": tree,
     }
 
     return render(request, "scavenger_index.html", context=context)
-
-
-def update_tree(team):
-    data = generate_tree(team)
-    if team.scav_tree is None:
-        team.scav_tree = models.FileField()
-    raw = io.BytesIO(data.encode('utf8'))
-    team.scav_tree.save(str(team.id)+".svg", raw)
 
 
 @login_required(login_url='/accounts/login')
@@ -144,7 +124,6 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
                 next_page = "../" + next_puzzle.secret_id
             else:
                 next_page = "../../stream_completed"
-            update_tree(team)
             return JsonResponse({"correct": correct, "scavenger_stream_completed": stream_completed,
                                 "next": next_page})
         else:

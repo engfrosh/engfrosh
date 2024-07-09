@@ -3,12 +3,185 @@
 {% block page_title %}
     Scav
 {% endblock page_title %}
+
+{% block page_style %}
+<style>
+    body {
+        margin: 0;
+        font-family: 'Courier New', Courier, monospace;
+        background-color: black;
+        color: #ffffff;
+    }
+    #helpButton {
+        cursor: pointer;
+        position: fixed; 
+        top:0; 
+        bottom: 0; 
+        margin:10px; 
+        width:3rem; 
+        height:3rem;
+    }
+    #scavHelp {
+        position: fixed; 
+        top: 0; 
+        width: 100%; 
+        height: 100%; 
+        display: none; 
+        margin:0;  
+        z-index: 999;
+    }
+    .slideNumber {
+        text-align: center; 
+        position:absolute; 
+        bottom:0; 
+        right:50%;
+    }
+    .welcomeSlides {
+        padding:20px;
+        width:80vm;
+        height: 80vh;
+    }
+    #bkgTint {
+        background-color:rgba(0,0,0,0.5); 
+        position: absolute; 
+        width: 100%; 
+        height: 100%;
+    }
+    #helpMenu {
+        background-color: #404146; 
+        border:solid black; 
+        border-radius: 25px; 
+        width: 70vmin; 
+        height:70vh; 
+        margin: auto; 
+        position: absolute; 
+        top:0; 
+        left:50%; 
+        transform: translate(-50%, 20%); 
+        box-shadow: 0 0 15px 10px #66039b;
+    }
+    .navButton {
+        position:absolute; 
+        cursor: pointer; 
+        bottom:15px; 
+    }
+    #scav {
+        white-space:nowrap;
+    }
+    .tree {
+        display: inline-block; 
+        position:relative;
+        margin:100px;
+    }
+    .branch {
+        margin:auto;
+        margin-bottom: 32px;
+        position: relative;
+    }
+    .clue {
+        margin:auto;
+        width:50px; 
+        height: 50px;
+        border-radius: 20px; 
+        display: grid;
+    }
+    .line {
+        margin:auto;
+        position:relative;
+        display: grid; 
+        width:10px; 
+        height: 50px;
+        background-color: #646262;
+    }
+    .solved {
+        background-color: #38B261;
+    }
+    .solved.clue{
+        cursor: pointer;
+    }
+    .active.line {
+        background-color: #a85800;
+    }
+    .active.clue {
+        cursor: pointer;
+        background-color: #8305c8;
+    }
+    .hidden.clue {
+        background-color: #494949;
+    }
+    .blocked {
+        background-color: #eb0b0b;
+    }
+    .fog {
+        box-shadow: inset 0 -30px 16px -6px black;
+    }
+    .inline {
+        display:inline-grid;
+        vertical-align: top;
+    }
+    .horizontal {
+        display: inline grid;
+    }
+    .HLine {
+        width: 50px;
+        height: 10px;
+        top:20px;
+    }
+    .branchTitle {
+        width: 0;
+        font-size: 16px;
+    }
+</style>
+{% endblock page_style %}
+
 {% block js_functions %}
 <meta http-equiv="Content-Security-Policy" content="default-src: 'self'" />
 {% endblock js_functions %}
 {% block body %}
 <script>
+const tree = JSON.parse(atob("{{tree|safe}}"));
 var old = false;
+var toggle = false;
+var slideIndex = 1;
+showDivs(slideIndex);
+
+function plusDivs(n) {
+    showDivs(slideIndex += n);
+}
+
+function showDivs(n) {
+    var i;
+    var x = document.getElementsByClassName("welcomeSlides");
+    if (n > x.length) {slideIndex = 1}
+    if (n < 1) {slideIndex = x.length}
+    for (i = 0; i < x.length; i++) {
+        x[i].style.display = "none";  
+    }
+    x[slideIndex-1].style.display = "block";
+    //Gray out arrows that would go out of slide range
+    var x = document.getElementsByClassName("st2");
+    if (slideIndex-1 == 0) {
+        x[0].style.fill = "rgba(255, 255, 255, 1)";
+        x[1].style.fill = "rgba(255, 255, 255, 0.3)";
+    } else if (slideIndex-1 == x.length) {
+        x[0].style.fill = "rgba(255, 255, 255, 0.3)";
+        x[1].style.fill = "rgba(255, 255, 255, 1)";
+    } else {
+        x[0].style.fill = "rgba(255, 255, 255, 1)";
+        x[1].style.fill = "rgba(255, 255, 255, 1)";
+    }
+}
+
+function toggleHelp() {
+    if (toggle==false){
+        document.getElementById("scavHelp").style.display = "block";
+        toggle = true;
+    } else{
+        document.getElementById("scavHelp").style.display = "none";
+        toggle = false;
+    }
+}
+
 function viewSwitch(){
     old = !old;
     var imgframe = document.getElementById("imgframe");
@@ -40,9 +213,261 @@ function viewSwitch(){
             {% if not scavenger_enabled_for_team %}
                 Scavenger is not currently enabled
             {% endif %}
+
             <div id="imgframe">
-                {{ tree|safe }}
+                <!-- Help Button -->
+                <div onclick="toggleHelp()" id="helpButton">
+                    <svg fill="#ffffff" width="3rem" height="3rem" viewBox="0 0 395.001 395">
+                        <g><g>
+                        <path d="M322.852,0H72.15C32.366,0,0,32.367,0,72.15v250.7C0,362.634,32.367,395,72.15,395h250.701
+                            c39.784,0,72.15-32.366,72.15-72.15V72.15C395.002,32.367,362.635,0,322.852,0z M370.002,322.85
+                            c0,25.999-21.151,47.15-47.15,47.15H72.15C46.151,370,25,348.849,25,322.85V72.15C25,46.151,46.151,25,72.15,25h250.701
+                            c25.999,0,47.15,21.151,47.15,47.15L370.002,322.85L370.002,322.85z"/>
+                        <path d="M197.501,79.908c-33.775,0-61.253,27.479-61.253,61.254c0,6.903,5.596,12.5,12.5,12.5c6.904,0,12.5-5.597,12.5-12.5
+                            c0-19.99,16.263-36.254,36.253-36.254s36.253,16.264,36.253,36.254c0,11.497-8.314,19.183-22.01,30.474
+                            c-12.536,10.334-26.743,22.048-26.743,40.67v40.104c0,6.902,5.597,12.5,12.5,12.5c6.903,0,12.5-5.598,12.5-12.5v-40.104
+                            c0-6.832,8.179-13.574,17.646-21.381c13.859-11.426,31.106-25.646,31.106-49.763C258.754,107.386,231.275,79.908,197.501,79.908z"
+                            />
+                        <path d="M197.501,283.024c-8.842,0-16.034,7.193-16.034,16.035c0,8.84,7.192,16.033,16.034,16.033
+                            c8.841,0,16.034-7.193,16.034-16.033C213.535,290.217,206.342,283.024,197.501,283.024z"/>
+                        </g></g>
+                    </svg>
+                </div>
+
+
+                <!-- Help Slides -->
+                <div id="scavHelp">
+                    <div onclick="toggleHelp()" id="bkgTint"></div>
+                    
+                    <!-- Overlay -->
+                    <div id="helpMenu">
+                        <h1 style="text-align: center;">Welcome to SCAV!</h1>
+                        <hr>
+                        <br>
+
+                        <div class="welcomeSlides">
+                            <img src="trade.jpg" style="width: 500;" alt="Map">
+                            <p>Hello! Welcome to the EngFrosh scavenger hunt!</p>
+                            <p>Anytime there are no major EngFrosh or school related events teams 
+                                are able to search all around Ottawa for scav clues.</p>
+                            <p>Scav clues look like QR codes with the EngFrosh logo in the middle and are usually taped to a surface. 
+                                You may also encounter QR codes from past years (don't mind these, the QR code won't work).</p>
+                            <h2 class="slideNumber">1/3</h2>
+                        </div>
+
+                        <div class="welcomeSlides">
+                            <p>Each scav tree is made from a "Main Branch" and optional side branches. 
+                                Depending on the branch, some may be disabled during certain times of the day.
+                                Completing side branches may reward your team with free hints, path skips, and more!</p>
+                            <p>Most clues are in person and require a photo of a frosh, the QR code, and a facil/head to be uploaded on 
+                                the clue submission page. Some clues are online (these will be clearly marked) and only require a code 
+                                to be entered in the submission page.</p>
+                            <h2 class="slideNumber">2/3</h2>
+                        </div>
+
+                        <div class="welcomeSlides">
+                            <p>There are also partial clues. These clues require you to find multiple QR codes before moving on. 
+                                The clue will indicate how many codes you need to find. </p>
+                            <p>Good luck finding all the clues and go get to know Ottawa! If you are stuck you can ask the "spirit on duty" for a hint in your teams Scav channel. </p>
+                            <h2 class="slideNumber">3/3</h2>
+                        </div>
+
+                        <!-- Nav Buttons -->
+                        <div onclick="plusDivs(1)" class="navButton" style="right:15px;">
+                            <svg version="1.1" id="icons_1_" width="5rem" height="5rem" viewBox="0 0 128 128" style="enable-background:new 0 0 128 128"><g id="row1_1_"><g id="_x31__3_"><path class="st2" d="M64 0C28.7 0 0 28.7 0 64s28.7 64 64 64 64-28.7 64-64S99.3 0 64 0zm0 121.6C32.2 121.6 6.4 95.8 6.4 64S32.2 6.4 64 6.4s57.6 25.8 57.6 57.6-25.8 57.6-57.6 57.6zM49.2 38.4 73.6 64 49.2 89.6h13.5L86.4 64 62.7 38.4H49.2z" id="_x32__2_"/></g></g></svg>
+                        </div>
+                        <div onclick="plusDivs(-1)" class="navButton" style="left:15px; transform: rotate(180deg);">
+                            <svg version="1.1" id="icons_1_"  width="5rem" height="5rem" viewBox="0 0 128 128" style="enable-background:new 0 0 128 128"><g id="row1_1_"><g id="_x31__3_"><path class="st2" d="M64 0C28.7 0 0 28.7 0 64s28.7 64 64 64 64-28.7 64-64S99.3 0 64 0zm0 121.6C32.2 121.6 6.4 95.8 6.4 64S32.2 6.4 64 6.4s57.6 25.8 57.6 57.6-25.8 57.6-57.6 57.6zM49.2 38.4 73.6 64 49.2 89.6h13.5L86.4 64 62.7 38.4H49.2z" id="_x32__2_"/></g></g></svg>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <!-- Actual scav -->
+                <div id="scav">
+                    <!-- Tree Generation Script -->
+                    <script>
+                        //Example dictionary - Generated by python and sent here. Python only sends nodes that should be displayed. Only clickable nodes contain links.
+                        var tree1Dictionary = { //Use tree1Dictionary["MainBranch"]["clue1"][0] -- to access the status of clue1 in main branch
+                            "MainBranch":{ 
+                                "clue0":["solved", "start","www.blabla.com"],
+                                "clue1":["solved", "", "www.blabla.com"],
+                                "clue2":["active", "", "www.blabla.com"],
+                                "clue3":["hidden", "", ""],
+                                "clue4":["hidden", "", ""],
+                                "clue5":["hidden", "", ""],
+                                "clue7":["hidden", "", ""],
+                                "clue8":["hidden", "", ""]//,
+                                //"clue6":["hidden", "end", ""]
+                            },
+                            "SideBranch1":{ //Branch that ends on the same node it starts and is blocked (by time of day etc)
+                                "clueA":["blocked", "clue2", ""],
+                                "clueB":["hidden", "", ""],
+                                "clueZ":["hidden", "", ""]
+                            },
+                            "SideBranch2":{ //Branch that goes out of (at clue2)
+                                "clueC":["active", "clue1", "https://www.youtube.com/watch?v=dQw4w9WgXcQ"],
+                                "clueD":["hidden", "", ""],
+                                "clueE":["hidden", "", ""],
+                                "clueF":["hidden", "", ""],
+                                "clueG":["hidden", "", ""],
+                                "clueH":["hidden", "", ""]
+                            },
+                            "SideBranch3":{ //Branch that does not end but the rest of the branch is not shown. This is hidden and so there is no link
+                                "clueI":["hidden", "clue3", ""],
+                                "clueJ":["hidden", "", ""],
+                                "clueK":["hidden", "", ""]
+                            },
+                            "SideBranch4":{ //Branch that does not end but the rest of the branch is not shown. This is hidden and so there is no link
+                                "clueL":["hidden", "clue5", ""],
+                                "clueM":["hidden", "", ""]
+                            },
+                            "SideBranch5":{ //Branch that does not end but the rest of the branch is not shown. This is hidden and so there is no link
+                                "clueN":["hidden", "clue5", ""],
+                                "clueO":["hidden", "", ""]
+                            }
+                        }
+
+                        generateScavTree(tree);
+
+                        function generateScavTree(tree) {
+                            let branchIndex = 0;
+                            let clueIndex = 0;
+                            let leftClues = 0;
+                            let rightClues = 0;
+                            const treeId = Math.random().toString(36).substring(2, 10);
+                            let curBranchSide, curBranch;
+                            const totalBranches = Object.keys(tree).length;
+                            const leftBranches = Math.ceil((totalBranches - 1) / 2);
+                            const rightBranches = Math.floor((totalBranches - 1) / 2);
+
+                            // Tree container
+                            document.write("<div class='tree'>");
+
+                            // Create left, middle, and right sections
+                            document.write(`<div id='${treeId}LeftSide' class='inline'></div>`);
+                            document.write(`<div id='${treeId}Middle' class='inline'></div>`);
+                            document.write(`<div id='${treeId}RightSide' class='inline'></div>`);
+
+                            for (const branch in tree) { // Iterate through each branch
+                                clueIndex = 0;
+                                branchIndex += 1;
+
+                                // Determine the current branch side (left, middle, right)
+                                if (branch === "MainBranch") {
+                                    curBranchSide = document.getElementById(`${treeId}Middle`);
+                                } else if (branchIndex % 2 === 0) {
+                                    curBranchSide = document.getElementById(`${treeId}LeftSide`);
+                                } else {
+                                    curBranchSide = document.getElementById(`${treeId}RightSide`);
+                                }
+
+                                // Create branch container
+                                curBranchSide.innerHTML += `<div id='${treeId}${branch}' class='branch ${branch}'>
+                                                            <div class='branchTitle'>${branch.replace(/([A-Z])/g, ' $1').trim()}</div>
+                                                            <div id='horz${treeId}${branch}' class='horz'></div>
+                                                            <div id='vert${treeId}${branch}' class='vert'></div>
+                                                            </div>`;
+                                curBranch = document.getElementById(`${treeId}${branch}`);
+
+                                // Adjust styling based on the side
+                                if (curBranchSide.id === `${treeId}LeftSide`) {
+                                    curBranchSide.style.width = (leftBranches * 100) + 'px';
+                                    curBranch.style.marginRight = 0;
+                                    document.getElementById(`vert${treeId}${branch}`).style.float = 'left';
+                                } else if (curBranchSide.id === `${treeId}RightSide`) {
+                                    curBranchSide.style.width = (rightBranches * 100) + 'px';
+                                    document.getElementById(`vert${treeId}${branch}`).style.float = 'right';
+                                    curBranch.style.marginLeft = 0;
+                                }
+
+                                const horzContainer = document.getElementById(`horz${treeId}${branch}`);
+                                const vertContainer = document.getElementById(`vert${treeId}${branch}`);
+                                const maxHorzClues = branch === "MainBranch" ? 0 : Math.ceil((totalBranches - branchIndex + 1) / 2);
+
+                                for (const clue in tree[branch]) { // Iterate through each clue
+                                    clueIndex += 1;
+
+                                    // Create clue element based on its status
+                                    const clueStatus = tree[branch][clue][0];
+                                    let clueClass = '';
+                                    let clueIcon = '';
+
+                                    //Moves the branches to their correct positions based on id of desired main branch clue
+                                    if (clueIndex == 1){
+                                        if (curBranchSide.id == `${treeId}LeftSide`){
+                                            curBranch.style.position = 'absolute';
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 118;
+                                            let leftOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().x - 150;
+                                            //let leftOffset = 100 * ((branchIndex/2)-1);
+                                            curBranch.style.top = `${topOffset}px`;
+                                            curBranch.style.right = `${leftOffset}px`;
+
+                                        } else if (curBranchSide.id === `${treeId}RightSide`){
+                                            curBranch.style.position = 'absolute';
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 118;
+                                            curBranch.style.top = `${topOffset}px`;
+                                        }
+                                    }
+
+                                    if (clueStatus === "solved") {
+                                        clueClass = 'solved';
+                                        clueIcon = "<svg width='32px' height='32px' viewBox='0,0,256,256' style='margin:auto;'><g fill='#ffffff' fill-rule='nonzero' stroke='none' stroke-width='1' stroke-linecap='butt' stroke-linejoin='miter' stroke-miterlimit='10' stroke-dasharray='' stroke-dashoffset='0' font-family='none' font-weight='none' font-size='none' text-anchor='none' style='mix-blend-mode: normal'><g transform='scale(5.12,5.12)''><path d='M41.9375,8.625c-0.66406,0.02344 -1.27344,0.375 -1.625,0.9375l-18.8125,28.78125l-12.1875,-10.53125c-0.52344,-0.54297 -1.30859,-0.74609 -2.03125,-0.51953c-0.71875,0.22266 -1.25391,0.83203 -1.37891,1.57422c-0.125,0.74609 0.17578,1.49609 0.78516,1.94531l13.9375,12.0625c0.4375,0.37109 1.01563,0.53516 1.58203,0.45313c0.57031,-0.08594 1.07422,-0.41016 1.38672,-0.89062l20.09375,-30.6875c0.42969,-0.62891 0.46484,-1.44141 0.09375,-2.10547c-0.37109,-0.66016 -1.08594,-1.05469 -1.84375,-1.01953z'></path></g></g></svg>";
+                                    } else if (clueStatus === "active") {
+                                        clueClass = 'active';
+                                        clueIcon = "<svg width='32px' height='32px' fill='#ffffff' viewBox='0 0 512 512' style='margin:auto;'><g stroke-width='0'></g><g stroke-linecap='round' stroke-linejoin='round'></g><g> <g> <g> <g> <path d='M437.019,74.981C388.668,26.629,324.38,0,256,0S123.332,26.629,74.981,74.981C26.629,123.332,0,187.62,0,256 s26.629,132.668,74.981,181.019C123.332,485.371,187.62,512,256,512c64.518,0,126.15-24.077,173.541-67.796l-10.312-11.178 c-44.574,41.12-102.544,63.766-163.229,63.766c-64.317,0-124.786-25.046-170.266-70.527 C40.254,380.786,15.208,320.317,15.208,256S40.254,131.214,85.734,85.735C131.214,40.254,191.683,15.208,256,15.208 s124.786,25.046,170.266,70.527c45.48,45.479,70.526,105.948,70.526,170.265c0,60.594-22.587,118.498-63.599,163.045 l11.188,10.301C487.986,381.983,512,320.421,512,256C512,187.62,485.371,123.332,437.019,74.981z'></path> <path d='M282.819,263.604h63.415v-15.208h-63.415c-1.619-5.701-5.007-10.662-9.536-14.25l35.913-86.701l-14.049-5.82 l-35.908,86.688c-1.064-0.124-2.142-0.194-3.238-0.194c-15.374,0-27.881,12.508-27.881,27.881s12.507,27.881,27.881,27.881 C268.737,283.881,279.499,275.292,282.819,263.604z M243.327,256c0-6.989,5.685-12.673,12.673-12.673 c6.989,0,12.673,5.685,12.673,12.673c0,6.989-5.685,12.673-12.673,12.673C249.011,268.673,243.327,262.989,243.327,256z'></path> <path d='M451.168,256c0-107.616-87.552-195.168-195.168-195.168S60.832,148.384,60.832,256S148.384,451.168,256,451.168 S451.168,363.616,451.168,256z M76.04,256c0-99.231,80.73-179.96,179.96-179.96S435.96,156.769,435.96,256 S355.231,435.96,256,435.96S76.04,355.231,76.04,256z'></path> <rect x='248.396' y='366.511' width='15.208' height='56.776'></rect> <path d='M61.672,336.501l-14.05,5.82c23.059,55.668,66.416,99.026,122.085,122.085l5.82-14.049 C123.61,428.851,83.176,388.416,61.672,336.501z'></path> <path d='M450.397,175.485l14.049-5.82c-23.059-55.669-66.417-99.027-122.085-122.084l-5.82,14.049 C388.457,83.135,428.891,123.569,450.397,175.485z'></path> <path d='M256,45.624V30.416c-60.256,0-116.904,23.465-159.512,66.071C53.881,139.095,30.416,195.744,30.416,256h15.208 c0-56.194,21.883-109.024,61.617-148.759C146.976,67.507,199.807,45.624,256,45.624z'></path> <path d='M481.584,256h-15.208c0,56.193-21.883,109.024-61.617,148.759c-39.734,39.735-92.566,61.617-148.759,61.617v15.208 c60.256,0,116.904-23.465,159.513-66.071C458.119,372.904,481.584,316.256,481.584,256z'></path> <rect x='248.396' y='88.713' width='15.208' height='56.776'></rect> <rect x='183.845' y='106.019' transform='matrix(0.3827 0.9239 -0.9239 0.3827 226.5988 -111.8865)' width='26.361' height='15.208'></rect> <rect x='301.78' y='390.75' transform='matrix(-0.3827 -0.9239 0.9239 -0.3827 67.4626 841.7849)' width='26.361' height='15.207'></rect> <rect x='100.445' y='189.43' transform='matrix(0.9239 0.3827 -0.3827 0.9239 84.0528 -28.4842)' width='26.36' height='15.207'></rect> <rect x='385.201' y='307.351' transform='matrix(-0.9239 -0.3827 0.3827 -0.9239 645.9084 758.3894)' width='26.361' height='15.207'></rect> <rect x='106.028' y='301.792' transform='matrix(-0.3827 -0.9239 0.9239 -0.3827 -133.8779 540.4901)' width='15.207' height='26.36'></rect> <rect x='390.765' y='183.851' transform='matrix(0.3827 0.9239 -0.9239 0.3827 427.9489 -246.4146)' width='15.207' height='26.361'></rect> <rect x='189.433' y='385.188' transform='matrix(-0.9239 -0.3827 0.3827 -0.9239 226.6226 841.8156)' width='15.208' height='26.361'></rect> <rect x='307.381' y='100.448' transform='matrix(0.9239 0.3827 -0.3827 0.9239 67.4614 -111.8911)' width='15.207' height='26.361'></rect> <rect x='129.389' y='150.181' transform='matrix(-0.7071 -0.7071 0.7071 -0.7071 157.7713 380.9216)' width='56.776' height='15.208'></rect> <rect x='325.825' y='346.62' transform='matrix(-0.7071 -0.7071 0.7071 -0.7071 354.2049 855.1643)' width='56.776' height='15.208'></rect> <rect x='88.713' y='248.396' width='56.776' height='15.208'></rect> <rect x='366.511' y='248.396' width='56.776' height='15.208'></rect> <rect x='150.157' y='325.829' transform='matrix(-0.7071 -0.7071 0.7071 -0.7071 18.8444 716.2403)' width='15.208' height='56.776'></rect> <rect x='346.602' y='129.395' transform='matrix(0.7071 0.7071 -0.7071 0.7071 215.3148 -204.2485)' width='15.208' height='56.776'></rect> </g> </g> </g> </g></svg>";
+                                    } else if (clueStatus === "blocked") {
+                                        clueClass = 'blocked';
+                                        clueIcon = "<svg fill='#FFFFFF' width='32px' height='32px' viewBox='0 0 28.25 28.25' style='margin:auto;'><g><path d='M14.125,0C6.337,0,0,6.337,0,14.125S6.337,28.25,14.125,28.25S28.25,21.913,28.25,14.125S21.913,0,14.125,0z M4,14.125C4,8.542,8.542,4,14.125,4c2.251,0,4.325,0.747,6.009,1.994L5.993,20.134C4.747,18.45,4,16.376,4,14.125z M14.125,24.25c-2.251,0-4.326-0.748-6.011-1.995l14.141-14.14c1.247,1.684,1.995,3.759,1.995,6.01C24.25,19.708,19.708,24.25,14.125,24.25z'/></g></svg>";
+                                    } else if (clueStatus === "hidden") {
+                                        clueClass = 'hidden';
+                                    }
+
+                                    const clueElement = `<div id='line${branch}${clueIndex}' class='line ${clueClass}'></div>
+                                                        <div id='${clue}' class='clue ${clueClass}' onclick="window.location='${tree[branch][clue][2]}';">${clueIcon}</div>`;
+
+                                    if (branch === "MainBranch" || clueIndex > maxHorzClues) {
+                                        vertContainer.innerHTML += clueElement;
+                                        if (curBranchSide.id === `${treeId}LeftSide`){ //Adds to the vertical clue count
+                                            leftClues += 1;
+                                        } else if (curBranchSide.id === `${treeId}RightSide`){
+                                            rightClues += 1;
+                                        }
+                                    } else {
+                                        horzContainer.innerHTML += clueElement;
+                                    }
+
+                                    // Add horizontal classes if needed
+                                    if (branch !== "MainBranch" && clueIndex <= maxHorzClues) {
+                                        const myLine = document.getElementById(`line${branch}${clueIndex}`);
+                                        const myClue = document.getElementById(`${clue}`);
+                                        const floatDirection = curBranchSide.id === `${treeId}LeftSide` ? 'right' : 'left';
+                                        myLine.style.float = floatDirection;
+                                        myClue.style.float = floatDirection;
+                                        myLine.classList.add('horizontal', 'HLine');
+                                        myClue.classList.add('horizontal');
+                                    }
+
+                                    // Remove the first line of the main branch
+                                    if (branch === "MainBranch" && clueIndex === 1) {
+                                        document.getElementById(`line${branch}${clueIndex}`).remove();
+                                    }
+
+                                    // Add fog line if it's the last visible clue in the main branch
+                                    if (branch === "MainBranch" && tree[branch][clue][1] === "") {
+                                        const length = Object.keys(tree[branch]).length;
+                                        if (length === clueIndex) {
+                                            curBranch.innerHTML += `<div id='line${branch}${clueIndex + 1}' class='line fog'></div>`;
+                                        }
+                                    }
+                                }
+                            }
+                            document.write('</div>'); // Close tree container
+                        }
+                    </script>
+                </div>
             </div>
+
             <div id="scavtext" style="display: none;">
                 <h2 style="text-size: 20px;">Active Scavenger Puzzles</h2>
                 <ul>
