@@ -16,7 +16,7 @@
         cursor: pointer;
         position: fixed; 
         top:0; 
-        bottom: 0; 
+        right:0;
         margin:10px; 
         width:3rem; 
         height:3rem;
@@ -424,7 +424,7 @@ function viewSwitch(){
                                     }
 
                                     const clueElement = `<div id='line${branch}${clueIndex}' class='line ${clueClass}'></div>
-                                                        <div id='${clue}' class='clue ${clueClass}' onclick="window.location='${tree[branch][clue][2]}';">${clueIcon}</div>`;
+                                                        <div id='${clue}' class='clue ${clueClass}' onclick="window.location='puzzle/${tree[branch][clue][2]}';">${clueIcon}</div>`;
 
                                     if (branch === "MainBranch" || clueIndex > maxHorzClues) {
                                         vertContainer.innerHTML += clueElement;
