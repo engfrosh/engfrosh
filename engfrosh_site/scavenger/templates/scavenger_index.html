@@ -143,7 +143,7 @@ const tree = JSON.parse(atob("{{tree|safe}}"));
 var old = false;
 var toggle = false;
 var slideIndex = 1;
-showDivs(slideIndex);
+//showDivs(slideIndex);
 
 function plusDivs(n) {
     showDivs(slideIndex += n);
@@ -467,6 +467,7 @@ function viewSwitch(){
                     </script>
                 </div>
             </div>
+            </div>
 
             <div id="scavtext" style="display: none;">
                 <h2 style="text-size: 20px;">Active Scavenger Puzzles</h2>
@@ -494,6 +495,9 @@ function viewSwitch(){
                     {% endfor %}
                 </ul>
             </div>
+            <script>
+                showDivs(slideIndex);
+            </script>
         {% endif %}
     {% endif %}
 {% endblock body %}
