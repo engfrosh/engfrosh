@@ -1,6 +1,6 @@
 django-scheduler==0.10.1
 boto3==1.24.52
-Django==4.2.11
+Django==4.2.14
 flake8==5.0.4
 nextcord==2.1.0
 oauthlib==3.2.2
