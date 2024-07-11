@@ -357,9 +357,14 @@ function viewSwitch(){
                             for (const branch in tree) { // Iterate through each branch
                                 clueIndex = 0;
                                 branchIndex += 1;
+                                let isMain = false;
+                                let keys = Object.keys(tree[branch]);
+                                if (keys.length > 0 && tree[branch][keys[0]][1] == "start"){
+                                    isMain = true;
+                                }
 
                                 // Determine the current branch side (left, middle, right)
-                                if (branch === "MainBranch") {
+                                if (isMain) {
                                     curBranchSide = document.getElementById(`${treeId}Middle`);
                                 } else if (branchIndex % 2 === 0) {
                                     curBranchSide = document.getElementById(`${treeId}LeftSide`);
@@ -388,7 +393,7 @@ function viewSwitch(){
 
                                 const horzContainer = document.getElementById(`horz${treeId}${branch}`);
                                 const vertContainer = document.getElementById(`vert${treeId}${branch}`);
-                                const maxHorzClues = branch === "MainBranch" ? 0 : Math.ceil((totalBranches - branchIndex + 1) / 2);
+                                const maxHorzClues = isMain ? 0 : Math.ceil((totalBranches - branchIndex + 1) / 2);
 
                                 for (const clue in tree[branch]) { // Iterate through each clue
                                     clueIndex += 1;
@@ -431,7 +436,7 @@ function viewSwitch(){
                                     const clueElement = `<div id='line${branch}${clueIndex}' class='line ${clueClass}'></div>
                                                         <div id='${clue}' class='clue ${clueClass}' onclick="window.location='puzzle/${tree[branch][clue][2]}';">${clueIcon}</div>`;
 
-                                    if (branch === "MainBranch" || clueIndex > maxHorzClues) {
+                                    if (isMain || clueIndex > maxHorzClues) {
                                         vertContainer.innerHTML += clueElement;
                                         if (curBranchSide.id === `${treeId}LeftSide`){ //Adds to the vertical clue count
                                             leftClues += 1;
@@ -443,7 +448,7 @@ function viewSwitch(){
                                     }
 
                                     // Add horizontal classes if needed
-                                    if (branch !== "MainBranch" && clueIndex <= maxHorzClues) {
+                                    if (!isMain && clueIndex <= maxHorzClues) {
                                         const myLine = document.getElementById(`line${branch}${clueIndex}`);
                                         const myClue = document.getElementById(`${clue}`);
                                         const floatDirection = curBranchSide.id === `${treeId}LeftSide` ? 'right' : 'left';
@@ -454,12 +459,12 @@ function viewSwitch(){
                                     }
 
                                     // Remove the first line of the main branch
-                                    if (branch === "MainBranch" && clueIndex === 1) {
+                                    if (isMain && clueIndex === 1) {
                                         document.getElementById(`line${branch}${clueIndex}`).remove();
                                     }
 
                                     // Add fog line if it's the last visible clue in the main branch
-                                    if (branch === "MainBranch" && tree[branch][clue][1] === "") {
+                                    if (isMain && tree[branch][clue][1] === "") {
                                         const length = Object.keys(tree[branch]).length;
                                         if (length === clueIndex) {
                                             curBranch.innerHTML += `<div id='line${branch}${clueIndex + 1}' class='line fog'></div>`;
