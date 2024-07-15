@@ -70,7 +70,6 @@ def index(request: HttpRequest) -> HttpResponse:
 
 @login_required(login_url='/accounts/login')
 def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
-    
     team = Team.from_user(request.user)
     set_team = request.GET.get('team', None)
     if set_team is not None and request.user.has_perm("common_models.manage_scav"):
