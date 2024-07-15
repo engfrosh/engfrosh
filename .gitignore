@@ -141,3 +141,5 @@ dmypy.json
 
 env
 !files/static/
+
+engfrosh_site/frosh-env/*
