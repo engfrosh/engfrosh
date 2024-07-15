@@ -46,6 +46,8 @@ def generate_tree(team: Team):
                     puzzle_arr += ["start"]
                 elif activity == branch_activities[len(branch_activities)-1]:
                     puzzle_arr += ["end"]
+                else:
+                    puzzle_arr += [""]
             else:
                 if activity == branch_activities[0]:
                     puzzle_set = branch.branch_puzzle.all()
