@@ -49,9 +49,13 @@ def index(request: HttpRequest) -> HttpResponse:
 
     tree = base64.b64encode(bytes(json.dumps(generate_tree(team)), 'utf-8')).decode('utf-8')
 
+    params = ""
+    if set_team is not None:
+        params = "?team=" + str(team.group.id)
     context = {
         "scavenger_enabled_for_team": team.scavenger_enabled,
         "team": team,
+        "params": params,
         "bypass": bypass,
         "no_save": no_save,
         "active_puzzles": team.active_puzzles,
@@ -66,8 +70,13 @@ def index(request: HttpRequest) -> HttpResponse:
 
 @login_required(login_url='/accounts/login')
 def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
-
+    
     team = Team.from_user(request.user)
+    set_team = request.GET.get('team', None)
+    if set_team is not None and request.user.has_perm("common_models.manage_scav"):
+        team = Team.objects.filter(group__id=int(set_team)).first()
+    else:
+        set_team = None
     if not team:
         return HttpResponse("Sorry you aren't on a team. If this is incorrect, please contact supoort")
 

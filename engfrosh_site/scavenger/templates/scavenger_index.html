@@ -434,7 +434,7 @@ function viewSwitch(){
                                     }
 
                                     const clueElement = `<div id='line${branch}${clueIndex}' class='line ${clueClass}'></div>
-                                                        <div id='${clue}' class='clue ${clueClass}' onclick="window.location='puzzle/${tree[branch][clue][2]}';">${clueIcon}</div>`;
+                                                        <div id='${clue}' class='clue ${clueClass}' onclick="window.location='puzzle/${tree[branch][clue][2]}/{{ params }}';">${clueIcon}</div>`;
 
                                     if (isMain || clueIndex > maxHorzClues) {
                                         vertContainer.innerHTML += clueElement;
