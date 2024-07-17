@@ -408,7 +408,7 @@ function viewSwitch(){
                                     if (clueIndex == 1){
                                         if (curBranchSide.id == `${treeId}LeftSide`){
                                             curBranch.style.position = 'absolute';
-                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 118;
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 128;
                                             //let leftOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().x - 150;
                                             let leftWidth = maxHorzClues*100;
                                             curBranch.style.top = `${topOffset}px`;
@@ -417,7 +417,7 @@ function viewSwitch(){
 
                                         } else if (curBranchSide.id === `${treeId}RightSide`){
                                             curBranch.style.position = 'absolute';
-                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 118;
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 128;
                                             curBranch.style.top = `${topOffset}px`;
                                         }
                                     }
