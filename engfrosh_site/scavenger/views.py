@@ -48,7 +48,6 @@ def index(request: HttpRequest) -> HttpResponse:
     no_save = request.user.has_perm('common_models.disable_scav_save')
 
     tree = base64.b64encode(bytes(json.dumps(generate_tree(team)), 'utf-8')).decode('utf-8')
-
     params = ""
     if set_team is not None:
         params = "?team=" + str(team.group.id)
