@@ -7,7 +7,7 @@ def generate_tree(team: Team):
     branch_lookahead = Setting.objects.get_or_create(id="Scav Branch Lookahead", defaults={"value": "1"})[0]
     branch_lookahead = int(branch_lookahead.value)
     fow_on_branches = Setting.objects.get_or_create(id="Fog Of War On Branches", defaults={"value": "True"})[0]
-    fow_on_branches = bool(fow_on_branches.value)
+    fow_on_branches = fow_on_branches.value == True
     result = {}
     streams = PuzzleStream.objects.filter(enabled=True)
     activities = TeamPuzzleActivity.objects.select_related()
