@@ -49,7 +49,9 @@ def shift_checkin(request: HttpRequest, id: int) -> HttpResponse:
     shift = FacilShift.objects.filter(id=id).first()
     if shift is None:
         return HttpResponse("Invalid shift!")
-
+    if shift.checkin_user is not None and shift.checkin_user != request.user:
+        if not request.user.has_perm('common_models.attendance_admin'):
+            return HttpResponse("You are not authorized to check in this shift1")
     if request.method == "GET":
         signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__last_name')
         return render(request, "shift_checkin.html", {"shift": shift, "signups": signups})
@@ -121,7 +123,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
     if datetime.datetime.utcfromtimestamp(lockout_time) <= datetime.datetime.now() and lockout_time != 0:
         can_remove = False
     if request.method == "GET":
-        shifts = list(FacilShift.objects.order_by('start').all())
+        shifts = list(FacilShift.objects.filter(administrative=False).order_by('start').all())
         rshifts = []  # Shifts remaining to be signed up for
         for shift in shifts:
             signups = shift.facil_count
@@ -140,8 +142,8 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             logger.info("Signing up for facil shift. Shift id: ")
             shift_id = int(request.POST["shift_id"])
             logger.info(shift_id)
-            shift = FacilShift.objects.filter(id=shift_id).first()
-            shifts = list(FacilShift.objects.order_by('start').all())
+            shift = FacilShift.objects.filter(administrative=False, id=shift_id).first()
+            shifts = list(FacilShift.objects.filter(administrative=False).order_by('start').all())
             rshifts = []
             my_shifts = []
             for shift2 in FacilShiftSignup.objects.filter(user=request.user).order_by('shift__start'):
@@ -178,7 +180,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                 calendar.create_relation(request.user)
             event = Event(start=shift.start, end=shift.end, title=shift.name, description=shift.desc, calendar=calendar)
             event.save()
-            shifts = list(FacilShift.objects.order_by('start').all())
+            shifts = list(FacilShift.objects.filter(administrative=False).order_by('start').all())
             rshifts = []
             for shift in shifts:
                 signups = shift.facil_count
@@ -198,7 +200,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             logger.info(request.user)
             logger.info("Removing from facil shift. Shift id: ")
             rshifts = []
-            shifts = list(FacilShift.objects.order_by('start').all())
+            shifts = list(FacilShift.objects.filter(administrative=False).order_by('start').all())
             for shift in shifts:
                 signups = shift.facil_count
                 count = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
@@ -210,7 +212,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                               {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
             shift_id = int(request.POST["shift_id"])
             logger.info(shift_id)
-            shift = FacilShift.objects.filter(id=shift_id).first()
+            shift = FacilShift.objects.filter(administrative=False, id=shift_id).first()
             if shift is None:
                 logger.info("Shift not found")
                 return render(request, "facil_shift_signup.html",
@@ -243,7 +245,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             for shift in FacilShiftSignup.objects.filter(user=request.user).order_by('shift__start'):
                 my_shifts += [shift.shift]
             rshifts = []
-            shifts = list(FacilShift.objects.order_by('start').all())
+            shifts = list(FacilShift.objects.filter(administrative=False).order_by('start').all())
             for shift in shifts:
                 signups = shift.facil_count
                 count = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
@@ -260,13 +262,19 @@ def mailing_list(request: HttpRequest) -> HttpResponse:
        not request.user.has_perm('common_models.attendance_manage'):
         raise PermissionDenied()
     if request.method == "GET":
-        shifts = list(FacilShift.objects.order_by('start'))
+        if not request.user.has_perm("common_models.attendance_admin"):
+            shifts = list(FacilShift.objects.filter(checkin_user__in=[None, request.user]).order_by('start'))
+        else:
+            shifts = list(FacilShift.objects.order_by('start'))
         return render(request, "create_mailing_list.html", {"shifts": shifts})
     elif request.method == "POST":
         if not request.user.has_perm('common_models.shift_manage'):
             raise PermissionDenied()
         shift_id = int(request.POST["shift_id"])
         shift = FacilShift.objects.filter(id=shift_id).first()
+        if shift.checkin_user is not None and shift.checkin_user != request.user and \
+           not request.user.has_perm("common_models.attendance_manage"):
+            raise PermissionDenied()
         signups = list(FacilShiftSignup.objects.filter(shift=shift))
         redir = ""
         for signup in signups:
@@ -749,11 +757,14 @@ def bulk_add_prc(request: HttpRequest) -> HttpResponse:
             sweater_size = req_dict["sweater_size"]
             shirt_size = req_dict["shirt_size"]
             allergies = req_dict["allergies"]
+            shifts = req_dict["shifts"]
         except KeyError:
             return HttpResponseBadRequest("Key Error in Body")
         user = User.objects.filter(email=email).first()
         print(email)
         if user is None or email is None or email == "":
+            if first_name is None or first_name == "" or last_name is None or last_name == "":
+                return HttpResponseBadRequest("User not found.")
             users = User.objects.filter(first_name__iexact=first_name, last_name__iexact=last_name)
             if len(users) == 1:
                 user = users.first()
@@ -791,6 +802,18 @@ def bulk_add_prc(request: HttpRequest) -> HttpResponse:
             details.shirt_size = shirt_size
         if allergies is not None:
             details.allergies = allergies
+        if shifts is not None and shifts != "":
+            shifts = shifts.split(",")
+            for shift_name in shifts:
+                shift = FacilShift.objects.filter(name__iexact=shift_name)
+                if len(shift) == 0:
+                    return HttpResponseBadRequest("Shift \"" + shift + "\" not found!")
+                shift = shift.first()
+                if len(FacilShiftSignup.objects.filter(user=user, shift=shift)) > 0:
+                    print(user.first_name, user.last_name, "is already in", shift.name)
+                    continue
+                signup = FacilShiftSignup(user=user, shift=shift)
+                signup.save()
         details.save()
 
         return JsonResponse({"user_id": user.id, "username": user.username})  # type: ignore

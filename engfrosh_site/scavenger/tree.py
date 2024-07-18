@@ -52,7 +52,11 @@ def generate_tree(team: Team):
                 if activity == branch_activities[0]:
                     puzzle_set = branch.branch_puzzle.all()
                     if len(puzzle_set) == 0:
-                        puzzle_arr += [""]
+                        puzzle_set = puzzle.puzzle_opener.all()
+                        if len(puzzle_set) == 0:
+                            puzzle_arr += [""]
+                        else:
+                            puzzle_arr += [puzzle_set[0].name]
                     else:
                         puzzle_arr += [puzzle_set[0].name]
                 else:

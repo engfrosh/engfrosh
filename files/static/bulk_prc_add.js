@@ -53,6 +53,7 @@ function addPRCRowButtonPress(row_id, disable_invalid_alert) {
   var sweater_size = getValue(inputs, maps, "sweater_size");
   var shirt_size = getValue(inputs, maps, "shirt_size");
   var allergies = getValue(inputs, maps, "allergies");
+  var shifts = getValue(inputs, maps, "shifts");
 
   let button = document.querySelector("button." + row_id);
 
@@ -84,7 +85,8 @@ function addPRCRowButtonPress(row_id, disable_invalid_alert) {
         "rafting_paid": rafting_paid,
         "sweater_size": sweater_size,
         "shirt_size": shirt_size,
-        "allergies": allergies
+        "allergies": allergies,
+        "shifts": shifts,
       })
     })
       .then(res => {
@@ -107,8 +109,12 @@ function addPRCRowButtonPress(row_id, disable_invalid_alert) {
         }
       })
 }
+var options = ["None", "First Name", "Last Name", "Email", "PRC Issued", "Brightspace Grade", "Contract", "Waiver", "Training", "Hardhat", "Hardhat Paid", "Breakfast", "Breakfast Paid", "Rafting", "Rafting Paid", "Sweater Size", "Shirt Size", "Allergies", "Shifts"];
+var map = ["none", "fname", "lname", "email", "prc", "grade", "contract", "waiver", "training", "hardhat", "hardhat_paid", "breakfast", "breakfast_paid", "rafting", "rafting_paid", "sweater_size", "shirt_size", "allergies", "shifts"];
+
 
 function addHeadingRow(values) {
+    heading_count = values.length;
     const table = document.getElementById("new-user-table");
     table.innerHTML = "";
     var thead = table.createTHead();
@@ -119,9 +125,6 @@ function addHeadingRow(values) {
         var sel = document.createElement("select");
         sel.id = "select" + i;
         tCell.appendChild(sel);
-
-        var options = ["None", "First Name", "Last Name", "Email", "PRC Issued", "Brightspace Grade", "Contract", "Waiver", "Training", "Hardhat", "Hardhat Paid", "Breakfast", "Breakfast Paid", "Rafting", "Rafting Paid", "Sweater Size", "Shirt Size", "Allergies"];
-        var map = ["none", "fname", "lname", "email", "prc", "grade", "contract", "waiver", "training", "hardhat", "hardhat_paid", "breakfast", "breakfast_paid", "rafting", "rafting_paid", "sweater_size", "shirt_size", "allergies"];
         for (let j = 0; j < options.length; j++){
             var option = document.createElement("option");
             option.value = map[j];
@@ -135,7 +138,9 @@ function addHeadingRow(values) {
 }
 
 function addPRCRow(values) {
-
+  if (heading_count == 0){
+    addHeadingRow(["Email", "First Name", "Last Name", "Value 1", "Value 2", "Value 3", "Value 4"]);
+  }
   const table = document.getElementById("new-user-table");
 
   current_row++;
@@ -143,21 +148,33 @@ function addPRCRow(values) {
 
   let row = table.insertRow();
   row.setAttribute("class", row_id);
-
-  for (let i = 0; i < values.length; i++){
-    let cell = row.insertCell(i);
-    let input = document.createElement("input");
-    input.setAttribute("type", "text");
-    input.setAttribute("class", row_id + " input" + i)
-    input.value = values[i];
-    cell.appendChild(input);
+  let index = 0;
+  if (values != null){
+    for (let i = 0; i < values.length; i++){
+      let cell = row.insertCell(i);
+      let input = document.createElement("input");
+      input.setAttribute("type", "text");
+      input.setAttribute("class", row_id + " input" + i)
+      input.value = values[i];
+      cell.appendChild(input);
+      index++;
+    }
+  }else{
+    for (let i = 0; i < heading_count; i++){
+      let cell = row.insertCell(i);
+      let input = document.createElement("input");
+      input.setAttribute("type", "text");
+      input.setAttribute("class", row_id + " input" + i)
+      cell.appendChild(input);
+      index++
+    }
   }
 
   let submitButton = document.createElement("button");
   submitButton.innerText = "ADD";
   submitButton.setAttribute("onclick", "addPRCRowButtonPress('" + row_id + "')")
   submitButton.setAttribute("class", row_id + " submit_button")
-  let submitCell = row.insertCell(values.length);
+  let submitCell = row.insertCell(index);
   submitCell.appendChild(submitButton);
 };
 
