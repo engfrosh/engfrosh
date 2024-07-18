@@ -120,6 +120,7 @@
     .inline {
         display:inline-grid;
         vertical-align: top;
+        position: relative;
     }
     .horizontal {
         display: inline grid;
@@ -407,15 +408,16 @@ function viewSwitch(){
                                     if (clueIndex == 1){
                                         if (curBranchSide.id == `${treeId}LeftSide`){
                                             curBranch.style.position = 'absolute';
-                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 118;
-                                            let leftOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().x - 150;
-                                            //let leftOffset = 100 * ((branchIndex/2)-1);
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 128;
+                                            //let leftOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().x - 150;
+                                            let leftWidth = maxHorzClues*100;
                                             curBranch.style.top = `${topOffset}px`;
-                                            curBranch.style.right = `${leftOffset}px`;
+                                            curBranch.style.width = `${leftWidth}px`;
+                                            curBranch.style.right = `0px`;
 
                                         } else if (curBranchSide.id === `${treeId}RightSide`){
                                             curBranch.style.position = 'absolute';
-                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 118;
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 128;
                                             curBranch.style.top = `${topOffset}px`;
                                         }
                                     }
