@@ -44,6 +44,24 @@ CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 
+@user_passes_test(lambda u: u.is_superuser)
+def generate_bus(request: HttpRequest) -> HttpResponse:
+    for team in Team.objects.all():
+        shifts = FacilShift.objects.filter(name=team.display_name + "-BusMorning")
+        if len(shifts) > 0:
+            shift = shifts.first()
+        else:
+            shift = FacilShift(name=team.display_name + "-BusMorning", desc="bus",
+                               flags="bus", type="wt", max_facils=0, administrative=True)
+            shift.save()
+        for signup in FacilShiftSignup.objects.filter(shift=shift):
+            signup.delete()
+        for user in team.group.user_set.all():
+            signup = FacilShiftSignup(shift=shift, user=user)
+            signup.save()
+    return HttpResponse("Created bus shifts")
+
+
 @permission_required("common_models.attendance_manage")
 def shift_checkin(request: HttpRequest, id: int) -> HttpResponse:
     shift = FacilShift.objects.filter(id=id).first()
@@ -54,20 +72,36 @@ def shift_checkin(request: HttpRequest, id: int) -> HttpResponse:
             return HttpResponse("You are not authorized to check in this shift1")
     if request.method == "GET":
         signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__last_name')
+        if shift.type == "wt":
+            signups = signups.select_related("user__details")
         return render(request, "shift_checkin.html", {"shift": shift, "signups": signups})
     elif request.method == "POST":
         signup_id = request.POST.get("signup", "")
         signup = FacilShiftSignup.objects.filter(id=signup_id).first()
         if signup is None:
             return HttpResponse("Invalid signup!")
-        switch = request.POST.get("switch", "")
-        if switch == "True":
-            signup.attendance = False
-        else:
-            signup.attendance = True
-        signup.save()
-        signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__last_name')
-        return render(request, "shift_checkin.html", {"shift": shift, "signups": signups})
+        action = request.POST["action"]
+        if action == "attendance":
+            if shift.type == "wt" and not signup.user.details.waiver_completed:
+                return HttpResponse("Incomplete waiver!")
+            switch = request.POST.get("switch", "")
+            if switch == "True":
+                signup.attendance = False
+            else:
+                signup.attendance = True
+            signup.save()
+            signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__last_name')
+            if shift.type == "wt":
+                signups = signups.select_related("user__details")
+            return render(request, "shift_checkin.html", {"shift": shift, "signups": signups})
+        elif action == "waiver":
+            details = signup.user.details
+            details.waiver_completed = True
+            details.save()
+            signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__last_name')
+            if shift.type == "wt":
+                signups = signups.select_related("user__details")
+            return render(request, "shift_checkin.html", {"shift": shift, "signups": signups})
 
 
 @permission_required("common_models.calendar_manage")
@@ -131,7 +165,8 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             if signups < shift.max_facils and u_signups == 0 and not shift.is_passed:
                 rshifts += [shift]
         my_shifts = []
-        for shift in FacilShiftSignup.objects.filter(user=request.user).order_by('shift__start'):
+        for shift in FacilShiftSignup.objects.filter(user=request.user, shift__administrative=False) \
+                                     .select_related().order_by('shift__start'):
             my_shifts += [shift.shift]
         return render(request, "facil_shift_signup.html",
                       {"shifts": rshifts, "my_shifts": my_shifts, "can_remove": can_remove})
@@ -271,16 +306,37 @@ def mailing_list(request: HttpRequest) -> HttpResponse:
         if not request.user.has_perm('common_models.shift_manage'):
             raise PermissionDenied()
         shift_id = int(request.POST["shift_id"])
-        shift = FacilShift.objects.filter(id=shift_id).first()
-        if shift.checkin_user is not None and shift.checkin_user != request.user and \
-           not request.user.has_perm("common_models.attendance_manage"):
-            raise PermissionDenied()
-        signups = list(FacilShiftSignup.objects.filter(shift=shift))
-        redir = ""
-        for signup in signups:
-            redir += "," + signup.user.email
-        redir = "mailto:" + redir[1:]
-        return HttpResponse('<meta http-equiv="refresh" content="0;url=' + redir + '" />')
+        action = request.POST["action"]
+        if action == "mail":
+            shift = FacilShift.objects.filter(id=shift_id).first()
+            if shift is None or (shift.checkin_user is not None and shift.checkin_user != request.user and
+               not request.user.has_perm("common_models.attendance_manage")):
+                raise PermissionDenied()
+            signups = list(FacilShiftSignup.objects.filter(shift=shift))
+            redir = ""
+            for signup in signups:
+                redir += "," + signup.user.email
+            redir = "mailto:" + redir[1:]
+            return HttpResponse('<meta http-equiv="refresh" content="0;url=' + redir + '" />')
+        elif action == "copy":
+            shift = FacilShift.objects.filter(id=shift_id).first()
+            if shift is None or not request.user.has_perm('common_models.shift_manage'):
+                raise PermissionDenied()
+            signups = FacilShiftSignup.objects.filter(shift=shift)
+            shift.pk = None  # Copy to new shift per
+            # https://stackoverflow.com/questions/4733609/how-do-i-clone-a-django-model-instance-object-and-save-it-to-the-database
+            shift.id = None
+            shift.name += "-copy"
+            shift.save()
+            for signup in signups:
+                if signup.attendance:
+                    new_signup = FacilShiftSignup(shift=shift, user=signup.user)
+                    new_signup.save()
+            if not request.user.has_perm("common_models.attendance_admin"):
+                shifts = list(FacilShift.objects.filter(checkin_user__in=[None, request.user]).order_by('start'))
+            else:
+                shifts = list(FacilShift.objects.order_by('start'))
+            return render(request, "create_mailing_list.html", {"shifts": shifts})
 
 
 @permission_required("common_models.report_manage")

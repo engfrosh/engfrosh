@@ -28,6 +28,7 @@
             <th class="px-2">Facil Count</th>
             {% if perms.common_models.shift_manage %}
             <th class="px-2">Send Email</th>
+            <th class="px-2">Copy Checked In</th>
             {% endif %}
             {% if perms.common_models.attendance_manage %}
             <th class="px-2">Check In</th>
@@ -49,7 +50,16 @@
                     <form method="POST">
                         {% csrf_token %}
                         <input type="hidden" name="shift_id" value="{{ shift.id }}">
-                        <input type="submit" value="Email Shift">
+                        <input type="hidden" name="action" value="mail">
+                        <input type="submit" class="bg-main dark:bg-main-night rounded-lg p-2 m-2" value="Email Shift">
+                    </form>
+                </td>
+                <td class="px-2">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="shift_id" value="{{ shift.id }}">
+                        <input type="hidden" name="action" value="copy">
+                        <input type="submit" class="bg-main dark:bg-main-night rounded-lg p-2 m-2" value="Copy">
                     </form>
                 </td>
                 {% endif %}
