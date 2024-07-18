@@ -21,7 +21,8 @@ def generate_tree(team: Team):
     orders = {}  # Cache to look up puzzle order by name without hitting db
     for branch in unlocked_branches:
         branch_dict = {}
-        branch_activities = activities.filter(puzzle__stream=branch).order_by('puzzle__order')
+        branch_activities = activities.filter(puzzle__stream=branch).order_by('puzzle__order') \
+                                      .select_related("puzzle", "verification_photo")
         if len(branch_activities) > 0:  # Populate puzzles that are before the first active puzzle
             # mostly useful for puzzles that open specific branch puzzles
             first_order = branch_activities[0].puzzle.order
