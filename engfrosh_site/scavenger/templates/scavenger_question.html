@@ -8,9 +8,6 @@
             {% if bypass %}
                 <h1 class="text-red-600 text-xl">Warning: Scav rule bypass is enabled!</h1>
             {% endif %}
-            {% if no_save %}
-                <h1 class="text-red-600 text-xl">Warning: Scav saving is disabled!</h1>
-            {% endif %}
             <div class="rounded-lg px-6 py-8 ring ring-slate-900 dark:ring-slate-400 shadow-xl max-w-5xl mx-auto text-center">
                 <h2>Puzzle: {{ puzzle.name }}</h2>
                 {% if puzzle.puzzle_text %}
