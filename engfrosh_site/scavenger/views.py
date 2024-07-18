@@ -89,6 +89,8 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
         return HttpResponse("You do not have access to this puzzle.")
 
     activity = puz.puzzle_activity_from_team(team)
+    if activity is None:
+        return HttpResponse("Unable to find this puzzle under your team!")
 
     if request.method == "GET":
 
