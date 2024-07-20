@@ -1530,7 +1530,7 @@ def edit_scavenger_puzzle(request: HttpRequest, id: int) -> HttpResponse:
         return HttpResponseNotAllowed(("GET", "POST"))
 
 
-@permission_required("common_models.change_puzzle", login_url='/accounts/login')
+@permission_required("common_models.manage_scav", login_url='/accounts/login')
 def approve_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
     """Page for approving verification images."""
 
