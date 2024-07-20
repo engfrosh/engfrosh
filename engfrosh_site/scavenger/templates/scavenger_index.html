@@ -145,7 +145,7 @@
 {% endblock js_functions %}
 {% block body %}
 <script>
-const tree = JSON.parse(atob("{{tree|safe}}"));
+var tree = JSON.parse(atob("{{tree|safe}}"));
 var old = false;
 var toggle = false;
 var slideIndex = 1;
@@ -331,6 +331,25 @@ function viewSwitch(){
                             }
                         }
 
+                        //Function to sort the tree
+                        function compareFn(a, b) {
+                            let aKeys = Object.keys(tree[a]);
+                            let bKeys = Object.keys(tree[b])
+                            if (tree[a][aKeys[0]][1] == "start"){
+                                return -1;
+                            }else if (tree[b][bKeys[0]][1] == "start") {
+                                return 1;
+                            }else if (Number(tree[a][aKeys[0]][1]) < Number(tree[b][bKeys[0]][1])) {
+                                return -1;
+                            } else if (Number(tree[a][aKeys[0]][1]) > Number(tree[b][bKeys[0]][1])) {
+                                return 1;
+                            }
+                            // a must be equal to b
+                            return 0;
+                        }
+                        
+                        
+                        tree = Object.keys(tree).sort(compareFn).reduce((r, k) => (r[k] = tree[k], r), {})
                         generateScavTree(tree);
 
                         function generateScavTree(tree) {
