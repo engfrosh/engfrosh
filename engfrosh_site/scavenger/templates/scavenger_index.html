@@ -145,7 +145,7 @@
 {% endblock js_functions %}
 {% block body %}
 <script>
-const tree = JSON.parse(atob("{{tree|safe}}"));
+var tree = JSON.parse(atob("{{tree|safe}}"));
 var old = false;
 var toggle = false;
 var slideIndex = 1;
