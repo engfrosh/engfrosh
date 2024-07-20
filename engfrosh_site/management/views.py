@@ -298,7 +298,8 @@ def mailing_list(request: HttpRequest) -> HttpResponse:
         raise PermissionDenied()
     if request.method == "GET":
         if not request.user.has_perm("common_models.attendance_admin"):
-            shifts = list(FacilShift.objects.filter(checkin_user__in=[None, request.user]).order_by('start'))
+            shifts = list(FacilShift.objects.filter(checkin_user=request.user).order_by('start'))
+            shifts += list(FacilShift.objects.filter(checkin_user=None).order_by('start'))
         else:
             shifts = list(FacilShift.objects.order_by('start'))
         return render(request, "create_mailing_list.html", {"shifts": shifts})
