@@ -38,7 +38,9 @@
                 <th class="px-2">Waiver Completed</th>
             {% endif %}
             <th class="px-2">Check In</th>
-            <th class="px-2">Complete Waiver</th>
+            {% if shift.type == "wt" %}
+                <th class="px-2">Complete Waiver</th>
+            {% endif %}
         </tr>
         {% for signup in signups %}
             <tr>
@@ -48,7 +50,7 @@
                 {% if shift.type == "wt" %}
                     <td class="px-2">{{ signup.user.details.waiver_completed }}</td>
                 {% endif %}
-                {% if not signup.user.details.waiver_completed %}
+                {% if not signup.user.details.waiver_completed and shift.type == "wt" %}
                 <td class="px-2" style="background-color: red;">Waiver Missing</td>
                 <td class="px-2">
                     <form method="POST">
