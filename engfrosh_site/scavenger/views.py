@@ -45,10 +45,8 @@ def index(request: HttpRequest) -> HttpResponse:
         return HttpResponse("Scavenger not currently enabled")
 
     bypass = request.user.has_perm('common_models.bypass_scav_rules')
-    no_save = request.user.has_perm('common_models.disable_scav_save')
 
     tree = base64.b64encode(bytes(json.dumps(generate_tree(team)), 'utf-8')).decode('utf-8')
-
     params = ""
     if set_team is not None:
         params = "?team=" + str(team.group.id)
@@ -57,7 +55,6 @@ def index(request: HttpRequest) -> HttpResponse:
         "team": team,
         "params": params,
         "bypass": bypass,
-        "no_save": no_save,
         "active_puzzles": team.active_puzzles,
         "verified_puzzles": team.verified_puzzles,
         "completed_puzzles_awaiting_verification": team.completed_puzzles_awaiting_verification,
@@ -84,7 +81,6 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
     except Puzzle.DoesNotExist:
         puz = None
     bypass = request.user.has_perm('common_models.bypass_scav_rules')
-    no_save = request.user.has_perm('common_models.disable_scav_save')
     if not (puz and puz.is_viewable_for_team(team)) and not bypass:
         return HttpResponse("You do not have access to this puzzle.")
 
@@ -100,7 +96,6 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
             "scavenger_enabled_for_team": team.scavenger_enabled,
             "guess": request.GET.get("answer", ""),
             "bypass": bypass,
-            "no_save": no_save,
             "requires_photo": puz.requires_verification_photo_by_team(team),
             "answers": len(puz.answers),
             "comp_answers": activity.completed_answers,
@@ -122,27 +117,19 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
         if not team.scavenger_enabled:
             return HttpResponseForbidden("Scavenger not currently enabled.")
         logger.info(f"Answer submitted by team {team} with answer: {req_dict['answer']} through the website")
-        if not no_save:
-            correct, stream_completed, next_puzzle, require_verification_photo = puz.check_team_guess(
-                team, req_dict["answer"], bypass)
-            if correct:
-                DiscordChannel.send_to_updates_channels(
-                    f"""{team.display_name} has submitted an answer for puzzle {puz.name} (order {puz.order})!""")
-            if require_verification_photo:
-                next_page = "verification_photo/"
-            elif next_puzzle:
-                next_page = "../" + next_puzzle.secret_id
-            else:
-                next_page = "../../stream_completed"
-            return JsonResponse({"correct": correct, "scavenger_stream_completed": stream_completed,
-                                "next": next_page})
+        correct, stream_completed, next_puzzle, require_verification_photo = puz.check_team_guess(
+            team, req_dict["answer"], bypass)
+        if correct:
+            DiscordChannel.send_to_updates_channels(
+                f"""{team.display_name} has submitted an answer for puzzle {puz.name} (order {puz.order})!""")
+        if require_verification_photo:
+            next_page = "verification_photo/"
+        elif next_puzzle:
+            next_page = "../" + next_puzzle.secret_id
         else:
-            if puz.answer.lower() == req_dict["answer"].lower():
-                return JsonResponse({"correct": True, "scavenger_stream_completed": None,
-                                    "next": "/scavenger/"})
-            else:
-                return JsonResponse({"correct": False, "scavenger_stream_completed": None,
-                                    "next": ""})
+            next_page = "../../stream_completed"
+        return JsonResponse({"correct": correct, "scavenger_stream_completed": stream_completed,
+                            "next": next_page})
     else:
         return HttpResponseNotAllowed(["GET", "POST"])
 

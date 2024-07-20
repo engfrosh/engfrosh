@@ -7,7 +7,7 @@ def generate_tree(team: Team):
     branch_lookahead = Setting.objects.get_or_create(id="Scav Branch Lookahead", defaults={"value": "1"})[0]
     branch_lookahead = int(branch_lookahead.value)
     fow_on_branches = Setting.objects.get_or_create(id="Fog Of War On Branches", defaults={"value": "True"})[0]
-    fow_on_branches = bool(fow_on_branches.value)
+    fow_on_branches = fow_on_branches.value is True
     result = {}
     streams = PuzzleStream.objects.filter(enabled=True)
     activities = TeamPuzzleActivity.objects.select_related()
@@ -21,7 +21,8 @@ def generate_tree(team: Team):
     orders = {}  # Cache to look up puzzle order by name without hitting db
     for branch in unlocked_branches:
         branch_dict = {}
-        branch_activities = activities.filter(puzzle__stream=branch).order_by('puzzle__order')
+        branch_activities = activities.filter(puzzle__stream=branch).order_by('puzzle__order') \
+                                      .select_related("puzzle", "verification_photo")
         if len(branch_activities) > 0:  # Populate puzzles that are before the first active puzzle
             # mostly useful for puzzles that open specific branch puzzles
             first_order = branch_activities[0].puzzle.order

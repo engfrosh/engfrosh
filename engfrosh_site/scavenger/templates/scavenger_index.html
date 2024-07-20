@@ -210,9 +210,6 @@ function viewSwitch(){
         {% if bypass %}
             <h1 class="text-red-600 text-xl">Warning: Scav rule bypass is enabled!</h1>
         {% endif %}
-        {% if no_save %}
-            <h1 class="text-red-600 text-xl">Warning: Scav saving is disabled!</h1>
-        {% endif %}
         {% if team.scavenger_finished %}
             <h1 class="text-5xl">Congratulation on Completing Scav!</h1>
         {% else %}
@@ -408,7 +405,7 @@ function viewSwitch(){
                                     if (clueIndex == 1){
                                         if (curBranchSide.id == `${treeId}LeftSide`){
                                             curBranch.style.position = 'absolute';
-                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 128;
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 200;
                                             //let leftOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().x - 150;
                                             let leftWidth = maxHorzClues*100;
                                             curBranch.style.top = `${topOffset}px`;
@@ -417,7 +414,7 @@ function viewSwitch(){
 
                                         } else if (curBranchSide.id === `${treeId}RightSide`){
                                             curBranch.style.position = 'absolute';
-                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 128;
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 200;
                                             curBranch.style.top = `${topOffset}px`;
                                         }
                                     }

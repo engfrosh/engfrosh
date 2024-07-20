@@ -21,30 +21,66 @@
 {% block active %}
     <h1 style="color: black; font-size: 30px;">Shift: {{ shift.name }}</h1>
     <div class="text-white p-6 bg-background rounded-lg shadow m-5 inline-block">
+    <script>
+    function btncallback(shift_id, shift_name, name, action){
+        var result = confirm("Are you sure you want to mark " + name + " " + action + " for shift " + shift_name);
+        if(result === true){
+            document.getElementById("shift-" + shift_id).submit();
+        }
+    }
+    </script>
     <table>
         <tr>
             <th class="px-2">First Name</th>
             <th class="px-2">Last Name</th>
             <th class="px-2">Present</th>
+            {% if shift.type == "wt" %}
+                <th class="px-2">Waiver Completed</th>
+            {% endif %}
             <th class="px-2">Check In</th>
+            <th class="px-2">Complete Waiver</th>
         </tr>
         {% for signup in signups %}
             <tr>
                 <td class="px-2">{{ signup.user.first_name }}</td>
                 <td class="px-2">{{ signup.user.last_name }}</td>
                 <td class="px-2">{{ signup.attendance }}</td>
+                {% if shift.type == "wt" %}
+                    <td class="px-2">{{ signup.user.details.waiver_completed }}</td>
+                {% endif %}
+                {% if not signup.user.details.waiver_completed %}
+                <td class="px-2" style="background-color: red;">Waiver Missing</td>
                 <td class="px-2">
                     <form method="POST">
                         {% csrf_token %}
                         <input type="hidden" name="signup" value="{{ signup.id }}">
+                        <input type="hidden" name="action" value="waiver">
+                        <input style="background-color: red;" type="submit" value="Mark Complete">
+                    </form>
+                </td>
+                {% else %}
+                <td class="px-2">
+                    <form method="POST" id="shift-{{ shift.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="signup" value="{{ signup.id }}">
                         <input type="hidden" name="switch" value="{{ signup.attendance }}">
+                        <input type="hidden" name="action" value="attendance">
+                        {% if shift.administrative %}
+                        {% if signup.attendance %}
+                            <button style="background-color: green;" type="button" onclick='btncallback({{ shift.id }}, "{{ shift.name }}", "{{ signup.user.first_name }} {{ signup.user.last_name }}", "absent")'>Mark Absent</button>
+                        {% else %}
+                            <button style="background-color: red;" type="button" onclick='btncallback({{ shift.id }}, "{{ shift.name }}", "{{ signup.user.first_name }} {{ signup.user.last_name }}", "present")'>Mark Present</button>
+                        {% endif %}
+                        {% else %}
                         {% if signup.attendance %}
                             <input style="background-color: green;" type="submit" value="Mark Absent">
                         {% else %}
                             <input style="background-color: red;" type="submit" value="Mark Present">
                         {% endif %}
+                        {% endif %}
                     </form>
                 </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </table>
