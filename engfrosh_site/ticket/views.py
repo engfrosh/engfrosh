@@ -24,7 +24,7 @@ def create_ticket(request: HttpRequest):
             ticket = Ticket(title=data['title'], body=data['body'], user=request.user)
             ticket.save()
             DiscordChannel.send_to_updates_channels(
-                f"""@here Ticket {ticket.id} has been created. """ +
+                f"""@&1234213434590236763 Ticket {ticket.id} has been created. """ +
                 f"""{request.build_absolute_uri("/tickets/view/"+str(ticket.id))}""")
             return redirect('view/'+str(ticket.id))
 
@@ -62,7 +62,7 @@ def create_comment(request: HttpRequest, id: int):
         ticket.create_comment(request.user, data['body'])
         if not request.user.is_staff:
             DiscordChannel.send_to_updates_channels(
-                f"""@here Ticket {ticket.id} has a new comment. """ +
+                f"""@&1234213434590236763 Ticket {ticket.id} has a new comment. """ +
                 f"""{request.build_absolute_uri("/tickets/view/"+str(ticket.id))}""")
         else:
             body = f"""Your ticket has new comments, view them at <a href='{request.build_absolute_uri("/tickets/view/"+str(ticket.id))}'>Here</a>"""  # noqa: E501
