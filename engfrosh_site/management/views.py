@@ -947,9 +947,9 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
         if not request.user.is_staff:
             team = Team.from_user(request.user)
             group = team.group
-            users = User.objects.select_related("discorduser").select_related("userdetails").filter(groups__in=[group]).order_by("username")  # noqa: E501
+            users = User.objects.select_related("discorduser").select_related("details").filter(groups__in=[group]).order_by("username")  # noqa: E501
         else:
-            users = User.objects.select_related("discorduser").select_related("userdetails").order_by("username")
+            users = User.objects.select_related("discorduser").select_related("details").order_by("username")
         # Handle Webpage requests
         # TODO add check that user doesn't yet have a discord account linked.
 
@@ -957,7 +957,7 @@ def get_discord_link(request: HttpRequest) -> HttpResponse:
         count = 0
         for usr in users:
             try:
-                d = usr.userdetails
+                d = usr.details
                 if d is None or not d.invite_email_sent:
                     email_sent = False
                 else:
