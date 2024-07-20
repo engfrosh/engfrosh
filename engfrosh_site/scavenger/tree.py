@@ -12,6 +12,7 @@ def generate_tree(team: Team):
     streams = PuzzleStream.objects.filter(enabled=True)
     activities = TeamPuzzleActivity.objects.select_related()
     activities = activities.filter(puzzle__stream__in=streams, puzzle__enabled=True, team=team)
+    activities = activities.order_by("puzzle_start_at")
     unlocked_branches = []
     for activity in activities:
         if activity.puzzle.stream not in unlocked_branches:
