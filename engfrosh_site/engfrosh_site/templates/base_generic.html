@@ -34,6 +34,9 @@
                 background-repeat: repeat-y;
                 background-size: 100vmax;
             }
+            main {
+                padding: 15px;
+            }
             input[type=text], textarea, input[type=number] {
                 color: black;
             }
@@ -55,6 +58,9 @@
             #calender {
                 padding:8px;
             }
+            h1 {
+                font-size: larger;
+            }
 
         </style>
     </head>
@@ -64,15 +70,15 @@
                 DEFAULT body
             {% endblock body %}
         </main>
+        {% block footer %}
         <footer class="h-fit bg-main dark:bg-main-night text-center w-full text-white">
-            {% block footer %}
-            {% endblock footer %}
             <p class="my-3">
                 Technical Support: <a href="mailto:websupport@engfrosh.com">websupport@engfrosh.com</a> | Other Questions: <a href="mailto:info@engfrosh.com">info@engfrosh.com</a>
                 |
                 <a href="{% url 'inclusivity_public' %}">Resources</a>
             </p>
         </footer>
+        {% endblock footer %}
         {% block page_js %}
         {% endblock page_js %}
     </body>
