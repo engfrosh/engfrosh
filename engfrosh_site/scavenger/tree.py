@@ -19,7 +19,7 @@ def generate_tree(team: Team):
         if activity.puzzle.stream not in unlocked_branches:
             remaining_branches += [activity.puzzle.stream]
     counter = 0
-    while counter < 100 and len(remaining_branches) > 0:
+    while counter < 10 and len(remaining_branches) > 0:
         branch = remaining_branches.pop(0)
         if branch.default:
             unlocked_branches += [branch]
