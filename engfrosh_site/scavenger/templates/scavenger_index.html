@@ -145,6 +145,9 @@
 {% endblock js_functions %}
 {% block body %}
 <script>
+window.onbeforeunload = function () {
+  window.scrollTo(0, 0);
+}
 var tree = JSON.parse(atob("{{tree|safe}}"));
 var old = false;
 var toggle = false;
