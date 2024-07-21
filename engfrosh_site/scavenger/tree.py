@@ -14,9 +14,35 @@ def generate_tree(team: Team):
     activities = activities.filter(puzzle__stream__in=streams, puzzle__enabled=True, team=team)
     activities = activities.order_by("puzzle_start_at")
     unlocked_branches = []
+    remaining_branches = []
     for activity in activities:
         if activity.puzzle.stream not in unlocked_branches:
-            unlocked_branches += [activity.puzzle.stream]
+            remaining_branches += [activity.puzzle.stream]
+    counter = 0
+    while counter < 10 and len(remaining_branches) > 0:
+        branch = remaining_branches.pop(0)
+        if branch.default:
+            unlocked_branches += [branch]
+            continue
+        puzzles = Puzzle.objects.filter(stream=branch, enabled=True)
+        openers = Puzzle.objects.filter(stream_puzzle__in=puzzles)
+        openers2 = Puzzle.objects.filter(stream_branch=branch)
+        ordered = True
+        for puzzle in openers:
+            if puzzle.stream not in unlocked_branches:
+                ordered = False
+                break
+        if ordered:
+            for puzzle in openers2:
+                if puzzle.stream not in unlocked_branches:
+                    ordered = False
+                    break
+        if not ordered:
+            remaining_branches += [branch]
+            counter += 1
+            continue
+        unlocked_branches += [branch]
+    print(counter, remaining_branches)
     pending_branches = []  # Branches that will be unlocked by an active puzzle
     pending_puzzles = []  # Puzzles that will be unlockedby an active puzzle on a new branch
     orders = {}  # Cache to look up puzzle order by name without hitting db
