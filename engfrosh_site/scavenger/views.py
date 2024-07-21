@@ -87,7 +87,8 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
     activity = puz.puzzle_activity_from_team(team)
     if activity is None:
         return HttpResponse("Unable to find this puzzle under your team!")
-
+    if puz.stream.locked:
+        return HttpResponse("This branch is locked out temporarily!")
     if request.method == "GET":
 
         context = {

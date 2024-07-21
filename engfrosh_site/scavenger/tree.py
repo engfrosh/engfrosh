@@ -22,6 +22,7 @@ def generate_tree(team: Team):
     orders = {}  # Cache to look up puzzle order by name without hitting db
     for branch in unlocked_branches:
         branch_dict = {}
+        locked = branch.locked
         branch_activities = activities.filter(puzzle__stream=branch).order_by('puzzle__order') \
                                       .select_related("puzzle", "verification_photo")
         if len(branch_activities) > 0:  # Populate puzzles that are before the first active puzzle
@@ -38,7 +39,10 @@ def generate_tree(team: Team):
             if activity.is_completed:
                 puzzle_arr += ["solved"]
             else:
-                puzzle_arr += ["active"]
+                if not locked:
+                    puzzle_arr += ["active"]
+                else:
+                    puzzle_arr += ["hidden"]
                 if puzzle.stream_branch is not None:
                     pending_branches += [puzzle.stream_branch]
                 if puzzle.stream_puzzle is not None:
@@ -112,14 +116,14 @@ def generate_tree(team: Team):
             result[puzzle.stream.name] = branch_dict
         else:
             old_dict = result[puzzle.stream.name]
-            if orders[old_dict[0][0]] > puzzle.order:
+            if orders[list(old_dict.keys())[0]] > puzzle.order:
                 branch_dict = {}
                 branch_dict[puzzle.name] = ["hidden", puzzle.puzzle_opener[0].name, ""]
                 for puzzle2 in puzzles_ahead:
                     branch_dict[puzzle2.name] = ["hidden", "", ""]
                 branch_dict.update(old_dict)
                 result[puzzle.stream.name] = branch_dict
-            elif orders[old_dict[-1][0]] < puzzle.order:
+            elif orders[list(old_dict.keys())[-1]] < puzzle.order:
                 branch_dict = old_dict
                 branch_dict[puzzle.name] = ["hidden", puzzle.puzzle_opener[0].name, ""]
                 for puzzle2 in puzzles_ahead:
