@@ -13,7 +13,7 @@
             <tr>
                 <th>{{ team.place }}</th>
                 <th>{{ team.name }}</th>
-                <th>{{ team.coin }}</th>
+                <th><a href="{% url 'set_skash' id=team.id %}">{{ team.coin }}</a></th>
             </tr>
         {% endfor %}
     </table>

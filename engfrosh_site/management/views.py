@@ -578,6 +578,23 @@ def announcements(request: HttpRequest) -> HttpResponse:
     return render(request, "announcements.html", context)
 
 
+@permission_required("common_models.change_team_coin")
+def set_skash(request: HttpRequest, id: int) -> HttpResponse:
+    if request.method == "GET":
+        team = Team.objects.filter(group_id=id).first()
+        form = forms.SkashForm(initial={'skash': team.coin_amount})
+
+        return render(request, "set_skash.html", {"team": team, "form": form})
+    elif request.method == "POST":
+        team = Team.objects.filter(group_id=id).first()
+        form = forms.SkashForm(request.POST)
+        if not form.is_valid():
+            return render(request, "set_skash.html", {"team": team, "form": form, "error": True})
+        team.coin_amount = form.cleaned_data['skash']
+        team.save()
+        return redirect("/teams/coin/")
+
+
 @permission_required("common_models.manage_scav")
 def free_hints(request: HttpRequest, id: int) -> HttpResponse:
     if request.method == "GET":

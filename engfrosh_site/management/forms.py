@@ -43,6 +43,10 @@ class HintForm(forms.Form):
     free_hints = forms.IntegerField(label="Free Hints")
 
 
+class SkashForm(forms.Form):
+    skash = forms.IntegerField(label="Skash")
+
+
 class PuzzleForm(forms.ModelForm):
     class Meta:
         model = Puzzle

@@ -97,6 +97,7 @@ def coin_standings(request: HttpRequest):
 
         d["name"] = team.display_name
         d["coin"] = team.coin_amount
+        d["id"] = team.group.id
 
         if d["coin"] == cur_coin:
             # If there is a tie
