@@ -585,8 +585,7 @@ def free_hints(request: HttpRequest, id: int) -> HttpResponse:
             return render(request, "free_hints.html", {"teams": Team.objects.all()})
         else:
             team = Team.objects.filter(group_id=id).first()
-            form = forms.HintForm()
-            form.free_hints = team.free_hints
+            form = forms.HintForm(initial={'free_hints': team.free_hints})
 
             return render(request, "free_hint.html", {"team": team, "form": form})
     elif request.method == "POST":
