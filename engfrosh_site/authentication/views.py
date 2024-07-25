@@ -154,9 +154,12 @@ def logout_page(request: HttpRequest) -> HttpResponse:
 def login_page(request: HttpRequest):
     """Login page."""
     redirect_location = request.GET.get("redirect")
-    registration_enabled = BooleanSetting.objects.get(id="REGISTRATION_ENABLED").value
-    discord_enabled = BooleanSetting.objects.get(id="DISCORD_ENABLED").value
-    discord_enabled &= BooleanSetting.objects.get(id="DISCORD_LOGIN_ENABLED").value
+
+    registration_enabled = BooleanSetting.objects.get_or_create(id="REGISTRATION_ENABLED",
+                                                                defaults={"value": False})[0].value
+    discord_enabled = BooleanSetting.objects.get_or_create(id="DISCORD_ENABLED", defaults={"value": True})[0].value
+    discord_enabled &= BooleanSetting.objects.get_or_create(id="DISCORD_LOGIN_ENABLED",
+                                                            defaults={"value": True})[0].value
     if not redirect_location:
         redirect_location = request.GET.get("next")
 
