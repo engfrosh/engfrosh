@@ -98,7 +98,7 @@ if development:
     ]
 else:
     ALLOWED_HOSTS = [
-        "*.engfrosh.com"
+        ".engfrosh.com"
     ]
 
 CSRF_TRUSTED_ORIGINS = [
