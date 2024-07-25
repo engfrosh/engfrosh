@@ -45,7 +45,15 @@
         <br/>
         <a href="{% url 'username_login' %}" type="button" class="login_button admin">Login as Staff</a> 
         <br/>
-        <a href="{% url 'discord_login' %}" type="button" class="login_button discord">Login with Discord</a>
+        {% if discord %}
+            <a href="{% url 'discord_login' %}" type="button" class="login_button discord">Login with Discord</a>
+            <br/>
+        {% endif %}
+        {% if register %}
+            <a href="{% url 'register' %}" type="button" class="login_button register">Register</a>
+            <br/>
+        {% endif %}
+        
     </div>
 </body>
 

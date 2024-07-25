@@ -14,7 +14,8 @@ import credentials
 import uuid
 
 from common_models.models import DiscordUser
-from common_models.models import DiscordRole, Setting, UserDetails
+from common_models.models import DiscordRole, Setting, UserDetails, Team
+from common_models.models import TeamPuzzleActivity, PuzzleStream
 from .discord_auth import DiscordUserAlreadyExistsError, register
 from pyaccord.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  # noqa E402
 
@@ -26,8 +27,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils.encoding import uri_to_iri
 from django.conf import settings
-from django.contrib.auth.models import User
-
+from django.contrib.auth.models import User, Group
+import string
+import random
 import msal
 
 logger = logging.getLogger("Authentication.Views")
@@ -78,13 +80,37 @@ def msTokenCallback(request: HttpRequest):
     user = User.objects.filter(email=email).first()
     if user is None:
         logger.error("Email is not registered: " + email)
-        return HttpResponse("Email is not registered!" +
-                            "You must sign in with the email you supplied on your application!")
+        registration_enabled = Setting.objects.get_or_create(id="registration_enabled",
+                                                             defaults={"value": "False"})[0].value == "True"
+        if not registration_enabled:
+            return HttpResponse("Email is not registered!" +
+                                "You must sign in with the email you supplied on your application!")
+        else:
+            username = email.split("@")[0] + "-" + \
+                       "".join(random.choice(string.ascii_letters + string.digits) for i in range(8))
+            user = User.objects.create_user(username, email)  # type: ignore
+            user.save()
+            group = Group(name=username)
+            group.save()
+            group.user_set.add(user)
+            group.save()
+            team = Team(group=group, display_name=username)
+            team.save()
+            streams = PuzzleStream.objects.filter(enabled=True, default=True)
+            for s in streams:
+                puz = s.first_enabled_puzzle
+                try:
+                    pa = TeamPuzzleActivity(team=team, puzzle=puz)
+                    pa.save()
+                except Exception:
+                    pass
     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
     discord = DiscordUser.objects.filter(user=user).first()
     details = UserDetails.objects.filter(user=user).first()
-    if discord is None and details is not None and details.discord_allowed:
+    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
+                                                    defaults={"value": "True"})[0].value == "True"
+    if discord_enabled and discord is None and details is not None and details.discord_allowed:
         return redirect("link_discord")
     home_url = Setting.objects.get_or_create(id="home_url",
                                              defaults={"value": "https://time.engfrosh.com/user/"})[0].value
@@ -101,6 +127,10 @@ def home_page(request: HttpRequest):
 def link_discord(request: HttpRequest):
     """Page to prompt user to link their discord account to their user account."""
     skip_confirmation = request.GET.get("skip-confirm")
+    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
+                                                    defaults={"value": "True"})[0].value == "True"
+    if not discord_enabled:
+        return HttpResponse("Discord is not enabled")
     details = UserDetails.objects.filter(user=request.user).first()
     if details is None or not details.discord_allowed:
         home_url = Setting.objects.get_or_create(id="home_url",
@@ -125,6 +155,10 @@ def logout_page(request: HttpRequest) -> HttpResponse:
 def login_page(request: HttpRequest):
     """Login page."""
     redirect_location = request.GET.get("redirect")
+    registration_enabled = Setting.objects.get_or_create(id="registration_enabled",
+                                                         defaults={"value": "False"})[0].value == "True"
+    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
+                                                    defaults={"value": "True"})[0].value == "True"
     if not redirect_location:
         redirect_location = request.GET.get("next")
 
@@ -147,6 +181,8 @@ def login_page(request: HttpRequest):
             return redirect("home")
 
     context = {}
+    context["register"] = registration_enabled
+    context["discord"] = discord_enabled
     if redirect_location:
         context["encoded_redirect"] = redirect_location
 
@@ -160,7 +196,10 @@ def discord_login(request: HttpRequest):
                                              defaults={"value": "https://server.engfrosh.com"})[0].value
     callback_url = base_url + "/accounts/login/discord/callback/"
     # TODO add redirect for the next page here
-
+    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
+                                                    defaults={"value": "True"})[0].value == "True"
+    if not discord_enabled:
+        return HttpResponse("Discord is not enabled")
     return redirect(
         build_oauth_authorize_url(
             credentials.DISCORD_CLIENT_ID, callback_url, settings.DEFAULT_DISCORD_SCOPE, prompt="none"))
@@ -190,6 +229,11 @@ def discord_login_callback(request: HttpRequest):
     """
 
     oauth_code = request.GET.get("code")
+
+    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
+                                                    defaults={"value": "True"})[0].value == "True"
+    if not discord_enabled:
+        return HttpResponse("Discord is not enabled")
 
     if request.GET.get("error", "") == "access_denied":
         return redirect("login_failed")
@@ -232,7 +276,14 @@ def discord_register(request):
     base_url = Setting.objects.get_or_create(id="callback_base",
                                              defaults={"value": "https://server.engfrosh.com"})[0].value
     callback_url = base_url + "/accounts/register/discord/callback/"
-
+    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
+                                                    defaults={"value": "True"})[0].value == "True"
+    if not discord_enabled:
+        return HttpResponse("Discord is not enabled")
+    registration_enabled = Setting.objects.get_or_create(id="registration_enabled",
+                                                         defaults={"value": "False"})[0].value == "True"
+    if request.user.is_anonymous is None and not registration_enabled:
+        return HttpResponse("You are not logged in!")
     return redirect(
         build_oauth_authorize_url(
             credentials.DISCORD_CLIENT_ID, callback_url, scope=settings.DEFAULT_DISCORD_SCOPE,
@@ -248,12 +299,18 @@ def discord_register_callback(request: HttpRequest):
     """
     oauth_code = request.GET.get("code")
     # oauth_state = request.GET.get("state")
-
+    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
+                                                    defaults={"value": "True"})[0].value == "True"
+    if not discord_enabled:
+        return HttpResponse("Discord is not enabled")
     user = request.user
     if user.is_anonymous:
         user = None
         # If disallowing registration to pre registered people.
-        return HttpResponse("Registration failed, please contact websupport@engfrosh.com")
+        registration_enabled = Setting.objects.get_or_create(id="registration_enabled",
+                                                             defaults={"value": "False"})[0].value == "True"
+        if not registration_enabled:
+            return HttpResponse("Registration failed, please contact websupport@engfrosh.com")
 
     base_url = Setting.objects.get_or_create(id="callback_base",
                                              defaults={"value": "https://server.engfrosh.com"})[0].value

@@ -7,10 +7,10 @@ import os
 from typing import Union
 
 import credentials
-from common_models.models import DiscordUser, MagicLink
+from common_models.models import DiscordUser, MagicLink, Team, PuzzleStream, TeamPuzzleActivity
 
 from django.contrib.auth.backends import BaseBackend
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import logout
 
 from pyaccord.DiscordUserAPI import DiscordUserAPI
@@ -60,6 +60,20 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
                 username = s + "".join(random.choice(string.ascii_letters + string.digits) for i in range(8))
             user = User.objects.create_user(username, email, password)  # type: ignore
             user.save()
+            group = Group(name=username)
+            group.save()
+            group.user_set.add(user)
+            group.save()
+            team = Team(group=group, display_name=username)
+            team.save()
+            streams = PuzzleStream.objects.filter(enabled=True, default=True)
+            for s in streams:
+                puz = s.first_enabled_puzzle
+                try:
+                    pa = TeamPuzzleActivity(team=team, puzzle=puz)
+                    pa.save()
+                except Exception:
+                    pass
 
         # Create new DiscordUser
         discord_user = DiscordUser(
