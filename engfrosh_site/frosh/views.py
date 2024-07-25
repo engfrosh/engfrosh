@@ -4,7 +4,7 @@ from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required, permission_required
 import random
 from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, Announcement, UserDetails
-from common_models.models import InclusivityPage, FroshRole, DiscordUser, Setting, FAQPage
+from common_models.models import InclusivityPage, FroshRole, DiscordUser, Setting, FAQPage, BooleanSetting
 import datetime
 from management import forms
 from schedule.models import Event, CalendarRelation
@@ -188,14 +188,16 @@ def user_home(request: HttpRequest) -> HttpResponse:
             details.charter.path
         except:  # noqa: E722
             upload_charter = True
-
+    link_discord = True if discord is None and details is not None and details.discord_allowed else False
+    discord_enabled = BooleanSetting.objects.get(id="DISCORD_ENABLED").value
+    link_discord &= discord_enabled
     context = {
         "scavenger_enabled": team.scavenger_enabled if team else False,
         "trade_up_enabled": team.trade_up_enabled if team else False,
         "scavenger_disabled": not team.scavenger_enabled if team else False,
         "trade_up_disabled": not team.trade_up_enabled if team else False,
         "details": details,
-        "link_discord": True if discord is None and details is not None and details.discord_allowed else False,
+        "link_discord": link_discord,
         "rand": rand,
         "calendars": calendars,
         "upload_charter": upload_charter,
