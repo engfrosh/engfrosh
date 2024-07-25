@@ -10,7 +10,7 @@ import credentials
 from common_models.models import DiscordUser, MagicLink, Team, PuzzleStream, TeamPuzzleActivity
 
 from django.contrib.auth.backends import BaseBackend
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
 from django.contrib.auth import logout
 
 from pyaccord.DiscordUserAPI import DiscordUserAPI
@@ -63,6 +63,8 @@ def register(access_token=None, expires_in=None, refresh_token=None, user=None, 
             group = Group(name=username)
             group.save()
             group.user_set.add(user)
+            perm = Permission.objects.filter(codename="guess_scavenger_puzzle").first()
+            group.permissions.add(perm)
             group.save()
             team = Team(group=group, display_name=username)
             team.save()
