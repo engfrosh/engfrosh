@@ -7,10 +7,15 @@
     Set Skash
 {% endblock top_title %}
 {% block active %}
+<div class="bg-background p-2 shadow">
     <h1>Skash for {{ team.display_name }}</h1>
     <form class="my-5" method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Change" class="text-blue-600">
+        <br>
+        <input type="submit" name="Add Skash" value="Add Skash" class="bg-main dark:bg-main-night rounded-lg p-1">
+        <input type="submit" name="Remove Skash" value="Remove Skash" class="bg-main dark:bg-main-night rounded-lg p-1">
+        <input type="submit" name="Set as value" value="Set as value" class="bg-main dark:bg-main-night rounded-lg p-1">
     </form>
+</div>
 {% endblock active %}

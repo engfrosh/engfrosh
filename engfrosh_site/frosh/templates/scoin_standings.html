@@ -1,20 +1,25 @@
-{% extends "base_generic.html" %}
+{% extends 'base_manage_subpage.html' %}
 {% block page_title %}
     Coin Standings
 {% endblock page_title %}
-{% block body %}
-    <table>
-        <tr>
-            <th>Place</th>
-            <th>Team</th>
-            <th>Amount</th>
-        </tr>
-        {% for team in teams %}
-            <tr>
-                <th>{{ team.place }}</th>
-                <th>{{ team.name }}</th>
-                <th><a href="{% url 'set_skash' id=team.id %}">{{ team.coin }}</a></th>
+{% block top_title %}
+    Skash Standings
+{% endblock top_title %}
+{% block active %}
+    <div class="bg-background p-2 shadow">
+        <table>
+            <tr >
+                <th>Place</th>
+                <th>Team</th>
+                <th>Amount</th>
             </tr>
-        {% endfor %}
-    </table>
-{% endblock body %}
+            {% for team in teams %}
+                <tr>
+                    <th>{{ team.place }}</th>
+                    <th>{{ team.name }}</th>
+                    <th class="p-2"><a class="bg-main dark:bg-main-night rounded-lg p-1" href="{% url 'set_skash' id=team.id %}">{{ team.coin }}</a></th>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock active %}

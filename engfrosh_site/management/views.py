@@ -590,7 +590,14 @@ def set_skash(request: HttpRequest, id: int) -> HttpResponse:
         form = forms.SkashForm(request.POST)
         if not form.is_valid():
             return render(request, "set_skash.html", {"team": team, "form": form, "error": True})
-        team.coin_amount = form.cleaned_data['skash']
+        
+        if 'Add Skash' in request.POST:
+            team.coin_amount += form.cleaned_data['skash']
+        elif 'Remove Skash' in request.POST: 
+            team.coin_amount -= form.cleaned_data['skash']
+        elif 'Set as value' in request.POST:
+            team.coin_amount = form.cleaned_data['skash']
+        
         team.save()
         return redirect("/teams/coin/")
 
