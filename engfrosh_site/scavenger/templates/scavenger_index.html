@@ -210,6 +210,7 @@ function viewSwitch(){
         <button onclick="viewSwitch();">Change View</button><br>
         Here is your team:
         {{ team.display_name }}<br>
+        Free hints: {{ team.free_hints }}<br>
         {% if bypass %}
             <h1 class="text-red-600 text-xl">Warning: Scav rule bypass is enabled!</h1>
         {% endif %}
