@@ -189,7 +189,7 @@ def user_home(request: HttpRequest) -> HttpResponse:
         except:  # noqa: E722
             upload_charter = True
     link_discord = True if discord is None and details is not None and details.discord_allowed else False
-    discord_enabled = BooleanSetting.objects.get(id="DISCORD_ENABLED").value
+    discord_enabled = BooleanSetting.objects.get_or_create(id="DISCORD_ENABLED")[0].value
     link_discord &= discord_enabled
     context = {
         "scavenger_enabled": team.scavenger_enabled if team else False,
