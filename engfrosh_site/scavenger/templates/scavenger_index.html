@@ -428,7 +428,7 @@ function viewSwitch(){
                                     if (clueIndex == 1){
                                         if (curBranchSide.id == `${treeId}LeftSide`){
                                             curBranch.style.position = 'absolute';
-                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 215;
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 238;
                                             let leftWidth = maxHorzClues*100;
                                             curBranch.style.top = `${topOffset}px`;
                                             curBranch.style.width = `${leftWidth}px`;
@@ -438,7 +438,7 @@ function viewSwitch(){
                                             }
                                         } else if (curBranchSide.id === `${treeId}RightSide`){
                                             curBranch.style.position = 'absolute';
-                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 215;
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 238;
                                             curBranch.style.top = `${topOffset}px`;
                                             if (branch == "SIDE-QUEST"){
                                                 curBranch.style.left = `100px`;
