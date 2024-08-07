@@ -79,6 +79,8 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
         puz: Union[Puzzle, None] = Puzzle.objects.get(secret_id=slug)
     except Puzzle.DoesNotExist:
         puz = None
+    if puz is None:
+        return HttpResponse("You do not have access to this puzzle.")
     bypass = request.user.has_perm('common_models.bypass_scav_rules')
     if not (puz and puz.is_viewable_for_team(team)) and not bypass:
         return HttpResponse("You do not have access to this puzzle.")
