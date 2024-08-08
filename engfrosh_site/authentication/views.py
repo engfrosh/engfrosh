@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 import credentials
 import uuid
 
-from common_models.models import DiscordUser
+from common_models.models import DiscordUser, BooleanSetting
 from common_models.models import DiscordRole, Setting, UserDetails, Team
 from common_models.models import TeamPuzzleActivity, PuzzleStream
 from .discord_auth import DiscordUserAlreadyExistsError, register
@@ -80,8 +80,7 @@ def msTokenCallback(request: HttpRequest):
     user = User.objects.filter(email=email).first()
     if user is None:
         logger.error("Email is not registered: " + email)
-        registration_enabled = Setting.objects.get_or_create(id="registration_enabled",
-                                                             defaults={"value": "False"})[0].value == "True"
+        registration_enabled = BooleanSetting.objects.get(id="REGISTRATION_ENABLED").value
         if not registration_enabled:
             return HttpResponse("Email is not registered!" +
                                 "You must sign in with the email you supplied on your application!")
@@ -110,8 +109,7 @@ def msTokenCallback(request: HttpRequest):
 
     discord = DiscordUser.objects.filter(user=user).first()
     details = UserDetails.objects.filter(user=user).first()
-    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
-                                                    defaults={"value": "True"})[0].value == "True"
+    discord_enabled = BooleanSetting.objects.get(id="DISCORD_ENABLED").value
     if discord_enabled and discord is None and details is not None and details.discord_allowed:
         return redirect("link_discord")
     home_url = Setting.objects.get_or_create(id="home_url",
@@ -129,8 +127,7 @@ def home_page(request: HttpRequest):
 def link_discord(request: HttpRequest):
     """Page to prompt user to link their discord account to their user account."""
     skip_confirmation = request.GET.get("skip-confirm")
-    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
-                                                    defaults={"value": "True"})[0].value == "True"
+    discord_enabled = BooleanSetting.objects.get(id="DISCORD_ENABLED").value
     if not discord_enabled:
         return HttpResponse("Discord is not enabled")
     details = UserDetails.objects.filter(user=request.user).first()
@@ -157,10 +154,12 @@ def logout_page(request: HttpRequest) -> HttpResponse:
 def login_page(request: HttpRequest):
     """Login page."""
     redirect_location = request.GET.get("redirect")
-    registration_enabled = Setting.objects.get_or_create(id="registration_enabled",
-                                                         defaults={"value": "False"})[0].value == "True"
-    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
-                                                    defaults={"value": "True"})[0].value == "True"
+
+    registration_enabled = BooleanSetting.objects.get_or_create(id="REGISTRATION_ENABLED",
+                                                                defaults={"value": False})[0].value
+    discord_enabled = BooleanSetting.objects.get_or_create(id="DISCORD_ENABLED", defaults={"value": True})[0].value
+    discord_enabled &= BooleanSetting.objects.get_or_create(id="DISCORD_LOGIN_ENABLED",
+                                                            defaults={"value": True})[0].value
     if not redirect_location:
         redirect_location = request.GET.get("next")
 
@@ -198,8 +197,8 @@ def discord_login(request: HttpRequest):
                                              defaults={"value": "https://server.engfrosh.com"})[0].value
     callback_url = base_url + "/accounts/login/discord/callback/"
     # TODO add redirect for the next page here
-    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
-                                                    defaults={"value": "True"})[0].value == "True"
+    discord_enabled = BooleanSetting.objects.get(id="DISCORD_ENABLED").value
+    discord_enabled &= BooleanSetting.objects.get(id="DISCORD_LOGIN_ENABLED").value
     if not discord_enabled:
         return HttpResponse("Discord is not enabled")
     return redirect(
@@ -232,8 +231,8 @@ def discord_login_callback(request: HttpRequest):
 
     oauth_code = request.GET.get("code")
 
-    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
-                                                    defaults={"value": "True"})[0].value == "True"
+    discord_enabled = BooleanSetting.objects.get(id="DISCORD_ENABLED").value
+    discord_enabled &= BooleanSetting.objects.get(id="DISCORD_LOGIN_ENABLED").value
     if not discord_enabled:
         return HttpResponse("Discord is not enabled")
 
@@ -278,12 +277,10 @@ def discord_register(request):
     base_url = Setting.objects.get_or_create(id="callback_base",
                                              defaults={"value": "https://server.engfrosh.com"})[0].value
     callback_url = base_url + "/accounts/register/discord/callback/"
-    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
-                                                    defaults={"value": "True"})[0].value == "True"
+    discord_enabled = BooleanSetting.objects.get(id="DISCORD_ENABLED").value
     if not discord_enabled:
         return HttpResponse("Discord is not enabled")
-    registration_enabled = Setting.objects.get_or_create(id="registration_enabled",
-                                                         defaults={"value": "False"})[0].value == "True"
+    registration_enabled = BooleanSetting.objects.get(id="REGISTRATION_ENABLED").value
     if request.user.is_anonymous is None and not registration_enabled:
         return HttpResponse("You are not logged in!")
     return redirect(
@@ -301,16 +298,14 @@ def discord_register_callback(request: HttpRequest):
     """
     oauth_code = request.GET.get("code")
     # oauth_state = request.GET.get("state")
-    discord_enabled = Setting.objects.get_or_create(id="discord_enabled",
-                                                    defaults={"value": "True"})[0].value == "True"
+    discord_enabled = BooleanSetting.objects.get(id="DISCORD_ENABLED").value
     if not discord_enabled:
         return HttpResponse("Discord is not enabled")
     user = request.user
     if user.is_anonymous:
         user = None
         # If disallowing registration to pre registered people.
-        registration_enabled = Setting.objects.get_or_create(id="registration_enabled",
-                                                             defaults={"value": "False"})[0].value == "True"
+        registration_enabled = BooleanSetting.objects.get(id="REGISTRATION_ENABLED").value
         if not registration_enabled:
             return HttpResponse("Registration failed, please contact websupport@engfrosh.com")
 

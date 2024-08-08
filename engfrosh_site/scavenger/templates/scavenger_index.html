@@ -210,6 +210,7 @@ function viewSwitch(){
         <button onclick="viewSwitch();">Change View</button><br>
         Here is your team:
         {{ team.display_name }}<br>
+        Free hints: {{ team.free_hints }}<br>
         {% if bypass %}
             <h1 class="text-red-600 text-xl">Warning: Scav rule bypass is enabled!</h1>
         {% endif %}
@@ -427,7 +428,7 @@ function viewSwitch(){
                                     if (clueIndex == 1){
                                         if (curBranchSide.id == `${treeId}LeftSide`){
                                             curBranch.style.position = 'absolute';
-                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 215;
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 238;
                                             let leftWidth = maxHorzClues*100;
                                             curBranch.style.top = `${topOffset}px`;
                                             curBranch.style.width = `${leftWidth}px`;
@@ -437,7 +438,7 @@ function viewSwitch(){
                                             }
                                         } else if (curBranchSide.id === `${treeId}RightSide`){
                                             curBranch.style.position = 'absolute';
-                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 215;
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 238;
                                             curBranch.style.top = `${topOffset}px`;
                                             if (branch == "SIDE-QUEST"){
                                                 curBranch.style.left = `100px`;

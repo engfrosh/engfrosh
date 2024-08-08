@@ -8,7 +8,6 @@ from django.contrib.auth.decorators import login_required, permission_required
 
 import logging
 import json
-from django.urls import reverse
 import base64
 from scavenger.tree import generate_tree
 
@@ -80,6 +79,8 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
         puz: Union[Puzzle, None] = Puzzle.objects.get(secret_id=slug)
     except Puzzle.DoesNotExist:
         puz = None
+    if puz is None:
+        return HttpResponse("You do not have access to this puzzle.")
     bypass = request.user.has_perm('common_models.bypass_scav_rules')
     if not (puz and puz.is_viewable_for_team(team)) and not bypass:
         return HttpResponse("You do not have access to this puzzle.")
@@ -177,8 +178,8 @@ def puzzle_photo_verification_view(request: HttpRequest, slug: str) -> HttpRespo
 
             DiscordChannel.send_to_updates_channels(
                 f"""<@&1234213434590236763> {team.display_name} has uploaded a photo for {puz.name}""" +
-                """that needs verification.""" +
-                f""""\n{request.build_absolute_uri(reverse("approve_scavenger_puzzles"))}""")
+                """ that needs verification.""" +
+                f"""\n{request.build_absolute_uri(photo.photo.url)}""")
             ScavConsumer.notify_trigger(photo.photo.url, team.display_name, photo.id)
             return HttpResponse()
 
