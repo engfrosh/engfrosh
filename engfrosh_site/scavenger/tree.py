@@ -113,6 +113,16 @@ def generate_tree(team: Team):
             puzzle_arr = ["hidden", "", ""]
             branch_dict[puzzle.name] = puzzle_arr
         result[branch.name] = branch_dict
+    for act in TeamPuzzleActivity.objects.exclude(completed_at=0) \
+                                 .filter(verification_photo__approved=True).select_related("puzzle"):
+        if act.puzzle.stream_branch is not None:
+            branch = act.puzzle.stream_branch
+            if branch not in pending_branches:
+                pending_branches.append(branch)
+        if act.puzzle.stream_puzzle is not None:
+            puz = act.puzzle.stream_puzzle
+            if puz not in pending_puzzles:
+                pending_puzzles.append(puz)
     for branch in pending_branches:
         branch_dict = {}
         puzzles = Puzzle.objects.filter(enabled=True, stream=branch).order_by('order')[:branch_lookahead]
