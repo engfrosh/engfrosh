@@ -5,7 +5,7 @@
 {% block body %}
     <p id="status">Connected</p>
     <script>
-        let socket = new WebSocket('ws://'+window.location.host+"/ws/check_in/");
+        let socket = new WebSocket('wss://'+window.location.host+"/ws/check_in/");
         socket.onopen = function(e){
             alert("Connected to server!");
             document.getElementById("status").innerHTML = "Connected";
