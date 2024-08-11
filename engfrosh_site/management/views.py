@@ -682,16 +682,15 @@ def edit_event(request: HttpRequest, id: int) -> HttpResponse:
         event = Event.objects.filter(id=id).first()
         form = forms.EventForm()
         if id != 0:
-            form.start = event.start
-            form.end = event.end
-            form.title = event.title
-            form.description = event.description
-            form.calendar = event.calendar.name
-            form.color_event = event.color_event
+            form = forms.EventForm(initial={'start': event.start, 'end': event.end,
+                                            'title': event.title, 'description': event.description,
+                                            'calendar': event.calendar.name, 'color_event': event.color_event})
         else:
-            form.start = datetime.datetime.now()
-            form.end = datetime.datetime.now()
-            form.title = ""
+            form = forms.EventForm(initial={'start': datetime.datetime.now(), 'end': datetime.datetime.now(),
+                                            'title': "", 'description': "", 'calendar': "", 'color_event': ""})
+            form.fields['start'].value = datetime.datetime.now()
+            form.fields['end'].value = datetime.datetime.now()
+            form.fields['title'].value = ""
             form.description = ""
             form.calendar = ""
             form.color_event = ""
