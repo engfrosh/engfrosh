@@ -112,6 +112,12 @@ def show_calendars(request: HttpRequest) -> HttpResponse:
 
 @permission_required("common_models.calendar_manage")
 def edit_calendar(request: HttpRequest, id: int) -> HttpResponse:
+    if request.method == "POST":
+        form = forms.CalendarForm(request.POST)
+        if not form.is_valid():
+            return render(request, "edit_calendar.html", {"form": form})
+        form.save()
+        return render(request, "edit_calendar.html", {"form": form})
     if id == 0:
         form = forms.CalendarForm()
     else:
@@ -141,6 +147,12 @@ def lock_scav(request: HttpRequest) -> HttpResponse:
 
 @permission_required("common_models.shift_manage")
 def shift_edit(request: HttpRequest, id: int) -> HttpResponse:
+    if request.method == "POST":
+        form = forms.ShiftForm(request.POST)
+        if not form.is_valid():
+            return render(request, "edit_shift.html", {"form": form})
+        form.save()
+        return render(request, "edit_shift.html", {"form": form})
     if id == 0:
         form = forms.ShiftForm()
     else:

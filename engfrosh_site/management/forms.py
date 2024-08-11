@@ -54,12 +54,12 @@ class PuzzleForm(forms.ModelForm):
 
 
 class EventForm(forms.Form):
-    start = forms.DateTimeField(label="Start")
-    end = forms.DateTimeField(label="End")
+    start = forms.DateTimeField(label="Start", widget=forms.TextInput(attrs={"type": "datetime-local"}))
+    end = forms.DateTimeField(label="End", widget=forms.TextInput(attrs={"type": "datetime-local"}))
     title = forms.CharField(label="Title", max_length=400)
     description = forms.CharField(label="Description", max_length=4000, widget=forms.Textarea)
     calendar = forms.MultipleChoiceField(label="Calendar", choices=[("Default", "Default")])
-    color_event = forms.CharField(label="Colour", max_length=50)
+    color_event = forms.CharField(label="Colour", max_length=50, widget=forms.TextInput(attrs={"type": "color"}))
 
     def __init__(self, *args, calendar_choices=None):
         super().__init__(*args)
@@ -70,9 +70,3 @@ class EventForm(forms.Form):
             name = c['name']
             choices += [(name, name)]
         self.fields['calendar'].choices = choices
-
-    class Meta:
-        widgets = {
-            "start": forms.DateTimeInput(),
-            "end": forms.DateTimeInput(),
-        }

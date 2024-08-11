@@ -7,6 +7,11 @@
     Edit Event
 {% endblock top_title %}
 {% block active %}
+    <style>
+        input{
+            color: black;
+        }
+    </style>
     <form class="my-5" method="POST">
         {% csrf_token %}
         {{ form.as_p }}
