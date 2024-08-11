@@ -114,7 +114,7 @@ def generate_tree(team: Team):
             branch_dict[puzzle.name] = puzzle_arr
         result[branch.name] = branch_dict
     for act in TeamPuzzleActivity.objects.exclude(puzzle_completed_at=0) \
-                                 .filter(verification_photo__approved=True).select_related("puzzle"):
+                                 .filter(verification_photo__approved=False).select_related("puzzle"):
         if act.puzzle.stream_branch is not None:
             branch = act.puzzle.stream_branch
             if branch not in pending_branches:
