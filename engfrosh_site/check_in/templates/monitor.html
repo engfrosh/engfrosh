@@ -21,7 +21,7 @@
         socket.onmessage = function(e){
             var data = JSON.parse(e.data)
             var table = document.getElementById("data");
-            var row = table.insertRow(0);
+            var row = table.insertRow(1);
             row.insertCell(0).innerHTML = data['location'];
             row.insertCell(1).innerHTML = data['name'];
             row.insertCell(2).innerHTML = data['size'];

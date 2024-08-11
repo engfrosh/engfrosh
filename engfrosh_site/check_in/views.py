@@ -89,7 +89,6 @@ def check_in_view(request: HttpRequest, id: int) -> HttpResponse:
         team = "None"
     else:
         team = team.name
-
     CheckInConsumer.notify_trigger(location, size, team, user.name)
 
     user.save()
