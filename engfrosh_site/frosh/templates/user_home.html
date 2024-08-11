@@ -82,7 +82,7 @@
             <br><p>To link your frosh calendar with a calendar app import the calendar from the following URL: <a href={% url "ics_api" uid=details.int_frosh_id %}>https://server.engfrosh.com{% url "ics_api" uid=details.int_frosh_id %}</a></p>
             {% endif %}
             <br>
-            <select id="filter">
+            <select id="filter" multiple>
                 <option value="all">All</option>
                 {% for calendar in calendars %}
                 <option value={{calendar.slug}}>{{calendar.name}}</option>
@@ -139,8 +139,16 @@
                         }
                     },
                     eventDidMount: function(arg) {
-                        let val = filter.value;
-                        if(!(val == arg.event.extendedProps.calendar || val == "all")){
+                        var result = [];
+                        var options = filter && filter.options;
+                        var opt;
+                        for (var i=0, iLen=options.length; i<iLen; i++) {
+                            opt = options[i];
+                            if (opt.selected) {
+                                result.push(opt.value);
+                            }
+                        }
+                        if(!(result.includes(arg.event.extendedProps.calendar) || result.includes("all"))){
                             arg.event.remove();
                         }
                     },
