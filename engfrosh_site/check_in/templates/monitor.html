@@ -5,7 +5,7 @@
 {% block body %}
     <p id="status">Connected</p>
     <script>
-        let socket = new WebSocket('wss://'+window.location.host+"/ws/check_in/");
+        let socket = new WebSocket('ws://'+window.location.host+"/ws/check_in/");
         socket.onopen = function(e){
             alert("Connected to server!");
             document.getElementById("status").innerHTML = "Connected";
@@ -19,8 +19,22 @@
             document.getElementById("status").innerHTML = "Error";
         }
         socket.onmessage = function(e){
-            data = JSON.parse(e.data)
-            alert("Location: "+data['location']+". Size: "+data['size']+". Team: "+data['team'])
+            var data = JSON.parse(e.data)
+            var table = document.getElementById("data");
+            var row = table.insertRow(0);
+            row.insertCell(0).innerHTML = data['location'];
+            row.insertCell(1).innerHTML = data['name'];
+            row.insertCell(2).innerHTML = data['size'];
+            row.insertCell(3).innerHTML = data['team'];
+            alert("Location: "+data['location']+". Name: " + data['name'] + ". Size: "+data['size']+". Team: "+data['team'])
         }
     </script>
+    <table id="data">
+        <tr>
+            <th>Location</th>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Team</th>
+        </tr>
+    </table>
 {% endblock body %}

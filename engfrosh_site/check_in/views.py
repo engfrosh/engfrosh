@@ -90,7 +90,7 @@ def check_in_view(request: HttpRequest, id: int) -> HttpResponse:
     else:
         team = team.name
 
-    CheckInConsumer.notify_trigger(location, size, team)
+    CheckInConsumer.notify_trigger(location, size, team, user.name)
 
     user.save()
     return render(request, "check_in.html", {'form': CheckInForm(), 'data': [user]})

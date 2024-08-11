@@ -29,10 +29,12 @@ class CheckInConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'location': event['location'],
             'size': event['size'],
-            'team': event['team']
+            'team': event['team'],
+            'name': event['name']
         }))
 
-    def notify_trigger(location: str, size: str, team: str) -> None:
+    def notify_trigger(location: str, size: str, team: str, name: str) -> None:
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)('default', {'type': 'send_notification',
-                                                            'location': location, 'size': size, 'team': team})
+                                                            'location': location, 'size': size,
+                                                            'team': team, 'name': name})
