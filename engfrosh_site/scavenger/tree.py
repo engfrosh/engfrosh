@@ -117,7 +117,7 @@ def generate_tree(team: Team):
                                  .filter(verification_photo__approved=False).select_related("puzzle"):
         if act.puzzle.stream_branch is not None:
             branch = act.puzzle.stream_branch
-            if branch not in pending_branches:
+            if branch not in pending_branches and branch not in branch_dict.keys():
                 pending_branches.append(branch)
         if act.puzzle.stream_puzzle is not None:
             puz = act.puzzle.stream_puzzle
