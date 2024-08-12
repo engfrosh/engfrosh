@@ -1,0 +1,65 @@
+{% extends 'base_generic.html' %}
+{% block page_title %}
+    Frosh List
+{% endblock page_title %}
+{% block body %}
+<a class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
+           href="{% url 'user_home' %}">Back</a>
+
+    <style>
+        td, th{
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+    </style>
+    <div class="p-6">
+        <div class="space-y-4 mt-4 text-center">
+            <div class="bg-background shadow rounded-lg px-6 py-8 shadow-xl max-w-5xl mx-auto m-4">
+                <form>
+                    {% csrf_token %}
+                    <label for="name">Name: </label>
+                    <input type="text" id="name" name="name">
+                    <input type="submit" value="Search">
+                </form>
+                <select id="filter">
+                    <option value="all">All</option>
+                    {% for team in teams %}
+                    <option value="{{team}}">{{team}}</option>
+                    {% endfor %}
+                </select>
+                <script>
+                    var filter = document.getElementById("filter");
+                    filter.addEventListener('change', function() {
+                        var elems = document.querySelectorAll("tr");
+                        for (var i = 0; i < elems.length; i++){
+                            var elem = elems[i];
+                            if (filter.value == "all"){
+                                elem.style.visibility = "visible";
+                            }else{
+                                if (elem.classList.contains("team-"+filter.value) || elem.classList.contains("header")){
+                                    elem.style.visibility = "visible";
+                                }else{
+                                    elem.style.visibility = "hidden";
+                                }
+                            }
+                        }
+                    });
+                </script>
+                <p style="color: red;">{{error}}</p>
+                <table>
+                    <tr class="header">
+                        <th>Name</th>
+                        <th>Team</th>
+                        <th>Checked In</th>
+                    </tr>
+                {% for user in data %}
+                    <tr class="team-{{user.team}}">
+                        <td>{{user.name}}</td>
+                        <td>{{user.team}}</td>
+                        <td>{{user.checked_in}}</td>
+                    </tr>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock body %}

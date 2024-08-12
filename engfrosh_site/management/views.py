@@ -44,6 +44,23 @@ CURRENT_DIRECTORY = os.path.dirname(__file__)
 PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 
 
+@permission_required("common_models.frosh_list")
+def frosh_list(request: HttpRequest) -> HttpResponse:
+    if request.GET.get('name', None) is not None:
+        name = request.GET['name']
+        if name.isnumeric():
+            results = UserDetails.objects.filter(user=int(name))
+        else:
+            results = UserDetails.objects.filter(name__icontains=name)
+        team = request.user.details.team
+        if team is None:
+            team = "All"
+        teams = Team.objects.all()
+        return render(request, "frosh_list.html", {'data': results, 'team': team, 'teams': teams})
+    else:
+        return render(request, "frosh_list.html")
+
+
 @user_passes_test(lambda u: u.is_superuser)
 def generate_bus(request: HttpRequest) -> HttpResponse:
     for team in Team.objects.all():

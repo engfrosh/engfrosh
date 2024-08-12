@@ -45,4 +45,5 @@ urlpatterns = [
     path('shift_checkin/<int:id>', views.shift_checkin, name="shift_checkin"),
     path('gen_bus', views.generate_bus, name="gen_bus"),
     path('set_skash/<int:id>', views.set_skash, name="set_skash"),
+    path('frosh_list', views.frosh_list, name="frosh_list"),
 ]
