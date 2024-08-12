@@ -64,9 +64,9 @@
                 <a href="{% url 'manage_discord_nicks' %}"
                 class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Unlink Discord Users</a>
                 {% endif %}
-                {% if perms.common_models.check_in %}
-                <a href="{% url 'check-in-index' %}"
-                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Check In</a>
+                {% if perms.common_models.frosh_list %}
+                <a href="{% url 'frosh_list' %}"
+                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Frosh List</a>
                 {% endif %}
             </div>
             <br>
