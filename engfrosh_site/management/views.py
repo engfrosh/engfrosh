@@ -923,6 +923,19 @@ def bulk_add_prc(request: HttpRequest) -> HttpResponse:
                     continue
                 signup = FacilShiftSignup(user=user, shift=shift)
                 signup.save()
+            calendar = Calendar.objects.filter(name=user.username).first()
+            if calendar is not None:
+                calendar.delete()
+            calendar = Calendar(name=user.username, slug=user.username)
+            calendar.save()
+            calendar.create_relation(user)
+
+            signups = list(FacilShiftSignup.objects.filter(user=user))
+            for signup in signups:
+                shift = signup.shift
+                event = Event(start=shift.start, end=shift.end, title=shift.name,
+                              description=shift.desc, calendar=calendar)
+                event.save()
         details.save()
 
         return JsonResponse({"user_id": user.id, "username": user.username})  # type: ignore
