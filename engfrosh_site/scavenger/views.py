@@ -1,9 +1,10 @@
+from django.utils import timezone
 from typing import Union
 from django.http import HttpRequest, HttpResponse
 from django.http.response import HttpResponseNotAllowed, HttpResponseBadRequest, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render
 from scavenger.consumers import ScavConsumer
-from common_models.models import DiscordChannel, Puzzle, Team, VerificationPhoto, QRCode
+from common_models.models import DiscordChannel, Puzzle, Team, VerificationPhoto, QRCode, LockoutPeriod
 from django.contrib.auth.decorators import login_required, permission_required
 
 import logging
@@ -90,6 +91,10 @@ def puzzle_view(request: HttpRequest, slug: str) -> HttpResponse:
         return HttpResponse("Unable to find this puzzle under your team!")
     if puz.stream.locked:
         return HttpResponse("This branch is locked out temporarily!")
+    now = timezone.now()
+    for period in LockoutPeriod.objects.filter(branch=puz.stream):
+        if period.start <= now and period.end >= now:
+            return HttpResponse("This branch is locked out temporarily!")
     if request.method == "GET":
 
         context = {

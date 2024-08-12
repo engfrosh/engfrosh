@@ -1,4 +1,5 @@
-from common_models.models import Puzzle, PuzzleStream, Team, TeamPuzzleActivity, Setting
+from django.utils import timezone
+from common_models.models import Puzzle, PuzzleStream, Team, TeamPuzzleActivity, Setting, LockoutPeriod
 
 
 def generate_tree(team: Team):
@@ -49,6 +50,11 @@ def generate_tree(team: Team):
     for branch in unlocked_branches:
         branch_dict = {}
         locked = branch.locked
+        now = timezone.now()
+        for period in LockoutPeriod.objects.filter(branch=branch):
+            if period.start <= now and period.end >= now:
+                locked = True
+                break
         branch_activities = activities.filter(puzzle__stream=branch).order_by('puzzle__order') \
                                       .select_related("puzzle", "verification_photo")
         if len(branch_activities) > 0:  # Populate puzzles that are before the first active puzzle
