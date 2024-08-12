@@ -34,12 +34,12 @@
                         for (var i = 0; i < elems.length; i++){
                             var elem = elems[i];
                             if (filter.value == "all"){
-                                elem.style.visibility = "visible";
+                                elem.style.display = "block";
                             }else{
                                 if (elem.classList.contains("team-"+filter.value) || elem.classList.contains("header")){
-                                    elem.style.visibility = "visible";
+                                    elem.style.display = "block";
                                 }else{
-                                    elem.style.visibility = "hidden";
+                                    elem.style.display = "none";
                                 }
                             }
                         }
