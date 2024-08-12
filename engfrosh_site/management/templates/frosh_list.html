@@ -24,7 +24,7 @@
                 <select id="filter">
                     <option value="all">All</option>
                     {% for team in teams %}
-                    <option value="{{team}}">{{team}}</option>
+                    <option value="{{team.discord_name}}">{{team}}</option>
                     {% endfor %}
                 </select>
                 <script>
@@ -53,7 +53,7 @@
                         <th>Checked In</th>
                     </tr>
                 {% for user in data %}
-                    <tr class="team-{{user.team}}">
+                    <tr class="team-{{user.team.discord_name}}">
                         <td>{{user.name}}</td>
                         <td>{{user.team}}</td>
                         <td>{{user.checked_in}}</td>
