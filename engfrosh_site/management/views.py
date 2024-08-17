@@ -195,8 +195,13 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             if signups < shift.max_facils and u_signups == 0 and not shift.is_passed:
                 rshifts += [shift]
         my_shifts = []
-        for shift in FacilShiftSignup.objects.filter(user=request.user, shift__administrative=False) \
-                                     .select_related().order_by('shift__start'):
+        if not request.user.is_staff:
+            my_shifts_i = FacilShiftSignup.objects.filter(user=request.user, shift__administrative=False) \
+                                          .select_related().order_by('shift__start')
+        else:
+            my_shifts_i = FacilShiftSignup.objects.filter(user=request.user) \
+                                          .select_related().order_by('shift__start')
+        for shift in my_shifts_i:
             my_shifts += [shift.shift]
         return render(request, "facil_shift_signup.html",
                       {"shifts": rshifts, "my_shifts": my_shifts, "can_remove": can_remove})
@@ -238,13 +243,6 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                               {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
             signup = FacilShiftSignup(user=request.user, shift=shift)
             signup.save()
-            calendar = Calendar.objects.filter(name=request.user.username).first()
-            if calendar is None:
-                calendar = Calendar(name=request.user.username, slug=request.user.username)
-                calendar.save()
-                calendar.create_relation(request.user)
-            event = Event(start=shift.start, end=shift.end, title=shift.name, description=shift.desc, calendar=calendar)
-            event.save()
             shifts = list(FacilShift.objects.filter(administrative=False).order_by('start').all())
             rshifts = []
             for shift in shifts:
@@ -292,20 +290,6 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                 return render(request, "facil_shift_signup.html",
                               {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
             signup.delete()
-            user = request.user
-            calendar = Calendar.objects.filter(name=user.username).first()
-            if calendar is not None:
-                calendar.delete()
-            calendar = Calendar(name=user.username, slug=user.username)
-            calendar.save()
-            calendar.create_relation(user)
-
-            signups = list(FacilShiftSignup.objects.filter(user=user))
-            for signup in signups:
-                shift = signup.shift
-                event = Event(start=shift.start, end=shift.end, title=shift.name,
-                              description=shift.desc, calendar=calendar)
-                event.save()
             my_shifts = []
             for shift in FacilShiftSignup.objects.filter(user=request.user).order_by('shift__start'):
                 my_shifts += [shift.shift]
@@ -485,43 +469,10 @@ def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
             shift_id = int(request.POST["shift"])
             if shift_id != -1:
                 signup = FacilShiftSignup.objects.filter(shift__pk=shift_id, user__pk=id).first()
-                shift = signup.shift
                 signup.delete()
-
-            user = User.objects.filter(id=id).first()
-            calendar = Calendar.objects.filter(name=user.username).first()
-            if calendar is not None:
-                calendar.delete()
-            calendar = Calendar(name=user.username, slug=user.username)
-            calendar.save()
-            calendar.create_relation(user)
-
-            signups = list(FacilShiftSignup.objects.filter(user__pk=id))
-            for signup in signups:
-                shift = signup.shift
-                event = Event(start=shift.start, end=shift.end, title=shift.name,
-                              description=shift.desc, calendar=calendar)
-                event.save()
 
             shifts = list(FacilShiftSignup.objects.filter(user__pk=id))
             return render(request, "shift_manage.html", {"shifts": shifts})
-        else:
-            for user in User.objects.all():
-                calendar = Calendar.objects.filter(name=user.username).first()
-                if calendar is not None:
-                    calendar.delete()
-                calendar = Calendar(name=user.username, slug=user.username)
-                calendar.save()
-                calendar.create_relation(user)
-
-                signups = list(FacilShiftSignup.objects.filter(user=user))
-                for signup in signups:
-                    shift = signup.shift
-                    event = Event(start=shift.start, end=shift.end, title=shift.name,
-                                  description=shift.desc, calendar=calendar)
-                    event.save()
-            users = list(User.objects.all())
-            return render(request, "shift_manage_lookup.html", {"users": users})
 
 
 @permission_required("common_models.shift_manage")
@@ -923,19 +874,6 @@ def bulk_add_prc(request: HttpRequest) -> HttpResponse:
                     continue
                 signup = FacilShiftSignup(user=user, shift=shift)
                 signup.save()
-            calendar = Calendar.objects.filter(name=user.username).first()
-            if calendar is not None:
-                calendar.delete()
-            calendar = Calendar(name=user.username, slug=user.username)
-            calendar.save()
-            calendar.create_relation(user)
-
-            signups = list(FacilShiftSignup.objects.filter(user=user))
-            for signup in signups:
-                shift = signup.shift
-                event = Event(start=shift.start, end=shift.end, title=shift.name,
-                              description=shift.desc, calendar=calendar)
-                event.save()
         details.save()
 
         return JsonResponse({"user_id": user.id, "username": user.username})  # type: ignore

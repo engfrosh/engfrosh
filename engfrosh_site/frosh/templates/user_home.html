@@ -84,6 +84,10 @@
             <br>
             <select id="filter" multiple>
                 <option value="all">All</option>
+                <option value="shifts">My Shifts</option>
+                {% if perms.common_models.shift_manage %}
+                <option value="allshifts">All Shifts</option>
+                {% endif %}
                 {% for calendar in calendars %}
                 <option value={{calendar.slug}}>{{calendar.name}}</option>
                 {% endfor %}

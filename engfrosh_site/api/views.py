@@ -2,7 +2,7 @@ from rest_framework import permissions, authentication, status
 from rest_framework.views import APIView
 from .serializers import VerificationPhotoSerializer
 from rest_framework.response import Response
-from common_models.models import VerificationPhoto, UserDetails
+from common_models.models import VerificationPhoto, UserDetails, FacilShiftSignup, FacilShift
 from datetime import datetime
 from schedule.models import CalendarRelation
 from django.urls import reverse
@@ -18,6 +18,50 @@ import logging
 logger = logging.getLogger("api.views")
 
 
+def get_events(user):
+    calendars = set()
+    for group in user.groups.all():
+        try:
+            ct = ContentType.objects.get_for_model(group)
+            relations = CalendarRelation.objects.filter(content_type=ct, object_id=group.id)
+            for relation in relations:
+                calendars.update({relation.calendar})
+        except Exception as e:
+            logger.error(e)
+            continue
+    try:
+        ct = ContentType.objects.get_for_model(user)
+        relations = CalendarRelation.objects.filter(content_type=ct, object_id=user.id)
+        for relation in relations:
+            calendars.update({relation.calendar})
+    except Exception:
+        pass
+    result = []
+    for calendar in calendars:
+        # create flat list of events from each calendar
+        for event in calendar.events.all():
+            e = {"name": event.title, "start": event.start, "end": event.end,
+                 "desc": event.description, "created_at": event.created_on,
+                 "updated_at": event.updated_on, "creator": str(event.creator),
+                 "id": event.id, "colour": event.color_event, "calendar": event.calendar.slug}
+            result.append(e)
+    for s in FacilShiftSignup.objects.select_related('shift').filter(user=user):
+        shift = s.shift
+        # start=shift.start, end=shift.end, title=shift.name, description=shift.desc
+        e = {"name": shift.name, "start": shift.start, "end": shift.end, "desc": shift.desc,
+             "created_at": None, "updated_at": None, "creator": None, "id": "shift", "colour": "blue",
+             "calendar": "shifts"}
+        result.append(e)
+    if user.has_perm("common_models.shift_manage"):
+        for shift in FacilShift.objects.all():
+            # start=shift.start, end=shift.end, title=shift.name, description=shift.desc
+            e = {"name": shift.name, "start": shift.start, "end": shift.end, "desc": shift.desc,
+                 "created_at": None, "updated_at": None, "creator": None, "id": "allshift", "colour": "green",
+                 "calendar": "allshifts"}
+            result.append(e)
+    return result
+
+
 class ICSAPI(APIView):
     renderer_classes = [renderer.PassthroughRenderer, rest_framework.renderers.JSONRenderer]
 
@@ -27,42 +71,15 @@ class ICSAPI(APIView):
         if details is None:
             return Response("Invalid request", status=status.HTTP_400_BAD_REQUEST)
         cal = ics.Calendar()
-        calendars = set()
-        user = details.user
-        for group in user.groups.all():
-            try:
-                ct = ContentType.objects.get_for_model(group)
-                relations = CalendarRelation.objects.filter(content_type=ct, object_id=group.id)
-                for relation in relations:
-                    calendars.update({relation.calendar})
-            except Exception as e:
-                logger.error(e)
-                continue
-        try:
-            ct = ContentType.objects.get_for_model(user)
-            relations = CalendarRelation.objects.filter(content_type=ct, object_id=user.id)
-            for relation in relations:
-                calendars.update({relation.calendar})
-        except Exception:
-            pass
-        # This is ripped right from the django-scheduler code
-        # https://github.com/llazzaro/django-scheduler/blob/8aa6f877f17e5b05f17d7c39e93d8e73625b0a65/schedule/views.py#L357
-        event_list = []
-        # relations = schedule.models.EventRelation.objects.get_events_for_object(user)
-        # for e in relations:
-        #     event_list += [e.event]
-        for calendar in calendars:
-            # create flat list of events from each calendar
-            for event in calendar.events.all():
-                event_list += [event]
+        event_list = get_events(details.user)
         for event in event_list:
             e = Event()
-            e.name = event.title
-            e.begin = event.start
-            e.end = event.end
-            e.description = event.description
-            e.created = event.created_on
-            e.last_modified = event.updated_on
+            e.name = event['name']
+            e.begin = event['start']
+            e.end = event['end']
+            e.description = event['desc']
+            e.created = event['created_at']
+            e.last_modified = event['updated_at']
             cal.events.add(e)
         data = cal.serialize()
         resp = Response(data, content_type="text/calendar")
@@ -116,53 +133,39 @@ class CalendarAPI(APIView):
         end = datetime.strptime(end, "%Y-%m-%dT%H:%M:%S%z")
         start_time = start
         end_time = end
-        calendars = set()
-        for group in user.groups.all():
-            try:
-                ct = ContentType.objects.get_for_model(group)
-                relations = CalendarRelation.objects.filter(content_type=ct, object_id=group.id)
-                for relation in relations:
-                    calendars.update({relation.calendar})
-            except Exception as e:
-                logger.error(e)
-                continue
-        try:
-            ct = ContentType.objects.get_for_model(user)
-            relations = CalendarRelation.objects.filter(content_type=ct, object_id=user.id)
-            for relation in relations:
-                calendars.update({relation.calendar})
-        except Exception:
-            pass
-        # This is ripped right from the django-scheduler code
-        # https://github.com/llazzaro/django-scheduler/blob/8aa6f877f17e5b05f17d7c39e93d8e73625b0a65/schedule/views.py#L357
         response_data = []
-        event_list = []
-        # relations = schedule.models.EventRelation.objects.get_events_for_object(user)
-        # for e in relations:
-        #     event_list += [e.event]
-        for calendar in calendars:
-            # create flat list of events from each calendar
-            for event in calendar.events.all():
-                if event.start <= end_time and (event.end_recurring_period is None or event.end_recurring_period > start_time):  # noqa: E501
-                    event_list += [event]
+        event_list = get_events(user)
+        """
+                {"name": event.title, "start": event.start, "end": event.end,
+                 "desc": event.description, "created_at": event.created_on,
+                 "updated_at": event.updated_on, "creator": str(event.creator),
+                 "id": event.id, "colour": event.color_event, "calendar": event.calendar.slug}
+        """
         for event in event_list:
-            url = ""
-            if request.user.has_perm("auth.change_user"):
-                url = reverse("edit_event", args=[event.id])
-            else:
-                url = reverse("view_event", args=[event.id])
-            response_data.append(
-                {
-                    "id": event.id,
-                    "title": event.title,
-                    "start": event.start,
-                    "end": event.end,
-                    "existed": True,
-                    "event_id": event.id,
-                    "color": event.color_event,
-                    "description": event.description,
-                    "creator": str(event.creator),
-                    "calendar": event.calendar.slug,
-                    "url": url
-                })
+            if event['start'] <= end_time and event['start'] >= start_time:
+                url = ""
+                if event['id'] != "shift" and event['id'] != "allshift":
+                    if request.user.has_perm("auth.change_user"):
+                        url = reverse("edit_event", args=[event['id']])
+                    else:
+                        url = reverse("view_event", args=[event['id']])
+                else:
+                    if event['id'] == "shift":
+                        url = reverse("facil_shifts")
+                    else:
+                        url = reverse("mailing_list")
+                response_data.append(
+                    {
+                        "id": event['id'],
+                        "title": event['name'],
+                        "start": event['start'],
+                        "end": event['end'],
+                        "existed": True,
+                        "event_id": event['id'],
+                        "color": event['colour'],
+                        "description": event['desc'],
+                        "creator": event['creator'],
+                        "calendar": event['calendar'],
+                        "url": url
+                    })
         return Response(response_data)

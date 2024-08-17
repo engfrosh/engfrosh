@@ -48,7 +48,7 @@
             <td class="px-2">{{ shift.max_facils }}</td>
             <td class="px-2">{{ shift.flags }}</td>
             <td class="px-2">
-                {% if can_remove and not shift.is_cutoff %}
+                {% if can_remove and not shift.is_cutoff and not shift.administrative %}
                 <form method="POST" id="shift-rem-{{ shift.id }}">
                     {% csrf_token %}
                     <input type="hidden" name="shift_id" value="{{ shift.id }}">
