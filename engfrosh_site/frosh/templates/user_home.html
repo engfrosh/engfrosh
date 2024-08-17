@@ -154,6 +154,10 @@
                         }
                         if(!(result.includes(arg.event.extendedProps.calendar) || result.includes("all"))){
                             arg.event.remove();
+                        }else{
+                            if(!result.include("allshifts") && arg.event.extendedProps.calendar == "allshifts"){
+                                arg.event.remove();
+                            }
                         }
                     },
                 });
