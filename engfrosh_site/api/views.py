@@ -142,7 +142,8 @@ class CalendarAPI(APIView):
                  "id": event.id, "colour": event.color_event, "calendar": event.calendar.slug}
         """
         for event in event_list:
-            if event['start'] <= end_time and event['start'] >= start_time:
+            if event['start'] is None or event['end'] is None or \
+               event['start'] <= end_time and event['start'] >= start_time:
                 url = ""
                 if event['id'] != "shift" and event['id'] != "allshift":
                     if request.user.has_perm("auth.change_user"):
