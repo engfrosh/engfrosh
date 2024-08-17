@@ -21,11 +21,14 @@ def faq_page(request: HttpRequest, id: int):
         groups = list(request.user.groups.all())
         groups += [None]
         pages = FAQPage.objects.filter(restricted__in=groups)
+        pages |= FAQPage.objects.filter(restricted=None)
         return render(request, "faq_pages.html", {"pages": pages})
     else:
         groups = list(request.user.groups.all())
         groups += [None]
         page = FAQPage.objects.filter(id=id, restricted__in=groups).first()
+        if page is None:
+            page = FAQPage.objects.filter(id=id, restricted=None).first()
         if page is None:
             return HttpResponse("FAQ not found!", status=404)
         return render(request, "faq_page.html", {"page": page})
