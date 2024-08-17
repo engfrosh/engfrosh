@@ -73,6 +73,8 @@ class ICSAPI(APIView):
         cal = ics.Calendar()
         event_list = get_events(details.user)
         for event in event_list:
+            if event['calendar'] == "allshifts":
+                continue
             e = Event()
             e.name = event['name']
             e.begin = event['start']
