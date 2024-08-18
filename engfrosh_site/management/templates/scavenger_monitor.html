@@ -3,11 +3,28 @@
     Approval Monitor
 {% endblock page_title %}
 {% block body %}
+    <style>
+        img{
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
     <p id="status">Disconnected</p>
     <div id="approval">
         <h1>Approvals</h1>
+        {% for puzzle_activity in puzzle_activities_awaiting_verification %}
+            <div id="approval-{{ puzzle_activity.verification_photo.id }}" class="px-3 text-center">
+                <h3>{{ puzzle_activity.team.display_name }}</h3>
+                <img style="width: 300px; height: 300px;" src="{{ puzzle_activity.verification_photo.photo.url }}">
+                <button id="btn-{{ puzzle_activity.verification_photo.id }}" onclick="buttonPress({{ puzzle_activity.verification_photo.id }});">Approve</button>
+            </div>
+        {% endfor %}
     </div>
     <script>
+        function buttonPress(id){
+            approvePhotoButtonPress(id);
+            document.getElementById("approval-" + id).remove()
+        }
         let socket = new WebSocket('wss://'+window.location.host+"/ws/scav/approval");
         socket.onopen = function(e){
             document.getElementById("status").innerHTML = "Connected";

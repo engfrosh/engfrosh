@@ -899,7 +899,10 @@ def scavenger_scoreboard(request: HttpRequest) -> HttpResponse:
 
 @permission_required("common_models.manage_scav", login_url='/accounts/login')
 def scavenger_monitor(request: HttpRequest) -> HttpResponse:
-    return render(request, "scavenger_monitor.html")
+    context = {"puzzle_activities_awaiting_verification": list(
+            filter(TeamPuzzleActivity._is_awaiting_verification,
+                   TeamPuzzleActivity.objects.exclude(puzzle_completed_at=None)))}
+    return render(request, "scavenger_monitor.html", context)
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -1538,15 +1541,7 @@ def edit_scavenger_puzzle(request: HttpRequest, id: int) -> HttpResponse:
 def approve_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
     """Page for approving verification images."""
 
-    if request.method == "GET":
-
-        context = {"puzzle_activities_awaiting_verification": list(
-            filter(TeamPuzzleActivity._is_awaiting_verification,
-                   TeamPuzzleActivity.objects.exclude(puzzle_completed_at=None)))}
-
-        return render(request, "approve_scavenger_puzzles.html", context)
-
-    elif request.method == "POST":
+    if request.method == "POST":
 
         if request.content_type != "application/json":
             return HttpResponseBadRequest("Invalid / missing content type.")
@@ -1575,7 +1570,7 @@ def approve_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
                 return HttpResponseBadRequest("Invalid command.")
 
     else:
-        return HttpResponseNotAllowed(("GET", "POST"))
+        return HttpResponseNotAllowed(("POST",))
 
 
 @permission_required("common_models.view_team")
