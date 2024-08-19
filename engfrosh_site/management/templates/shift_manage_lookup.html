@@ -8,10 +8,6 @@
 {% endblock top_title %}
 {% block active %}
     <div class="text-white p-6 bg-background rounded-lg shadow m-5 inline-block">
-    <form method="POST">
-        {% csrf_token %}
-        <input type="submit" value="Regen All Calendars">
-    </form>
     {% for user in users %}
         <div>
             <a href='{{ user.id }}'>{{ user.username }}</a>
