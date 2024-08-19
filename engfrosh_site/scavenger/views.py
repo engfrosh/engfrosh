@@ -20,7 +20,7 @@ def print_qr(request: HttpRequest) -> HttpResponse:
     for puz in Puzzle.objects.all():
         if len(QRCode.objects.filter(puzzle=puz)) == 0:
             puz._generate_qr_code()
-    codes = QRCode.objects.filter(stream__online=False)
+    codes = QRCode.objects.filter(puzzle__stream__online=False)
     return render(request, "print_qr.html", {"codes": codes})
 
 
