@@ -466,7 +466,7 @@ def reports(request: HttpRequest) -> HttpResponse:
 def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
     if request.method == "GET":
         if id == 0:
-            users = list(User.objects.all())
+            users = list(User.objects.all().order_by("username"))
             return render(request, "shift_manage_lookup.html", {"users": users})
         else:
             shifts = list(FacilShiftSignup.objects.filter(user__pk=id))
