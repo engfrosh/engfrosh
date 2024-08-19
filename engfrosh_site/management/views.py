@@ -1472,7 +1472,7 @@ def manage_frosh_teams(request: HttpRequest) -> HttpResponse:
     return HttpResponseBadRequest()
 
 
-@permission_required("common_models.view_puzzle")
+@permission_required("common_models.manage_scav")
 def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
     """Page for managing scavenger puzzles."""
 
