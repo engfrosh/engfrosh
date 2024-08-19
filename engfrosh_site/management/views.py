@@ -863,7 +863,7 @@ def bulk_add_prc(request: HttpRequest) -> HttpResponse:
         if allergies is not None:
             details.allergies = allergies
         if shifts is not None and shifts != "":
-            shifts = shifts.split(",")
+            shifts = shifts.split("-")
             for shift_name in shifts:
                 shift = FacilShift.objects.filter(name__iexact=shift_name)
                 if len(shift) == 0:
