@@ -470,16 +470,24 @@ def shift_manage(request: HttpRequest, id: int) -> HttpResponse:
             return render(request, "shift_manage_lookup.html", {"users": users})
         else:
             shifts = list(FacilShiftSignup.objects.filter(user__pk=id))
-            return render(request, "shift_manage.html", {"shifts": shifts})
+            available_shifts = list(FacilShift.objects.all().order_by("name"))
+            return render(request, "shift_manage.html", {"shifts": shifts, "avail": available_shifts})
     else:
         if id != 0:
             shift_id = int(request.POST["shift"])
-            if shift_id != -1:
-                signup = FacilShiftSignup.objects.filter(shift__pk=shift_id, user__pk=id).first()
-                signup.delete()
+            action = request.POST['action']
+            if action == "remove":
+                if shift_id != -1:
+                    signup = FacilShiftSignup.objects.filter(shift__pk=shift_id, user__pk=id).first()
+                    signup.delete()
+            elif action == "add":
+                signup = FacilShiftSignup(shift=FacilShift.objects.filter(id=shift_id).first(),
+                                          user=User.objects.filter(id=id).first())
+                signup.save()
 
             shifts = list(FacilShiftSignup.objects.filter(user__pk=id))
-            return render(request, "shift_manage.html", {"shifts": shifts})
+            available_shifts = list(FacilShift.objects.all().order_by("name"))
+            return render(request, "shift_manage.html", {"shifts": shifts, "avail": available_shifts})
 
 
 @permission_required("common_models.shift_manage")
