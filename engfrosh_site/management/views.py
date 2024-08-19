@@ -48,10 +48,11 @@ PARENT_DIRECTORY = os.path.dirname(CURRENT_DIRECTORY)
 def frosh_list(request: HttpRequest) -> HttpResponse:
     if request.GET.get('name', None) is not None:
         name = request.GET['name']
+        frosh_group = Group.objects.filter(name="Frosh").first()
         if name.isnumeric():
-            results = UserDetails.objects.filter(user=int(name))
+            results = UserDetails.objects.filter(user=int(name), user__groups__in=[frosh_group])
         else:
-            results = UserDetails.objects.filter(name__icontains=name)
+            results = UserDetails.objects.filter(name__icontains=name, user__groups__in=[frosh_group])
         team = request.user.details.team
         if team is None:
             team = "All"

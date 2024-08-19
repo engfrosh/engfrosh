@@ -104,7 +104,7 @@ function addPRCRowButtonPress(row_id, disable_invalid_alert) {
         else {
           res.text().then(data => {
             console.log("Error: " + data);
-            alert("Failed to add user. " + data);
+            alert("Failed to add bulk data. " + data);
           })
         }
       })
