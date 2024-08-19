@@ -192,7 +192,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         shifts = list(FacilShift.objects.filter(administrative=False).order_by('start').all())
         rshifts = []  # Shifts remaining to be signed up for
-        if shift_count >= max_shifts:
+        if shift_count < max_shifts:
             for shift in shifts:
                 signups = shift.facil_count
                 u_signups = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
