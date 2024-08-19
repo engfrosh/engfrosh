@@ -873,7 +873,7 @@ def bulk_add_prc(request: HttpRequest) -> HttpResponse:
             for shift_name in shifts:
                 shift = FacilShift.objects.filter(name__iexact=shift_name)
                 if len(shift) == 0:
-                    return HttpResponseBadRequest("Shift \"" + shift + "\" not found!")
+                    return HttpResponseBadRequest("Shift \"" + shift_name + "\" not found!")
                 shift = shift.first()
                 if len(FacilShiftSignup.objects.filter(user=user, shift=shift)) > 0:
                     print(user.first_name, user.last_name, "is already in", shift.name)
