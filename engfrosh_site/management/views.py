@@ -185,7 +185,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
                                                      defaults={"value": "0"})[0].value)
     max_shifts = int(Setting.objects.get_or_create(id="MAX_FACIL_SHIFTS",
                                                    defaults={"value": "2"})[0].value)
-    shift_count = len(FacilShiftSignup.objects.filter(user=request.user))
+    shift_count = len(FacilShiftSignup.objects.filter(user=request.user, shift__administrative=False))
     can_remove = True
     if datetime.datetime.utcfromtimestamp(lockout_time) <= datetime.datetime.now() and lockout_time != 0:
         can_remove = False
