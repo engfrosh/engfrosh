@@ -508,8 +508,13 @@ def shift_export(request: HttpRequest) -> HttpResponse:
             signup = shift_signups[j]
             if len(signup) > i:
                 user = signup[i].user
+                team = Team.from_user(user)
+                if team is None:
+                    team = ""
+                else:
+                    team = team.display_name
                 line += user.first_name + " " + user.last_name + "," + user.email + \
-                    "," + str(signup[i].attendance) + "," + Team.from_user(user).display_name + ","
+                    "," + str(signup[i].attendance) + "," + team + ","
             else:
                 line += ",,,,"
     response = HttpResponse(line, content_type="text/csv")
