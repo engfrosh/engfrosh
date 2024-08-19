@@ -183,17 +183,21 @@ def shift_edit(request: HttpRequest, id: int) -> HttpResponse:
 def facil_shifts(request: HttpRequest) -> HttpResponse:
     lockout_time = int(Setting.objects.get_or_create(id="Facil Shift Drop Deadline",
                                                      defaults={"value": "0"})[0].value)
+    max_shifts = int(Setting.objects.get_or_create(id="MAX_FACIL_SHIFTS",
+                                                   defaults={"value": "2"})[0].value)
+    shift_count = len(FacilShiftSignup.objects.filter(user=request.user, shift__administrative=False))
     can_remove = True
     if datetime.datetime.utcfromtimestamp(lockout_time) <= datetime.datetime.now() and lockout_time != 0:
         can_remove = False
     if request.method == "GET":
         shifts = list(FacilShift.objects.filter(administrative=False).order_by('start').all())
         rshifts = []  # Shifts remaining to be signed up for
-        for shift in shifts:
-            signups = shift.facil_count
-            u_signups = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
-            if signups < shift.max_facils and u_signups == 0 and not shift.is_passed:
-                rshifts += [shift]
+        if shift_count < max_shifts:
+            for shift in shifts:
+                signups = shift.facil_count
+                u_signups = len(FacilShiftSignup.objects.filter(shift=shift, user=request.user))
+                if signups < shift.max_facils and u_signups == 0 and not shift.is_passed:
+                    rshifts += [shift]
         my_shifts = []
         if not request.user.is_staff:
             my_shifts_i = FacilShiftSignup.objects.filter(user=request.user, shift__administrative=False) \
@@ -208,6 +212,8 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
     elif request.method == "POST":
         action = request.POST.get("action", "")
         if action == "add":
+            if shift_count >= max_shifts:
+                return HttpResponse("At max shifts!")
             logger.info(request.user)
             logger.info("Signing up for facil shift. Shift id: ")
             shift_id = int(request.POST["shift_id"])
