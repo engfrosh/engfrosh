@@ -946,7 +946,8 @@ def scavenger_scoreboard(request: HttpRequest) -> HttpResponse:
 def scavenger_monitor(request: HttpRequest) -> HttpResponse:
     context = {"puzzle_activities_awaiting_verification": list(
             filter(TeamPuzzleActivity._is_awaiting_verification,
-                   TeamPuzzleActivity.objects.exclude(puzzle_completed_at=None)))}
+                   TeamPuzzleActivity.objects.exclude(puzzle_completed_at=None).
+                   select_related("verification_photo", "team")))}
     return render(request, "scavenger_monitor.html", context)
 
 
