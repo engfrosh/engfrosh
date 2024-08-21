@@ -54,8 +54,13 @@ def index(request: HttpRequest) -> HttpResponse:
         return HttpResponse("Scavenger not currently enabled")
 
     bypass = request.user.has_perm('common_models.bypass_scav_rules')
-
-    tree = base64.b64encode(bytes(json.dumps(generate_tree(team)), 'utf-8')).decode('utf-8')
+    if team.invalidate_tree:
+        tree = base64.b64encode(bytes(json.dumps(generate_tree(team)), 'utf-8')).decode('utf-8')
+        team.invalidate_tree = False
+        team.tree_cache = tree
+        team.save()
+    else:
+        tree = team.tree_cache
     params = ""
     if set_team is not None:
         params = "?team=" + str(team.group.id)
