@@ -13,9 +13,22 @@
         {% csrf_token %}
         <p class="inline">{{ shift.shift.name }}</p>
         <input type="submit" value="Remove Shift" class="text-blue-600">
+        <input class="inline" type="hidden" value="remove" id="action" name="action">
         <input class="inline" type="hidden" value="{{ shift.shift.id }}" id="shift" name="shift">
     </form>
     <br>
     {% endfor %}
+    <br><br>
+    <form class="my-5 inline m-0 p-0" method="POST">
+        {% csrf_token %}
+        <p class="inline">{{ shift.shift.name }}</p>
+        <input class="inline" type="hidden" value="add" id="action" name="action">
+        <select name="shift" id="shift">
+        {% for shift in avail %}
+            <option value="{{ shift.id }}">{{ shift.name }}</option>
+        {% endfor %}
+        <input type="submit" value="Add Shift" class="text-blue-600">
+        </select>
+    </form>
     </div>
 {% endblock active %}

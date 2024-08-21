@@ -1,4 +1,4 @@
-{% extends "base_manage_subpage.html" %}
+{% extends "base_generic.html" %}
 {% load static %}
 {% block page_title %}
     Sign Up For Facil Shifts
@@ -6,8 +6,9 @@
 {% block top_title %}
     Sign Up For Facil Shifts
 {% endblock top_title %}
-{% block active %}
-
+{% block body %}
+<a class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
+           href="{% url 'user_home' %}">Back</a>
     <div class="text-white p-6 bg-background rounded-lg shadow m-5 inline-block" style="font-size: 2vmin;">
         {% if success is None %}
         {% elif not success %}
@@ -108,4 +109,4 @@
             <h1>There are no shifts currently available!</h1>
         {% endif %}
     </div>
-{% endblock active %}
+{% endblock body %}

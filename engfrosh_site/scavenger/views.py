@@ -20,7 +20,16 @@ def print_qr(request: HttpRequest) -> HttpResponse:
     for puz in Puzzle.objects.all():
         if len(QRCode.objects.filter(puzzle=puz)) == 0:
             puz._generate_qr_code()
-    codes = QRCode.objects.all()
+    codes = QRCode.objects.filter(puzzle__stream__online=False)
+    return render(request, "print_qr.html", {"codes": codes})
+
+
+@permission_required("common_models.manage_scav", login_url='/accounts/login')
+def view_qr(request: HttpRequest, puzzle: int):
+    for puz in Puzzle.objects.all():
+        if len(QRCode.objects.filter(puzzle=puz)) == 0:
+            puz._generate_qr_code()
+    codes = QRCode.objects.filter(puzzle__id=puzzle)
     return render(request, "print_qr.html", {"codes": codes})
 
 

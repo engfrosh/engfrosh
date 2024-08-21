@@ -13,6 +13,8 @@
             <th>Order</th>
             <th>Name</th>
             <th>Enabled</th>
+            <th>Toggle</th>
+            <th>QR Codes</th>
         </tr>
         {% for puzzle in puzzles %}
             <tr >
@@ -29,6 +31,7 @@
                 <td>
                     <button onclick="postToServer(csrf_token, {'command': 'toggle', 'puzzle': '{{ puzzle.id }}'}).then(res => {res.text().then(data => {alert(data);window.location.href='';})});">Toggle</button>
                 </td>
+                <td><a href="{% url 'view_qr' puzzle=puzzle.id %}">QR Codes</a></td>
             </tr>
         {% endfor %}
     </table>

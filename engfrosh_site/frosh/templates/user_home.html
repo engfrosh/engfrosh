@@ -83,7 +83,7 @@
             {% endif %}
             <br>
             <select id="filter" multiple>
-                <option value="all">All</option>
+                <option value="all" selected>All</option>
                 <option value="shifts">My Shifts</option>
                 {% if perms.common_models.shift_manage %}
                 <option value="allshifts">All Shifts</option>
