@@ -48,7 +48,7 @@ def view_event(request: HttpRequest, id: int):
     if e is None:
         form = None
     else:
-        form = forms.EventForm(calendar_choices=[{"name": e.calendar.name}])
+        form = forms.EventForm(calendar_choices=[{"name": e.calendar.name}], readonly=True)
         form.initial['start'] = e.start
         form.initial['end'] = e.end
         form.initial['title'] = e.title
