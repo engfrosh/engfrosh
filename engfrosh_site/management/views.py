@@ -545,7 +545,7 @@ def shift_export(request: HttpRequest) -> HttpResponse:
                 line += user.first_name + " " + user.last_name + "," + user.email + \
                     "," + str(signup[i].attendance) + ","
             else:
-                line += ",,,,"
+                line += ",,,"
     response = HttpResponse(line, content_type="text/csv")
     response['Content-Disposition'] = 'attachment; filename="shifts.csv"'
     return response
