@@ -166,8 +166,11 @@ def user_home(request: HttpRequest) -> HttpResponse:
 
     calendars = set()
     user = request.user
+    headplanning = False
     for group in user.groups.all():
         try:
+            if group.name == "Head" or group.name == "Planning":
+                headplanning = True
             ct = ContentType.objects.get_for_model(group)
             relations = CalendarRelation.objects.filter(content_type=ct, object_id=group.id)
             for relation in relations:
@@ -204,6 +207,7 @@ def user_home(request: HttpRequest) -> HttpResponse:
         "rand": rand,
         "calendars": calendars,
         "upload_charter": upload_charter,
+        "headplanning": headplanning
     }
 
     return render(request, "user_home.html", context)

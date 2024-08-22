@@ -24,6 +24,7 @@
                 {% else %}
                     <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2 inline-block m-2">No Scav Team</a>
                 {% endif %}
+                {% comment %}
                 {% if trade_up_enabled %}
                     <a href="https://forms.gle/fjZJo2U6x68RBeE29"
                         class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Trade Up</a>
@@ -32,8 +33,9 @@
                 {% else %}
                     <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2 inline-block m-2">No Trade Up Team</a>
                 {% endif %}
+                {% endcomment %}
                 <a href="{% url 'view_faq' id=0 %}"
-                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">View FAQs</a>
+                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Event Information</a>
                 {% if link_discord %}
                     <a href="{% url 'discord_register' %}"
                     class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Link Discord</a>
@@ -67,6 +69,12 @@
                 {% if perms.common_models.frosh_list %}
                 <a href="{% url 'frosh_list' %}"
                 class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Frosh List</a>
+                {% endif %}
+                {% if headplanning %}
+                <a href="https://docs.google.com/document/d/1wzCLK6ZLXpoleWLJB4GKP0V05VD9OfCVgdtwexiYGhg/edit?usp=drive_link"
+                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">The Best Document</a>
+                <a href="https://docs.google.com/document/d/1wJpnis7I-b1CnnrflZBebyTjpOUfY3aGbRNxrkwYv1o/edit?usp=drive_web&ouid=108689740860636164130"
+                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Heads Manual</a>
                 {% endif %}
             </div>
             <br>
