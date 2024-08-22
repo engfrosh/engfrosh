@@ -79,6 +79,7 @@ def check_in_view(request: HttpRequest, id: int) -> HttpResponse:
 
     location = request.user.username  # User name will be used as the location
     size = user.shirt_size
+    ssize = user.sweater_size
     groups = user.user.groups
     frosh_groups = FroshRole.objects.all()
     names = []
@@ -89,7 +90,7 @@ def check_in_view(request: HttpRequest, id: int) -> HttpResponse:
         team = "None"
     else:
         team = team.name
-    CheckInConsumer.notify_trigger(location, size, team, user.name)
+    CheckInConsumer.notify_trigger(location, size, ssize, team, user.name)
 
     user.save()
     return render(request, "check_in.html", {'form': CheckInForm(), 'data': [user]})
