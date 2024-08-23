@@ -527,7 +527,7 @@ def shift_export(request: HttpRequest) -> HttpResponse:
         if shift.facil_count > longest:
             longest = shift.facil_count
         name = shift.name.replace(',', '') + ","
-        line += name + name + name + name
+        line += name + name + name
         s = []
         for signup in signups:
             if signup.shift == shift:
