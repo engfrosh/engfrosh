@@ -61,7 +61,7 @@ class EventForm(forms.Form):
     calendar = forms.MultipleChoiceField(label="Calendar", choices=[("Default", "Default")])
     color_event = forms.CharField(label="Colour", max_length=50, widget=forms.TextInput(attrs={"type": "color"}))
 
-    def __init__(self, *args, calendar_choices=None, **kwargs):
+    def __init__(self, *args, calendar_choices=None, readonly=False, **kwargs):
         super().__init__(*args, **kwargs)
         if calendar_choices is None:
             calendar_choices = Calendar.objects.exclude(name__in=User.objects.all().values('username')).values("name")
@@ -70,3 +70,5 @@ class EventForm(forms.Form):
             name = c['name']
             choices += [(name, name)]
         self.fields['calendar'].choices = choices
+        self.fields['start'].widget = forms.TextInput()
+        self.fields['end'].widget = forms.TextInput()

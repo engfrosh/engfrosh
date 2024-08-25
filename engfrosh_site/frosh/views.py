@@ -48,7 +48,7 @@ def view_event(request: HttpRequest, id: int):
     if e is None:
         form = None
     else:
-        form = forms.EventForm(calendar_choices=[{"name": e.calendar.name}])
+        form = forms.EventForm(calendar_choices=[{"name": e.calendar.name}], readonly=True)
         form.initial['start'] = e.start
         form.initial['end'] = e.end
         form.initial['title'] = e.title
@@ -166,8 +166,11 @@ def user_home(request: HttpRequest) -> HttpResponse:
 
     calendars = set()
     user = request.user
+    headplanning = False
     for group in user.groups.all():
         try:
+            if group.name == "Head" or group.name == "Planning":
+                headplanning = True
             ct = ContentType.objects.get_for_model(group)
             relations = CalendarRelation.objects.filter(content_type=ct, object_id=group.id)
             for relation in relations:
@@ -204,6 +207,7 @@ def user_home(request: HttpRequest) -> HttpResponse:
         "rand": rand,
         "calendars": calendars,
         "upload_charter": upload_charter,
+        "headplanning": headplanning
     }
 
     return render(request, "user_home.html", context)
