@@ -207,7 +207,8 @@ def user_home(request: HttpRequest) -> HttpResponse:
         "rand": rand,
         "calendars": calendars,
         "upload_charter": upload_charter,
-        "headplanning": headplanning
+        "headplanning": headplanning,
+        "team": team
     }
 
     return render(request, "user_home.html", context)

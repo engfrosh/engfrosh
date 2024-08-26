@@ -85,9 +85,12 @@
             }
         </style>
         <div class="bg-background p-2 shadow">
+            {% if team.room %}
+                <p style="float:left">Your team HQ for the day is: <b><a href="https://www.classfind.com/carleton/room/{{ team.room }}" target="_blank">{{ team.room }}</a></b></p>
+            {% endif %}
             {% if details %}
             <p class="float-right">Your frosh id is: {{ details.frosh_id }}</p>
-            <br><p>To link your frosh calendar with a calendar app import the calendar from the following URL: <a href={% url "ics_api" uid=details.int_frosh_id %}>https://time.engfrosh.com{% url "ics_api" uid=details.int_frosh_id %}</a></p>
+            <br><br><p>To link your frosh calendar with a calendar app import the calendar from the following URL: <a href={% url "ics_api" uid=details.int_frosh_id %}>https://time.engfrosh.com{% url "ics_api" uid=details.int_frosh_id %}</a></p>
             {% endif %}
             <br>
             <select id="filter" multiple>
