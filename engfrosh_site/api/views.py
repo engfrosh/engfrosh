@@ -4,7 +4,7 @@ from .serializers import VerificationPhotoSerializer
 from rest_framework.response import Response
 from common_models.models import VerificationPhoto, UserDetails, FacilShiftSignup, FacilShift
 from datetime import datetime
-from schedule.models import CalendarRelation
+from schedule.models import CalendarRelation, Calendar
 from django.urls import reverse
 from django.contrib.auth.models import User
 from engfrosh_common.AWS_SES import send_SES
@@ -43,22 +43,35 @@ def get_events(user):
             e = {"name": event.title, "start": event.start, "end": event.end,
                  "desc": event.description, "created_at": event.created_on,
                  "updated_at": event.updated_on, "creator": str(event.creator),
-                 "id": event.id, "colour": event.color_event, "calendar": event.calendar.slug}
+                 "id": event.id, "colour": event.color_event, "calendar": event.calendar.slug,
+                 "all": True}
             result.append(e)
     for s in FacilShiftSignup.objects.select_related('shift').filter(user=user):
         shift = s.shift
         # start=shift.start, end=shift.end, title=shift.name, description=shift.desc
         e = {"name": shift.name, "start": shift.start, "end": shift.end, "desc": shift.desc,
              "created_at": None, "updated_at": None, "creator": None, "id": "shift", "colour": "blue",
-             "calendar": "shifts"}
+             "calendar": "shifts", "all": True}
         result.append(e)
     if user.has_perm("common_models.shift_manage"):
         for shift in FacilShift.objects.all():
             # start=shift.start, end=shift.end, title=shift.name, description=shift.desc
             e = {"name": shift.name, "start": shift.start, "end": shift.end, "desc": shift.desc,
                  "created_at": None, "updated_at": None, "creator": None, "id": "allshift", "colour": "green",
-                 "calendar": "allshifts"}
+                 "calendar": "allshifts", "all": False}
             result.append(e)
+    if user.has_perm("common_models.calendar_manage"):
+        slugs = []
+        for c in calendars:
+            slugs.append(c.slug)
+        for calendar in Calendar.objects.exclude(slug__in=slugs):
+            for event in calendar.events.all():
+                e = {"name": event.title, "start": event.start, "end": event.end,
+                     "desc": event.description, "created_at": event.created_on,
+                     "updated_at": event.updated_on, "creator": str(event.creator),
+                     "id": event.id, "colour": event.color_event, "calendar": event.calendar.slug,
+                     "all": False}
+                result.append(e)
     return result
 
 
@@ -73,7 +86,7 @@ class ICSAPI(APIView):
         cal = ics.Calendar()
         event_list = get_events(details.user)
         for event in event_list:
-            if event['calendar'] == "allshifts":
+            if not event['all']:
                 continue
             e = Event()
             e.name = event['name']
@@ -169,6 +182,7 @@ class CalendarAPI(APIView):
                         "description": event['desc'],
                         "creator": event['creator'],
                         "calendar": event['calendar'],
-                        "url": url
+                        "url": url,
+                        "all": event['all'],
                     })
         return Response(response_data)

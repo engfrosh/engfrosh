@@ -164,12 +164,8 @@
                                 result.push(opt.value);
                             }
                         }
-                        if(!(result.includes(arg.event.extendedProps.calendar) || result.includes("all"))){
+                        if(!(result.includes(arg.event.extendedProps.calendar) || (result.includes("all") && arg.event.extendedProps.all))){
                             arg.event.remove();
-                        }else{
-                            if(!result.includes("allshifts") && arg.event.extendedProps.calendar == "allshifts"){
-                                arg.event.remove();
-                            }
                         }
                     },
                 });
