@@ -490,7 +490,7 @@ function viewSwitch(){
                                     }
 
                                     // Add fog line if it's the last visible clue in the main branch
-                                    if (isMain && tree[branch][clue][1] === "") {
+                                    if (isMain && tree[branch][clue][1] == "end" && tree[branch][clue][0] != "solved") {
                                         const length = Object.keys(tree[branch]).length;
                                         if (length === clueIndex) {
                                             curBranch.innerHTML += `<div id='line${branch}${clueIndex + 1}' class='line fog'></div>`;
