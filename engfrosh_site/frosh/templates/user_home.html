@@ -94,7 +94,10 @@
         </style>
         <div class="bg-background p-2 shadow" style="margin-bottom: 50px;">
             {% if team.room %}
-                <p style="float:left">Your team HQ for the day is: <b><a href="https://www.classfind.com/carleton/room/{{ team.room }}" target="_blank">{{ team.room }}</a></b></p>
+                <p style="float:left">
+                    Your team HQ for the day is: <b><a href="https://www.classfind.com/carleton/room/{{ team.room }}" target="_blank">{{ team.room }}</a></b><br>
+                    The quiet room is <b><a href="https://www.classfind.com/carleton/room/ME4342" target="_blank">ME4342</a></b>
+                </p>
             {% endif %}
             {% if details %}
             <p class="float-right">Your frosh id is: {{ details.frosh_id }}</p>
