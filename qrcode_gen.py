@@ -61,7 +61,7 @@ for num in range(COUNT):
     text_len = font.getlength(answer)
     width = int(max(orig_width + 50, text_len + 50))
     offset = 25
-    if text_len + 50 > orig_width: 
+    if text_len + 50 > orig_width:
         offset = int((text_len + 50 - orig_width)/2)
     with_text = Image.new(mode="RGB", size=(width, height + 50))
     draw = ImageDraw.Draw(with_text)
