@@ -5,10 +5,28 @@
 {% endblock page_title %}
 
 {% block body %}
+    <style>
+        body{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            overflow-x: scroll;
+        }
+        table{
+            overflow-x: scroll;
+            width: 100%;
+        }
+        td, th{
+            width: 80px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+    </style>
     <div class="m-4">
         {% block nav_bar %}
-            <div class="flex flex-row flex-wrap-reverse items-center justify-start mb-4">
-            <a class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
+            <div class="items-center justify-start mb-4">
+            <a class="bg-main dark:bg-main-night rounded text-white p-2 max-w-fit max-h-fit text-sm mr-2"
                 href="{% url 'mailing_list' %}">Back to Shifts</a>
             <h1 class="text-center p-2 text-2xl grow max-w-fit">
                 {% block top_title %}

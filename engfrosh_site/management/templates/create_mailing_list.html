@@ -7,6 +7,24 @@
     View Facil Shifts
 {% endblock top_title %}
 {% block active %}
+    <style>
+        body{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            overflow-x: scroll;
+        }
+        table{
+            overflow-x: scroll;
+            width: 100%;
+        }
+        td, th{
+            width: 80px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+    </style>
     <div class="flex flex-col space-y-3 mx-auto container text-white text-center max-w-sm">
         <a href="{% url 'shift_export' %}"
              class="bg-main dark:bg-main-night rounded-lg p-2">Export Shifts</a>
