@@ -1522,6 +1522,8 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
                 return HttpResponseBadRequest("Bad request body, missing puzzle.")
             puzzle_id = req_dict['puzzle']
             puzzle = Puzzle.objects.filter(id=puzzle_id).first()
+            if puzzle.stream_branch is not None or puzzle.stream_puzzle is not None:
+                return HttpResponse("This will break things! Aborting.")
             if puzzle.enabled:
                 puzzle.enabled = False
                 puzzle.save()
