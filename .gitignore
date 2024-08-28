@@ -11,6 +11,8 @@ offline-files/soopp-bingo/*.pdf
 jstools/node_modules/
 tree.png
 venv
+qr_codes
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
