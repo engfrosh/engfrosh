@@ -13,9 +13,9 @@
         {% csrf_token %}
         {{ form.as_p }}
         <br>
-        <input type="submit" name="Add Skash" value="Add Skash" class="bg-main dark:bg-main-night rounded-lg p-1">
-        <input type="submit" name="Remove Skash" value="Remove Skash" class="bg-main dark:bg-main-night rounded-lg p-1">
-        <input type="submit" name="Set as value" value="Set as value" class="bg-main dark:bg-main-night rounded-lg p-1">
+        <input type="submit" name="Add Skash" value="Add to total" style="cursor: pointer;" class="bg-main dark:bg-main-night rounded-lg p-1">
+        <input type="submit" name="Remove Skash" value="Remove from total" style="cursor: pointer;" class="bg-main dark:bg-main-night rounded-lg p-1">
+        <input type="submit" name="Set as value" value="Set as total" style="cursor: pointer;" class="bg-main dark:bg-main-night rounded-lg p-1">
     </form>
 </div>
 {% endblock active %}

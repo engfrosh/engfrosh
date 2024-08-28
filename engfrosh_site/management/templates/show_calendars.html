@@ -8,17 +8,19 @@
     View Calendar
 {% endblock top_title %}
 {% block active %}
-    <h1>View Calendars</h1><br>
-    <a href="{% url 'edit_calendar' id=0 %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2">Create Calendar</a><br>
-    <style>
-        input {
-            color: black;
-        }
-    </style>
-    <h2>Calendars:</h2><br>
-    {% for cal in calendars %}
-        <a href="{% url 'edit_calendar' id=cal.id %}"
-            class="bg-main dark:bg-main-night rounded-lg p-2">{{ cal.name }}</a><br><br>
-    {% endfor %}
+    <div class="bg-background shadow">
+        <h1>View Calendars</h1><br>
+        <a href="{% url 'edit_calendar' id=0 %}"
+            class="bg-main dark:bg-main-night rounded-lg p-2">Create Calendar</a><br>
+        <style>
+            input {
+                color: black;
+            }
+        </style>
+        <h2>Calendars:</h2><br>
+        {% for cal in calendars %}
+            <a href="{% url 'edit_calendar' id=cal.id %}"
+                class="bg-main dark:bg-main-night rounded-lg p-2">{{ cal.name }}</a><br><br>
+        {% endfor %}
+    </div>
 {% endblock active %}

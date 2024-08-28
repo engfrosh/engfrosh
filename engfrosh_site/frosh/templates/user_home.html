@@ -10,6 +10,7 @@
 <script type='text/javascript' src="{% static 'moment.js' %}"></script>
 <script type='text/javascript' src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
 <script type='text/javascript' src="{% static 'fullcalendar.js' %}"></script>
+<script src='https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js'></script>
 {% endblock js_functions %}
 {% block active %}
     <div class="text-white text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
@@ -83,8 +84,16 @@
             :root {
                 --fc-page-bg-color: #8305c8;
             }
+            .fc-event:hover {
+                z-index: 999 !important;
+                width: 250%;
+                height: 250%;
+            }
+            .fc-timegrid-event-harness:hover {
+                z-index: 999 !important;
+            }
         </style>
-        <div class="bg-background p-2 shadow">
+        <div class="bg-background p-2 shadow" style="margin-bottom: 50px;">
             {% if team.room %}
                 <p style="float:left">Your team HQ for the day is: <b><a href="https://www.classfind.com/carleton/room/{{ team.room }}" target="_blank">{{ team.room }}</a></b></p>
             {% endif %}

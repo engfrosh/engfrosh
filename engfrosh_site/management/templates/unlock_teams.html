@@ -7,7 +7,7 @@
     Unlock Team
 {% endblock top_title %}
 {% block active %}
-<div class="flex flex-col mx-auto container text-white text-center m-3">
+<div class="flex flex-col mx-auto container text-white text-center m-3 bg-background shadow">
     <ul>
         {% for team in teams %}
             <li><a href="{% url 'unlock_team' id=team.group_id %}">{{ team.display_name }}</a> - {{ team.scavenger_locked_out_until }}</li>

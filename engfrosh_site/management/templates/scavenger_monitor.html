@@ -13,10 +13,10 @@
     <div id="approval">
         <h1>Approvals</h1>
         {% for puzzle_activity in puzzle_activities_awaiting_verification %}
-            <div id="approval-{{ puzzle_activity.verification_photo.id }}" class="px-3 text-center">
+            <div id="approval-{{ puzzle_activity.verification_photo.id }}" class="px-3 text-center bg-background shadow" style="margin: 15px;">
                 <h3>{{ puzzle_activity.team.display_name }}</h3>
                 <img style="width: 300px; height: 300px;" src="{{ puzzle_activity.verification_photo.photo.url }}">
-                <button id="btn-{{ puzzle_activity.verification_photo.id }}" onclick="buttonPress({{ puzzle_activity.verification_photo.id }});">Approve</button>
+                <button id="btn-{{ puzzle_activity.verification_photo.id }}" onclick="buttonPress({{ puzzle_activity.verification_photo.id }});" class="bg-main dark:bg-main-night rounded-lg text-white p-2 inline-block m-2">Approve</button>
             </div>
         {% endfor %}
     </div>

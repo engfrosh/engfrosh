@@ -7,10 +7,12 @@
     Change Free Hints
 {% endblock top_title %}
 {% block active %}
-    <h1>Free Hints for {{ team.display_name }}</h1>
-    <form class="my-5" method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Change" class="text-blue-600">
-    </form>
+    <div class="bg-background shadow">
+        <h1>Free Hints for {{ team.display_name }}</h1>
+        <form class="my-5" method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Change" class="bg-main dark:bg-main-night rounded-lg text-white p-2 inline-block m-2">
+        </form>
+    </div>
 {% endblock active %}

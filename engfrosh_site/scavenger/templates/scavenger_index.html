@@ -10,6 +10,7 @@
         margin: 0;
         background-color: black;
         color: #ffffff;
+        font-size: 16px;
     }
     #imgframe {
         font-family: 'Courier New', Courier, monospace;
@@ -137,6 +138,10 @@
              0px 0px 4px rgba(0, 0, 0, 1),
              0px 0px 2px rgba(0, 0, 0, 1);
     }
+    .topText {
+        width: 100%;
+        height: 150px;
+    }
 </style>
 {% endblock page_style %}
 
@@ -204,10 +209,11 @@ function viewSwitch(){
     }
 }
 </script>
+    <div class="topText">
     {% if not team %}
         You are not part of a team
     {% else %}
-        <button onclick="viewSwitch();">Change View</button><br>
+    <button onclick="viewSwitch();">Change View</button><br>
         Here is your team:
         {{ team.display_name }}<br>
         Free hints: {{ team.free_hints }}<br>
@@ -220,7 +226,7 @@ function viewSwitch(){
             {% if not scavenger_enabled_for_team %}
                 Scavenger is not currently enabled
             {% endif %}
-
+    </div>
             <div id="imgframe">
                 <!-- Help Button -->
                 <div onclick="toggleHelp()" id="helpButton">
@@ -428,17 +434,17 @@ function viewSwitch(){
                                     if (clueIndex == 1){
                                         if (curBranchSide.id == `${treeId}LeftSide`){
                                             curBranch.style.position = 'absolute';
-                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 238;
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 288;
                                             let leftWidth = maxHorzClues*100;
                                             curBranch.style.top = `${topOffset}px`;
                                             curBranch.style.width = `${leftWidth}px`;
                                             curBranch.style.right = `0px`;
                                             if (branch == "SIDE-QUEST"){
-                                                curBranch.style.right = `100px`;
+                                                curBranch.style.right = 100*(branchIndex-maxHorzClues)+`px`;
                                             }
                                         } else if (curBranchSide.id === `${treeId}RightSide`){
                                             curBranch.style.position = 'absolute';
-                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 238;
+                                            let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 288;
                                             curBranch.style.top = `${topOffset}px`;
                                             if (branch == "SIDE-QUEST"){
                                                 curBranch.style.left = `100px`;
@@ -506,25 +512,25 @@ function viewSwitch(){
             </div>
 
             <div id="scavtext" style="display: none;">
-                <h2 style="text-size: 20px;">Active Scavenger Puzzles</h2>
+                <h2 style="font-size: 20px;">Active Scavenger Puzzles</h2>
                 <ul>
                     {% for puzzle in active_puzzles %}
                         <a href="{% url 'view_puzzle' slug=puzzle.secret_id%}">{{puzzle.name}}</a><br>
                     {% endfor %}
                 </ul><br>
-                <h2 style="text-size: 20px;">Puzzles Missing Image</h2>
+                <h2 style="font-size: 20px;">Puzzles Missing Image</h2>
                 <ul>
                     {% for puzzle in completed_puzzles_requiring_photo_upload %}
                         <a href="{% url 'verify_puzzle' slug=puzzle.secret_id%}">{{puzzle.name}}</a><br>
                     {% endfor %}
                 </ul><br>
-                <h2 style="text-size: 20px;">Puzzles Awaiting Verification</h2>
+                <h2 style="font-size: 20px;">Puzzles Awaiting Verification</h2>
                 <ul>
                     {% for puzzle in completed_puzzles_awaiting_verification %}
                         <a href="{% url 'view_puzzle' slug=puzzle.secret_id%}">{{puzzle.name}}</a><br>
                     {% endfor %}
                 </ul><br>
-                <h2 style="text-size: 20px;">Verified Scavenger Puzzles</h2>
+                <h2 style="font-size: 20px;">Verified Scavenger Puzzles</h2>
                 <ul>
                     {% for puzzle in verified_puzzles %}
                         <a href="{% url 'view_puzzle' slug=puzzle.secret_id%}">{{puzzle.name}}</a><br>

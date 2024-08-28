@@ -11,16 +11,21 @@
         input{
             color: black;
         }
+        input {
+            margin: 10px;
+        }
     </style>
-    <form class="my-5" method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="hidden" value="modify" id="action" name="action">
-        <input type="submit" value="Change Event" class="text-blue-600">
-    </form>
-    <form class="my-5" method="POST">
-        {% csrf_token %}
-        <input type="hidden" value="delete" id="action" name="action">
-        <input type="submit" value="Delete Event" class="text-red-600">
-    </form>
+    <div class="bg-background shadow">
+        <form class="my-5" method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="hidden" value="modify" id="action" name="action">
+            <input type="submit" value="Change Event" class="bg-main dark:bg-main-night rounded-lg text-white p-2 inline-block m-2">
+        </form>
+        <form class="my-5" method="POST">
+            {% csrf_token %}
+            <input type="hidden" value="delete" id="action" name="action">
+            <input type="submit" value="Delete Event" class="bg-orange dark:bg-main-night rounded-lg text-white p-2 inline-block m-2">
+        </form>
+    </div>
 {% endblock active %}

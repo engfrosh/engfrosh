@@ -9,7 +9,7 @@
 {% block body %}
 <a class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
            href="{% url 'user_home' %}">Back</a>
-    <div class="text-white p-6 bg-background rounded-lg shadow m-5 inline-block" style="font-size: 2vmin;">
+    <div class="text-white p-6 bg-background shadow m-5 inline-block" style="font-size: 2vmin;">
         {% if success is None %}
         {% elif not success %}
             <p>Failed to modify shift!</p>
