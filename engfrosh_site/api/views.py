@@ -38,27 +38,30 @@ def get_events(user):
         pass
     result = []
     for calendar in calendars:
+        ics = True
+        if calendar.name == "Weeklongs":
+            ics = False
         # create flat list of events from each calendar
         for event in calendar.events.all():
             e = {"name": event.title, "start": event.start, "end": event.end,
                  "desc": event.description, "created_at": event.created_on,
                  "updated_at": event.updated_on, "creator": str(event.creator),
                  "id": event.id, "colour": event.color_event, "calendar": event.calendar.slug,
-                 "all": True}
+                 "all": True, "ics": ics}
             result.append(e)
     for s in FacilShiftSignup.objects.select_related('shift').filter(user=user):
         shift = s.shift
         # start=shift.start, end=shift.end, title=shift.name, description=shift.desc
         e = {"name": shift.name, "start": shift.start, "end": shift.end, "desc": shift.desc,
              "created_at": None, "updated_at": None, "creator": None, "id": "shift", "colour": "blue",
-             "calendar": "shifts", "all": True}
+             "calendar": "shifts", "all": True, "ics": True}
         result.append(e)
     if user.has_perm("common_models.shift_manage"):
         for shift in FacilShift.objects.all():
             # start=shift.start, end=shift.end, title=shift.name, description=shift.desc
             e = {"name": shift.name, "start": shift.start, "end": shift.end, "desc": shift.desc,
                  "created_at": None, "updated_at": None, "creator": None, "id": "allshift", "colour": "green",
-                 "calendar": "allshifts", "all": False}
+                 "calendar": "allshifts", "all": False, "ics": False}
             result.append(e)
     if user.has_perm("common_models.calendar_manage"):
         slugs = []
@@ -70,7 +73,7 @@ def get_events(user):
                      "desc": event.description, "created_at": event.created_on,
                      "updated_at": event.updated_on, "creator": str(event.creator),
                      "id": event.id, "colour": event.color_event, "calendar": event.calendar.slug,
-                     "all": False}
+                     "all": False, "ics": False}
                 result.append(e)
     return result
 
@@ -86,7 +89,7 @@ class ICSAPI(APIView):
         cal = ics.Calendar()
         event_list = get_events(details.user)
         for event in event_list:
-            if not event['all']:
+            if not event['all'] or not event['ics']:
                 continue
             e = Event()
             e.name = event['name']
