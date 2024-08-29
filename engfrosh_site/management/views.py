@@ -842,6 +842,7 @@ def bulk_add_prc(request: HttpRequest) -> HttpResponse:
 
             first_name = req_dict["first_name"]
             last_name = req_dict["last_name"]
+            full_name = req_dict["full_name"]
             email = req_dict["email"]
             issued = req_dict["prc"]
             grade = req_dict["grade"]
@@ -863,11 +864,15 @@ def bulk_add_prc(request: HttpRequest) -> HttpResponse:
         user = User.objects.filter(email=email).first()
         print(email)
         if user is None or email is None or email == "":
-            if first_name is None or first_name == "" or last_name is None or last_name == "":
-                return HttpResponseBadRequest("User not found.")
-            users = User.objects.filter(first_name__iexact=first_name, last_name__iexact=last_name)
-            if len(users) == 1:
-                user = users.first()
+            if not (first_name is None or first_name == "" or last_name is None or last_name == ""):
+                users = User.objects.filter(first_name__iexact=first_name, last_name__iexact=last_name)
+                if len(users) == 1:
+                    user = users.first()
+        if user is None:
+            if full_name is not None:
+                users = UserDetails.objects.filter(name__iexact=full_name).select_related("user")
+                if len(users) == 1:
+                    user = users.first().user
         if user is None:
             return HttpResponseBadRequest("User not found.")
         details = UserDetails.objects.filter(user=user).first()
