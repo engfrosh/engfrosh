@@ -1,6 +1,24 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <style>
+        body{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            overflow-x: scroll;
+        }
+        table{
+            overflow-x: scroll;
+            width: 100%;
+        }
+        td, th{
+            width: 80px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+        </style>
         {% load static %}
         <link rel="stylesheet" type="text/css" href="{% static 'engfrosh.css' %}">
         {% csrf_token %}
