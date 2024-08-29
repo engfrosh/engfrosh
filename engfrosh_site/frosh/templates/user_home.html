@@ -51,30 +51,30 @@
                 <a href="{% url 'inclusivity_private' %}"
                 class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Wellness Resources</a>
                 {% if request.user.is_staff %}
-                <a href="{% url 'manage_index' %}"
-                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Management</a>
+                    <a href="{% url 'manage_index' %}"
+                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Management</a>
                 {% endif %}
                 {% if perms.common_models.view_links %}
-                <a href="{% url 'magic_links' %}"
-                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">View Magic Links</a>
+                    <a href="{% url 'magic_links' %}"
+                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">View Magic Links</a>
                 {% endif %}
                 {% if perms.common_models.facil_signup %}
-                <a href="{% url 'facil_shifts' %}"
-                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Signup For Facil Shifts</a>
+                    <a href="{% url 'facil_shifts' %}"
+                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Signup For Facil Shifts</a>
                 {% endif %}
                 {% if perms.common_models.view_discord_nicks %}
-                <a href="{% url 'manage_discord_nicks' %}"
-                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Unlink Discord Users</a>
+                    <a href="{% url 'manage_discord_nicks' %}"
+                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Unlink Discord Users</a>
                 {% endif %}
                 {% if perms.common_models.frosh_list %}
-                <a href="{% url 'frosh_list' %}"
-                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Frosh List</a>
+                    <a href="{% url 'frosh_list' %}"
+                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Frosh List</a>
                 {% endif %}
                 {% if headplanning %}
-                <a href="https://docs.google.com/document/d/1wzCLK6ZLXpoleWLJB4GKP0V05VD9OfCVgdtwexiYGhg/edit?usp=drive_link"
-                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">The Best Document</a>
-                <a href="https://docs.google.com/document/d/1wJpnis7I-b1CnnrflZBebyTjpOUfY3aGbRNxrkwYv1o/edit?usp=drive_web&ouid=108689740860636164130"
-                class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Heads Manual</a>
+                    <a href="https://docs.google.com/document/d/1wzCLK6ZLXpoleWLJB4GKP0V05VD9OfCVgdtwexiYGhg/edit?usp=drive_link"
+                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">The Best Document</a>
+                    <a href="https://docs.google.com/document/d/1wJpnis7I-b1CnnrflZBebyTjpOUfY3aGbRNxrkwYv1o/edit?usp=drive_web&ouid=108689740860636164130"
+                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Heads Manual</a>
                 {% endif %}
             </div>
             <br>
