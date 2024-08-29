@@ -38,6 +38,7 @@ function addPRCRowButtonPress(row_id, disable_invalid_alert) {
   }
   var fname = getValue(inputs, maps, "fname");
   var lname = getValue(inputs, maps, "lname");
+  var fullname = getValue(inputs, maps, "fullname");
   var email = getValue(inputs, maps, "email");
   var prc = getValue(inputs, maps, "prc");
   var grade = getValue(inputs, maps, "grade");
@@ -70,6 +71,7 @@ function addPRCRowButtonPress(row_id, disable_invalid_alert) {
       body: JSON.stringify({
         "command": "add_prc",
         "first_name": fname,
+        "full_name": fullname,
         "email": email,
         "last_name": lname,
         "prc": prc,
@@ -109,8 +111,8 @@ function addPRCRowButtonPress(row_id, disable_invalid_alert) {
         }
       })
 }
-var options = ["None", "First Name", "Last Name", "Email", "PRC Issued", "Brightspace Grade", "Contract", "Waiver", "Training", "Hardhat", "Hardhat Paid", "Breakfast", "Breakfast Paid", "Rafting", "Rafting Paid", "Sweater Size", "Shirt Size", "Allergies", "Shifts"];
-var map = ["none", "fname", "lname", "email", "prc", "grade", "contract", "waiver", "training", "hardhat", "hardhat_paid", "breakfast", "breakfast_paid", "rafting", "rafting_paid", "sweater_size", "shirt_size", "allergies", "shifts"];
+var options = ["None", "First Name", "Last Name", "Email", "Full Name", "PRC Issued", "Brightspace Grade", "Contract", "Waiver", "Training", "Hardhat", "Hardhat Paid", "Breakfast", "Breakfast Paid", "Rafting", "Rafting Paid", "Sweater Size", "Shirt Size", "Allergies", "Shifts"];
+var map = ["none", "fname", "lname", "email", "fullname", "prc", "grade", "contract", "waiver", "training", "hardhat", "hardhat_paid", "breakfast", "breakfast_paid", "rafting", "rafting_paid", "sweater_size", "shirt_size", "allergies", "shifts"];
 
 
 function addHeadingRow(values) {
