@@ -90,7 +90,41 @@
             tr:nth-of-type(even) {
                 background:#d40eee3d;
             }
+            .tooltip {
+                position: relative;
+                display: inline-block;
+                border-bottom: 1px dotted black;
+            }
 
+            .tooltiptext {
+                visibility: hidden;
+                width: 120px;
+                background-color: black;
+                color: #fff;
+                text-align: center;
+                border-radius: 6px;
+                padding: 5px 0;
+                position: absolute;
+                z-index: 1;
+                bottom: 120%;
+                left: 50%;
+                margin-left: -60px;
+            }
+
+            .tooltip .tooltiptext::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: black transparent transparent transparent;
+            }
+
+            .tooltip:hover .tooltiptext {
+                visibility: visible;
+            }
         </style>
     </head>
     <body class="bg-white dark:bg-background-night text-white dark:border-slate-400 dark:shadow-slate-400 shadow-black min-h-screen flex flex-col">

@@ -92,7 +92,7 @@
     {% for team in teams %}
     <div id="div-{{ team.id }}"  class="bg-background shadow" style="display: none;">
         <h1><b>Team Details: {{ team.display_name }}</b></h1><br>
-        <a href="/scavenger/?team={{ team.id }}">View Team Tree</a><br>
+        <a class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2" href="/scavenger/?team={{ team.id }}">View Team Tree</a><br>
         <h2>Overall Stats</h2>
         <p>Last puzzle was completed at: {{ team.last_puzzle_timestamp }}</p>
         <label for="prog-overall-{{ team.id }}">Overall ({{ team.num_clues_finished }}/{{ puzzles_total }})</label>
