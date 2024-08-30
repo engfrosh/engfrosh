@@ -54,7 +54,7 @@ def frosh_list(request: HttpRequest) -> HttpResponse:
         else:
             results = UserDetails.objects.filter(name__icontains=name, user__groups__in=[frosh_group])
         details = request.user.details
-        if details is None:
+        if details is not None:
             team = request.user.details.team
             if team is None and request.user.is_staff:
                 team = "All"
