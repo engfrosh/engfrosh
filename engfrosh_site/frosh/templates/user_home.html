@@ -100,7 +100,7 @@
                 </p>
             {% endif %}
             {% if details %}
-            <p class="float-right">Your frosh id is: {{ details.frosh_id }}</p>
+            <!-- <p class="float-right">Your frosh id is: {{ details.frosh_id }}</p> -->
             <br><br><p>To link your frosh calendar with a calendar app import the calendar from the following URL: <a href={% url "ics_api" uid=details.int_frosh_id %}>https://time.engfrosh.com{% url "ics_api" uid=details.int_frosh_id %}</a></p>
             {% endif %}
             <br>
