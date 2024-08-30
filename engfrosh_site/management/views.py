@@ -53,15 +53,16 @@ def frosh_list(request: HttpRequest) -> HttpResponse:
             results = UserDetails.objects.filter(user=int(name), user__groups__in=[frosh_group])
         else:
             results = UserDetails.objects.filter(name__icontains=name, user__groups__in=[frosh_group])
-        details = request.user.details
-        if details is not None:
+        try:
+            details = request.user.details
             team = request.user.details.team
             if team is None and request.user.is_staff:
                 team = "All"
-        elif request.user.is_staff:
-            team = "All"
-        else:
-            return HttpResponse("Error")
+        except:
+            if request.user.is_staff:
+                team = "All"
+            else:
+                return HttpResponse("Error")
         teams = Team.objects.all()
         return render(request, "frosh_list.html", {'data': results, 'team': team, 'teams': teams})
     else:
