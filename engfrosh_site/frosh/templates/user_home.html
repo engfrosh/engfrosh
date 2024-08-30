@@ -83,19 +83,30 @@
             :root {
                 --fc-page-bg-color: #8305c8;
             }
+            .fc-timeGridWeek-view{
+                min-width: 650px;
+            }
             .fc-event:hover {
                 z-index: 999 !important;
                 width: 250%;
                 height: 250%;
+                min-width: 100px;
+                max-width: 250px;
             }
             .fc-timegrid-event-harness:hover {
                 z-index: 999 !important;
+            }
+            .fc-timegrid-col-frame:hover{
+                z-index: 999 !important;
+            }
+            #calendar {
+                overflow-x: scroll;
             }
         </style>
         <div class="bg-background p-2 shadow" style="margin-bottom: 50px;">
             {% if team.room %}
                 <p style="float:left">
-                    Your team HQ for the day is: <b><a href="https://www.classfind.com/carleton/room/{{ team.room }}" target="_blank">{{ team.room }}</a></b><br>
+                    {{ team.display_name }} HQ for the day is: <b><a href="https://www.classfind.com/carleton/room/{{ team.room }}" target="_blank">{{ team.room }}</a></b><br>
                     The quiet room is <b><a href="https://www.classfind.com/carleton/room/ME4342" target="_blank">ME4342</a></b>
                 </p><br>
             {% endif %}

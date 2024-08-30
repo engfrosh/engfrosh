@@ -95,7 +95,6 @@
                 display: inline-block;
                 border-bottom: 1px dotted black;
             }
-
             .tooltiptext {
                 visibility: hidden;
                 width: 120px;
@@ -110,7 +109,6 @@
                 left: 50%;
                 margin-left: -60px;
             }
-
             .tooltip .tooltiptext::after {
                 content: "";
                 position: absolute;
@@ -121,9 +119,17 @@
                 border-style: solid;
                 border-color: black transparent transparent transparent;
             }
-
             .tooltip:hover .tooltiptext {
                 visibility: visible;
+            }
+            a.rounded-lg{
+                cursor: pointer;
+                color: white;
+                transition: 0.3s;
+            }
+            a.rounded-lg:hover{
+                background-color: rgb(243, 174, 228);
+                background-color:#4e0079;
             }
         </style>
     </head>
