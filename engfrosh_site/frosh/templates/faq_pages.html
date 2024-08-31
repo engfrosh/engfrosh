@@ -58,10 +58,10 @@
                 {% for p in pages %}
                     <style>
                         #box{{ p.id }}{
-                            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('/media/{{ p.image }}'); 
+                            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{{ p.img.url }}'); 
                         }
                         #box{{ p.id }}:hover{
-                            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('/media/{{ p.image }}');
+                            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{{ p.img.url }}');
                         }
                     </style>
                     <a id="box{{ p.id }}" href={% url 'view_faq' id=p.id %} class="p-2 hoverBox">
