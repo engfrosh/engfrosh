@@ -155,7 +155,7 @@
                 {% for p in pages %}
                     <a id="box{{ p.id }}" href={% url 'view_faq' id=p.id %} class="p-2 hoverBox">
                         <p><b>{{ p.title }}</b></p>
-                        <p style="font-size:.7em;">{{ p.html_body|safe}}</p>
+                        <p style="font-size:.7em;">{{ p.body }}</p>
                     </a>
                 {% endfor %}
             </div>
