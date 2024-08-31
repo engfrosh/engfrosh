@@ -480,7 +480,7 @@ def reports(request: HttpRequest) -> HttpResponse:
             line = ""
             for o1 in output:
                 for o2 in o1:
-                    line += o2 + ","
+                    line += str(o2) + ","
                 line += "\n"
             response = HttpResponse(line, content_type="text/csv")
             response['Content-Disposition'] = 'attachment; filename="report.csv"'
