@@ -16,15 +16,149 @@
         h1 {
             font-size: 32px;
         }
+        .box {
+            display: block;
+        }
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        @media (max-width:960px) { 
+            .grid-cols-2 {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
+        }
+        .hoverBox{
+            background-color: rgb(138, 12, 111);
+            background-size:auto 100%;
+            background-position: center;
+            border-style: solid;
+            border-width: 2px;
+            border-color: black;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin:1vw;
+            max-height: 100px;
+            background-size: 100% auto;
+        }
+        .hoverBox:hover{
+            background-color: rgba(128, 0, 128, 0.473);
+        }
+
+        #box1{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "walk.jpg" %}'); 
+        }
+        #box1:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "walk.jpg" %}');
+        }
+        #box2{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "rand.jpg" %}'); 
+        }
+        #box2:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "rand.jpg" %}');
+        }
+        #box3{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "cup.jpg" %}'); 
+        }
+        #box3:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "cup.jpg" %}');
+        }
+        #box4{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "trade.jpg" %}'); 
+        }
+        #box4:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "trade.jpg" %}');
+        }
+        #box5{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "kevi.jpg" %}'); 
+        }
+        #box5:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "kevi.jpg" %}');
+        }
+        #box6{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "larry.jpg" %}'); 
+        }
+        #box6:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "larry.jpg" %}');
+        }
+        #box7{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "water.jpg" %}'); 
+        }
+        #box7:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "water.jpg" %}');
+        }
+        #box8{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "amog.jpg" %}'); 
+        }
+        #box8:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "amog.jpg" %}');
+        }
+        #box9{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "bus.jpg" %}'); 
+        }
+        #box9:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "bus.jpg" %}');
+        }
+        #box10{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "idol.jpg" %}'); 
+        }
+        #box10:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "idol.jpg" %}');
+        }
+        #box11{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "angussy.jpg" %}'); 
+        }
+        #box11:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "angussy.jpg" %}');
+        }
+        #box12{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "market.jpg" %}'); 
+        }
+        #box12:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "market.jpg" %}');
+        }
+        #box13{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "raft.jpg" %}'); 
+        }
+        #box13:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "raft.jpg" %}');
+        }
+        #box14{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "frog.jpg" %}'); 
+        }
+        #box14:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "frog.jpg" %}');
+        }
+        #box15{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "flag.jpg" %}'); 
+        }
+        #box15:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "flag.jpg" %}');
+        }
+        #box16{
+            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "sport.jpg" %}'); 
+        }
+        #box16:hover{
+            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "sport.jpg" %}');
+        }
+        p {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: 50px;
+        }
     </style>
     <div class="text-white text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
         <div class="bg-background p-2 shadow">
-            <h1>FAQ Pages</h1><br>
-            {% for p in pages %}
-                <div>
-                    <a href={% url 'view_faq' id=p.id %}>{{ p.title }}</a>
-                </div><br>
-            {% endfor %}
+            <h1><b>FAQ Pages</b></h1><br>
+            <div class="grid gap-4 grid-cols-2" style="grid-template-rows: auto;">
+                {% for p in pages %}
+                    <a id="box{{ p.id }}" href={% url 'view_faq' id=p.id %} class="p-2 hoverBox">
+                        <p><b>{{ p.title }}</b></p>
+                        <p style="font-size:.7em;">{{ p.body}}</p>
+                    </a>
+                {% endfor %}
+            </div>
         </div>
     </div>
 {% endblock active %}
