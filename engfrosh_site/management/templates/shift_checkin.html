@@ -80,16 +80,16 @@
                 </td>
                 {% else %}
                 <td class="px-2">
-                    <form method="POST" id="shift-{{ shift.id }}">
+                    <form method="POST" id="shift-{{ signup.id }}">
                         {% csrf_token %}
                         <input type="hidden" name="signup" value="{{ signup.id }}">
                         <input type="hidden" name="switch" value="{{ signup.attendance }}">
                         <input type="hidden" name="action" value="attendance">
                         {% if shift.administrative %}
                         {% if signup.attendance %}
-                            <button style="background-color: green;" type="button" onclick='btncallback({{ shift.id }}, "{{ shift.name }}", "{{ signup.user.first_name }} {{ signup.user.last_name }}", "absent")'>Mark Absent</button>
+                            <button style="background-color: green;" type="button" onclick='btncallback({{ signup.id }}, "{{ shift.name }}", "{{ signup.user.first_name }} {{ signup.user.last_name }}", "absent")'>Mark Absent</button>
                         {% else %}
-                            <button style="background-color: red;" type="button" onclick='btncallback({{ shift.id }}, "{{ shift.name }}", "{{ signup.user.first_name }} {{ signup.user.last_name }}", "present")'>Mark Present</button>
+                            <button style="background-color: red;" type="button" onclick='btncallback({{ signup.id }}, "{{ shift.name }}", "{{ signup.user.first_name }} {{ signup.user.last_name }}", "present")'>Mark Present</button>
                         {% endif %}
                         {% else %}
                         {% if signup.attendance %}
