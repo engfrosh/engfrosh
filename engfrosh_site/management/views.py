@@ -96,7 +96,7 @@ def shift_checkin(request: HttpRequest, id: int) -> HttpResponse:
         if not request.user.has_perm('common_models.attendance_admin'):
             return HttpResponse("You are not authorized to check in this shift1")
     if request.method == "GET":
-        signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__last_name')
+        signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__first_name')
         if shift.type == "wt":
             signups = signups.select_related("user__details")
         return render(request, "shift_checkin.html", {"shift": shift, "signups": signups})
@@ -115,7 +115,7 @@ def shift_checkin(request: HttpRequest, id: int) -> HttpResponse:
             else:
                 signup.attendance = True
             signup.save()
-            signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__last_name')
+            signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__first_name')
             if shift.type == "wt":
                 signups = signups.select_related("user__details")
             return render(request, "shift_checkin.html", {"shift": shift, "signups": signups})
@@ -123,7 +123,7 @@ def shift_checkin(request: HttpRequest, id: int) -> HttpResponse:
             details = signup.user.details
             details.waiver_completed = True
             details.save()
-            signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__last_name')
+            signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__first_name')
             if shift.type == "wt":
                 signups = signups.select_related("user__details")
             return render(request, "shift_checkin.html", {"shift": shift, "signups": signups})
