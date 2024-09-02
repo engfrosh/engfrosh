@@ -44,103 +44,6 @@
         .hoverBox:hover{
             background-color: rgba(128, 0, 128, 0.473);
         }
-
-        #box1{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "walk.jpg" %}'); 
-        }
-        #box1:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "walk.jpg" %}');
-        }
-        #box2{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "rand.jpg" %}'); 
-        }
-        #box2:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "rand.jpg" %}');
-        }
-        #box5{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "cup.jpg" %}'); 
-        }
-        #box5:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "cup.jpg" %}');
-        }
-        #box6{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "trade.jpg" %}'); 
-        }
-        #box6:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "trade.jpg" %}');
-        }
-        #box7{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "kevi.jpg" %}'); 
-        }
-        #box7:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "kevi.jpg" %}');
-        }
-        #box8{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "larry.jpg" %}'); 
-        }
-        #box8:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "larry.jpg" %}');
-        }
-        #box9{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "water.jpg" %}'); 
-        }
-        #box9:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "water.jpg" %}');
-        }
-        #box10{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "amog.jpg" %}'); 
-        }
-        #box10:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "amog.jpg" %}');
-        }
-        #box11{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "bus.jpg" %}'); 
-        }
-        #box11:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "bus.jpg" %}');
-        }
-        #box12{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "idol.jpg" %}'); 
-        }
-        #box12:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "idol.jpg" %}');
-        }
-        #box13{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "angussy.jpg" %}'); 
-        }
-        #box13:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "angussy.jpg" %}');
-        }
-        #box14{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "market.jpg" %}'); 
-        }
-        #box14:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "market.jpg" %}');
-        }
-        #box16{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "raft.jpg" %}'); 
-        }
-        #box16:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "raft.jpg" %}');
-        }
-        #box17{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "frog.jpg" %}'); 
-        }
-        #box17:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "frog.jpg" %}');
-        }
-        #box18{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "flag.jpg" %}'); 
-        }
-        #box18:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "flag.jpg" %}');
-        }
-        #box19{
-            background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{% static "sport.jpg" %}'); 
-        }
-        #box19:hover{
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% static "sport.jpg" %}');
-        }
         p {
             white-space: nowrap;
             overflow: hidden;
@@ -153,9 +56,19 @@
             <h1><b>Event Information</b></h1><br>
             <div class="grid gap-4 grid-cols-2" style="grid-template-rows: auto;">
                 {% for p in pages %}
+                    {% if p.img %}
+                        <style>
+                            #box{{ p.id }}{
+                                background-image: linear-gradient(rgba(60,0,60,0.3), rgba(60,0,60,0.6)), url('{{ p.img.url }}'); 
+                            }
+                            #box{{ p.id }}:hover{
+                                background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{{ p.img.url }}');
+                            }
+                        </style>
+                    {% endif %}
                     <a id="box{{ p.id }}" href={% url 'view_faq' id=p.id %} class="p-2 hoverBox">
                         <p><b>{{ p.title }}</b></p>
-                        <p style="font-size:.7em;">{{ p.html_body|safe}}</p>
+                        <p style="font-size:.7em;">{{ p.body }}</p>
                     </a>
                 {% endfor %}
             </div>
