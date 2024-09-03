@@ -341,7 +341,7 @@ function viewSwitch(){
                             }
                         }
 
-                        //Function to sort the tree
+                        /*//Function to sort the tree
                         function compareFn(a, b) {
                             let aKeys = Object.keys(tree[a]);
                             let bKeys = Object.keys(tree[b])
@@ -356,10 +356,10 @@ function viewSwitch(){
                             }
                             // a must be equal to b
                             return 0;
-                        }
+                        }*/
                         
                         
-                        tree = Object.keys(tree).sort(compareFn).reduce((r, k) => (r[k] = tree[k], r), {})
+                        //tree = Object.keys(tree).sort(compareFn).reduce((r, k) => (r[k] = tree[k], r), {})
                         generateScavTree(tree);
 
                         function generateScavTree(tree) {
