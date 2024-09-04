@@ -1543,8 +1543,19 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
                 puzzle.enabled = True
                 puzzle.save()
             teams = Team.objects.all()
+            next_puzzle = puzzle.stream.get_next_enabled_puzzle(puzzle)
             for team in teams:
-                team.refresh_scavenger_progress()
+                activity = TeamPuzzleActivity.objects.filter(puzzle=puzzle, team=team, completed_at=0)
+                if len(activity) == 0:
+                    continue
+                if next_puzzle is None:
+                    activity.delete()
+                else:
+                    activity.puzzle = next_puzzle
+                    activity.save()
+                team.invalidate_tree = True
+                team.save()
+                # team.refresh_scavenger_progress()
             return HttpResponse("Successfully toggled puzzle")
         else:
             return HttpResponseBadRequest("Invalid command.")
