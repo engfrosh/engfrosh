@@ -396,7 +396,7 @@ function viewSwitch(){
                                 // Determine the current branch side (left, middle, right)
                                 if (isMain) {
                                     curBranchSide = document.getElementById(`${treeId}Middle`);
-                                } else if ((branchIndex % 2 === 0 && branch != "SIDE-QUEST") || (branchIndex % 2 != 0 && branch == "SIDE-QUEST")) {
+                                } else if ((branchIndex % 2 === 0 && branch != "SIDE-QUEST")) {
                                     curBranchSide = document.getElementById(`${treeId}LeftSide`);
                                 } else {
                                     curBranchSide = document.getElementById(`${treeId}RightSide`);
@@ -443,14 +443,16 @@ function viewSwitch(){
                                             curBranch.style.width = `${leftWidth}px`;
                                             curBranch.style.right = `0px`;
                                             if (branch == "SIDE-QUEST"){
-                                                curBranch.style.right = 100*(branchIndex-maxHorzClues)+`px`;
+                                                let rightOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().x;
+                                                curBranch.style.right = `${rightOffset-615}px`;
                                             }
                                         } else if (curBranchSide.id === `${treeId}RightSide`){
                                             curBranch.style.position = 'absolute';
                                             let topOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().y - 288;
                                             curBranch.style.top = `${topOffset}px`;
                                             if (branch == "SIDE-QUEST"){
-                                                curBranch.style.left = `100px`;
+                                                let leftOffset = document.getElementById(`${tree[branch][clue][1]}`).getBoundingClientRect().x;
+                                                curBranch.style.left = `${leftOffset-615}px`;
                                             }
                                         }
                                     }
