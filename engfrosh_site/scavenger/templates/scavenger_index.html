@@ -352,6 +352,12 @@ function viewSwitch(){
                                 return -1;
                             }else if (tree[b][bKeys[0]][1] == "start") {
                                 return 1;
+                            }else if (Number(tree[a][aKeys[0]][1]) == NaN || Number(tree[b][bKeys[0]][1]) == NaN){
+                                if (Number(tree[a][aKeys[0]][1]) == NaN){
+                                    return 1;
+                                }else {
+                                    return -1;
+                                }
                             }else if (Number(tree[a][aKeys[0]][1]) < Number(tree[b][bKeys[0]][1])) {
                                 return -1;
                             } else if (Number(tree[a][aKeys[0]][1]) > Number(tree[b][bKeys[0]][1])) {
