@@ -1539,7 +1539,7 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
             teams = Team.objects.all()
             next_puzzle = puzzle.stream.get_next_enabled_puzzle(puzzle)
             for team in teams:
-                activity = TeamPuzzleActivity.objects.filter(puzzle=puzzle, team=team , puzzle_completed_at=None)
+                activity = TeamPuzzleActivity.objects.filter(puzzle=puzzle, team=team, puzzle_completed_at=None)
                 print(team.display_name, len(activity))
                 if len(activity) == 0:
                     continue
