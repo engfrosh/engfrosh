@@ -1536,18 +1536,14 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
             puzzle = Puzzle.objects.filter(id=puzzle_id).first()
             if puzzle.stream_branch is not None or puzzle.stream_puzzle is not None:
                 return HttpResponse("This will break things! Aborting.")
-            if puzzle.enabled:
-                puzzle.enabled = False
-                puzzle.save()
-            else:
-                puzzle.enabled = True
-                puzzle.save()
             teams = Team.objects.all()
             next_puzzle = puzzle.stream.get_next_enabled_puzzle(puzzle)
             for team in teams:
-                activity = TeamPuzzleActivity.objects.filter(puzzle=puzzle, team=team, puzzle_completed_at=0)
+                activity = TeamPuzzleActivity.objects.filter(puzzle=puzzle, team=team , puzzle_completed_at=None)
+                print(team.display_name, len(activity))
                 if len(activity) == 0:
                     continue
+                activity = activity.first()
                 if next_puzzle is None:
                     activity.delete()
                 else:
@@ -1556,6 +1552,12 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
                 team.invalidate_tree = True
                 team.save()
                 # team.refresh_scavenger_progress()
+            if puzzle.enabled:
+                puzzle.enabled = False
+                puzzle.save()
+            else:
+                puzzle.enabled = True
+                puzzle.save()
             return HttpResponse("Successfully toggled puzzle")
         else:
             return HttpResponseBadRequest("Invalid command.")
