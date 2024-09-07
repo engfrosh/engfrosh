@@ -12,6 +12,7 @@ jstools/node_modules/
 tree.png
 venv
 qr_codes
+*.sqlite3
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

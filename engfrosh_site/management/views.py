@@ -37,6 +37,9 @@ from .email import send_email
 from django.contrib.auth.decorators import user_passes_test
 from schedule.models import Event, Calendar
 
+from .controllers import create_bus_shifts, complete_waiver, shift_check_in, global_toggle_weeklongs, get_user_shifts, \
+                         get_eligible_shifts, user_add_shift, user_remove_shift, copy_shift, run_report, \
+                         toggle_scav_puzzle
 
 logger = logging.getLogger("management.views")
 
@@ -71,19 +74,7 @@ def frosh_list(request: HttpRequest) -> HttpResponse:
 
 @user_passes_test(lambda u: u.is_superuser)
 def generate_bus(request: HttpRequest) -> HttpResponse:
-    for team in Team.objects.all():
-        shifts = FacilShift.objects.filter(name=team.display_name + "-BusMorning")
-        if len(shifts) > 0:
-            shift = shifts.first()
-        else:
-            shift = FacilShift(name=team.display_name + "-BusMorning", desc="bus",
-                               flags="bus", type="wt", max_facils=0, administrative=True)
-            shift.save()
-        for signup in FacilShiftSignup.objects.filter(shift=shift):
-            signup.delete()
-        for user in team.group.user_set.all():
-            signup = FacilShiftSignup(shift=shift, user=user)
-            signup.save()
+    create_bus_shifts()
     return HttpResponse("Created bus shifts")
 
 
@@ -107,22 +98,18 @@ def shift_checkin(request: HttpRequest, id: int) -> HttpResponse:
             return HttpResponse("Invalid signup!")
         action = request.POST["action"]
         if action == "attendance":
-            if shift.type == "wt" and not signup.user.details.waiver_completed:
-                return HttpResponse("Incomplete waiver!")
             switch = request.POST.get("switch", "")
-            if switch == "True":
-                signup.attendance = False
-            else:
-                signup.attendance = True
-            signup.save()
+            att = switch == "True"
+            success = shift_check_in(signup, att)
+            if not success[0]:
+                return HttpResponse(success[1])
             signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__first_name')
             if shift.type == "wt":
                 signups = signups.select_related("user__details")
             return render(request, "shift_checkin.html", {"shift": shift, "signups": signups})
         elif action == "waiver":
             details = signup.user.details
-            details.waiver_completed = True
-            details.save()
+            complete_waiver(details)
             signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__first_name')
             if shift.type == "wt":
                 signups = signups.select_related("user__details")
@@ -153,21 +140,10 @@ def edit_calendar(request: HttpRequest, id: int) -> HttpResponse:
 
 @permission_required("common_models.lock_scav")
 def lock_scav(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        global_toggle_weeklongs(request.user.username)
     scav = BooleanSetting.objects.get(id="SCAVENGER_ENABLED")
     tradeup = BooleanSetting.objects.get(id="TRADE_UP_ENABLED")
-    if request.method == "POST":
-        scav.value = not scav.value
-        tradeup.value = not tradeup.value
-        scav.save()
-        tradeup.save()
-        scav_txt = "locked"
-        if scav.value:
-            scav_txt = "unlocked"
-        tradeup_txt = "locked"
-        if tradeup.value:
-            tradeup_txt = "unlocked"
-        DiscordChannel.send_to_updates_channels("@everyone - " + request.user.username +
-                                                ": Scav is now " + scav_txt + ". Trade Up is now " + tradeup_txt)
     return render(request, "lock_scav.html", {"scav": scav.value, "tradeup": tradeup.value})
 
 
@@ -198,28 +174,8 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
     if datetime.datetime.utcfromtimestamp(lockout_time) <= datetime.datetime.now() and lockout_time != 0:
         can_remove = False
     if request.method == "GET":
-        shifts = list(FacilShift.objects.filter(administrative=False).order_by('start').all())
-        my = FacilShiftSignup.objects.filter(user=request.user)
-        rshifts = []  # Shifts remaining to be signed up for
-        if shift_count < max_shifts:
-            for shift in shifts:
-                signups = shift.facil_count
-                found = False
-                for s in my:
-                    if s.shift == shift:
-                        found = True
-                        break
-                if signups < shift.max_facils and not found and not shift.is_passed:
-                    rshifts += [shift]
-        my_shifts = []
-        if not request.user.is_staff:
-            my_shifts_i = FacilShiftSignup.objects.filter(user=request.user, shift__administrative=False) \
-                                          .select_related().order_by('shift__start')
-        else:
-            my_shifts_i = FacilShiftSignup.objects.filter(user=request.user) \
-                                          .select_related().order_by('shift__start')
-        for shift in my_shifts_i:
-            my_shifts += [shift.shift]
+        rshifts = get_eligible_shifts(request.user)
+        my_shifts = get_user_shifts(request.user)
         return render(request, "facil_shift_signup.html",
                       {"shifts": rshifts, "my_shifts": my_shifts, "can_remove": can_remove})
     elif request.method == "POST":
@@ -232,113 +188,32 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             shift_id = int(request.POST["shift_id"])
             logger.info(shift_id)
             shift = FacilShift.objects.filter(administrative=False, id=shift_id).first()
-            shifts = list(FacilShift.objects.filter(administrative=False).order_by('start').all())
-            rshifts = []
-            my_shifts = []
-            for shift2 in FacilShiftSignup.objects.filter(user=request.user).order_by('shift__start'):
-                my_shifts += [shift2.shift]
-            my = FacilShiftSignup.objects.filter(user=request.user)
-            for s in shifts:
-                signups = s.facil_count
-                found = False
-                for s2 in my:
-                    if s2.shift == s:
-                        found = True
-                        break
-                if signups < s.max_facils and not found and not shift.is_passed:
-                    rshifts += [s]
-            if shift is None:
-                logger.info("Shift not found")
+            rshifts = get_eligible_shifts(request.user)
+            success = user_add_shift(request.user, shift)
+            if not success[0]:
+                logger.info(success[1])
                 return render(request, "facil_shift_signup.html",
                               {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
-            if shift.is_passed:
-                logger.info("Shift is passed")
-                return render(request, "facil_shift_signup.html",
-                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
-            count = len(FacilShiftSignup.objects.filter(shift=shift))
-            if count >= shift.max_facils:
-                logger.info("Full shift")
-                return render(request, "facil_shift_signup.html",
-                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
-            signup = FacilShiftSignup.objects.filter(user=request.user, shift=shift).first()
-            if signup is not None:
-                logger.info("Already signed up")
-                return render(request, "facil_shift_signup.html",
-                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
-            signup = FacilShiftSignup(user=request.user, shift=shift)
-            signup.save()
-            shifts = list(FacilShift.objects.filter(administrative=False).order_by('start').all())
-            rshifts = []
-            my = FacilShiftSignup.objects.filter(user=request.user)
-            for shift in shifts:
-                signups = shift.facil_count
-                found = False
-                for s in my:
-                    if s.shift == shift:
-                        found = True
-                        break
-                if signups < shift.max_facils and not found and not shift.is_passed:
-                    rshifts += [shift]
+            rshifts = get_eligible_shifts(request.user)
             logger.info("Signed up for shift")
-            my_shifts = []
-            for shift in FacilShiftSignup.objects.filter(user=request.user).order_by('shift__start'):
-                my_shifts += [shift.shift]
+            my_shifts = get_user_shifts(request.user)
             return render(request, "facil_shift_signup.html",
                           {"shifts": rshifts, "success": True, "my_shifts": my_shifts, "can_remove": can_remove})
         elif action == "remove":
-            my_shifts = []
-            for shift in FacilShiftSignup.objects.filter(user=request.user).order_by('shift__start'):
-                my_shifts += [shift.shift]
+            my_shifts = get_user_shifts(request.user)
             logger.info(request.user)
             logger.info("Removing from facil shift. Shift id: ")
-            rshifts = []
-            shifts = list(FacilShift.objects.filter(administrative=False).order_by('start').all())
-            my = FacilShiftSignup.objects.filter(user=request.user)
-            for shift in shifts:
-                found = False
-                signups = shift.facil_count
-                for s in my:
-                    if s.shift == shift:
-                        found = True
-                        break
-                if signups < shift.max_facils and not found and not shift.is_passed:
-                    rshifts += [shift]
-            if not can_remove:
-                logger.info("Removing is disabled")
-                return render(request, "facil_shift_signup.html",
-                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
+            rshifts = get_eligible_shifts(request.user)
             shift_id = int(request.POST["shift_id"])
             logger.info(shift_id)
             shift = FacilShift.objects.filter(administrative=False, id=shift_id).first()
-            if shift is None:
-                logger.info("Shift not found")
+            success = user_remove_shift(request.user, shift)
+            if not success[0]:
+                logger.info(success[1])
                 return render(request, "facil_shift_signup.html",
                               {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
-            if shift.is_cutoff:
-                logger.info("Shift is cutoff")
-                return render(request, "facil_shift_signup.html",
-                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
-            signup = FacilShiftSignup.objects.filter(shift=shift, user=request.user).first()
-            if signup is None:
-                logger.info("Shift not found")
-                return render(request, "facil_shift_signup.html",
-                              {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
-            signup.delete()
-            my_shifts = []
-            for shift in FacilShiftSignup.objects.filter(user=request.user).order_by('shift__start'):
-                my_shifts += [shift.shift]
-            rshifts = []
-            shifts = list(FacilShift.objects.filter(administrative=False).order_by('start').all())
-            my = FacilShiftSignup.objects.filter(user=request.user)
-            for shift in shifts:
-                signups = shift.facil_count
-                found = False
-                for s in my:
-                    if s.shift == shift:
-                        found = True
-                        break
-                if signups < shift.max_facils and not found and not shift.is_passed:
-                    rshifts += [shift]
+            my_shifts = get_user_shifts(request.user)
+            rshifts = get_user_shifts(request.user)
             return render(request, "facil_shift_signup.html",
                           {"shifts": rshifts, "success": True, "my_shifts": my_shifts, "can_remove": can_remove})
 
@@ -374,18 +249,11 @@ def mailing_list(request: HttpRequest) -> HttpResponse:
             return HttpResponse('<meta http-equiv="refresh" content="0;url=' + redir + '" />')
         elif action == "copy":
             shift = FacilShift.objects.filter(id=shift_id).first()
-            if shift is None or not request.user.has_perm('common_models.shift_manage'):
+            if not request.user.has_perm('common_models.shift_manage'):
                 raise PermissionDenied()
-            signups = FacilShiftSignup.objects.filter(shift=shift)
-            shift.pk = None  # Copy to new shift per
-            # https://stackoverflow.com/questions/4733609/how-do-i-clone-a-django-model-instance-object-and-save-it-to-the-database
-            shift.id = None
-            shift.name += "-copy"
-            shift.save()
-            for signup in signups:
-                if signup.attendance:
-                    new_signup = FacilShiftSignup(shift=shift, user=signup.user)
-                    new_signup.save()
+            success = copy_shift(shift)
+            if not success:
+                raise PermissionDenied()
             if not request.user.has_perm("common_models.attendance_admin"):
                 shifts = list(FacilShift.objects.filter(checkin_user__in=[None, request.user]).order_by('start'))
             else:
@@ -419,36 +287,7 @@ def reports(request: HttpRequest) -> HttpResponse:
                 requirements += [(target, value, operator)]
         except KeyError:
             return HttpResponseBadRequest("Key Error in Body")
-        users = UserDetails.objects.select_related('user').all()
-        data = []
-        for user in users:
-            met = True
-            for r in requirements:
-                d = r[0].split(".")
-                obj = d[0]
-                name = d[1]
-                if obj == "details":
-                    value = str(getattr(user, name))
-                    if callable(value):
-                        value = value()
-                elif obj == "user":
-                    value = str(getattr(user.user, name))
-                    if callable(value):
-                        value = value()
-                if r[2] == "=" and value.lower() != str(r[1]).lower():
-                    met = False
-                    break
-                elif r[2] == "!=" and value.lower() == str(r[1]).lower():
-                    met = False
-                    break
-                elif r[2] == "ew" and not value.lower().endswith(str(r[1]).lower()):
-                    met = False
-                    break
-                elif r[2] == "new" and value.lower().endswith(str(r[1]).lower()):
-                    met = False
-                    break
-            if met:
-                data += [user]
+        data = run_report(requirements)
         output = []
         first = True
         for user in data:
@@ -1534,30 +1373,10 @@ def manage_scavenger_puzzles(request: HttpRequest) -> HttpResponse:
                 return HttpResponseBadRequest("Bad request body, missing puzzle.")
             puzzle_id = req_dict['puzzle']
             puzzle = Puzzle.objects.filter(id=puzzle_id).first()
-            if puzzle.stream_branch is not None or puzzle.stream_puzzle is not None:
-                return HttpResponse("This will break things! Aborting.")
-            teams = Team.objects.all()
-            next_puzzle = puzzle.stream.get_next_enabled_puzzle(puzzle)
-            for team in teams:
-                activity = TeamPuzzleActivity.objects.filter(puzzle=puzzle, team=team, puzzle_completed_at=None)
-                print(team.display_name, len(activity))
-                if len(activity) == 0:
-                    continue
-                activity = activity.first()
-                if next_puzzle is None:
-                    activity.delete()
-                else:
-                    activity.puzzle = next_puzzle
-                    activity.save()
-                team.invalidate_tree = True
-                team.save()
-                # team.refresh_scavenger_progress()
-            if puzzle.enabled:
-                puzzle.enabled = False
-                puzzle.save()
-            else:
-                puzzle.enabled = True
-                puzzle.save()
+            success = toggle_scav_puzzle(puzzle)
+            if not success[0]:
+                logger.info(success[1])
+                return HttpResponse(success[1])
             return HttpResponse("Successfully toggled puzzle")
         else:
             return HttpResponseBadRequest("Invalid command.")
