@@ -2,6 +2,7 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from channels.layers import get_channel_layer
+from channels.exceptions import StopConsumer
 
 
 class CheckInConsumer(WebsocketConsumer):
@@ -21,6 +22,7 @@ class CheckInConsumer(WebsocketConsumer):
             'checkin',
             self.channel_name
         )
+        raise StopConsumer()
 
     def receive(self, text_data):
         pass
