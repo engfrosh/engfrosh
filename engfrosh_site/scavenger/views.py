@@ -42,6 +42,7 @@ def stream_view(request: HttpRequest) -> HttpResponse:
 def index(request: HttpRequest) -> HttpResponse:
     team = Team.from_user(request.user)
     set_team = request.GET.get('team', None)
+    bypass = request.user.has_perm('common_models.bypass_scav_rules')
     if set_team is not None and request.user.has_perm("common_models.manage_scav"):
         team = Team.objects.filter(group__id=int(set_team)).first()
     else:
@@ -50,10 +51,9 @@ def index(request: HttpRequest) -> HttpResponse:
     if not team:
         return render(request, "scavenger_index.html", context={"team": None})
 
-    if not team.scavenger_enabled:
+    if not team.scavenger_enabled and not bypass:
         return HttpResponse("Scavenger not currently enabled")
 
-    bypass = request.user.has_perm('common_models.bypass_scav_rules')
     if team.invalidate_tree:
         tree = base64.b64encode(bytes(json.dumps(generate_tree(team)), 'utf-8')).decode('utf-8')
         team.invalidate_tree = False
