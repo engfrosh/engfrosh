@@ -198,7 +198,7 @@ DATABASES = {
         'CONN_MAX_AGE': 3600,
         "PORT": "3306",
         'OPTIONS': {
-           "init_command": "SET GLOBAL max_connections = 100000", # Unlimited DB connections
+           "init_command": "SET GLOBAL max_connections = 100000",  # Unlimited DB connections
         }
     }}
 
