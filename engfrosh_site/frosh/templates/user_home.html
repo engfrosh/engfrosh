@@ -145,17 +145,20 @@
                 var year = currDate.getFullYear();
                 var month = currDate.getMonth(); // 0 indexed
                 var day = currDate.getDate();
-                if (month <= 7 && day < 26){
+                if ((month == 7 && day < 26) || month < 7){
                     month = 7;
                     day = 26;
-                }else if (month >= 8 && day > 8){
+                }else if ((month == 8 && day > 8) || month > 8){
                     month = 8;
                     day = 8;
                 }
                 if (day < 10){
                     day = "0" + day;
                 }
-                var initDate = year + "-0" + (month + 1) + "-" + day;
+                if (month < 9){ // Month is 0 indexed
+                    month = "0" + (month+1);
+                }
+                var initDate = year + "-" + month + "-" + day;
                 var view = "timeGridWeek";
                 if(window.mobileCheck()){
                     view = "timeGridDay";
