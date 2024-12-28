@@ -25,7 +25,11 @@
             approvePhotoButtonPress(id);
             document.getElementById("approval-" + id).remove()
         }
-        let socket = new WebSocket('wss://'+window.location.host+"/ws/scav/approval");
+        var proto = "wss";
+        if (window.location.host.startsWith("localhost")){
+            proto = "ws";
+        }
+        let socket = new WebSocket(proto+'://'+window.location.host+"/ws/scav/approval");
         socket.onopen = function(e){
             document.getElementById("status").innerHTML = "Connected";
         }

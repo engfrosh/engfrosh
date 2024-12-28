@@ -202,7 +202,6 @@ DATABASES = {
         }
     }}
 
-
 # Password validation & Authentication
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
