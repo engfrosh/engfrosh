@@ -4,7 +4,7 @@ from .serializers import VerificationPhotoSerializer
 from rest_framework.response import Response
 from common_models.models import VerificationPhoto, UserDetails, FacilShiftSignup, FacilShift
 from datetime import datetime
-from schedule.models import CalendarRelation, Calendar
+from common_models.models import CalendarRelation, Calendar
 from django.urls import reverse
 from django.contrib.auth.models import User
 from engfrosh_common.AWS_SES import send_SES

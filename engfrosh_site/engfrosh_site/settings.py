@@ -147,8 +147,7 @@ INSTALLED_APPS = [
     'check_in.apps.CheckInConfig',
     'ticket.apps.TicketConfig',
     'api.apps.APIConfig',
-    'channels',
-    'schedule'
+    'channels'
 ]
 
 MIDDLEWARE = [

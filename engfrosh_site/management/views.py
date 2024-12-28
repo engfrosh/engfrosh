@@ -35,7 +35,7 @@ from django.shortcuts import render, redirect
 from .forms import AnnouncementForm
 from .email import send_email
 from django.contrib.auth.decorators import user_passes_test
-from schedule.models import Event, Calendar
+from common_models.models import Event, Calendar
 
 from .controllers import create_bus_shifts, complete_waiver, shift_check_in, global_toggle_weeklongs, get_user_shifts, \
                          get_eligible_shifts, user_add_shift, user_remove_shift, copy_shift, run_report, \

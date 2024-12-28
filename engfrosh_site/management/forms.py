@@ -1,6 +1,6 @@
 from django import forms
 from common_models.models import Puzzle, FacilShift
-from schedule.models import Calendar
+from common_models.models import Calendar
 from django.contrib.auth.models import User
 
 

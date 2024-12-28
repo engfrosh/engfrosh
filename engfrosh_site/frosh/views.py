@@ -7,7 +7,7 @@ from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, A
 from common_models.models import InclusivityPage, FroshRole, DiscordUser, Setting, FAQPage, BooleanSetting
 import datetime
 from management import forms
-from schedule.models import Event, CalendarRelation, Calendar
+from common_models.models import Event, CalendarRelation, Calendar
 from django.contrib.contenttypes.models import ContentType
 import logging
 from .forms import CharterForm

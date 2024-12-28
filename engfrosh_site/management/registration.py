@@ -117,24 +117,6 @@ def email_magic_link(user: User, hostname: str, login_path: str, sender_email: s
     return res
 
 
-def compute_discord_name(user):
-    details = md.UserDetails.objects.filter(user=user).first()
-    if details.override_nick is not None:
-        return details.override_nick
-    pronouns = details.pronouns
-    name = user.first_name
-    if user.last_name:
-        name += " " + user.last_name[:1]
-    if len(pronouns) > 0:
-        name += " ("
-        for i in range(len(pronouns)-1):
-            if len(name + pronouns[i].name + " ") > 31:
-                break
-            name += pronouns[i].name + " "
-        name += pronouns[len(pronouns)-1].name + ")"
-    return name
-
-
 def create_user_initialize(name: str, email: str, role: FroshRole, team: Optional[Team] = None,
                            program: Optional[UniversityProgram] = None, size: Optional[str] = None,
                            rafting=False, hardhat=False, allergies="", sweater_size=None) -> User:
@@ -202,7 +184,7 @@ def create_user_initialize(name: str, email: str, role: FroshRole, team: Optiona
                     continue
 
             client.set_roles_for_member(credentials.GUILD_ID, discord.id, discord_role_ids)
-            name = compute_discord_name(user)
+            name = discord.compute_name()
             print("New nick: " + name)
             client.change_user_nickname(credentials.GUILD_ID, discord.id, name)
             return user
