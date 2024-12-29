@@ -201,8 +201,8 @@ DATABASES = {
         }
     }}
 
-if 'test' in sys.argv:
-    print("!!TESTING MODE!!")
+if 'test' in sys.argv or DEBUG:
+    print("!!SQLITE MODE!!")
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3', 'NAME': BASE_DIR / 'db.sqlite3'}
 
 # Password validation & Authentication
