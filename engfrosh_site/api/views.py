@@ -6,8 +6,6 @@ from common_models.models import VerificationPhoto, UserDetails, FacilShiftSignu
 from datetime import datetime
 from common_models.models import CalendarRelation, Calendar
 from django.urls import reverse
-from django.contrib.auth.models import User
-from engfrosh_common.AWS_SES import send_SES
 from ics import Event
 import ics
 from api import renderer
@@ -103,23 +101,6 @@ class ICSAPI(APIView):
         resp = Response(data, content_type="text/calendar")
         resp.accepted_media_type = "text/calendar"
         return resp
-
-
-class WaiverAPI(APIView):
-    def get(self, request):
-        email = request.GET.get("email")
-        user = User.objects.filter(email=email).first()
-        if user is None:
-            # Freak out
-            print("Uh oh spaghetti O's, failed to find user " + email)
-            body = "Hello,\nA user with email: " + email + " could not be found!"
-            send_SES("noreply@engfrosh.com", "technical@engfrosh.com", "Waiver User Not Found", body, body)
-            return Response({"success": False})
-        else:
-            details = UserDetails.objects.filter(user=user).first()
-            details.waiver_completed = True
-            details.save()
-            return Response({"success": True})
 
 
 class VerificationPhotoAPI(APIView):
