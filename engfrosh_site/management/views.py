@@ -1020,15 +1020,15 @@ def discord_create(request: HttpRequest) -> HttpResponse:
         ("Groupco", ChannelTag.objects.get_or_create(name="GROUP-CO")[0],
          Group.objects.get_or_create(name="GroupCo")[0]),
     ]
-    if guild.get_role("Planning") is None:
-        r = guild.create_role("Planning")
+    if guild.get_role("Core Planning") is None:
+        r = guild.create_role("Core Planning")
     else:
-        r = guild.get_role("Planning")
-    g = Group.objects.get_or_create(name="Planning")[0]
+        r = guild.get_role("Core Planning")
+    g = Group.objects.get_or_create(name="Core Planning")[0]
     dr = DiscordRole.objects.get_or_create(role_id=r.id, group_id=g)[0]
     dr.save()
-    prole = DiscordRole.objects.get(group_id=Group.objects.filter(name="Planning").first())
-    poverwrite = DiscordOverwrite(descriptive_name="Planning", user_id=prole.role_id, type=0, allow=3072, deny=0)
+    prole = DiscordRole.objects.get(group_id=Group.objects.filter(name="Core Planning").first())
+    poverwrite = DiscordOverwrite(descriptive_name="Core Planning", user_id=prole.role_id, type=0, allow=3072, deny=0)
     poverwrite.save()
     disallow = DiscordOverwrite(descriptive_name="Deny All", user_id=guild.id, type=0, allow=0, deny=3072)
     disallow.save()
