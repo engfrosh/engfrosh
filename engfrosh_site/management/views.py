@@ -1044,7 +1044,7 @@ def discord_create(request: HttpRequest) -> HttpResponse:
             sg = t[2]
 
             if guild.get_role(name) is None and len(DiscordRole.objects
-                                                    .filter(group_id=team.group, secondary_group_id=sg) == 0):
+                                                    .filter(group_id=team.group, secondary_group_id=sg)) == 0:
                 r = guild.create_role(name)
                 dr = DiscordRole(role_id=r.id, group_id=team.group, secondary_group_id=sg)
                 dr.save()
