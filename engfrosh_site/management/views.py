@@ -1051,7 +1051,8 @@ def discord_create(request: HttpRequest) -> HttpResponse:
     prole = DiscordRole.objects.get(group_id=Group.objects.filter(name="Core Planning").first())
     poverwrite = DiscordOverwrite(descriptive_name="Core Planning", user_id=prole.role_id, type=0, allow=3072, deny=0)
     poverwrite.save()
-    ploverwrite = DiscordOverwrite(descriptive_name="Core Planning", user_id=prole.role_id, type=0, allow=1024, deny=2048)
+    ploverwrite = DiscordOverwrite(descriptive_name="Core Planning", user_id=prole.role_id,
+                                   type=0, allow=1024, deny=2048)
     ploverwrite.save()
     disallow = DiscordOverwrite(descriptive_name="Deny All", user_id=guild.id, type=0, allow=0, deny=3072)
     disallow.save()
