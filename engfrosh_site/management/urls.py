@@ -18,7 +18,6 @@ urlpatterns = [
     path('database/initialize', views.initialize_database, name="initialize_database"),
     path('database/scavinit', views.initialize_scav, name="initialize_scav"),
     path('trade-up/view-all', views.trade_up_viewer, name="trade_up_viewer"),
-    path('users/add-to-guild', views.add_discord_user_to_guild, name="add_users_to_discord_guild"),
     path('discord/channels', views.manage_discord_channels, name="manage_discord_channels"),
     path('discord/channel-groups', views.manage_discord_channel_groups, name="manage_discord_channel_groups"),
     path('discord/nicks', views.manage_discord_nicks, name="manage_discord_nicks"),

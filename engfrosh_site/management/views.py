@@ -1,7 +1,6 @@
 """Views for management pages."""
 
 import logging
-from typing import List, Union
 import requests
 import json
 import os
@@ -12,7 +11,6 @@ import credentials
 
 from django.contrib import auth
 import pyaccord
-from pyaccord.DiscordUserAPI import DiscordUserAPI
 from common_models.models import DiscordChannel, DiscordUser, MagicLink, Puzzle, TeamPuzzleActivity, VerificationPhoto
 from common_models.models import FroshRole, Team, UniversityProgram, TeamTradeUpActivity, UserDetails
 from common_models.models import ChannelTag, DiscordGuild, Announcement, FacilShift, FacilShiftSignup
@@ -1138,76 +1136,6 @@ def manage_discord_channel_groups(request: HttpRequest) -> HttpResponse:
     else:
 
         return HttpResponseBadRequest("Bad http request method.")
-
-
-@permission_required("auth.change_user")
-def add_discord_user_to_guild(request: HttpRequest) -> HttpResponse:
-    """Add users to to the discord server."""
-
-    if request.method == "GET":
-        context = {
-            "users": []
-        }
-
-        users = User.objects.all()
-        for usr in users:
-            if not usr.is_staff and DiscordUser.objects.filter(user=usr).exists():
-                context["users"].append(usr)
-
-        return render(request, "add_discord_user_to_guild.html", context)
-
-    elif request.method == "POST":
-
-        if request.content_type != "application/json":
-            return HttpResponseBadRequest("Invalid / missing content type.")
-
-        req_dict = json.loads(request.body)
-        if "user_id" not in req_dict and "command" not in req_dict:
-            return HttpResponseBadRequest("Bad request body.")
-
-        if req_dict["command"] == "add_user":
-            # Get user information
-            logger.info(f"Trying to add website user with id {req_dict['user_id']}")
-            discord_user = DiscordUser.objects.get(user=req_dict["user_id"])
-            user = User.objects.get(id=req_dict["user_id"])
-            if not discord_user:
-                return HttpResponseBadRequest("User does not exist / have a discord account linked.")
-
-            user_api = DiscordUserAPI(bot_token=credentials.BOT_TOKEN,
-                                      access_token=discord_user.access_token, refresh_token=discord_user.refresh_token,
-                                      expiry=discord_user.expiry)
-
-            groups = user.groups.all()
-            discord_role_ids: Union[List[int], None] = []
-            for g in groups:
-                try:
-                    query = DiscordRole.objects.filter(group_id=g)
-                    for role in query:
-                        if role.secondary_group is None or role.secondary_group in groups:
-                            discord_role_ids.append(role.role_id)
-                except ObjectDoesNotExist:
-                    continue
-
-            if not discord_role_ids:
-                discord_role_ids = None
-
-            # TODO Make guild id dynamic
-            res = user_api.add_user_to_guild(credentials.GUILD_ID, user_id=discord_user.id,
-                                             roles=discord_role_ids, nickname=user.get_full_name())
-
-            if res:
-                # Add succeeded
-                return HttpResponse(status=204)
-
-            else:
-                # Add to guild failed
-                logger.error(f"Request to add website user with id {req_dict['user_id']} failed.")
-                return HttpResponseServerError()
-
-        else:
-            return HttpResponseBadRequest("Invalid command")
-
-    return HttpResponseServerError()
 
 
 def manage_index(request: HttpRequest) -> HttpResponse:
