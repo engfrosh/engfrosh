@@ -145,7 +145,6 @@ INSTALLED_APPS = [
     'management.apps.ManagementConfig',
     'common_models.apps.CommonModelsConfig',
     'check_in.apps.CheckInConfig',
-    'ticket.apps.TicketConfig',
     'api.apps.APIConfig',
     'channels'
 ]

@@ -489,9 +489,9 @@ def free_hints(request: HttpRequest, id: int) -> HttpResponse:
 
 @permission_required("common_models.manage_scav")
 def lock_team(request: HttpRequest, id: int) -> HttpResponse:
-    for team in Team.objects.exclude(scavenger_locked_out_until=None):
+    for team in Team.objects.exclude(scavenger_locked_out_until=0):
         if not team.scavenger_lock:
-            team.scavenger_locked_out_until = None
+            team.scavenger_locked_out_until = 0
             team.save()
     if request.method == "GET":
         if id == 0:
@@ -507,24 +507,21 @@ def lock_team(request: HttpRequest, id: int) -> HttpResponse:
         form = forms.LockForm(request.POST)
         if not form.is_valid():
             return render(request, "lock_team.html", {"team": team, "form": form, "error": True})
-        curr = datetime.datetime.now()
-        delta = datetime.timedelta(minutes=form.cleaned_data['duration'])
-        team.scavenger_locked_out_until = curr + delta
-        team.save()
+        team.scavenger_lock(int(form.cleaned_data['duration']))
         return redirect("/manage/lock_team/0")
 
 
 @permission_required("common_models.manage_scav")
 def unlock_team(request: HttpRequest, id: int) -> HttpResponse:
-    for team in Team.objects.exclude(scavenger_locked_out_until=None):
+    for team in Team.objects.exclude(scavenger_locked_out_until=0):
         if not team.scavenger_lock:
-            team.scavenger_locked_out_until = None
+            team.scavenger_locked_out_until = 0
             team.save()
     if id == 0:
         return render(request, "unlock_teams.html", {"teams": Team.objects.all()})
     else:
         team = Team.objects.filter(group_id=id).first()
-        team.scavenger_locked_out_until = None
+        team.scavenger_locked_out_until = 0
         team.save()
         return redirect("/manage/unlock_team/0")
 
