@@ -1010,13 +1010,36 @@ def discord_create(request: HttpRequest) -> HttpResponse:
     guild = DiscordGuild.objects.first()
     if guild is None:
         return redirect('/manage/')
+    frosh = Group.objects.get_or_create(name="Frosh")[0]
+    facil = Group.objects.get_or_create(name="Facil")[0]
+    head = Group.objects.get_or_create(name="Head")[0]
+    groupco = Group.objects.get_or_create(name="GroupCo")[0]
+    design = Group.objects.get_or_create(name="Design")[0]
+    backstage = Group.objects.get_or_create(name="Backstage")[0]
+    admin = Group.objects.get_or_create(name="Administration")[0]
     types = [
-        ("Frosh", ChannelTag.objects.get_or_create(name="FROSH")[0], Group.objects.get_or_create(name="Frosh")[0]),
-        ("Facil", ChannelTag.objects.get_or_create(name="FACIL")[0], Group.objects.get_or_create(name="Facil")[0]),
-        ("Design", ChannelTag.objects.get_or_create(name="DESIGN")[0], Group.objects.get_or_create(name="Design")[0]),
-        ("Head", ChannelTag.objects.get_or_create(name="HEAD")[0], Group.objects.get_or_create(name="Head")[0]),
-        ("Groupco", ChannelTag.objects.get_or_create(name="GROUP-CO")[0],
-         Group.objects.get_or_create(name="GroupCo")[0]),
+        ("Groupco", ChannelTag.objects.get_or_create(name="GROUP-CO")[0], [head, groupco], []),
+        ("Head", ChannelTag.objects.get_or_create(name="HEAD")[0], [head, groupco], []),
+        ("Randall", ChannelTag.objects.get_or_create(name="RANDALL")[0], [backstage, head, groupco], []),
+        ("Design", ChannelTag.objects.get_or_create(name="DESIGN")[0], [design, head, groupco], []),
+        ("Administration", ChannelTag.objects.get_or_create(name="ADMINISTRATION")[0], [admin, head, groupco], []),
+        ("Announcement", ChannelTag.objects.get_or_create(name="ANNOUNCEMENT")[0], [head, groupco], [frosh, facil]),
+        ("Facil", ChannelTag.objects.get_or_create(name="FACIL")[0], [facil, head, groupco], []),
+        ("Frosh", ChannelTag.objects.get_or_create(name="FROSH")[0], [frosh, facil, head, groupco], []),
+        ("Scav", ChannelTag.objects.get_or_create(name="SCAV")[0], [frosh, facil, head, groupco], []),
+        ("Tradeup", ChannelTag.objects.get_or_create(name="TRADEUP")[0], [frosh, facil, head, groupco], []),
+        ("Engfrosh-cup", ChannelTag.objects.get_or_create(name="CUP")[0], [frosh, facil, head, groupco], []),
+    ]
+    team_roles = [
+        frosh,
+        facil,
+        head,
+        groupco
+    ]
+    non_team_roles = [
+        design,
+        backstage,
+        admin
     ]
     if guild.get_role("Core Planning") is None:
         r = guild.create_role("Core Planning")
@@ -1031,35 +1054,37 @@ def discord_create(request: HttpRequest) -> HttpResponse:
     disallow = DiscordOverwrite(descriptive_name="Deny All", user_id=guild.id, type=0, allow=0, deny=3072)
     disallow.save()
     admin = DiscordOverwrite.objects.get(descriptive_name="Technical")
+    r_map = {}
+    for role in non_team_roles:
+        name = role.name
+        if len(DiscordRole.objects.filter(group_id=role)) == 0:
+            r = guild.get_role(name)
+            dr = DiscordRole(role_id=r.id, group_id=role)
+            dr.save()
+        dr = DiscordRole.objects.filter(group_id=role).first()
+        r_map[role] = dr
+
     for team in Team.objects.all():
         if team.discord_name is None:
             continue
-        overwrites = []
-        for t in types:
-            name = team.display_name + " " + t[0]
-            if t[0] == "Design":
-                name = "Design"
-            sg = t[2]
+        tr_map = {}
+        for key, value in r_map.items():
+            tr_map[key] = value
+        for t in team_roles:
+            name = team.display_name + " " + t.name
 
             if guild.get_role(name) is None and len(DiscordRole.objects
-                                                    .filter(group_id=team.group, secondary_group_id=sg)) == 0:
+                                                    .filter(group_id=team.group, secondary_group_id=t)) == 0:
                 r = guild.create_role(name)
-                dr = DiscordRole(role_id=r.id, group_id=team.group, secondary_group_id=sg)
+                dr = DiscordRole(role_id=r.id, group_id=team.group, secondary_group_id=t)
                 dr.save()
-            if not t[0] == "Design":
-                dr = DiscordRole.objects.filter(group_id=team.group, secondary_group_id=sg).first()
-            else:
-                dr = DiscordRole.objects.filter(group_id=Group.objects.filter(name=t[0]).first().id).first()
-            o = DiscordOverwrite(descriptive_name=team.display_name + " " + t[0],
-                                 user_id=dr.role_id, type=0, allow=3072, deny=0)
-            o.save()
-            overwrites += [o]
+            dr = DiscordRole.objects.filter(group_id=team.group, secondary_group_id=t).first()
+            tr_map[t] = dr
         if len(DiscordChannel.objects.filter(name=team.display_name, type=4)) == 0:
             category = guild.create_channel(team.display_name, None, True)
             DiscordChannel(name=team.display_name, type=4, id=category.id, team=team).save()
         cat = DiscordChannel.objects.filter(name=team.display_name, type=4).first()
-        for i in range(len(types) - 1):
-            t = types[i]
+        for t in types:
             if len(DiscordChannel.objects.filter(name=team.discord_name + "-" + t[0])) > 0:
                 continue
             chan = guild.create_channel(team.discord_name + "-" + t[0], cat.id, False)
@@ -1068,14 +1093,30 @@ def discord_create(request: HttpRequest) -> HttpResponse:
             dchan.tags.add(t[1])
             dchan.unlocked_overwrites.add(disallow)
             dchan.unlocked_overwrites.add(admin)
-            if i == 0:
+            dchan.locked_overwrites.add(disallow)
+            dchan.locked_overwrites.add(admin)
+            send_roles = t[2]
+            ro_roles = t[3]
+            if send_roles == [frosh, facil, head, groupco]:
                 dchan.unlocked_overwrites.add(poverwrite)
-            for i2 in range(i, len(types)):
-                if not (i2 == 2) or i == 2:
-                    dchan.unlocked_overwrites.add(overwrites[i2])
-
+            for role in send_roles:
+                dr = tr_map[role]
+                overwrite = DiscordOverwrite.objects.get_or_create(descriptive_name=team.display_name + " " + role.name,
+                                                                   user_id=dr.role_id, type=0, allow=3072, deny=0)[0]
+                dchan.unlocked_overwrites.add(overwrite)
+                overwrite = DiscordOverwrite.objects.get_or_create(descriptive_name=team.display_name + " " + role.name,
+                                                                   user_id=dr.role_id, type=0, allow=1024, deny=2048)[0]
+                dchan.locked_overwrites.add(overwrite)
+            for role in ro_roles:
+                dr = tr_map[role]
+                overwrite = DiscordOverwrite.objects.get_or_create(descriptive_name=team.display_name + " " + role.name,
+                                                                   user_id=dr.role_id, type=0, allow=1024, deny=0)[0]
+                dchan.unlocked_overwrites.add(overwrite)
+                overwrite = DiscordOverwrite.objects.get_or_create(descriptive_name=team.display_name + " " + role.name,
+                                                                   user_id=dr.role_id, type=0, allow=1024, deny=2048)[0]
+                dchan.locked_overwrites.add(overwrite)
             dchan.save()
-            dchan.unlock()
+            dchan.lock()
     return redirect('/manage/')
 
 
