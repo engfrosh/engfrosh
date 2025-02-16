@@ -1051,6 +1051,8 @@ def discord_create(request: HttpRequest) -> HttpResponse:
     prole = DiscordRole.objects.get(group_id=Group.objects.filter(name="Core Planning").first())
     poverwrite = DiscordOverwrite(descriptive_name="Core Planning", user_id=prole.role_id, type=0, allow=3072, deny=0)
     poverwrite.save()
+    ploverwrite = DiscordOverwrite(descriptive_name="Core Planning", user_id=prole.role_id, type=0, allow=1024, deny=2048)
+    ploverwrite.save()
     disallow = DiscordOverwrite(descriptive_name="Deny All", user_id=guild.id, type=0, allow=0, deny=3072)
     disallow.save()
     admin = DiscordOverwrite.objects.get(descriptive_name="Technical")
@@ -1097,8 +1099,9 @@ def discord_create(request: HttpRequest) -> HttpResponse:
             dchan.locked_overwrites.add(admin)
             send_roles = t[2]
             ro_roles = t[3]
-            if send_roles == [frosh, facil, head, groupco]:
+            if t[0] == "Frosh":
                 dchan.unlocked_overwrites.add(poverwrite)
+                dchan.locked_overwrites.add(ploverwrite)
             for role in send_roles:
                 dr = tr_map[role]
                 overwrite = DiscordOverwrite.objects.get_or_create(descriptive_name=team.display_name + " " + role.name,
