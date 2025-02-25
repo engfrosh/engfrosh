@@ -10,7 +10,7 @@
 <div class="flex flex-col mx-auto container text-white text-center m-3 bg-background">
     <ul>
         {% for team in teams %}
-            <li><a href="{% url 'lock_team' id=team.group_id %}">{{ team.display_name }}</a> - {{ team.scavenger_locked_out_until }}</li>
+            <li><a href="{% url 'lock_team' id=team.group_id %}">{{ team.display_name }}</a> - {{ team.scavenger_locked_datetime }}</li>
         {% endfor %}
     </ul>
 </div>

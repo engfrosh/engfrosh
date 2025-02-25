@@ -94,10 +94,6 @@
       {% if perms.auth.add_user %}
       <a href="users/add" class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Add Users</a>
       {% endif %}
-      {% if perms.auth.change_user %}
-      <a href="{% url 'add_users_to_discord_guild' %}"
-         class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Add Users To Guild</a>
-      {% endif %}
       {% if perms.frosh_team.change_team %}
       <a href="{% url 'manage_frosh_teams' %}"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Manage Teams</a>

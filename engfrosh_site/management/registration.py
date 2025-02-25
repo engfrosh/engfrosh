@@ -124,12 +124,12 @@ def create_user_initialize(name: str, email: str, role: FroshRole, team: Optiona
 
     name_split = name.split()
 
-    if len(name_split) == 2:
+    if len(name_split) >= 2:
         first_name = name_split[0]
-        last_name = name_split[1]
+        last_name = " ".join(name_split[1:])
     else:
-        first_name = ""
-        last_name = name
+        first_name = name
+        last_name = ""
     # Check that the email has not already been added
     if User.objects.filter(email=email).exists():
         logger.info(f"User with email {email} already exists in database. Updating!")
