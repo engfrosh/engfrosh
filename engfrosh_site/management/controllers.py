@@ -113,7 +113,7 @@ def user_remove_shift(user: User, shift: FacilShift):
     if shift is None:
         return (False, "Shift not found!")
     can_remove = True
-    if datetime.datetime.utcfromtimestamp(lockout_time) <= datetime.datetime.now() and lockout_time != 0:
+    if datetime.utcfromtimestamp(lockout_time) <= datetime.now() and lockout_time != 0:
         can_remove = False
     if not can_remove:
         return (False, "Removing shifts is disabled")
