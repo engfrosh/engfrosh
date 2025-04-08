@@ -189,6 +189,7 @@ def facil_shifts(request: HttpRequest) -> HttpResponse:
             rshifts = get_eligible_shifts(request.user)
             success = user_add_shift(request.user, shift)
             if not success[0]:
+                my_shifts = get_user_shifts(request.user)
                 logger.info(success[1])
                 return render(request, "facil_shift_signup.html",
                               {"shifts": rshifts, "success": False, "my_shifts": my_shifts, "can_remove": can_remove})
