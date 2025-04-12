@@ -83,7 +83,7 @@ def shift_checkin(request: HttpRequest, id: int) -> HttpResponse:
         return HttpResponse("Invalid shift!")
     if shift.checkin_user is not None and shift.checkin_user != request.user:
         if not request.user.has_perm('common_models.attendance_admin'):
-            return HttpResponse("You are not authorized to check in this shift1")
+            return HttpResponse("You are not authorized to check in this shift!")
     if request.method == "GET":
         signups = FacilShiftSignup.objects.filter(shift=shift).select_related("user").order_by('user__first_name')
         if shift.type == "wt":
@@ -126,7 +126,10 @@ def edit_calendar(request: HttpRequest, id: int) -> HttpResponse:
         form = forms.CalendarForm(request.POST)
         if not form.is_valid():
             return render(request, "edit_calendar.html", {"form": form})
-        form.save()
+        cal = Calendar.objects.get(id=id)
+        cal.name = form.cleaned_data['name']
+        cal.slug = form.cleaned_data['slug']
+        cal.save()
         return render(request, "edit_calendar.html", {"form": form})
     if id == 0:
         form = forms.CalendarForm()
@@ -151,7 +154,20 @@ def shift_edit(request: HttpRequest, id: int) -> HttpResponse:
         form = forms.ShiftForm(request.POST)
         if not form.is_valid():
             return render(request, "edit_shift.html", {"form": form})
-        form.save()
+        data = form.cleaned_data
+        shift = FacilShift.objects.get(id=id)
+        shift.name = data['name']
+        shift.desc = data['desc']
+        shift.flags = data['flags']
+        shift.start = data['start']
+        shift.end = data['end']
+        shift.max_facils = data['max_facils']
+        shift.administrative = data['administrative']
+        shift.checkin_user = data['checkin_user']
+        shift.type = data['type']
+        if shift.type is None:
+            shift.type = ""
+        shift.save()
         return render(request, "edit_shift.html", {"form": form})
     if id == 0:
         form = forms.ShiftForm()
