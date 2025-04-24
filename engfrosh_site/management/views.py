@@ -97,7 +97,7 @@ def shift_checkin(request: HttpRequest, id: int) -> HttpResponse:
         action = request.POST["action"]
         if action == "attendance":
             switch = request.POST.get("switch", "")
-            att = switch == "True"
+            att = switch == "False"
             success = shift_check_in(signup, att)
             if not success[0]:
                 return HttpResponse(success[1])
