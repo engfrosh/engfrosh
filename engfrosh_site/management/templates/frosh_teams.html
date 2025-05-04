@@ -42,7 +42,7 @@
     <hr />
     <table id="team_table">
         <tr>
-            <th></th>
+            <th>Colour</th>
             <th>Team</th>
             <th>Discord Role?</th>
             <th>Scav Channel?</th>
@@ -62,9 +62,7 @@
             {% if team.discord_role %}
             <td class="discord_role">✔</td>
             {% else %}
-            <td class="discord_role team{{team.id}}">
-                <button type="button" onclick="addDiscordRoleButton('{{team.id}}')">Add Role</button>
-            </td>
+            <td class="discord_role">❌</td>
             {% endif %}
             {% if team.scav_channel %}
             <td class="scav_channel">{{team.scav_channel}}</td>
