@@ -162,18 +162,18 @@ class ManagementTests(TestCase):
         self.assertTrue("Frosh" in content)
         self.assertTrue("McTester" in content)
 
-        # Test setting attendance for WT with incomplete waiver
+        # Test setting attendance for WT with incomplete WT waiver
         response = self.client.post(reverse("shift_checkin", args=[self.shift1.id]),
                                     {"signup": self.signup1.id, "action": "attendance", "switch": "True"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode('utf-8'), "Incomplete waiver!")
-        self.assertFalse(UserDetails.objects.get(user=self.frosh1).waiver_completed)
+        self.assertFalse(UserDetails.objects.get(user=self.frosh1).wt_waiver_completed)
 
         # Test completing waiver and setting attendance for WT
         response = self.client.post(reverse("shift_checkin", args=[self.shift1.id]),
-                                    {"signup": self.signup1.id, "action": "waiver"})
+                                    {"signup": self.signup1.id, "action": "wt_waiver"})
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(UserDetails.objects.get(user=self.frosh1).waiver_completed)
+        self.assertTrue(UserDetails.objects.get(user=self.frosh1).wt_waiver_completed)
         response = self.client.post(reverse("shift_checkin", args=[self.shift1.id]),
                                     {"signup": self.signup1.id, "action": "attendance", "switch": "True"})
         self.assertEqual(response.status_code, 200)
