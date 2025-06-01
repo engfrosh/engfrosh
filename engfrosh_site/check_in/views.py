@@ -67,6 +67,7 @@ def waiver(request: HttpRequest, id: int) -> HttpResponse:
     user.save()
     return HttpResponse("User modified! You can close this window!")
 
+
 @permission_required("common_models.check_in")
 def wt_waiver(request: HttpRequest, id: int) -> HttpResponse:
     user = UserDetails.objects.filter(user__id=id).first()  # This is safe as user is a pk
@@ -75,6 +76,7 @@ def wt_waiver(request: HttpRequest, id: int) -> HttpResponse:
     user.wt_waiver_completed = True
     user.save()
     return HttpResponse("User modified! You can close this window!")
+
 
 @permission_required("common_models.check_in")
 def check_in_view(request: HttpRequest, id: int) -> HttpResponse:
