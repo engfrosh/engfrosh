@@ -24,9 +24,11 @@ def complete_waiver(details: UserDetails):
     details.waiver_completed = True
     details.save()
 
+
 def complete_wt_waiver(details: UserDetails):
     details.wt_waiver_completed = True
     details.save()
+
 
 def shift_check_in(signup: FacilShiftSignup, attendance: bool):
     if signup is None:
