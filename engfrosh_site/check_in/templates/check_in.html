@@ -114,6 +114,9 @@
                         function waiver(id){
                             send("/check-in/waiver/" + id);
                         }
+                        function wt_waiver(id){
+                            send("/check-in/wt_waiver/" + id);
+                        }
                         </script>
                         {% if user.role != "Frosh" %}
                         <td><button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="rafting({{user.user.id}})">Rafting</button><br/>
@@ -125,6 +128,7 @@
                         <td>
                         {% endif %}
                         <button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="waiver({{user.user.id}})">Waiver</button></td>
+                        <button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="wt_waiver({{user.user.id}})">Wilderness Tours Waiver</button></td>
                     </tr>
                 {% endfor %}
             </div>

@@ -25,11 +25,16 @@ def complete_waiver(details: UserDetails):
     details.save()
 
 
+def complete_wt_waiver(details: UserDetails):
+    details.wt_waiver_completed = True
+    details.save()
+
+
 def shift_check_in(signup: FacilShiftSignup, attendance: bool):
     if signup is None:
         return (False, "Signup not found!")
     shift = signup.shift
-    if shift.type == "wt" and not signup.user.details.waiver_completed:
+    if shift.type == "wt" and not (signup.user.details.waiver_completed and signup.user.details.wt_waiver_completed):
         return (False, "Incomplete waiver!")
     signup.attendance = attendance
     signup.save()

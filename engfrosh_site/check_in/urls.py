@@ -12,5 +12,6 @@ urlpatterns = [
     path('brightspace/<int:id>', views.brightspace),
     path('prc/<int:id>', views.prc),
     path('waiver/<int:id>', views.waiver),
+    path('wt_waiver/<int:id>', views.wt_waiver),
     path('contract/<int:id>', views.contract),
 ]
