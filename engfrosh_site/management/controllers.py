@@ -82,12 +82,11 @@ def get_eligible_shifts(user: User):
     my = FacilShiftSignup.objects.filter(user=user)
     for shift in shifts:
         found = False
-        signups = shift.facil_count
         for s in my:
             if s.shift == shift:
                 found = True
                 break
-        if signups < shift.max_facils and not found and not shift.is_passed:
+        if shift.can_sign_up(user.details) and not found:
             rshifts += [shift]
     return rshifts
 
@@ -100,10 +99,8 @@ def user_add_shift(user: User, shift: FacilShift):
     shift_count = len(FacilShiftSignup.objects.filter(user=user, shift__administrative=False))
     if shift_count >= max_shifts:
         return (False, "At shift limit")
-    if shift.is_passed:
-        return (False, "Shift has passed")
-    if shift.facil_count >= shift.max_facils:
-        return (False, "Shift is at capacity")
+    if not shift.can_sign_up(user.details):
+        return (False, "Shift is full or not released yet")
     signup = FacilShiftSignup.objects.filter(user=user, shift=shift).first()
     if signup is not None:
         return (False, "You have already signed up for this shift")
