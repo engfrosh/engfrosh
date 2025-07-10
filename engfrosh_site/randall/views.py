@@ -79,8 +79,11 @@ def book(request: HttpRequest) -> HttpResponse:
                 booking = form.save(commit=False)
                 booking.user = request.user
                 booking.save()
+                team_name = "None"
+                if booking.user.details.team:
+                    team_name = booking.user.details.team.display_name
                 DiscordChannel.send_to_backstage_updates_channels("@everyone - New booking submitted!\nTeam: " +
-                                                                  booking.user.details.team.display_name +
+                                                                  team_name +
                                                                   "\nStart: " + str(booking.start) + "\nEnd: " +
                                                                   str(booking.end))
                 return redirect("/randall")
