@@ -4,7 +4,7 @@ from .serializers import VerificationPhotoSerializer
 from rest_framework.response import Response
 from common_models.models import VerificationPhoto, UserDetails, FacilShiftSignup, FacilShift
 from datetime import datetime
-from common_models.models import CalendarRelation, Calendar
+from common_models.models import CalendarRelation, Calendar, RandallLocation, RandallBlocked, RandallBooking
 from django.urls import reverse
 from ics import Event
 import ics
@@ -101,6 +101,54 @@ class ICSAPI(APIView):
         resp = Response(data, content_type="text/calendar")
         resp.accepted_media_type = "text/calendar"
         return resp
+
+
+class RandallAPI(APIView):
+    authentication_classes = {authentication.SessionAuthentication, authentication.BasicAuthentication}
+    permission_classes = {permissions.IsAuthenticated}
+
+    def post(self, request, format=None):
+        if not request.user.has_perm('common_models.locate_randall'):
+            return Response({"Error": "Forbidden"}, status=status.HTTP_403_FORBIDDEN, content_type="application/json")
+        lat = float(request.data["latitude"])
+        lon = float(request.data["longitude"])
+        alt = int(request.data["altitude"])
+        time = int(request.data["time"])
+        location = RandallLocation(latitude=lat, longitude=lon, altitude=alt, timestamp=time)
+        location.save()
+
+
+class RandallAvailabilityAPI(APIView):
+    authentication_classes = {authentication.SessionAuthentication, authentication.BasicAuthentication}
+    permission_classes = {permissions.IsAuthenticated}
+
+    def get(self, request, format=None):
+        if not request.user.has_perm('common_models.view_randall'):
+            return Response({"Error": "Forbidden"}, status=status.HTTP_403_FORBIDDEN, content_type="application/json")
+        response_data = []
+        bookings = RandallBooking.objects.filter(approved=True)
+        blocked = RandallBlocked.objects.all()
+        for booking in bookings:
+            response_data.append(
+                {
+                    "id": "book-" + str(booking.id),
+                    "title": "Booked",
+                    "start": booking.start,
+                    "end": booking.start,
+                    "existed": True,
+                    "event_id": "book-" + str(booking.id),
+                })
+        for block in blocked:
+            response_data.append(
+                {
+                    "id": "block-" + str(block.id),
+                    "title": "Unavailable",
+                    "start": block.start,
+                    "end": block.start,
+                    "existed": True,
+                    "event_id": "block-" + str(block.id),
+                })
+        return Response(response_data)
 
 
 class VerificationPhotoAPI(APIView):

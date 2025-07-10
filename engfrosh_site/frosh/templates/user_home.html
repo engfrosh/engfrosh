@@ -74,6 +74,10 @@
                     <a href="https://docs.google.com/document/d/1wJpnis7I-b1CnnrflZBebyTjpOUfY3aGbRNxrkwYv1o/edit?usp=drive_web&ouid=108689740860636164130"
                     class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Heads Manual</a>
                 {% endif %}
+                {% if perms.common_models.view_randall %}
+                    <a href="{% url 'randall_index' %}"
+                    class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Randall</a>
+                {% endif %}
             </div>
             <br>
         </div>
