@@ -1,6 +1,7 @@
 from common_models.models import RandallBooking
 from django import forms
 
+
 class RandallBookingForm(forms.ModelForm):
     class Meta:
         model = RandallBooking

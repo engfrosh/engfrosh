@@ -102,9 +102,11 @@ class ICSAPI(APIView):
         resp.accepted_media_type = "text/calendar"
         return resp
 
+
 class RandallAPI(APIView):
     authentication_classes = {authentication.SessionAuthentication, authentication.BasicAuthentication}
     permission_classes = {permissions.IsAuthenticated}
+
     def post(self, request, format=None):
         if not request.user.has_perm('common_models.locate_randall'):
             return Response({"Error": "Forbidden"}, status=status.HTTP_403_FORBIDDEN, content_type="application/json")
@@ -115,9 +117,11 @@ class RandallAPI(APIView):
         location = RandallLocation(latitude=lat, longitude=lon, altitude=alt, timestamp=time)
         location.save()
 
+
 class RandallAvailabilityAPI(APIView):
     authentication_classes = {authentication.SessionAuthentication, authentication.BasicAuthentication}
     permission_classes = {permissions.IsAuthenticated}
+
     def get(self, request, format=None):
         if not request.user.has_perm('common_models.view_randall'):
             return Response({"Error": "Forbidden"}, status=status.HTTP_403_FORBIDDEN, content_type="application/json")
@@ -145,6 +149,7 @@ class RandallAvailabilityAPI(APIView):
                     "event_id": "block-" + str(block.id),
                 })
         return Response(response_data)
+
 
 class VerificationPhotoAPI(APIView):
     authentication_classes = {authentication.SessionAuthentication, authentication.BasicAuthentication}
