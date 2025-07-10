@@ -146,6 +146,7 @@ INSTALLED_APPS = [
     'common_models.apps.CommonModelsConfig',
     'check_in.apps.CheckInConfig',
     'api.apps.APIConfig',
+    'randall.apps.RandallConfig',
     'channels'
 ]
 

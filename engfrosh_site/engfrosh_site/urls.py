@@ -35,4 +35,5 @@ urlpatterns = [
     path("favicon.ico", RedirectView.as_view(url=staticfiles_storage.url("favicon.ico"))),
     path("check-in/", include('check_in.urls')),
     path("api/", include('api.urls')),
+    path("randall/", include('randall.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

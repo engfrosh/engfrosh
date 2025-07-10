@@ -1,0 +1,85 @@
+{% extends "base_user.html" %}
+{% load static %}
+{% block page_title %}Randall Management{% endblock page_title %}
+{% block js_functions %}
+<link rel='stylesheet' type='text/css' href="{% static 'jquery-ui/jquery-ui.min.css' %}" />
+<script type='text/javascript' src="{% static 'jquery/dist/jquery.js' %}"></script>
+<script type='text/javascript' src="{% static 'moment.js' %}"></script>
+<script type='text/javascript' src="{% static 'jquery-ui/jquery-ui.min.js' %}"></script>
+{% endblock js_functions %}
+{% block active %}
+<a class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
+           href="{% url 'randall_index' %}">Back</a>
+    <div class="text-white text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
+        <h1>Pending Approval</h1>
+        {% if error %}
+            <h1 style="color: red;">Error: {{ error }}</h1>
+        {% endif %}
+        <table>
+            <tr>
+                <th>Team</th>
+                <th>Name</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Message</th>
+                <th>Approve</th>
+                <th>Delete</th>
+            </tr>
+            {% for booking in pending %}
+                <tr>
+                    <td>{{booking.user.details.team.display_name}}</td>
+                    <td>{{booking.user.details.name}}</td>
+                    <td>{{booking.start}}</td>
+                    <td>{{booking.end}}</td>
+                    <td>{{booking.message}}</td>
+                    <td>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" id="id" name="id" value="{{booking.id}}"/>
+                            <input type="hidden" id="action" name="action" value="approve"/>
+                            <input type="submit" value="Approve"/>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" id="id" name="id" value="{{booking.id}}"/>
+                            <input type="hidden" id="action" name="action" value="delete"/>
+                            <input type="submit" value="Delete"/>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        <table>
+        <h1>Approved</h1>
+        <table>
+            <tr>
+                <th>Team</th>
+                <th>Name</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Message</th>
+                <th>Unapprove</th>
+            </tr>
+            {% for booking in approved %}
+                <tr>
+                    {% if booking.user.details.team %}
+                        <td>{{booking.user.details.team.display_name}}</td>
+                    {% endif %}
+                    <td>{{booking.user.details.name}}</td>
+                    <td>{{booking.start}}</td>
+                    <td>{{booking.end}}</td>
+                    <td>{{booking.message}}</td>
+                    <td>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" id="id" name="id" value="{{booking.id}}"/>
+                            <input type="hidden" id="action" name="action" value="unapprove"/>
+                            <input type="submit" value="Unapprove"/>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        <table>
+    </div>
+{% endblock active %}
