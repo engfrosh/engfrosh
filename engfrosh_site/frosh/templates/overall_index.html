@@ -6,7 +6,7 @@
 {% block body %}
     <img src="{% static 'logo.png' %}" class="m-auto" style="margin-top:10px; height:56vmin; width:75vmin;" alt="EngFrosh Logo">
     <div class="h-full text-center" style="margin:25px; font-size:3rem;">
-        <div style="background-color: #003c43;"><b id="timer" >Countdown</b></div>
+        <div class="rounded-lg text-4xl p-4 mx-auto" style="width:37%; background-color: #003c43;"><b id="timer" >Countdown</b></div>
         <div style="margin-bottom:3rem;">
             <a href="{% url 'user_home' %}"
                 class="bg-main dark:bg-main-night rounded-lg text-4xl p-4 mx-auto text-white">Enter the labyrinth</a>
