@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 import random
 from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, Announcement, UserDetails
 from common_models.models import InclusivityPage, FroshRole, DiscordUser, Setting, FAQPage, BooleanSetting
+from common_models.models import SponsorLogo
 import datetime
 from management import forms
 from common_models.models import Event, CalendarRelation, Calendar
@@ -32,6 +33,10 @@ def faq_page(request: HttpRequest, id: int):
         if page is None:
             return HttpResponse("FAQ not found!", status=404)
         return render(request, "faq_page.html", {"page": page})
+
+
+def sponsors(request: HttpRequest):
+    return render(request, "sponsors.html", {"sponsors": SponsorLogo.objects.all()})
 
 
 def fish(request: HttpRequest):
@@ -133,7 +138,9 @@ def my_coin(request: HttpRequest):
 def overall_index(request: HttpRequest):
     """The home page at the root of the site."""
     announcements = Announcement.objects.order_by("-created")
-    return render(request, "overall_index.html", {'announcements': announcements})
+    sponsors = SponsorLogo.objects.all()
+    return render(request, "overall_index.html", {'announcements': announcements,
+                                                  'sponsors': sponsors})
 
 
 @login_required(login_url='/accounts/login')
@@ -210,7 +217,8 @@ def user_home(request: HttpRequest) -> HttpResponse:
         "calendars": calendars,
         "upload_charter": upload_charter,
         "headplanning": headplanning,
-        "team": team
+        "team": team,
+        "sponsors": SponsorLogo.objects.all()
     }
 
     return render(request, "user_home.html", context)

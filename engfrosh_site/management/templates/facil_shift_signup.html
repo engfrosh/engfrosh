@@ -7,9 +7,9 @@
     Sign Up For Facil Shifts
 {% endblock top_title %}
 {% block body %}
-<a class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
+<a style="color: #FFFFFF;" class="bg-main dark:bg-main-night rounded  p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
            href="{% url 'user_home' %}">Back</a>
-    <div class="text-white p-6 bg-background shadow m-5 inline-block" style="font-size: 2vmin;">
+    <div class=" p-6 bg-background shadow m-5 inline-block" style="color: #FFFFFF; font-size: 2vmin;">
         {% if success is None %}
         {% elif not success %}
             <p>Failed to modify shift!</p>
@@ -54,7 +54,7 @@
                     {% csrf_token %}
                     <input type="hidden" name="shift_id" value="{{ shift.id }}">
                     <input type="hidden" name="action" value="remove">
-                    <button class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2" type="button" onclick='btnremcallback({{ shift.id }}, "{{ shift.name }}")'>Remove</button>
+                    <button class="bg-main dark:bg-main-night rounded  p-2 flex-none max-w-fit max-h-fit text-sm mr-2" type="button" onclick='btnremcallback({{ shift.id }}, "{{ shift.name }}")'>Remove</button>
                 </form>
                 {% endif %}
             </td>
@@ -99,7 +99,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="shift_id" value="{{ shift.id }}">
                         <input type="hidden" name="action" value="add">
-                        <button class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2" type="button" onclick='btnaddcallback({{ shift.id }}, "{{ shift.name }}")'>Sign Up</button>
+                        <button class="bg-main dark:bg-main-night rounded  p-2 flex-none max-w-fit max-h-fit text-sm mr-2" type="button" onclick='btnaddcallback({{ shift.id }}, "{{ shift.name }}")'>Sign Up</button>
                     </form>
                 </td>
             </tr>

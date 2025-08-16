@@ -12,7 +12,7 @@
 <script type='text/javascript' src="{% static 'fullcalendar.js' %}"></script>
 {% endblock js_functions %}
 {% block active %}
-<a class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
+<a style="color: #FFFFFF;" class="bg-main dark:bg-main-night rounded p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
            href="{% url 'user_home' %}">Back</a>
     <div class="text-white text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
         {% if perms.common_models.manage_randall %}

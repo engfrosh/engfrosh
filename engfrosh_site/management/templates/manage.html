@@ -3,16 +3,16 @@
    EngFrosh Management
 {% endblock page_title %}
 {% block top_title %}
-   <a href="{% url 'user_home' %}" class="bg-main dark:bg-main-night rounded-lg p-2">Back</a> 
-   <div class="text-white p-6 bg-background shadow m-6 inline-block">
+   <a href="{% url 'user_home' %}" style="color: #FFFFFF;" class="bg-main dark:bg-main-night rounded-lg p-2">Back</a> 
+   <div class="p-6 bg-background shadow m-6 inline-block" style="color: #FFFFFF;">
       EngFrosh Management
    </div>
 {% endblock top_title %}
 {% block active %}
-<div class="flex flex-row">
+<div class="flex flex-row" style="color: #FFFFFF;">
    <!--Weeklongs-->
-   <div class="flex flex-col space-y-3 mx-auto container text-white text-center max-w-sm">
-      <div class="text-white p-1 bg-background shadow m-1 inline-block">
+   <div class="flex flex-col space-y-3 mx-auto container text-center max-w-sm">
+      <div class="p-1 bg-background shadow m-1 inline-block">
          <h1>Weeklongs</h1>
       </div>
       {% if perms.common_models.manage_scav %}
@@ -45,8 +45,8 @@
       {% endif %}
    </div>
    <!--Volunteers & Schedule-->
-   <div class="flex flex-col space-y-3 mx-auto container text-white text-center max-w-sm">
-      <div class="text-white p-1 bg-background shadow m-1 inline-block">
+   <div class="flex flex-col space-y-3 mx-auto container text-center max-w-sm">
+      <div class="p-1 bg-background shadow m-1 inline-block">
          <h1>Volunteers & Schedule</h1>
       </div>
       {% if perms.common_models.view_links %}
@@ -86,8 +86,8 @@
          class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Check In</a>
       {% endif %}
    </div>
-   <div class="flex flex-col space-y-3 mx-auto container text-white text-center max-w-sm">
-      <div class="text-white p-1 bg-background shadow m-1 inline-block">
+   <div class="flex flex-col space-y-3 mx-auto container text-center max-w-sm">
+      <div class="p-1 bg-background shadow m-1 inline-block">
          <h1>Technical Stuff</h1>
       </div>
       <a href="/admin" class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Server Admin</a>

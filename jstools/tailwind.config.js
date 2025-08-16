@@ -8,6 +8,7 @@ module.exports = {
         "accent": "#4F226E",
         "background": "#0F0E18",
         "background-night": "#0D0D0D",
+        "white": "#000000",
       }
     },
   },

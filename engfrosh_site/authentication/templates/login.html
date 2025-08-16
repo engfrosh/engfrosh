@@ -52,7 +52,11 @@
             <a href="{% url 'register' %}" type="button" class="login_button register">Register</a>
             <br/>
         {% endif %}
-        
+        {% for sponsor in sponsors %}
+            {% if sponsor.footer %}
+                <a href="{{ sponsor.link }}"><img class="inline-block" style="width: 30%;" src="{{ sponsor.image.url }}"></img></a>
+            {% endif %}
+        {% endfor %}
     </div>
 </body>
 

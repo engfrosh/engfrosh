@@ -134,12 +134,19 @@
             {% endblock body %}
         </main>
         {% block footer %}
-        <footer class="bg-main text-center text-white">
-            <p class="my-3">
-                Technical Support: <a href="mailto:websupport@engfrosh.com">websupport@engfrosh.com</a> | Other Questions: <a href="mailto:info@engfrosh.com">info@engfrosh.com</a>
-                |
+        <footer class="bg-main text-center" style="color: #FFFFFF;">
+            <div>
+            {% for sponsor in sponsors %}
+                {% if sponsor.footer %}
+                    <a href="{{ sponsor.link }}"><img class="inline-block" style="width: 15%;" src="{{ sponsor.image.url }}"></img></a>
+                {% endif %}
+            {% endfor %}
+            <div class="inline-block">
+                <a href="mailto:websupport@engfrosh.com">websupport@engfrosh.com</a><br>
                 <a href="{% url 'inclusivity_public' %}">Resources</a>
-            </p>
+                <a href="{% url 'sponsors' %}">Sponsors</a>
+            </div>
+            </div>
         </footer>
         {% endblock footer %}
         {% block page_js %}

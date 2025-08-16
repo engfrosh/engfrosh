@@ -1,6 +1,6 @@
 {% extends "base_user.html" %}
 {% load static %}
-{% block page_title %}EngFrosh Resources{% endblock page_title %}
+{% block page_title %}EngFrosh Sponsors{% endblock page_title %}
 {% block js_functions %}
 <link rel='stylesheet' type='text/css' href="{% static 'jquery-ui/jquery-ui.min.css' %}" />
 <script type='text/javascript' src="{% static 'jquery/dist/jquery.js' %}"></script>
@@ -13,11 +13,11 @@
            href="{% url 'user_home' %}">Back</a>
 
     <div style="color: #FFFFFF;" class="text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
-        <div class="bg-background p-2 shadow">
-            <h1>Open Resources</h1><br>
-            {% for p in pages %}
-                <div>
-                    <a href={{ p.file.url }}>{{ p.name }}</a>
+        <div class="bg-background p-2 shadow inline-block">
+            <h1>Sponsors</h1><br>
+            {% for s in sponsors %}
+                <div style="display: inline-block;">
+                    <a href={{ s.link }}><img style="width: 50%;"src="{{ s.image.url }}"/></a>
                 </div><br>
             {% endfor %}
         </div>

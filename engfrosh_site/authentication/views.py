@@ -15,7 +15,7 @@ import uuid
 
 from common_models.models import DiscordUser, BooleanSetting
 from common_models.models import DiscordRole, Setting, UserDetails, Team
-from common_models.models import TeamPuzzleActivity, PuzzleStream
+from common_models.models import TeamPuzzleActivity, PuzzleStream, SponsorLogo
 from .discord_auth import DiscordUserAlreadyExistsError, register
 from pyaccord.DiscordUserAPI import DiscordUserAPI, build_oauth_authorize_url  # noqa E402
 
@@ -184,6 +184,7 @@ def login_page(request: HttpRequest):
     context = {}
     context["register"] = registration_enabled
     context["discord"] = discord_enabled
+    context["sponsors"] = SponsorLogo.objects.all()
     if redirect_location:
         context["encoded_redirect"] = redirect_location
 

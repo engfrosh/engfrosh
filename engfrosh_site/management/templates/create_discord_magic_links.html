@@ -1,7 +1,7 @@
 {% extends "base_manage.html" %}
 {% block nav_bar %}
     <div class="flex flex-row flex-wrap-reverse items-center justify-start mb-4">
-        <a class="bg-main dark:bg-main-night rounded text-white p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
+        <a style="color: #FFFFFF;" class="bg-main dark:bg-main-night rounded  p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
            href="{% url 'user_home' %}">Back to Home Page</a>
     </div>
 {% endblock nav_bar %}
@@ -16,15 +16,15 @@
 {% block active %}
     <p>Use this page to give users links to join the discord server. There are {{count}} users who have not joined.</p>
     <button type="button"
-            class="bg-main dark:bg-main-night rounded text-white p-1 m-2"
+            style="color: #FFFFFF;" class="bg-main dark:bg-main-night rounded  p-1 m-2"
             onclick="add50Button()">
         Email 50
     </button>
-    <a class="bg-main dark:bg-main-night rounded text-white p-1 m-2" href="/manage/unregistered">Unregistered Facils List</a>
-    <a class="bg-main dark:bg-main-night rounded text-white p-1 m-2" href="{% url 'unregistered_email' %}">Send Unregistered Email</a>
+    <a style="color: #FFFFFF;" class="bg-main dark:bg-main-night rounded  p-1 m-2" href="/manage/unregistered">Unregistered Facils List</a>
+    <a style="color: #FFFFFF;" class="bg-main dark:bg-main-night rounded  p-1 m-2" href="{% url 'unregistered_email' %}">Send Unregistered Email</a>
     <hr/>
-    <div class="text-white p-6 bg-background rounded-lg shadow m-5 inline-block">
-    <table>
+    <div class=" p-6 bg-background rounded-lg shadow m-5 inline-block">
+    <table style="color: #FFFFFF;">
         <tr>
             <th class="px-2">User</th>
             <th class="px-2">Create New Link</th>
@@ -36,14 +36,14 @@
             <tr>
                 <td class="px-2">{{ user.username }}</td>
                 <td class="user_{{ user.id }} create_link button_cell text-center px-2">
-                    <button class="p-0.5 bg-main dark:bg-main-night text-white rounded px-1"
+                    <button class="p-0.5 bg-main dark:bg-main-night  rounded px-1"
                             onclick="get_new_magic_link({{ user.id }})"
                             type="button">
                         Create
                     </button>
                 </td>
                 <td class="user_{{ user.id }} get_link button_cell text-center px-2">
-                    <button class="p-0.5 bg-main dark:bg-main-night text-white rounded px-1"
+                    <button class="p-0.5 bg-main dark:bg-main-night  rounded px-1"
                             onclick="get_existing_magic_link({{ user.id }})"
                             type="button">
                         Get
@@ -53,7 +53,7 @@
                     {% if '@cmail.carleton.ca' in user.email %}
                         <p class="p-0.5 rounded border px-1">Using CMail</p>
                     {% elif not user.email_sent %}
-                        <button class="p-0.5 bg-main dark:bg-main-night text-white rounded px-1"
+                        <button class="p-0.5 bg-main dark:bg-main-night  rounded px-1"
                                 type="button"
                                 onclick="email_magic_link({{ user.id }})">
                             Email
@@ -63,7 +63,7 @@
                     {% endif %}
                 </td>
                 <td class="px-2 text-center">
-                    <button class="p-0.5 bg-main dark:bg-main-night text-white rounded px-1"
+                    <button class="p-0.5 bg-main dark:bg-main-night  rounded px-1"
                             type="button"
                             onclick="get_qr_code_magic_link({{ user.id }})">
                         Get
