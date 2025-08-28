@@ -26,7 +26,7 @@
     <div class="m-4">
         {% block nav_bar %}
             <div class="items-center justify-start mb-4">
-            <a class="bg-main dark:bg-main-night rounded text-white p-2 max-w-fit max-h-fit text-sm mr-2"
+            <a class="bg-main dark:bg-main-night rounded p-2 max-w-fit max-h-fit text-sm mr-2"
                 href="{% url 'mailing_list' %}">Back to Shifts</a>
             <h1 class="text-center p-2 text-2xl grow max-w-fit">
                 {% block top_title %}
@@ -38,7 +38,7 @@
         {% endblock nav_bar %}
 {% block active %}
     <h1 style="color: black; font-size: 30px;">Shift: {{ shift.name }}</h1>
-    <div class="text-white p-6 bg-background rounded-lg shadow m-5 inline-block">
+    <div style="color: white;" class="p-6 bg-background rounded-lg shadow m-5 inline-block">
     <script>
     function btncallback(shift_id, shift_name, name, action){
         var result = confirm("Are you sure you want to mark " + name + " " + action + " for shift " + shift_name);
