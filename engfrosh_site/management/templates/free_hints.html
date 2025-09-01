@@ -7,7 +7,7 @@
     Change Free Hints
 {% endblock top_title %}
 {% block active %}
-<div class="flex flex-col mx-auto container text-white text-center m-3 bg-background shadow">
+<div class="flex flex-col mx-auto container text-center m-3 bg-background shadow" style="color: white;">
     <ul>
         {% for team in teams %}
             <li><a href="{% url 'free_hints' id=team.group_id %}">{{ team.display_name }}</a> - {{ team.free_hints }}</li>

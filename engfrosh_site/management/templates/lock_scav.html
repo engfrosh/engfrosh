@@ -7,7 +7,7 @@
     Lock Scav
 {% endblock top_title %}
 {% block active %}
-    <div class="bg-background shadow">
+    <div class="bg-background shadow" style="color: white;">
         <h1>Lock Scav and Trade Up</h1>
         <style>
             input {
@@ -29,7 +29,7 @@
         <br>
         <form class="my-5" method="POST">
             {% csrf_token %}
-            <input type="submit" value="Toggle Scav and Trade Up" class="bg-main dark:bg-main-night rounded-lg text-white p-2 inline-block m-2">
+            <input type="submit" value="Toggle Scav and Trade Up" class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">
         </form>
     </div>
 {% endblock active %}

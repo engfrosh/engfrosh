@@ -12,12 +12,12 @@
             color: black;
         }
     </style>
-    <div class="bg-background shadow">
+    <div class="bg-background shadow" style="color: white;">
         <h1>Lock {{ team.display_name }}</h1>
         <form class="my-5" method="POST">
             {% csrf_token %}
             {{ form.as_p }}
-            <input type="submit" value="Lock Team" style="cursor: pointer;" class="bg-main dark:bg-main-night rounded-lg text-white p-2 inline-block m-2">
+            <input type="submit" value="Lock Team" style="cursor: pointer;" class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">
         </form>
     </div>
 {% endblock active %}
