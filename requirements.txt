@@ -13,7 +13,7 @@ channels==4.2.0
 charset-normalizer==3.4.1
 click==8.1.8
 credentials==1.1
-cryptography==44.0.0
+cryptography==46.0.5
 dacite==1.8.1
 Django==5.1.15
 django-unixdatetimefield==1.2.0
