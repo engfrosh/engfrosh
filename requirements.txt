@@ -43,7 +43,7 @@ pycparser==2.22
 pyflakes==3.2.0
 PyJWT==2.10.1
 PyL360==0.1.10
-pyOpenSSL==24.3.0
+pyOpenSSL==26.0.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
 pytz==2024.2
