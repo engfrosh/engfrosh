@@ -256,7 +256,7 @@ if not PRODUCTION:
 
 # STATIC_ROOT should not be present, at least for development as far as I know.
 if PRODUCTION:
-    STATICFILES_DIRS.append('/home/ubuntu/engfrosh/files/static')
+    STATICFILES_DIRS.append('/app/engfrosh/files/static')
     STATIC_ROOT = '/usr/share/engfrosh_site/files/static'
     MEDIA_ROOT = '/usr/share/engfrosh_site/files/media'
 
