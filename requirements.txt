@@ -60,7 +60,7 @@ tls-client==1.0.1
 types-python-dateutil==2.9.0.20241206
 typing_extensions==4.12.2
 tzdata==2024.2
-urllib3==2.3.0
+urllib3==2.6.3
 uvicorn==0.34.0
 uvloop==0.21.0
 watchfiles==1.1.0
