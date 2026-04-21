@@ -45,7 +45,7 @@ PyJWT==2.10.1
 PyL360==0.1.10
 pyOpenSSL==24.3.0
 python-dateutil==2.9.0.post0
-python-dotenv==1.1.1
+python-dotenv==1.2.2
 pytz==2024.2
 PyYAML==6.0.2
 qrcode==8.0
