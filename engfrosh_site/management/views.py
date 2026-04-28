@@ -1022,7 +1022,10 @@ def discord_rename(request: HttpRequest) -> HttpResponse:
 @user_passes_test(lambda u: u.is_superuser)
 def discord_role_rename(request: HttpRequest) -> HttpResponse:
     for role in DiscordRole.objects.all():
-        role.rename()
+        try:
+            role.rename()
+        except Exception as e:
+            print(f"Failed role {role.id}: {e}")
     return redirect('/manage/')
 
 @user_passes_test(lambda u: u.is_superuser)
