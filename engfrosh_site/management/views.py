@@ -1025,7 +1025,7 @@ def discord_role_rename(request: HttpRequest) -> HttpResponse:
         try:
             role.rename()
         except Exception as e:
-            print(f"Failed role {role.id}: {e}")
+            print(f"Failed role {role_id.id}: {e}")
     return redirect('/manage/')
 
 @user_passes_test(lambda u: u.is_superuser)
