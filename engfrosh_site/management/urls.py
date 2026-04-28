@@ -35,6 +35,7 @@ urlpatterns = [
     path('export_teams', views.export_teams, name="export_teams"),
     path('prc', views.bulk_add_prc, name="bulk_add_prc"),
     path('discord_rename', views.discord_rename, name="discord_rename"),
+    path('discord_role_rename', views.discord_role_rename, name="discord_role_rename"),
     path('discord_create', views.discord_create, name="discord_create"),
     path('shift_edit/<int:id>', views.shift_edit, name="shift_edit"),
     path('lock_scav', views.lock_scav, name="lock_scav"),

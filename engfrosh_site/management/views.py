@@ -1019,6 +1019,11 @@ def discord_rename(request: HttpRequest) -> HttpResponse:
         role.rename()
     return redirect('/manage/')
 
+@user_passes_test(lambda u: u.is_superuser)
+def discord_role_rename(request: HttpRequest) -> HttpResponse:
+    for role in DiscordRole.objects.all():
+        role.rename()
+    return redirect('/manage/')
 
 @user_passes_test(lambda u: u.is_superuser)
 def discord_create(request: HttpRequest) -> HttpResponse:
