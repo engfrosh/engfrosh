@@ -1028,6 +1028,7 @@ def discord_role_rename(request: HttpRequest) -> HttpResponse:
             print(f"Failed role {role.role_id}: {e}")
     return redirect('/manage/')
 
+
 @user_passes_test(lambda u: u.is_superuser)
 def discord_create(request: HttpRequest) -> HttpResponse:
     guild = DiscordGuild.objects.first()
