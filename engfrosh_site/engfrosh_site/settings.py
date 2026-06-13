@@ -190,12 +190,12 @@ ASGI_APPLICATION = 'engfrosh_site.asgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "engfrosh",
-        "USER": "engfrosh_site",
-        "PASSWORD": "there-exercise-fenegle",
-        "HOST": "127.0.0.1",
+        "NAME": os.environ.get("ENGFROSH_DB_NAME"),
+        "USER": os.environ.get("ENGFROSH_DB_USER"),
+        "PASSWORD": os.environ.get("ENGFROSH_DB_PASSWORD"),
+        "HOST": os.environ.get("ENGFROSH_DB_HOST"),
         'CONN_MAX_AGE': 3600,
-        "PORT": "3306",
+        "PORT": os.environ.get("ENGFROSH_DB_PORT"),
         'OPTIONS': {
            "init_command": "SET GLOBAL max_connections = 100000",  # Unlimited DB connections
         }
