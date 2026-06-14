@@ -196,7 +196,7 @@ def puzzle_photo_verification_view(request: HttpRequest, slug: str) -> HttpRespo
             pa.save()
 
             verification_role = Setting.objects.get_or_create(
-                id="Scav Verification Ping Role", 
+                id="Scav Verification Ping Role",
                 defaults={'value': '1234567890123456789'}
             )[0].value
 
