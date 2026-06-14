@@ -4,7 +4,7 @@ from django.http import HttpRequest, HttpResponse
 from django.http.response import HttpResponseNotAllowed, HttpResponseBadRequest, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render
 from scavenger.consumers import ScavConsumer
-from common_models.models import DiscordChannel, Puzzle, Team, VerificationPhoto, QRCode, LockoutPeriod
+from common_models.models import DiscordChannel, Puzzle, Setting, Team, VerificationPhoto, QRCode, LockoutPeriod
 from django.contrib.auth.decorators import login_required, permission_required
 
 import logging
@@ -195,8 +195,13 @@ def puzzle_photo_verification_view(request: HttpRequest, slug: str) -> HttpRespo
             pa.verification_photo = photo
             pa.save()
 
+            verification_role = Setting.objects.get_or_create(
+                id="Scav Verification Ping Role", 
+                defaults={'value': '1234567890123456789'}
+            )[0].value
+
             DiscordChannel.send_to_updates_channels(
-                f"""<@&1434950811166834726> {team.display_name} has uploaded a photo for {puz.name}""" +
+                f"""<@&{verification_role}> {team.display_name} has uploaded a photo for {puz.name}""" +
                 """ that needs verification.""" +
                 f"""\n{request.build_absolute_uri(photo.photo.url)}""")
             ScavConsumer.notify_trigger(photo.photo.url, team.display_name, photo.id)
