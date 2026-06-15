@@ -6,6 +6,14 @@ from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont
 import random
 
+from engfrosh_site.common_models.models import SiteImage
+
+
+"""
+very important functionality here :skull:
+"""
+
+
 COUNT = 100
 URLS = [
     "https://www.youtube.com/watch?v=xvFZjo5PgG0",
@@ -47,7 +55,13 @@ for num in range(COUNT):
     qr.make(fit=True)
 
     blob = BytesIO()
-    STYLE_IMAGE_PATH = "engfrosh_site/SpiritX.png"
+
+    site_image = SiteImage.objects.filter(name="QR Code Image").first()
+    if site_image and site_image.image:
+        STYLE_IMAGE_PATH = site_image.image.path
+    else:
+        STYLE_IMAGE_PATH = "engfrosh_site/SpiritX.png"
+
     USE_IMAGE = True
     if USE_IMAGE:
         img = qr.make_image(image_factory=StyledPilImage, embeded_image_path=STYLE_IMAGE_PATH)
