@@ -147,6 +147,7 @@ INSTALLED_APPS = [
     'check_in.apps.CheckInConfig',
     'api.apps.APIConfig',
     'randall.apps.RandallConfig',
+    'template_helpers.apps.TemplateHelpersConfig'
     'channels'
 ]
 
@@ -176,6 +177,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'template_helpers.context_processors.background_image'
             ],
         },
     },
