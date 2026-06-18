@@ -2,6 +2,7 @@ from django.http.response import HttpResponse, HttpResponseNotAllowed, HttpRespo
 from django.shortcuts import render  # noqa F401
 from django.http import HttpRequest
 from django.contrib.auth.decorators import login_required, permission_required
+from django.templatetags.static import static
 import random
 from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, Announcement, UserDetails
 from common_models.models import InclusivityPage, FroshRole, DiscordUser, Setting, FAQPage, BooleanSetting

@@ -2,6 +2,7 @@ from django.core.cache import cache
 from django.templatetags.static import static
 from common_models.models import SiteImage
 
+
 def background_image(request):
     url = cache.get('STYLE_IMAGE_URL')
     if url is None:
