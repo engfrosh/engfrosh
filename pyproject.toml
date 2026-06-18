@@ -1,0 +1,16 @@
+[tool.ruff]
+preview = true
+line-length = 120
+exclude = ["**/migrations/**"]
+
+[tool.ruff.lint]
+explicit-preview-rules = true
+select = [
+  "E",  # pycodestyle errors
+  "E302", # whitespace
+  "F",  # pyflakes
+  "W",  # pycodestyle warnings
+  # "C"  # complexity
+  # "B", # bugbear
+  # "S",  # security
+]

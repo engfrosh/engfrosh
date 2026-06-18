@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 import random
 from common_models.models import Team, TeamTradeUpActivity, VerificationPhoto, Announcement, UserDetails
 from common_models.models import InclusivityPage, FroshRole, DiscordUser, Setting, FAQPage, BooleanSetting
-from common_models.models import SponsorLogo
+from common_models.models import SiteImage, SponsorLogo
 import datetime
 from management import forms
 from common_models.models import Event, CalendarRelation, Calendar
@@ -139,8 +139,14 @@ def overall_index(request: HttpRequest):
     """The home page at the root of the site."""
     announcements = Announcement.objects.order_by("-created")
     sponsors = SponsorLogo.objects.all()
+    si = SiteImage.objects.filter(name="EngFrosh Logo").first()
+    if si and si.image:
+        logo_url = si.image.url
+    else:
+        logo_url = static('logo.png')
     return render(request, "overall_index.html", {'announcements': announcements,
-                                                  'sponsors': sponsors})
+                                                  'sponsors': sponsors,
+                                                  'logo_url': logo_url})
 
 
 @login_required(login_url='/accounts/login')
