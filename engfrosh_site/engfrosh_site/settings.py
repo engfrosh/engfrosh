@@ -147,7 +147,7 @@ INSTALLED_APPS = [
     'check_in.apps.CheckInConfig',
     'api.apps.APIConfig',
     'randall.apps.RandallConfig',
-    'template_helpers.apps.TemplateHelpersConfig'
+    'template_helpers.apps.TemplateHelpersConfig',
     'channels'
 ]
 
