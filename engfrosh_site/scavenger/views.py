@@ -81,7 +81,7 @@ def index(request: HttpRequest) -> HttpResponse:
 
     ss = SiteSVG.objects.filter(name="Scav Active Clue SVG").first()
     if ss and ss.file:
-        scav_icon_active_url = si.file.url
+        scav_icon_active_url = ss.file.url
     else:
         scav_icon_active_url = static('scav_active.svg')
 
