@@ -3,8 +3,10 @@ from typing import Union
 from django.http import HttpRequest, HttpResponse
 from django.http.response import HttpResponseNotAllowed, HttpResponseBadRequest, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render
+from django.templatetags.static import static
 from scavenger.consumers import ScavConsumer
-from common_models.models import DiscordChannel, Puzzle, Setting, Team, VerificationPhoto, QRCode, LockoutPeriod
+from common_models.models import Puzzle, Team, VerificationPhoto, QRCode, LockoutPeriod
+from common_models.models import BooleanSetting, Setting, SiteImage, DiscordChannel
 from django.contrib.auth.decorators import login_required, permission_required
 
 import logging
@@ -54,8 +56,8 @@ def index(request: HttpRequest) -> HttpResponse:
     if not team.scavenger_enabled and not bypass:
         return HttpResponse("Scavenger not currently enabled")
 
-    invalidate_tree_setting = Setting.objects.get_or_create(
-                id="Disable Scav Tree Caching",
+    invalidate_tree_setting = BooleanSetting.objects.get_or_create(
+                id="DISABLE_SCAVENGER_TREE_CACHE",
                 defaults={'value': 'False'}
     )[0].value
 
@@ -70,6 +72,19 @@ def index(request: HttpRequest) -> HttpResponse:
     params = ""
     if set_team is not None:
         params = "?team=" + str(team.group.id)
+
+    si = SiteImage.objects.filter(name="Scav Help Image").first()
+    if si and si.image:
+        scav_help_img_url = si.image.url
+    else:
+        scav_help_img_url = static('trade.jpg')
+
+    si = SiteImage.objects.filter(name="Scav Help Image").first()
+    if si and si.image:
+        scav_icon_active_url = si.image.url
+    else:
+        scav_icon_active_url = static('scav_active.svg')
+
     context = {
         "scavenger_enabled_for_team": team.scavenger_enabled,
         "team": team,
@@ -80,6 +95,8 @@ def index(request: HttpRequest) -> HttpResponse:
         "completed_puzzles_awaiting_verification": team.completed_puzzles_awaiting_verification,
         "completed_puzzles_requiring_photo_upload": team.completed_puzzles_requiring_photo_upload,
         "tree": tree,
+        "scav_help_img_url": scav_help_img_url,
+        "scav_icon_active_url": scav_icon_active_url
     }
 
     return render(request, "scavenger_index.html", context=context)
