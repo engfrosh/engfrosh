@@ -79,9 +79,9 @@ def index(request: HttpRequest) -> HttpResponse:
     else:
         scav_help_img_url = static('trade.jpg')
 
-    ss = SiteSVG.objects.filter(name="Scav Active Clue SVG").first()
-    if ss and ss.file:
-        scav_icon_active_url = ss.file.url
+    ss = SiteSVG.objects.filter(name="Scav Active Clue").first()
+    if ss and ss.image:
+        scav_icon_active_url = ss.image.url
     else:
         scav_icon_active_url = static('scav_active.svg')
 
