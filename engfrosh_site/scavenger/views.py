@@ -54,7 +54,13 @@ def index(request: HttpRequest) -> HttpResponse:
     if not team.scavenger_enabled and not bypass:
         return HttpResponse("Scavenger not currently enabled")
 
-    if team.invalidate_tree:
+    invalidate_tree_setting = Setting.objects.get_or_create(
+                id="Disable Scav Tree Caching",
+                defaults={'value': 'False'}
+    )[0].value
+
+    if team.invalidate_tree or invalidate_tree_setting:
+        logger.info(f"Regenerating scav tree for team: {team}")
         tree = base64.b64encode(bytes(json.dumps(generate_tree(team)), 'utf-8')).decode('utf-8')
         team.invalidate_tree = False
         team.tree_cache = tree
