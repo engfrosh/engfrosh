@@ -79,7 +79,7 @@ def index(request: HttpRequest) -> HttpResponse:
     else:
         scav_help_img_url = static('trade.jpg')
 
-    si = SiteImage.objects.filter(name="Scav Help Image").first()
+    si = SiteImage.objects.filter(name="Scav Active Clue Image").first()
     if si and si.image:
         scav_icon_active_url = si.image.url
     else:
