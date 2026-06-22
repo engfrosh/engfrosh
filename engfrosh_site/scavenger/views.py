@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.templatetags.static import static
 from scavenger.consumers import ScavConsumer
 from common_models.models import Puzzle, Team, VerificationPhoto, QRCode, LockoutPeriod
-from common_models.models import BooleanSetting, Setting, SiteImage, DiscordChannel
+from common_models.models import BooleanSetting, Setting, SiteImage, SiteSVG, DiscordChannel
 from django.contrib.auth.decorators import login_required, permission_required
 
 import logging
@@ -79,9 +79,9 @@ def index(request: HttpRequest) -> HttpResponse:
     else:
         scav_help_img_url = static('trade.jpg')
 
-    si = SiteImage.objects.filter(name="Scav Active Clue Image").first()
-    if si and si.image:
-        scav_icon_active_url = si.image.url
+    ss = SiteSVG.objects.filter(name="Scav Active Clue SVG").first()
+    if ss and ss.file:
+        scav_icon_active_url = si.file.url
     else:
         scav_icon_active_url = static('scav_active.svg')
 
