@@ -145,9 +145,12 @@ def overall_index(request: HttpRequest):
         logo_url = si.image.url
     else:
         logo_url = static('logo.png')
+    countdown_date = Setting.objects.get_or_create(id="Countdown Date",
+                                                   defaults={"value": "August 30, 2026 18:30:00"})[0]
     return render(request, "overall_index.html", {'announcements': announcements,
                                                   'sponsors': sponsors,
-                                                  'logo_url': logo_url})
+                                                  'logo_url': logo_url,
+                                                  'countdown_date': countdown_date})
 
 
 @login_required(login_url='/accounts/login')
