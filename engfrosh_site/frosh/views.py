@@ -146,7 +146,7 @@ def overall_index(request: HttpRequest):
     else:
         logo_url = static('logo.png')
     countdown_date = Setting.objects.get_or_create(id="Countdown Date",
-                                                   defaults={"value": "August 30, 2026 18:30:00"})[0]
+                                                   defaults={"value": "August 30, 2026 18:30:00"})[0].value
     return render(request, "overall_index.html", {'announcements': announcements,
                                                   'sponsors': sponsors,
                                                   'logo_url': logo_url,
