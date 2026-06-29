@@ -1,0 +1,14 @@
+repos:
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        name: lint
+        files: ^(engfrosh_site/|lambda_function\.py$|qrcode_gen\.py$)
+        args:
+          - --count
+          - --show-source
+          - --statistics
+          - --max-line-length=120
+          - --exclude
+          - '*/migrations/*'
