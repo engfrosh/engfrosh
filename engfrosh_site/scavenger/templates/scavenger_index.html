@@ -160,7 +160,7 @@ window.onbeforeunload = function () {
 }
 var tree = JSON.parse(atob("{{tree|safe}}"));
 var scavActiveIcon = "{{ scav_icon_active_url }}";
-var branchActiveIcons = "{{ branch_icons_json|safe }}";
+var branchActiveIcons = "{{ branch_icon_urls|safe }}";
 var old = false;
 var toggle = false;
 var slideIndex = 1;
