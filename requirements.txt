@@ -22,6 +22,7 @@ flake8==7.1.1
 frozenlist==1.5.0
 geographiclib==2.0
 geopy==2.4.1
+granian==2.7.9
 h11==0.16.0
 httptools==0.6.4
 icalendar==6.1.0
