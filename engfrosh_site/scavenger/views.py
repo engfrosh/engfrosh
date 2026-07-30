@@ -5,7 +5,7 @@ from django.http.response import HttpResponseNotAllowed, HttpResponseBadRequest,
 from django.shortcuts import render
 from django.templatetags.static import static
 from scavenger.consumers import ScavConsumer
-from common_models.models import Puzzle, Team, VerificationPhoto, QRCode, LockoutPeriod
+from common_models.models import Puzzle, PuzzleStream, Team, VerificationPhoto, QRCode, LockoutPeriod
 from common_models.models import BooleanSetting, Setting, SiteImage, SiteSVG, DiscordChannel
 from django.contrib.auth.decorators import login_required, permission_required
 
@@ -85,6 +85,19 @@ def index(request: HttpRequest) -> HttpResponse:
     else:
         scav_icon_active_url = static('scav_active.svg')
 
+    branch_icons = {}
+    streams = PuzzleStream.objects.filter(enabled=True)
+    for s in streams:
+        icon_url = None
+        if getattr(s, 'active_icon', None):
+            try:
+                icon_url = s.active_icon.image.url
+            except Exception:
+                icon_url = None
+        branch_icons[s.name] = icon_url
+
+    branch_icon_urls = json.dumps(branch_icons)
+
     context = {
         "scavenger_enabled_for_team": team.scavenger_enabled,
         "team": team,
@@ -96,7 +109,8 @@ def index(request: HttpRequest) -> HttpResponse:
         "completed_puzzles_requiring_photo_upload": team.completed_puzzles_requiring_photo_upload,
         "tree": tree,
         "scav_help_img_url": scav_help_img_url,
-        "scav_icon_active_url": scav_icon_active_url
+        "scav_icon_active_url": scav_icon_active_url,
+        "branch_icon_urls": branch_icon_urls
     }
 
     return render(request, "scavenger_index.html", context=context)
