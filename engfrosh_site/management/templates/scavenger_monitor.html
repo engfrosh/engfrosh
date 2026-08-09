@@ -9,8 +9,8 @@
             margin-right: auto;
         }
     </style>
-    <p id="status">Disconnected</p>
-    <div id="approval">
+    <p id="status" style="color: #FFFFFF;">Disconnected</p>
+    <div id="approval" style="color: #FFFFFF;">
         <h1>Approvals</h1>
         {% for puzzle_activity in puzzle_activities_awaiting_verification %}
             <div id="approval-{{ puzzle_activity.verification_photo.id }}" class="px-3 text-center bg-background shadow" style="margin: 15px;">
