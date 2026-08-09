@@ -1,20 +1,26 @@
 import json
+import logging
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from channels.layers import get_channel_layer
 from channels.exceptions import StopConsumer
 
+logger = logging.getLogger("engfrosh_site.scavenger.consumers")
+
 
 class ScavConsumer(WebsocketConsumer):
 
     def connect(self):
+        logger.info(f"Attempting scav websocket connection for user: {self.user}")
         self.user = self.scope["user"]
         if not self.user.has_perm("common_models.manage_scav"):
+            logger.info("Failed permission check")
             self.close()
         async_to_sync(self.channel_layer.group_add)(
             'scav',
             self.channel_name
         )
+        logger.info("Accepted connection")
         self.accept()
 
     def disconnect(self, close_code):
@@ -22,6 +28,7 @@ class ScavConsumer(WebsocketConsumer):
             'scav',
             self.channel_name
         )
+        logger.info(f"Closing scav websocket connection, code: {close_code}")
         raise StopConsumer()
 
     def receive(self, text_data):

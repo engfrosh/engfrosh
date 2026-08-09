@@ -134,7 +134,7 @@ class RandallAvailabilityAPI(APIView):
                     "id": "book-" + str(booking.id),
                     "title": "Booked",
                     "start": booking.start,
-                    "end": booking.start,
+                    "end": booking.end,
                     "existed": True,
                     "event_id": "book-" + str(booking.id),
                 })
@@ -144,7 +144,7 @@ class RandallAvailabilityAPI(APIView):
                     "id": "block-" + str(block.id),
                     "title": "Unavailable",
                     "start": block.start,
-                    "end": block.start,
+                    "end": block.end,
                     "existed": True,
                     "event_id": "block-" + str(block.id),
                 })
