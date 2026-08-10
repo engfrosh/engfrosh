@@ -178,6 +178,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'template_helpers.context_processors.background_image',
+                'template_helpers.context_processors.header_image',
                 'template_helpers.context_processors.favicon32',
                 'template_helpers.context_processors.favicon16'
             ],

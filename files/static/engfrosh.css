@@ -27,3 +27,9 @@ td.button_cell {
 /* button {
     @apply ring ring-white dark:ring-black;
 } */
+
+@layer components {
+  h1, h2, h3, h4, h5, h6, p, span, a, li {
+    mix-blend-mode: screen;
+  }
+}
