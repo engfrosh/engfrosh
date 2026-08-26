@@ -8,7 +8,7 @@
             {% if bypass %}
                 <h1 class="text-red-600 text-xl">Warning: Scav rule bypass is enabled!</h1>
             {% endif %}
-            <div class="rounded bg-background text-white shadow max-w-5xl mx-auto text-center" style="margin: auto;">
+            <div class="rounded bg-background text-white shadow max-w-5xl mx-auto text-center"  style="margin: auto; color: white;">
                 <h2>Puzzle: {{ puzzle.name }}</h2>
                 {% if puzzle.puzzle_text %}
                 {% if puzzle.puzzle_is_link %}
@@ -44,7 +44,7 @@
                 {% endfor %}
                 {% for i in remaining_answers %}
                 <li>
-                <div class="rounded bg-background shadow max-w-5xl mx-auto m-4 text-white">
+                <div class="rounded bg-background shadow max-w-5xl mx-auto m-4 text-white" style="color: white;">
                     <p>Text Answer</p>
                     <input type="text"
                            id="answerText-{{ i }}"
