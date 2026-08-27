@@ -11,8 +11,8 @@ logger = logging.getLogger("engfrosh_site.scavenger.consumers")
 class ScavConsumer(WebsocketConsumer):
 
     def connect(self):
-        logger.info(f"Attempting scav websocket connection for user: {self.user}")
         self.user = self.scope["user"]
+        logger.info(f"Attempting scav websocket connection for user: {self.user}")
         if not self.user.has_perm("common_models.manage_scav"):
             logger.info("Failed permission check")
             self.close()
