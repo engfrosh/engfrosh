@@ -18,9 +18,9 @@
             {% for s in sponsors %}
                 <div style="display: inline-block;">
                     {% if s.link %}
-                    <a href={{ s.link }}><img style="width: 50%;"src="{{ s.image.url }}"/></a>
+                    <a href={{ s.link }}><img style="width: 50%; margin-left: auto; margin-right: auto; padding: 20px;"src="{{ s.image.url }}"/></a>
                     {% else %}
-                    <img style="width: 50%;"src="{{ s.image.url }}"/>
+                    <img style="width: 50%; margin-left: auto; margin-right: auto; padding: 20px;"src="{{ s.image.url }}"/>
                     {% endif %}
                 </div><br>
             {% endfor %}

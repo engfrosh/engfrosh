@@ -238,7 +238,7 @@ function viewSwitch(){
     </div>
             <div id="imgframe">
                 <!-- Help Button -->
-                <div onclick="toggleHelp()" id="helpButton">
+                <div onclick="toggleHelp()" id="helpButton" style="display: none;">
                     <svg fill="#ffffff" width="3rem" height="3rem" viewBox="0 0 395.001 395">
                         <g><g>
                         <path d="M322.852,0H72.15C32.366,0,0,32.367,0,72.15v250.7C0,362.634,32.367,395,72.15,395h250.701
@@ -267,8 +267,8 @@ function viewSwitch(){
                         <hr>
                         <br>
 
-                        <div class="welcomeSlides">
-                            <img src="{{ scav_help_img_url }}" style="width: 100;" alt="SCAV">
+                        <div class="welcomeSlides" style="color: #FFFFFF;">
+                            <img src="{{ scav_help_img_url }}" style="width: 100px; display: block; margin-left: auto; margin-right: auto; margin-bottom: 20px;" alt="SCAV">
                             <p>Hello! Welcome to the EngFrosh scavenger hunt!</p>
                             <p>Anytime there are no major EngFrosh or school related events, teams 
                                 are able to search all around Ottawa for scav clues.</p>
@@ -278,7 +278,7 @@ function viewSwitch(){
                         </div>
 
                         <div class="welcomeSlides">
-                            <p>Each scav tree is made from a "Main Branch" and optional side branches. 
+                            <p>Each scav tree is made from a "Main Branch" and side branches. 
                                 Depending on the branch, some may be disabled during certain times of the day.
                                 Completing side branches may reward your team with free hints, path skips, and more!</p>
                             <p>Most clues are in person and require a photo of a frosh, the QR code, and a facil/head to be uploaded on 
@@ -486,7 +486,7 @@ function viewSwitch(){
 
                                     if (isMain || clueIndex > maxHorzClues) {
                                         vertContainer.innerHTML += clueElement;
-                                        if (curBranchSide.id === `${treeId}LeftSide`){ //Adds to the vertical clue count
+                                        if (curBranchSide.id === `${treeId}LeftSide`){ // Adds to the vertical clue count
                                             leftClues += 1;
                                         } else if (curBranchSide.id === `${treeId}RightSide`){
                                             rightClues += 1;
@@ -527,7 +527,7 @@ function viewSwitch(){
             </div>
             </div>
 
-            <div id="scavtext" style="display: none;">
+            <div id="scavtext" style="display: none; color: #FFFFFF;">
                 <h2 style="font-size: 20px;">Active Scavenger Puzzles</h2>
                 <ul>
                     {% for puzzle in active_puzzles %}

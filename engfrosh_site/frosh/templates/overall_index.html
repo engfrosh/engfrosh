@@ -7,17 +7,17 @@
     <img src="{{ logo_url }}" class="m-auto" style="margin-top:10px; height:56vmin; width:75vmin;" alt="EngFrosh Logo">
     <div class="h-full text-center" style="margin:10px; margin-bottom:120px; font-size:3rem; color: #FFFFFF;">
         <div class="rounded-lg text-4xl p-4 mx-auto w-fit" style="background-color: #003c43;"><b id="timer" >Countdown</b></div>
-        <div>
+        <div class="mx-auto w-1/2" style="display: grid; place-content: center; padding: 20px;"></div>
             <a href="{% url 'user_home' %}"
-                class="bg-main dark:bg-main-night rounded-lg text-4xl p-4 mx-auto text-white">Enter the Multiverse</a>
+                class="bg-main dark:bg-main-night rounded-lg text-4xl p-4 mx-auto text-white" style="white-space: nowrap;">Enter the Multiverse</a>
         </div>
         <div>
             <a href="{% url 'inclusivity_public' %}"
                 class="bg-main dark:bg-main-night rounded-lg text-2xl p-4 mx-auto text-white">Resources</a>
         </div>
-        <div class="flex flex-col space-y-3 mx-auto container text-white text-center max-w-sm">
+        <div class="flex flex-col flex-wrap justify-center space-y-3 mx-auto container text-white text-center max-w-fit">
         {% for a in announcements %}
-            <div class="m-8 bg-accent text-white width-50 rounded-lg">
+            <div class="m-8 bg-accent text-white width-50 rounded-lg" style="box-sizing: border-box; padding: 20px; font-size: 2rem;">
                 <h2>{{ a.title }}</h2>
                 <br>
                 <p>{{ a.body}}</p>
