@@ -1,137 +1,260 @@
 {% extends 'base_generic.html' %}
+
 {% block page_title %}
     Check In
 {% endblock page_title %}
-{% block body %}
-<a class="bg-main dark:bg-main-night rounded p-2 flex-none max-w-fit max-h-fit text-sm mr-2" style="color: white;"
-           href="{% url 'user_home' %}">Back</a>
 
-    <style>
-        body{
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            overflow-x: scroll;
-        }
-        table{
-            overflow-x: scroll;
-            width: 100%;
-        }
-        td, th{
-            width: 80px;
-            padding-left: 5px;
-            padding-right: 5px;
-        }
-        button {
-            position: relative;
-            margin: 5px;
-            border: none;
-            text-align: center;
-            -webkit-transition-duration: 0.2s; /* Safari */
-            transition-duration: 0.2s;
-            text-decoration: none;
-            overflow: hidden;
-            cursor: pointer;
-        }
-        button:active {
-            background: #a85800;
-        }
-    </style>
-    <div class="p-6" style="width: 100%; color: white;">
-        <div class="space-y-4 mt-4 text-center">
-            <div class="bg-background shadow rounded shadow-xl mx-auto m-4">
-                <a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/monitor" style="float: left;" target="_blank">Monitor</a>
-                <form action="/check-in/">
-                    {% csrf_token %}
-                    {{ form }}
-                    <input type="submit" value="Search" style="cursor: pointer;">
-                </form>
-                <p style="color: red;">{{error}}</p>
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>Shirt Size</th>
-                        <th>Sweater Size</th>
-                        <th>Hardhat</th>
-                        <th>Rafting</th>
-                        <th>Team</th>
-                        <th>Check In</th>
-                        <th>Reason</th>
-                    </tr>
+{% block body %}
+
+<a class="bg-main dark:bg-main-night rounded p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
+   style="color: white;"
+   href="{% url 'user_home' %}">
+    Back
+</a>
+
+<style>
+    body {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        overflow-x: scroll;
+    }
+
+    table {
+        overflow-x: scroll;
+        width: 100%;
+    }
+
+    td, th {
+        width: 80px;
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    button {
+        position: relative;
+        margin: 5px;
+        border: none;
+        text-align: center;
+        -webkit-transition-duration: 0.2s;
+        transition-duration: 0.2s;
+        text-decoration: none;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    button:active {
+        background: #a85800;
+    }
+
+    .check-in-disabled {
+        pointer-events: none;
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .payment-confirmed {
+        background-color: red !important;
+        color: white !important;
+    }
+</style>
+
+<div class="p-6" style="width: 100%; color: white;">
+    <div class="space-y-4 mt-4 text-center">
+        <div class="bg-background shadow rounded shadow-xl mx-auto m-4">
+
+            <a class="bg-main dark:bg-main-night rounded-lg p-2"
+               href="/check-in/monitor"
+               style="float: left;"
+               target="_blank">
+                Monitor
+            </a>
+
+            <form action="/check-in/">
+                {% csrf_token %}
+                {{ form }}
+                <input type="submit" value="Search" style="cursor: pointer;">
+            </form>
+
+            <p style="color: red;">{{ error }}</p>
+
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Shirt Size</th>
+                    <th>Sweater Size</th>
+                    <th>Hardhat</th>
+                    <th>Rafting</th>
+                    <th>Team</th>
+                    <th>Check In</th>
+                    <th>Reason</th>
+                </tr>
+
                 {% for user in data %}
-                    <tr>
-                        <td>{{user.name}}</td>
-                        <td>{{user.shirt_size}}</td>
-                        <td>{{user.sweater_size}}</td>
-                        <td>{{user.hardhat}}</td>
-                        <td>{{user.rafting}}</td>
-                        <td>{{user.team}}</td>
-                        {% if user.can_check_in %}
-                            <td><a class="bg-main dark:bg-main-night rounded-lg p-2" href="/check-in/check-in/{{user.user.id}}">Check In</a></td>
-                            <td></td>
-                        {% else %}
-                            <td>Requirements Not Met</td>
-                            <td>{{user.check_in_reason}}</td>
-                        {% endif %}
-                        <script>
-                        function send(endpoint){
-                            fetch(endpoint, {
-                                method: "POST",
-                                mode: "cors",
-                                credentials: "same-origin",
-                                headers: {
-                                    "X-CSRFToken": csrf_token,
-                                    "Content-Type": "application/json"
-                                },
-                            })
-                            .then(res => {
-                                if (res.ok) {
-                                    location.reload();
-                                } else {
-                                    res.text().then(data => {
-                                        console.log("Error: " + data);
-                                        alert("Failed to set!");
-                                    })
-                                }
-                            })
-                        }
-                        function rafting(id){
-                            send("/check-in/rafting/" + id);
-                        }
-                        function hardhat(id){
-                            send("/check-in/hardhat/" + id);
-                        }
-                        function brightspace(id){
-                            send("/check-in/brightspace/" + id);
-                        }
-                        function prc(id){
-                            send("/check-in/prc/" + id);
-                        }
-                        function contract(id){
-                            send("/check-in/contract/" + id);
-                        }
-                        function waiver(id){
-                            send("/check-in/waiver/" + id);
-                        }
-                        function wt_waiver(id){
-                            send("/check-in/wt_waiver/" + id);
-                        }
-                        </script>
-                        {% if user.role != "Frosh" %}
-                        <td><button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="rafting({{user.user.id}})">Rafting</button><br/>
-                        <button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="hardhat({{user.user.id}})">Hardhat</button></td>
-                        <td><button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="brightspace({{user.user.id}})">Brightspace</button><br/>
-                        <button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="prc({{user.user.id}})">PRC</button></td>
-                        <td><button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="contract({{user.user.id}})">Contract</button><br/>
-                        {% else %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.shirt_size }}</td>
+                    <td>{{ user.sweater_size }}</td>
+                    <td>{{ user.hardhat }}</td>
+                    <td>{{ user.rafting }}</td>
+                    <td>{{ user.team }}</td>
+
+                    {% if user.can_check_in %}
                         <td>
-                        {% endif %}
-                        <button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="waiver({{user.user.id}})">Waiver</button>
-                        <button class="bg-main dark:bg-main-night rounded-lg p-2" onclick="wt_waiver({{user.user.id}})">Wilderness Tours Waiver</button></td>
-                    </tr>
+                            {% if user.role == "Frosh" %}
+                                <a id="check-in-{{ user.user.id }}"
+                                   class="bg-main dark:bg-main-night rounded-lg p-2 check-in-disabled"
+                                   href="/check-in/check-in/{{ user.user.id }}">
+                                    Check In
+                                </a>
+                            {% else %}
+                                <a class="bg-main dark:bg-main-night rounded-lg p-2"
+                                   href="/check-in/check-in/{{ user.user.id }}">
+                                    Check In
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td></td>
+                    {% else %}
+                        <td>Requirements Not Met</td>
+                        <td>{{ user.check_in_reason }}</td>
+                    {% endif %}
+
+                    {% if user.role != "Frosh" %}
+                        <td>
+                            <button class="bg-main dark:bg-main-night rounded-lg p-2"
+                                    onclick="rafting({{ user.user.id }})">
+                                Rafting
+                            </button>
+                            <br/>
+
+                            <button class="bg-main dark:bg-main-night rounded-lg p-2"
+                                    onclick="hardhat({{ user.user.id }})">
+                                Hardhat
+                            </button>
+                        </td>
+
+                        <td>
+                            <button class="bg-main dark:bg-main-night rounded-lg p-2"
+                                    onclick="brightspace({{ user.user.id }})">
+                                Brightspace
+                            </button>
+                            <br/>
+
+                            <button class="bg-main dark:bg-main-night rounded-lg p-2"
+                                    onclick="prc({{ user.user.id }})">
+                                PRC
+                            </button>
+                        </td>
+
+                        <td>
+                            <button class="bg-main dark:bg-main-night rounded-lg p-2"
+                                    onclick="contract({{ user.user.id }})">
+                                Contract
+                            </button>
+                            <br/>
+
+                    {% else %}
+
+                        <td>
+                            {% if user.can_check_in %}
+                                <button id="payment-{{ user.user.id }}"
+                                        class="bg-main dark:bg-main-night rounded-lg p-2"
+                                        onclick="confirmPayment({{ user.user.id }})">
+                                    Confirm Payment
+                                </button>
+                            {% endif %}
+                        </td>
+
+                        <td>
+
+                    {% endif %}
+
+                        <button class="bg-main dark:bg-main-night rounded-lg p-2"
+                                onclick="waiver({{ user.user.id }})">
+                            Waiver
+                        </button>
+
+                        <button class="bg-main dark:bg-main-night rounded-lg p-2"
+                                onclick="wt_waiver({{ user.user.id }})">
+                            Wilderness Tours Waiver
+                        </button>
+                    </td>
+
+                </tr>
                 {% endfor %}
-            </div>
+            </table>
+
         </div>
     </div>
+</div>
+
+<script>
+    function send(endpoint) {
+        fetch(endpoint, {
+            method: "POST",
+            mode: "cors",
+            credentials: "same-origin",
+            headers: {
+                "X-CSRFToken": csrf_token,
+                "Content-Type": "application/json"
+            },
+        })
+        .then(res => {
+            if (res.ok) {
+                location.reload();
+            } else {
+                res.text().then(data => {
+                    console.log("Error: " + data);
+                    alert("Failed to set!");
+                });
+            }
+        });
+    }
+
+    function rafting(id) {
+        send("/check-in/rafting/" + id);
+    }
+
+    function hardhat(id) {
+        send("/check-in/hardhat/" + id);
+    }
+
+    function brightspace(id) {
+        send("/check-in/brightspace/" + id);
+    }
+
+    function prc(id) {
+        send("/check-in/prc/" + id);
+    }
+
+    function contract(id) {
+        send("/check-in/contract/" + id);
+    }
+
+    function waiver(id) {
+        send("/check-in/waiver/" + id);
+    }
+
+    function wt_waiver(id) {
+        send("/check-in/wt_waiver/" + id);
+    }
+
+    function confirmPayment(id) {
+        const paymentButton = document.getElementById("payment-" + id);
+        const checkInButton = document.getElementById("check-in-" + id);
+
+        if (!paymentButton || !checkInButton) {
+            return;
+        }
+
+        paymentButton.classList.add("payment-confirmed");
+        paymentButton.innerText = "Payment Confirmed";
+        paymentButton.disabled = true;
+
+        checkInButton.classList.remove("check-in-disabled");
+    }
+</script>
+
 {% endblock body %}
