@@ -100,21 +100,25 @@
       {% endif %}
       {% if request.user.is_superuser %}
       <a href="{% url 'initialize_database' %}"
+         onclick="return confirm('Are you 100% sure you want to try initializing the database? This action should only be performed by technical.');"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Initialize Database</a>
       <a href="{% url 'initialize_scav' %}"
+         onclick="return confirm('Are you 100% sure you need to initialize scav? This action should only be performed by technical.');"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Initialize Scavenger</a>
       <a href="{% url 'discord_rename' %}"
+         onclick="return confirm('Are you 100% sure you want to try renaming the discord channels? This action should only be performed by technical.');"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Rename Discord Channels</a>
       <a href="{% url 'discord_role_rename' %}"
+         onclick="return confirm('Are you 100% sure you want to try renaming the discord roles? This action should only be performed by technical.');"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Rename Discord Roles</a>
       <a href="{% url 'discord_create' %}"
+         onclick="return confirm('Are you 100% sure you want to blow everything up? This action cannot be undone and may destroy the discord server.');"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Blow everything up</a>
       <a href="{% url 'gen_bus' %}"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Create Bus Groups</a>
       {% endif %}
       {% if perms.auth.change_user %}
       <a href="{% url 'bulk_add_prc' %}"
-         onclick="return confirm('Are you sure you want to blow everything up? This action cannot be undone.');"
          class="bg-main dark:bg-main-night rounded-lg p-2 m-2">Bulk Data Import</a>
       {% endif %}
    </div>
