@@ -25,6 +25,19 @@
             padding-right: 5px;
         }
     </style>
+    <script> 
+        function copyEmails(button) { 
+            const emails = button.dataset.emails; 
+            navigator.clipboard.writeText(emails).then(function() { 
+                const originalText = button.innerText; 
+                button.innerText = "Copied!"; 
+                setTimeout(function() { 
+                    button.innerText = originalText; 
+                }, 1500); 
+            }).catch(function(err) { 
+                console.error("Failed to copy emails:", err); alert("Could not copy emails to clipboard."); }); 
+        } 
+    </script>
     <div class="flex flex-col space-y-3 mx-auto container text-center max-w-sm">
         <a href="{% url 'shift_export' %}"
              class="bg-main dark:bg-main-night rounded-lg p-2">Export Shifts</a>
@@ -46,6 +59,7 @@
             <th class="px-2">Facil Count</th>
             {% if perms.common_models.shift_manage %}
             <th class="px-2">Send Email</th>
+            <th class="px-2">Copy Emails</th>
             <th class="px-2">Copy Checked In</th>
             {% endif %}
             {% if perms.common_models.attendance_manage %}
@@ -72,6 +86,8 @@
                         <input type="submit" class="bg-main dark:bg-main-night rounded-lg p-2 m-2" value="Email Shift">
                     </form>
                 </td>
+                <td class="px-2"> 
+                    <button type="button" class="bg-main dark:bg-main-night rounded-lg p-2 m-2" data-emails="{% for signup in shift.signups.all %}{{ signup.user.email }}{% if not forloop.last %}; {% endif %}{% endfor %}" onclick="copyEmails(this)"> Copy Emails </button> </td>
                 <td class="px-2">
                     <form method="POST">
                         {% csrf_token %}
