@@ -29,7 +29,6 @@
     table {
         width: 100%;
         border-collapse: collapse;
-        table-layout: auto;
     }
 
     th,
@@ -37,7 +36,6 @@
         padding: 8px;
         text-align: center;
         vertical-align: middle;
-        white-space: nowrap;
     }
 
     th {
@@ -52,7 +50,6 @@
         text-align: center;
         text-decoration: none;
         cursor: pointer;
-        white-space: nowrap;
     }
 
     button:active {
@@ -64,13 +61,13 @@
         color: white !important;
     }
 
-    .action-cell {
-        min-width: 130px;
+    .reason-cell {
+        min-width: 120px;
     }
 
-    .reason-cell {
+    .actions-cell {
+        min-width: 220px;
         white-space: normal;
-        min-width: 140px;
     }
 </style>
 
@@ -105,9 +102,7 @@
                             <th>Team</th>
                             <th>Check In</th>
                             <th>Reason</th>
-                            <th>Action 1</th>
-                            <th>Action 2</th>
-                            <th>Action 3</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
 
@@ -138,69 +133,55 @@
                                     {% endif %}
                                 </td>
 
-                                {% if user.role == "Frosh" %}
-                                    <td class="action-cell">
+                                <td class="actions-cell">
+                                    {% if user.role == "Frosh" %}
+
                                         {% if user.breakfast_paid %}
                                             <button class="payment-required rounded-lg p-2"
                                                     onclick="paid({{ user.user.id }})">
                                                 Mark Payment Complete
                                             </button>
                                         {% endif %}
-                                    </td>
 
-                                    <td class="action-cell"></td>
-                                    <td class="action-cell"></td>
+                                    {% else %}
 
-                                {% else %}
-                                    <td class="action-cell">
                                         <button class="bg-main dark:bg-main-night rounded-lg p-2"
                                                 onclick="rafting({{ user.user.id }})">
                                             Rafting
                                         </button>
 
-                                        <br/>
-
                                         <button class="bg-main dark:bg-main-night rounded-lg p-2"
                                                 onclick="hardhat({{ user.user.id }})">
                                             Hardhat
                                         </button>
-                                    </td>
 
-                                    <td class="action-cell">
                                         <button class="bg-main dark:bg-main-night rounded-lg p-2"
                                                 onclick="brightspace({{ user.user.id }})">
                                             Brightspace
                                         </button>
 
-                                        <br/>
-
                                         <button class="bg-main dark:bg-main-night rounded-lg p-2"
                                                 onclick="prc({{ user.user.id }})">
                                             PRC
                                         </button>
-                                    </td>
 
-                                    <td class="action-cell">
                                         <button class="bg-main dark:bg-main-night rounded-lg p-2"
                                                 onclick="contract({{ user.user.id }})">
                                             Contract
                                         </button>
-
-                                        <br/>
 
                                         <button class="bg-main dark:bg-main-night rounded-lg p-2"
                                                 onclick="waiver({{ user.user.id }})">
                                             Waiver
                                         </button>
 
-                                        <br/>
-
                                         <button class="bg-main dark:bg-main-night rounded-lg p-2"
                                                 onclick="wt_waiver({{ user.user.id }})">
                                             Wilderness Tours Waiver
                                         </button>
-                                    </td>
-                                {% endif %}
+
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
