@@ -14,4 +14,5 @@ urlpatterns = [
     path('waiver/<int:id>', views.waiver),
     path('wt_waiver/<int:id>', views.wt_waiver),
     path('contract/<int:id>', views.contract),
+    path('paid/<int:id>', views.paid),
 ]
