@@ -26,10 +26,7 @@ def contract(request: HttpRequest, id: int) -> HttpResponse:
     return HttpResponse("User modified! You can close this window!")
 
 @permission_required("common_models.check_in")
-
-# This is currently linked to breakfast unpaid
-# Breakfast paid will be false when the user has paid in full i didn't want to explode the database
-def unpaid(request: HttpRequest, id: int) -> HttpResponse:
+def paid(request: HttpRequest, id: int) -> HttpResponse:
     user = UserDetails.objects.filter(user__id=id).first()  # This is safe as user is a pk
     if user is None:
         return HttpResponse('Failed to find user!')
