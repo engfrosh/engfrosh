@@ -109,12 +109,12 @@
             {% if team.room %}
                 <p style="float:left">
                     {{ team.display_name }} HQ for the day is: <b><a href="https://www.classfind.com/carleton/room/{{ team.room }}" target="_blank">{{ team.room }}</a></b><br>
-                    The quiet room is <b><a href="https://www.classfind.com/carleton/room/ME3356" target="_blank">ME3356</a></b>
+                    The chill zone is <b><a href="https://www.classfind.com/carleton/room/ME3356" target="_blank">ME3356</a></b>
                 </p><br>
             {% endif %}
             {% if details %}
             <!-- <p class="float-right">Your frosh id is: {{ details.frosh_id }}</p> -->
-            <br><br><p>To link your frosh calendar with a calendar app import the calendar from the following URL: <a href={% url "ics_api" uid=details.int_frosh_id %}>https://time.engfrosh.com{% url "ics_api" uid=details.int_frosh_id %}</a></p>
+            <br><br><p>To link your frosh calendar with a calendar app import the calendar from the following URL: <a href={% url "ics_api" uid=details.int_frosh_id %}>https://server.engfrosh.com{% url "ics_api" uid=details.int_frosh_id %}</a></p>
             {% endif %}
             <br>
             <div class="tooltip">
