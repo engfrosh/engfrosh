@@ -104,6 +104,128 @@
             #calendar {
                 overflow-x: scroll;
             }
+            .calendar-subscription {
+                margin: 30px auto;
+                padding: 0 15px;
+                text-align: center;
+                line-height: 1.6;
+            }
+
+            .calendar-subscription p {
+                margin: 0;
+            }
+
+            .calendar-subscription a {
+                color: #c792ff;
+                overflow-wrap: anywhere;
+                text-decoration: underline;
+            }
+
+            .calendar-subscription a:hover {
+                color: #dcadff;
+            }
+
+            .calendar-filter-section {
+                margin: 25px auto;
+                padding: 0 10px;
+            }
+
+            .calendar-filter-label {
+                margin: 0 0 12px;
+                color: #d9e5ef;
+                text-align: center;
+                font-size: 14px;
+            }
+
+            .calendar-filter {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+                max-width: 900px;
+                margin: 0 auto;
+            }
+
+            .calendar-option {
+                position: relative;
+                cursor: pointer;
+                user-select: none;
+            }
+
+            /*
+             * The real checkbox remains available to keyboards and
+             * screen readers but is visually replaced by the pill.
+             */
+            .calendar-option input {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                opacity: 0;
+            }
+
+            .calendar-option span {
+                display: inline-flex;
+                min-height: 42px;
+                align-items: center;
+                justify-content: center;
+                padding: 9px 16px;
+
+                color: #FFFFFF;
+                background: #19384f;
+                border: 2px solid #31516b;
+                border-radius: 8px;
+
+                font-size: 15px;
+
+                transition:
+                    background 0.15s ease,
+                    border-color 0.15s ease,
+                    box-shadow 0.15s ease,
+                    transform 0.15s ease;
+            }
+
+            .calendar-option:hover span {
+                background: #234b68;
+                transform: translateY(-1px);
+            }
+
+            .calendar-option input:checked + span {
+                background: #7d16c9;
+                border-color: #c15cff;
+                box-shadow: 0 0 10px rgba(193, 92, 255, 0.4);
+            }
+
+            .calendar-option input:checked + span::before {
+                content: "✓";
+                margin-right: 7px;
+                font-weight: bold;
+            }
+
+            .calendar-option input:focus-visible + span {
+                outline: 3px solid #FFFFFF;
+                outline-offset: 3px;
+            }
+
+            .calendar-instructions {
+                margin: 20px 0 10px;
+                text-align: center;
+            }
+
+            @media (max-width: 600px) {
+                .calendar-subscription {
+                    margin: 20px auto;
+                }
+
+                .calendar-filter {
+                    gap: 8px;
+                }
+
+                .calendar-option span {
+                    min-height: 44px;
+                    padding: 9px 13px;
+                    font-size: 14px;
+                }
+            }
         </style>
         <div class="bg-background p-2 shadow" style="margin-bottom: 50px;">
             {% if team.room %}
@@ -114,26 +236,69 @@
             {% endif %}
             {% if details %}
             <!-- <p class="float-right">Your frosh id is: {{ details.frosh_id }}</p> -->
-            <br><br><p>To link your frosh calendar with a calendar app import the calendar from the following URL: <a href={% url "ics_api" uid=details.int_frosh_id %}>https://server.engfrosh.com{% url "ics_api" uid=details.int_frosh_id %}</a></p>
+            <div class="calendar-subscription">
+                <p>
+                    To link your frosh calendar with a calendar app,
+                    import the calendar from the following URL:
+                </p>
+
+                <a href="{% url 'ics_api' uid=details.int_frosh_id %}">
+                    https://time.engfrosh.com{% url 'ics_api' uid=details.int_frosh_id %}
+                </a>
+            </div>
             {% endif %}
             <br>
-            <div class="tooltip">
-                <select id="filter" multiple>]
-                    <option value="all" selected>All</option>
-                    <option value="shifts">My Shifts</option>
+
+            <div class="calendar-filter-section">
+                <p class="calendar-filter-label"> Show calendars </p>
+
+                <div
+                    id="filter"
+                    class="calendar-filter"
+                    role="group"
+                    aria-label="Choose calendars to display"
+                >
+                    <label class="calendar-option">
+                        <input
+                            type="checkbox"
+                            value="all"
+                            checked
+                        >
+                        <span>All</span>
+                    </label>
+
+                    <label class="calendar-option">
+                        <input
+                            type="checkbox"
+                            value="shifts"
+                        >
+                        <span>My Shifts</span>
+                    </label>
+
                     {% if perms.common_models.shift_manage %}
-                    <option value="allshifts">All Shifts</option>
+                        <label class="calendar-option">
+                            <input
+                                type="checkbox"
+                                value="allshifts"
+                            >
+                            <span>All Shifts</span>
+                        </label>
                     {% endif %}
+
                     {% for calendar in calendars %}
-                    <option value={{calendar.slug}}>{{calendar.name}}</option>
+                        <label class="calendar-option">
+                            <input type="checkbox" value="{{ calendar.slug }}">
+                            <span>{{ calendar.name }}</span>
+                        </label>
                     {% endfor %}
-                </select>
-                <span class="tooltiptext">Hold CTRL to select multiple</span>
-            </div><br>
-            Click an event to view more details
-            <div id="calendar" class="p-2">
+                </div>
             </div>
+            <p class="calendar-instructions">
+                Click an event to view more details
+            </p>
+            <div id="calendar" class="p-2"></div>
         </div>
+
       
         <script type='text/javascript'>
             $(document).ready(function() {
@@ -167,6 +332,15 @@
                 }
                 var calendar = document.getElementById("calendar");
                 var filter = document.getElementById("filter");
+                function getSelectedCalendars() {
+                    return Array.from(
+                        filter.querySelectorAll(
+                            'input[type="checkbox"]:checked'
+                        )
+                    ).map(function (input) {
+                        return input.value;
+                    });
+                }
                 var obj = new FullCalendar.Calendar(calendar, {
                     initialDate: initDate,
                     height: "auto",
@@ -184,6 +358,7 @@
                             nowIndicator: true
                         }
                     },
+                    /*
                     eventDidMount: function(arg) {
                         var result = [];
                         var options = filter && filter.options;
@@ -199,9 +374,76 @@
                         }
                     },
                 });
+                */
+                    eventDidMount: function (arg) {
+                    var selectedCalendars =
+                            getSelectedCalendars();
+
+                        var matchesCalendar =
+                            selectedCalendars.includes(
+                                arg.event.extendedProps.calendar
+                            );
+
+                        var matchesAll =
+                            selectedCalendars.includes("all") &&
+                            arg.event.extendedProps.all;
+
+                        if (!(matchesCalendar || matchesAll)) {
+                            arg.event.remove();
+                            }
+                        }
+                    }
+                );
                 obj.render();
+                /*
                 filter.addEventListener('change', function() {
                     obj.refetchEvents();
+                    */
+                filter.addEventListener(
+                    "change",
+                    function (event) {
+                        var changedCheckbox = event.target;
+
+                        if (changedCheckbox.type !== "checkbox") {
+                            return;
+                        }
+
+                        var allCheckbox =
+                            filter.querySelector(
+                                'input[value="all"]'
+                            );
+
+                        var individualCheckboxes =
+                            filter.querySelectorAll(
+                                'input[type="checkbox"]:not([value="all"])'
+                            );
+
+                        if (
+                            changedCheckbox.value === "all" &&
+                            changedCheckbox.checked
+                        ) {
+                            individualCheckboxes.forEach(
+                                function (checkbox) {
+                                    checkbox.checked = false;
+                                }
+                            );
+                        }
+
+                        if (
+                            changedCheckbox.value !== "all" &&
+                            changedCheckbox.checked
+                        ) {
+                            allCheckbox.checked = false;
+                        }
+
+                        var checkedCheckboxes =
+                            filter.querySelectorAll(
+                                'input[type="checkbox"]:checked'
+                            );
+
+                        if (checkedCheckboxes.length === 0) {
+                            allCheckbox.checked = true;
+                        }
                 });
             });
         </script>
