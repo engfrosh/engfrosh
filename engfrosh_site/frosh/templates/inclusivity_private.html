@@ -9,17 +9,63 @@
 <script type='text/javascript' src="{% static 'fullcalendar.js' %}"></script>
 {% endblock js_functions %}
 {% block active %}
-<a style="color: #FFFFFF;" class="bg-main dark:bg-main-night rounded p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
-           href="{% url 'user_home' %}">Back</a>
 
-    <div style="color: #FFFFFF;" class="text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
-        <div class="bg-background p-2 shadow">
-            <h1>Open Resources</h1><br>
+<a style="color: #FFFFFF;"
+   class="bg-main dark:bg-main-night rounded p-2 flex-none max-w-fit max-h-fit text-sm mr-2"
+   href="{% url 'user_home' %}">
+    Back
+</a>
+
+<div style="color: #FFFFFF;"
+     class="text-center flex flex-col space-y-3 mx-auto container m-5">
+
+    <div class="bg-background p-4 shadow rounded-lg resource-box">
+        <h1 class="text-2xl mb-5">Open Resources</h1>
+        <div class="resource-list">
             {% for p in pages %}
-                <div>
-                    <a href={{ p.file.url }}>{{ p.name }}</a>
-                </div><br>
+                <a href="{{ p.file.url }}" class="resource-link"> {{ p.name }} </a>
             {% endfor %}
         </div>
     </div>
+</div>
+
+<style>
+    .resource-box {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .resource-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 650px;
+        margin: 0 auto;
+    }
+
+    .resource-link {
+        display: block;
+        padding: 12px 16px;
+
+        color: #FFFFFF;
+        background: #19384f;
+        border: 2px solid #31516b;
+        border-radius: 8px;
+
+        text-decoration: none;
+
+        transition:
+            background 0.15s ease,
+            border-color 0.15s ease,
+            transform 0.15s ease;
+    }
+
+    .resource-link:hover {
+        color: #FFFFFF;
+        background: #234b68;
+        border-color: #c15cff;
+        transform: translateY(-1px);
+    }
+</style>
+
 {% endblock active %}
