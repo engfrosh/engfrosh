@@ -13,7 +13,7 @@
 {% endblock js_functions %}
 {% block active %}
     <div style="color: #FFFFFF;" class="text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
-        <img src="{{ HEADER_IMAGE_URL }}" alt="EngFrosh Header Logo"  style="width: 90vw; max-width: 1200px; height: auto; align-self: center;>
+        <img src="{{ HEADER_IMAGE_URL }}" alt="EngFrosh Header Logo"  style="width: 90vw; max-width: 1200px; height: auto; align-self: center;">
         <div>
             <div class="mx-auto max-w-4xl">
                 {% if scavenger_enabled %}
@@ -48,6 +48,11 @@
                 class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Team Skash</a>
                 <a href="{% url 'inclusivity_private' %}"
                 class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Wellness Resources</a>
+                {% if request.user.is_staff or perms.common_models.view_links or perms.common_models.facil_signup or perms.common_models.view_discord_nicks or perms.common_models.frosh_list or headplanning or perms.common_models.view_randall %}
+                    <div class="staff-divider">
+                        <span>STAFF TOOLS</span>
+                    </div>
+                {% endif %}
                 {% if request.user.is_staff %}
                     <a href="{% url 'manage_index' %}"
                     class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Management</a>
@@ -82,6 +87,30 @@
             <br>
         </div>
         <style>
+            .staff-divider {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+
+                max-width: 950px;
+                margin: 34px auto 20px;
+
+                color: #c792ff;
+                font-size: 14px;
+                font-weight: 700;
+                letter-spacing: 0.16em;
+            }
+            .staff-divider::before,
+            .staff-divider::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: #6b3a8c;
+            }
+            
+            .staff-divider span {
+                white-space: nowrap;
+            }
             :root {
                 --fc-page-bg-color: #8305c8;
             }
