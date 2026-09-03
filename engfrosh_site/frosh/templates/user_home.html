@@ -385,8 +385,7 @@
                             );
 
                         var matchesAll =
-                            selectedCalendars.includes("all") &&
-                            arg.event.extendedProps.all;
+                            selectedCalendars.includes("all");
 
                         if (!(matchesCalendar || matchesAll)) {
                             arg.event.remove();
@@ -444,6 +443,8 @@
                         if (checkedCheckboxes.length === 0) {
                             allCheckbox.checked = true;
                         }
+                        
+                        obj.refetchEvents();
                 });
             });
         </script>
