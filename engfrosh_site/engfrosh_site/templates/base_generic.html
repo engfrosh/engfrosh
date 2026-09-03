@@ -16,24 +16,30 @@
             {% block style %}
             {% endblock style %}
         </style>
+
         <title>
             {% block page_title %}
                 DEFAULT page_title
             {% endblock page_title %}
         </title>
+
         {% csrf_token %}
         <script>const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;</script>
         <script src="{% static 'functions.js' %}"></script>
+
         {% block js_functions %}
         {% endblock js_functions %}
+
         {% block page_style %}
         {% endblock page_style %}
+
         <style>
             html {
                 position: relative;
                 min-height: 100%;
                 height: 100%;
             }
+
             body {
                 background-image: url("{{ BACKGROUND_IMAGE_URL }}");
                 background-repeat: repeat;
@@ -42,53 +48,79 @@
                 position: relative;
                 min-height: 100%;
                 height: auto;
-                margin-bottom: 80px;
+
+                /*
+                 * CHANGED:
+                 * Removed margin-bottom: 80px.
+                 *
+                 * The footer can now change height on mobile without
+                 * overlapping the page.
+                 */
             }
+
             main {
                 padding: 15px;
+
+                /*
+                 * CHANGED:
+                 * Removed margin-bottom: 80px.
+                 *
+                 * The body is already a flex column and main has
+                 * flex-grow, so the footer naturally stays at the bottom.
+                 */
             }
+
+            /*
+             * CHANGED:
+             * The footer no longer needs absolute positioning.
+             */
             footer {
-                position: absolute;
-                bottom: 0;
                 width: 100%;
-                left: 0;
             }
+
             input[type=text], textarea, input[type=number] {
                 color: black;
             }
+
             select {
                 color: black;
             }
-            .bg-main, .bg-main-night{
+
+            .bg-main, .bg-main-night {
                 background-color: #0b2a41;
             }
+
             .bg-orange {
                 background-color: #a85800;
             }
+
             .bg-background {
                 background-color: #0b2a41;
                 padding: 20px;
             }
+
             .shadow {
                 box-shadow: 0 0 10px 1px rgba(0,0,0,0.8);
             }
+
             #calender {
-                padding:8px;
+                padding: 8px;
             }
+
             h1 {
                 font-size: larger;
             }
-            main {
-                margin-bottom: 80px;
-            }
+
             tr:nth-of-type(even) {
-                background:#d40eee3d;
+                background: #d40eee3d;
             }
+
             .tooltip {
                 position: relative;
                 display: inline-block;
                 border-bottom: 1px dotted black;
             }
+
             .tooltiptext {
                 visibility: hidden;
                 width: 120px;
@@ -103,6 +135,7 @@
                 left: 50%;
                 margin-left: -60px;
             }
+
             .tooltip .tooltiptext::after {
                 content: "";
                 position: absolute;
@@ -113,43 +146,231 @@
                 border-style: solid;
                 border-color: black transparent transparent transparent;
             }
+
             .tooltip:hover .tooltiptext {
                 visibility: visible;
             }
-            a.rounded-lg{
+
+            a.rounded-lg {
                 cursor: pointer;
                 color: white;
                 transition: 0.3s;
             }
-            a.rounded-lg:hover{
+
+            a.rounded-lg:hover {
                 background-color: rgb(243, 174, 228);
-                background-color:#4e0079;
+                background-color: #4e0079;
+            }
+
+
+            /*
+             * ============================================================
+             * CHANGED: FOOTER STYLING
+             * ============================================================
+             */
+
+            .site-footer {
+                /*
+                 * Pale background so the existing sponsor images can
+                 * remain completely unchanged.
+                 */
+                background-color: #eef7f5;
+                color: #0b2a41;
+
+                border-top: 4px solid #7d16c9;
+
+                padding: 30px 20px;
+            }
+
+            .footer-inner {
+                width: 100%;
+                max-width: 1100px;
+
+                margin: 0 auto;
+            }
+
+            /*
+             * Sponsor logos
+             */
+            .footer-logos {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-wrap: wrap;
+
+                gap: 30px 45px;
+            }
+
+            .footer-logo-link {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .footer-logo {
+                display: block;
+
+                width: auto;
+                height: auto;
+
+                max-width: 240px;
+                max-height: 70px;
+
+                object-fit: contain;
+            }
+
+            /*
+             * Line separating branding from footer navigation.
+             */
+            .footer-divider {
+                width: 100%;
+                height: 1px;
+
+                margin: 25px 0 18px;
+
+                background-color: rgba(11, 42, 65, 0.18);
+            }
+
+            /*
+             * Email + resource links
+             */
+            .footer-info {
+                text-align: center;
+                font-size: 16px;
+                line-height: 1.8;
+            }
+
+            .footer-info a {
+                color: #0b2a41;
+                text-decoration: none;
+            }
+
+            .footer-info a:hover,
+            .footer-info a:focus-visible {
+                text-decoration: underline;
+            }
+
+            .footer-links {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                gap: 10px;
+
+                margin-top: 3px;
+            }
+
+            .footer-links a {
+                color: #087f78;
+                font-weight: 600;
+            }
+
+            .footer-link-separator {
+                color: #7d16c9;
+            }
+
+            /*
+             * Mobile
+             */
+            @media (max-width: 700px) {
+                .site-footer {
+                    padding: 28px 16px;
+                }
+
+                .footer-logos {
+                    flex-direction: column;
+                    gap: 24px;
+                }
+
+                .footer-logo {
+                    max-width: 210px;
+                    max-height: 65px;
+                }
+
+                .footer-divider {
+                    margin: 24px 0 16px;
+                }
+            }
+
+            @media (max-width: 400px) {
+                .footer-logo {
+                    max-width: 180px;
+                    max-height: 55px;
+                }
+
+                .footer-info {
+                    font-size: 15px;
+                }
             }
         </style>
     </head>
+
     <body class="bg-white dark:bg-background-night text-white dark:border-slate-400 dark:shadow-slate-400 shadow-black min-h-screen flex flex-col">
+
         <main class="flex-grow">
             {% block body %}
                 DEFAULT body
             {% endblock body %}
         </main>
+
+
         {% block footer %}
-        <footer class="bg-main text-center" style="color: #000000; background-color: #00b8a5; opacity: 0.8; padding-top: 20px; padding-bottom: 20px;">
-            <div>
-            {% for sponsor in sponsors %}
-                {% if sponsor.footer %}
-                    <a href="{{ sponsor.link }}"><img class="inline-block" style="width: 15%;" src="{{ sponsor.image.url }}"></img></a>
-                {% endif %}
-            {% endfor %}
-            <div class="inline-block" style="color: #000000;>
-                <a href="mailto:websupport@engfrosh.com">websupport@engfrosh.com</a><br>
-                <a href="{% url 'inclusivity_public' %}">Resources</a> | 
-                <a href="{% url 'sponsors' %}">Sponsors</a>
-            </div>
+
+        <footer class="site-footer">
+            <div class="footer-inner">
+
+                <div class="footer-logos">
+                    {% for sponsor in sponsors %}
+                        {% if sponsor.footer %}
+                            <a
+                                class="footer-logo-link"
+                                href="{{ sponsor.link }}"
+                            >
+                                <img
+                                    class="footer-logo"
+                                    src="{{ sponsor.image.url }}"
+                                    alt="{{ sponsor.name }}"
+                                >
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+
+                <div class="footer-divider"></div>
+
+
+                <div class="footer-info">
+                    <a href="mailto:websupport@engfrosh.com">
+                        websupport@engfrosh.com
+                    </a>
+
+                    <div class="footer-links">
+                        <a href="{% url 'inclusivity_public' %}">
+                            Resources
+                        </a>
+
+                        <span
+                            class="footer-link-separator"
+                            aria-hidden="true"
+                        >
+                            •
+                        </span>
+
+                        <a href="{% url 'sponsors' %}">
+                            Sponsors
+                        </a>
+                    </div>
+                </div>
+
             </div>
         </footer>
+
         {% endblock footer %}
+
+
         {% block page_js %}
         {% endblock page_js %}
+
     </body>
 </html>
