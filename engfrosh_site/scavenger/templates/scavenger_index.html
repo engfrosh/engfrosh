@@ -146,6 +146,48 @@
         height: 150px;
         color: #ffffff;
     }
+    .scav-info {
+    max-width: 900px;
+    margin: 24px;
+    padding: 20px 24px;
+
+    background: rgba(10, 25, 55, 0.85);
+    border: 1px solid #7d4ac7;
+    border-radius: 12px;
+
+    color: white;
+    text-align: left;
+    }
+    
+    .scav-info p {
+        margin: 8px 0;
+        font-size: 18px;
+    }
+    
+    .scav-info strong {
+        color: #c792ff;
+    }
+    
+    .scav-view-button {
+        margin-bottom: 16px;
+        padding: 9px 16px;
+    
+        color: white;
+        background: #19384f;
+        border: 2px solid #31516b;
+        border-radius: 8px;
+    
+        cursor: pointer;
+    }
+    
+    .scav-view-button:hover {
+        background: #234b68;
+    }
+    
+    .scav-warning {
+        color: #ef4444;
+        font-weight: 600;
+    }
     footer {
         display: none;
     }
@@ -218,23 +260,32 @@ function viewSwitch(){
     }
 }
 </script>
-    <div class="topText">
+<div class="topText scav-info">
     {% if not team %}
-        You are not part of a team
+        <p>You are not part of a team</p>
     {% else %}
-    <button onclick="viewSwitch();">Change View</button><br>
-        Here is your team:
-        {{ team.display_name }}<br>
-        Free hints: {{ team.free_hints }}<br>
+        <button onclick="viewSwitch();" class="scav-view-button">Change View</button>
+
+        <p>Here is your team:
+            <strong>{{ team.display_name }}</strong>
+        </p>
+
+        <p>Free hints:
+            <strong>{{ team.free_hints }}</strong>
+        </p>
+
         {% if bypass %}
-            <h1 class="text-red-600 text-xl">Warning: Scav rule bypass is enabled!</h1>
+            <p class="scav-warning">Warning: Scav rule bypass is enabled!</p>
         {% endif %}
+
         {% if team.scavenger_finished %}
             <h1 class="text-5xl">Congratulation on Completing Scav!</h1>
         {% else %}
             {% if not scavenger_enabled_for_team %}
-                Scavenger is not currently enabled
+                <p>Scavenger is not currently enabled</p>
             {% endif %}
+        {% endif %}
+    {% endif %}
     </div>
             <div id="imgframe">
                 <!-- Help Button -->
