@@ -12,8 +12,8 @@
 <script type='text/javascript' src="{% static 'fullcalendar.js' %}"></script>
 {% endblock js_functions %}
 {% block active %}
-    <img src="{{ HEADER_IMAGE_URL }}" alt="EngFrosh Header Logo"  style="width: 70vw; max-width: 1200px; height: auto; align-self: center;">
-    <div style="color: #FFFFFF;" class="text-center flex flex-col space-y-3 mx-auto container w-50% m-5 inline-block">
+    <div style="color: #FFFFFF;" class="text-center flex flex-col space-y-3 mx-auto w-full m-5">
+        <img src="{{ HEADER_IMAGE_URL }}" alt="EngFrosh Header Logo"  style="width: 100%; max-width: 1200px; height: auto; align-self: center;">
         <div>
             <div class="mx-auto max-w-4xl">
                 {% if scavenger_enabled %}
