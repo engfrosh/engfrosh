@@ -21,6 +21,7 @@
 
     <div class="bg-background p-4 shadow rounded-lg resource-box">
         <h1 class="text-2xl mb-5">Open Resources</h1>
+        <div class="resource-divider"></div>
         <div class="resource-list">
             {% for p in pages %}
                 <a href="{{ p.file.url }}" class="resource-link"> {{ p.name }} </a>
@@ -34,6 +35,13 @@
         max-width: 900px;
         margin: 0 auto;
     }
+   
+   .resource-divider {
+       height: 1px;
+       background: #6b3a8c;
+       max-width: 650px;
+       margin: 16px auto 22px;
+   }
 
     .resource-list {
         display: flex;
