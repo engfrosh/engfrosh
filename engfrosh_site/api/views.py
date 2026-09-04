@@ -18,14 +18,6 @@ logger = logging.getLogger("api.views")
 
 def get_events(user):
     calendars = set()
-
-    # Explicitly enable frosh calendar for facils and heads because they couldn't see it
-    # This probably shouldn't be a permanent change and can be removed 
-    if user.groups.filter(name__in=["Heads", "Facils"]).exists():
-        frosh_calendar = Calendar.objects.filter(slug="frosh").first()
-    if frosh_calendar:
-            calendars.add(frosh_calendar)
-    ## End
     
     for group in user.groups.all():
         try:
