@@ -24,16 +24,14 @@
                 {% else %}
                     <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2 inline-block m-2">No Scav Team</a>
                 {% endif %}
-                {% comment %}
                 {% if trade_up_enabled %}
-                    <a href="https://forms.gle/fjZJo2U6x68RBeE29"
+                    <a href="https://docs.google.com/forms/d/1ZCy5M8wuGrrnoY1ut2JYQa4kvkAkJWLdpSXa1kU_vzM/edit?usp=drivesdk"
                         class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Trade Up</a>
                 {% elif trade_up_disabled %}
                     <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2 inline-block m-2">Trade Up Disabled</a>
                 {% else %}
                     <a class="bg-red-600 dark:bg-red-600 rounded-lg p-2 inline-block m-2">No Trade Up Team</a>
                 {% endif %}
-                {% endcomment %}
                 <a href="{% url 'view_faq' id=0 %}"
                     class="bg-main dark:bg-main-night rounded-lg p-2 inline-block m-2">Event Information</a>
                 {% if link_discord %}
