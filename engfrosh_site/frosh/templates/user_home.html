@@ -258,7 +258,9 @@
             {% if team.room %}
                 <p style="text-align: center;">
                     {{ team.display_name }} HQ for the day is: <b><a href="https://www.classfind.com/carleton/room/{{ team.room }}" target="_blank">{{ team.room }}</a></b><br>
-                    The chill zone is <b><a href="https://www.classfind.com/carleton/room/ME3356" target="_blank">ME3356</a></b>
+                    {% if chill_zone %}
+                        The chill zone is <b><a href="https://www.classfind.com/carleton/room/{{ chill_zone }}" target="_blank">{{chill_zone}}</a></b>
+                    {% endif %}
                 </p><br>
             {% endif %}
             <div class="staff-divider">Calendar</div>
