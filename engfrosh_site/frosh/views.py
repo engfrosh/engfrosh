@@ -174,6 +174,7 @@ def upload_charter(request: HttpRequest) -> HttpResponse:
 def user_home(request: HttpRequest) -> HttpResponse:
     """The home page for regular users."""
 
+    chill_zone = Setting.objects.get_or_create(id="chill_zone", defaults={"value": "NA"})[0]
     rand = random.randint(0, 3)
     roll = Setting.objects.get_or_create(id="Rick Roll", defaults={"value": "Darwin_J-gwktdVor"})[0]
     if request.user.username != roll.value:
@@ -228,6 +229,7 @@ def user_home(request: HttpRequest) -> HttpResponse:
         "upload_charter": upload_charter,
         "headplanning": headplanning,
         "team": team,
+        "chill_zone": chill_zone,
         "sponsors": SponsorLogo.objects.all()
     }
 
